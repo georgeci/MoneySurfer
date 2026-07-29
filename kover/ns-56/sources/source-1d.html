@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionTypeUi</title>
+  <title>MoneySurfer Coverage Report > TransactionSplitTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,67 +22,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionTypeUi (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionSplitTestTags (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionTypeUi</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">TransactionSplitTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (24/24)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -94,153 +46,207 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_category_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_add_line
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_category_placeholder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_enable
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_over
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_remainder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_remove_line
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_total
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-<b class="fc">&nbsp;enum class TransactionTypeUi { Expense, Income, Transfer }</b>
+&nbsp;/** Stable selectors for the split editor — see docs/testing/testing-strategy.md. */
+&nbsp;object TransactionSplitTestTags {
+&nbsp;    const val Toggle = &quot;transactionCreation:split:toggle&quot;
+&nbsp;    const val AddLine = &quot;transactionCreation:split:addLine&quot;
 &nbsp;
-&nbsp;@optics
-&nbsp;sealed interface TransactionCreationState {
-&nbsp;    data object Loading : TransactionCreationState
-&nbsp;
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        val amount: String,
-&nbsp;        val note: String,
-&nbsp;        val type: TransactionTypeUi,
-&nbsp;        val accounts: List&lt;Account&gt;,
-&nbsp;        val categories: List&lt;Category&gt;,
-&nbsp;        val selectedAccount: Account?,
-&nbsp;        val selectedCategory: Category?,
-&nbsp;        val isEditMode: Boolean,
-&nbsp;        val editingTransactionId: TransactionId?,
-&nbsp;        /** Non-null only in edit mode: the stored row behind the identity band. */
-&nbsp;        val editIdentity: TransactionEditIdentity? = null,
-&nbsp;        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
-&nbsp;        val showDeleteConfirmation: Boolean = false,
-&nbsp;        val editingCreatedAt: kotlin.time.Instant? = null,
-&nbsp;        // Original `operationDate` from the persisted transaction. Preserved across
-&nbsp;        // edits unless the user explicitly picks a new date — otherwise a timezone
-&nbsp;        // change between the original save and the edit would silently shift the
-&nbsp;        // stored business date.
-&nbsp;        val pinnedOperationDate: LocalDate? = null,
-&nbsp;        /**
-&nbsp;         * Fields of the transaction being edited that this form cannot change but must not
-&nbsp;         * destroy — see [PreservedTransactionFields].
-&nbsp;         */
-&nbsp;        val preserved: PreservedTransactionFields = PreservedTransactionFields(),
-&nbsp;        val timestamp: Long,
-&nbsp;        val categoryUsageCounts: Map&lt;CategoryId, Int&gt;,
-&nbsp;        val displayCategories: List&lt;Category&gt;,
-&nbsp;        val fromAccount: Account? = null,
-&nbsp;        val toAccount: Account? = null,
-&nbsp;        val toAmount: String = &quot;&quot;,
-&nbsp;        val transferEnabled: Boolean = true,
-&nbsp;        /**
-&nbsp;         * Lines of the split editor, or empty when the form is entering an ordinary single-category
-&nbsp;         * transaction. Non-empty is what &quot;the user asked to split this&quot; means — there is no separate
-&nbsp;         * flag that could disagree with the lines.
-&nbsp;         */
-&nbsp;        val splitLines: List&lt;TransactionSplitLineUi&gt; = emptyList(),
-&nbsp;    ) : TransactionCreationState {
-&nbsp;        val isExpense: Boolean get() = type == TransactionTypeUi.Expense
-&nbsp;        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer
-&nbsp;
-&nbsp;        /** Whether the form is entering one receipt across several categories. */
-&nbsp;        val isSplit: Boolean get() = splitLines.isNotEmpty()
-&nbsp;
-&nbsp;        /**
-&nbsp;         * Whether the row being edited is one leg of a stored receipt. Distinct from [isSplit],
-&nbsp;         * which is about the editor being open: an edit never opens it, but deleting from here
-&nbsp;         * still takes the whole group, and the confirmation has to say so.
-&nbsp;         */
-&nbsp;        val isEditingSplitLeg: Boolean get() = isEditMode &amp;&amp; preserved.splitId != null
-&nbsp;
-&nbsp;        /**
-&nbsp;         * The receipt total: what the amount hero holds, which is also what the legs must add up to.
-&nbsp;         * Unparseable input is zero here — the amount field flags it on its own.
-&nbsp;         */
-&nbsp;        val splitTotal: Money
-&nbsp;            get() = Money.fromDouble(TransactionAmountInput.parse(amount) ?: 0.0).abs()
-&nbsp;
-&nbsp;        /**
-&nbsp;         * What is left for the last line after every line above it. May be negative, which is the
-&nbsp;         * &quot;over the amount&quot; state the editor reports and Save refuses.
-&nbsp;         */
-&nbsp;        val splitRemainder: Money
-&nbsp;            get() = splitLines.dropLast(1)
-&nbsp;                .fold(splitTotal) { left, line -&gt; left - line.enteredMoney() }
-&nbsp;
-&nbsp;        /**
-&nbsp;         * Every line&#39;s money, in line order, with the last line holding the remainder — the legs
-&nbsp;         * a save would write. Only meaningful once [isSplitComplete] holds.
-&nbsp;         */
-&nbsp;        val splitAmounts: List&lt;Money&gt;
-&nbsp;            get() = splitLines.dropLast(1).map { it.enteredMoney() } + listOfNotNull(
-&nbsp;                splitRemainder.takeIf { splitLines.isNotEmpty() },
-&nbsp;            )
-&nbsp;
-&nbsp;        /**
-&nbsp;         * Whether the lines describe a receipt that can be written: at least two of them, each
-&nbsp;         * filed under a category and carrying a positive amount. The remainder line is what makes
-&nbsp;         * the last condition non-trivial — assign more than the total above it and it goes negative.
-&nbsp;         */
-&nbsp;        val isSplitComplete: Boolean
-&nbsp;            get() = splitLines.size &gt;= MIN_SPLIT_LINES &amp;&amp;
-&nbsp;                splitLines.all { it.category != null } &amp;&amp;
-&nbsp;                splitAmounts.all { it.isPositive() }
-&nbsp;        val crossCurrency: Boolean
-&nbsp;            get() = isTransfer &amp;&amp;
-&nbsp;                fromAccount != null &amp;&amp;
-&nbsp;                toAccount != null &amp;&amp;
-&nbsp;                fromAccount.currencyCode != toAccount.currencyCode
-&nbsp;
-&nbsp;        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
-&nbsp;        val amountError: TransactionAmountError?
-&nbsp;            get() = TransactionAmountInput.errorFor(amount)
-&nbsp;
-&nbsp;        /** Inline validation error for the cross-currency &quot;to&quot; amount, or null when it is acceptable. */
-&nbsp;        val toAmountError: TransactionAmountError?
-&nbsp;            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null
-&nbsp;
-&nbsp;        val isSaveEnabled: Boolean
-&nbsp;            get() = when {
-&nbsp;                isTransfer -&gt;
-&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                        (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &amp;&amp;
-&nbsp;                        fromAccount != null &amp;&amp; toAccount != null &amp;&amp;
-&nbsp;                        fromAccount.id != toAccount.id
-&nbsp;                isSplit -&gt;
-&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                        selectedAccount != null &amp;&amp;
-&nbsp;                        isSplitComplete
-&nbsp;                else -&gt;
-&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                        selectedAccount != null &amp;&amp;
-&nbsp;                        selectedCategory != null
-&nbsp;            }
-&nbsp;
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object
+&nbsp;    /** One line&#39;s amount field, suffixed with the line&#39;s index. */
+&nbsp;    const val LineAmountPrefix = &quot;transactionCreation:split:amount:&quot;
 &nbsp;}
 &nbsp;
-&nbsp;/** Fewer lines than this is an ordinary transaction, not a split. */
-&nbsp;const val MIN_SPLIT_LINES: Int = 2
+&nbsp;/**
+&nbsp; * Turns the single-category form into a receipt filed under several categories, and back.
+&nbsp; *
+&nbsp; * Offered on creation only. Converting a stored transaction into a group would mean deleting the
+&nbsp; * row and writing N in its place — new ids, a different thing to sync — which is a larger change
+&nbsp; * than an edit screen should make behind one toggle.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SplitToggleRow(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    if (state.isEditMode) return
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalArrangement = Arrangement.End,
+&nbsp;    ) {
+&nbsp;        SurferButton(
+&nbsp;            text = stringResource(Res.string.transaction_creation_split_enable),
+&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnSplitToggled) },
+&nbsp;            style = if (state.isSplit) SurferButtonStyle.Tonal else SurferButtonStyle.Text,
+&nbsp;            // Deliberately the smallest size: this row sits between the category grid and the note
+&nbsp;            // field on a scrolling form, and every dp it adds pushes the note (and the Save button
+&nbsp;            // the flows tap) further under the keyboard on a short screen.
+&nbsp;            size = SurferButtonSize.Small,
+&nbsp;            startIcon = SurferIcons.Category,
+&nbsp;            modifier = Modifier.testTag(TransactionSplitTestTags.Toggle),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The line&#39;s typed amount as money, zero for anything unparseable — the editor shows what is left
-&nbsp; * to assign rather than an inline error per line, so a half-typed figure simply counts as nothing
-&nbsp; * yet.
+&nbsp; * The lines a split will be written as: a category and a slice of the amount each.
+&nbsp; *
+&nbsp; * The **last** line is not editable — it always carries whatever is left of the amount above. That
+&nbsp; * is what makes the legs add up by construction: there is no way to save a receipt whose parts do
+&nbsp; * not sum to the payment, and no arithmetic for the user to redo when they change one line.
 &nbsp; */
-&nbsp;private fun TransactionSplitLineUi.enteredMoney(): Money =
-&nbsp;    Money.fromDouble(TransactionAmountInput.parse(amount) ?: 0.0).abs()
+&nbsp;@Composable
+&nbsp;internal fun SplitLinesBlock(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val currency = state.selectedAccount?.currencyCode ?: CurrencyCode(&quot;USD&quot;)
+&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small)) {
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.transaction_creation_split_title),
+&nbsp;            style = AppTheme.typography.titleSmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;        )
+&nbsp;        state.splitLines.forEachIndexed { index, line -&gt;
+&nbsp;            SplitLineRow(
+&nbsp;                line = line,
+&nbsp;                index = index,
+&nbsp;                // Only the trailing line is derived; every line above it is the user&#39;s to type.
+&nbsp;                remainderFormatted = if (index == state.splitLines.lastIndex) {
+&nbsp;                    MoneyFormatter.format(state.splitRemainder, currency)
+&nbsp;                } else {
+&nbsp;                    null
+&nbsp;                },
+&nbsp;                onEvent = onEvent,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        SurferButton(
+&nbsp;            text = stringResource(Res.string.transaction_creation_split_add_line),
+&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnSplitLineAdded) },
+&nbsp;            style = SurferButtonStyle.Text,
+&nbsp;            size = SurferButtonSize.Biggest,
+&nbsp;            startIcon = SurferIcons.Add,
+&nbsp;            modifier = Modifier.testTag(TransactionSplitTestTags.AddLine),
+&nbsp;        )
+&nbsp;        SplitStatusLine(state = state, currency = currency)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SplitLineRow(
+&nbsp;    line: TransactionSplitLineUi,
+&nbsp;    index: Int,
+&nbsp;    remainderFormatted: String?,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;    ) {
+&nbsp;        SurferPickerRow(
+&nbsp;            label = stringResource(Res.string.transaction_creation_category_label),
+&nbsp;            value = line.category?.name
+&nbsp;                ?: stringResource(Res.string.transaction_creation_split_category_placeholder),
+&nbsp;            icon = SurferIcons.Category,
+&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnOpenSplitLineCategoryChooser(line.key)) },
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;        OutlinedTextField(
+&nbsp;            value = remainderFormatted ?: line.amount,
+&nbsp;            onValueChange = { typed -&gt;
+&nbsp;                onEvent(TransactionCreationEvent.OnSplitLineAmountChanged(line.key, typed))
+&nbsp;            },
+&nbsp;            label = { Text(stringResource(Res.string.transaction_creation_amount_label)) },
+&nbsp;            singleLine = true,
+&nbsp;            readOnly = remainderFormatted != null,
+&nbsp;            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+&nbsp;            shape = AppTheme.shapes.extraSmall,
+&nbsp;            modifier = Modifier
+&nbsp;                .width(SPLIT_AMOUNT_FIELD_WIDTH)
+&nbsp;                .testTag(TransactionSplitTestTags.LineAmountPrefix + index),
+&nbsp;        )
+&nbsp;        IconButton(onClick = { onEvent(TransactionCreationEvent.OnSplitLineRemoved(line.key)) }) {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Close,
+&nbsp;                contentDescription = stringResource(Res.string.transaction_creation_split_remove_line),
+&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * How the lines stand against the amount. Over-assigning is the only state the editor calls out in
+&nbsp; * error colour — a positive remainder is simply a line the user has not filled in yet.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun SplitStatusLine(state: TransactionCreationState.Content, currency: CurrencyCode) {
+&nbsp;    val remainder = state.splitRemainder
+&nbsp;    val overAssigned = remainder.isNegative()
+&nbsp;    val text = when {
+&nbsp;        overAssigned -&gt; stringResource(
+&nbsp;            Res.string.transaction_creation_split_over,
+&nbsp;            MoneyFormatter.format(remainder.abs(), currency),
+&nbsp;        )
+&nbsp;        remainder.isZero() -&gt; stringResource(
+&nbsp;            Res.string.transaction_creation_split_total,
+&nbsp;            MoneyFormatter.format(state.splitTotal, currency),
+&nbsp;            MoneyFormatter.format(state.splitTotal, currency),
+&nbsp;        )
+&nbsp;        else -&gt; stringResource(
+&nbsp;            Res.string.transaction_creation_split_remainder,
+&nbsp;            MoneyFormatter.format(remainder, currency),
+&nbsp;        )
+&nbsp;    }
+&nbsp;    Text(
+&nbsp;        text = text,
+&nbsp;        style = AppTheme.typography.bodySmall,
+&nbsp;        color = if (overAssigned) {
+&nbsp;            AppTheme.materialColors.error
+&nbsp;        } else {
+&nbsp;            AppTheme.materialColors.onSurfaceVariant
+&nbsp;        },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Wide enough for a five-figure amount without stealing the category picker&#39;s room. */
+&nbsp;private val SPLIT_AMOUNT_FIELD_WIDTH = 132.dp
 </code>
 </pre>
 </div>
@@ -264,7 +270,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InitialBalanceInputKt</title>
+  <title>MoneySurfer Coverage Report > AccountCreationTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,74 +22,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.account.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: InitialBalanceInputKt (com.georgeci.moneysurfer.feature.account.creation)</h1>
+<h1>Coverage Summary for Class: AccountCreationTestTags (com.georgeci.moneysurfer.feature.account.creation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">InitialBalanceInputKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
+  <td class="name">AccountCreationTestTags</td>
+    <td class="coverageStat"/>
 </tr>
 
 </table>
@@ -101,64 +46,552 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.creation
 &nbsp;
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.ExperimentalLayoutApi
+&nbsp;import androidx.compose.foundation.layout.FlowRow
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.saveable.rememberSaveable
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.font.FontFamily
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetails
+&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.feature.account.extraDetailLabel
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_add_another_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_error_negative
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_helper
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_cancel
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_search_placeholder
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_custom_field_add
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_custom_field_dialog_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_custom_field_name_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_optional
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_custom
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_first_run_subtitle
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_first_run_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_error_required
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_remove
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_remove_content_description
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_save
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_label
+&nbsp;import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
+&nbsp;import com.georgeci.moneysurfer.feature.account.labelRes
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferTextField
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFormSection
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/**
-&nbsp; * Input filtering + validation for the account creation &quot;Opening balance&quot; field.
-&nbsp; * Lives outside the ViewModel so the parsing rules can be unit-tested directly.
-&nbsp; */
-&nbsp;object InitialBalanceInput {
+&nbsp;/** Stable selectors for the account creation screen — see docs/testing/testing-strategy.md. */
+&nbsp;object AccountCreationTestTags {
+&nbsp;    const val Root = &quot;accountCreation:root&quot;
+&nbsp;    const val Name = &quot;accountCreation:name&quot;
+&nbsp;    const val OpeningBalance = &quot;accountCreation:openingBalance&quot;
+&nbsp;    const val Iban = &quot;accountCreation:iban&quot;
+&nbsp;    const val Save = &quot;accountCreation:save&quot;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Reduces a raw text-field value to a parseable money string: digits, an
-&nbsp;     * optional leading minus, and at most one decimal separator (&#39;,&#39; normalised
-&nbsp;     * to &#39;.&#39;). Letters and any extra separators are dropped, so the field can
-&nbsp;     * never hold an unparseable amount.
+&nbsp;     * Chip that *adds* an extra-detail field, suffixed with the lowercased
+&nbsp;     * [AccountExtraDetailKey]. Distinct from the field it creates ([Iban]): both carry the same
+&nbsp;     * label, so a text selector cannot tell &quot;add IBAN&quot; from &quot;type into IBAN&quot;.
 &nbsp;     */
-&nbsp;    fun sanitize(raw: String): String {
-&nbsp;        val negative = raw.startsWith(&#39;-&#39;)
-&nbsp;        val digits = StringBuilder()
-&nbsp;        var separatorUsed = false
-&nbsp;        for (ch in raw) {
-&nbsp;            when {
-&nbsp;                ch.isDigit() -&gt; digits.append(ch)
-&nbsp;                (ch == &#39;.&#39; || ch == &#39;,&#39;) &amp;&amp; !separatorUsed -&gt; {
-&nbsp;                    separatorUsed = true
-&nbsp;                    digits.append(&#39;.&#39;)
-&nbsp;                }
-&nbsp;            }
+&nbsp;    const val AddExtraDetailPrefix = &quot;accountCreation:addExtra:&quot;
+&nbsp;
+&nbsp;    /** Account-type option, suffixed with the lowercased [AccountType]. */
+&nbsp;    const val TypePrefix = &quot;accountCreation:type:&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun AccountCreationScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToDashboard: () -&gt; Unit = {},
+&nbsp;    accountId: com.georgeci.moneysurfer.domain.primitives.AccountId? = null,
+&nbsp;    firstRun: Boolean = false,
+&nbsp;    initialType: AccountType = AccountType.SAVINGS,
+&nbsp;    viewModel: AccountCreationViewModel = koinViewModel(
+&nbsp;        key = accountId?.value.orEmpty(),
+&nbsp;    ) { org.koin.core.parameter.parametersOf(accountId, firstRun, initialType) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            AccountCreationEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            AccountCreationEffect.NavigateToDashboard -&gt; onNavigateToDashboard()
 &nbsp;        }
-&nbsp;        return if (negative) &quot;-$digits&quot; else digits.toString()
 &nbsp;    }
 &nbsp;
-&nbsp;    /** Parses a [sanitize]d value to a [Double], or null while it is still incomplete (e.g. &quot;&quot; or &quot;-&quot;). */
-&nbsp;    fun parse(value: String): Double? = value.toDoubleOrNull()
+&nbsp;    when (val current = state) {
+&nbsp;        is AccountCreationState.Loading -&gt; AccountCreationLoading(
+&nbsp;            firstRun = firstRun,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;        is AccountCreationState.Content -&gt; AccountCreationContent(
+&nbsp;            state = current,
+&nbsp;            firstRun = firstRun,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    /**
-&nbsp;     * The inline error to surface for [balance] given the selected [type], or
-&nbsp;     * null when the amount is acceptable. A negative opening balance is only
-&nbsp;     * valid for account types that can carry debt (see [allowsNegativeBalance]).
-&nbsp;     */
-&nbsp;    fun errorFor(balance: String, type: AccountType): InitialBalanceError? {
-&nbsp;        val parsed = parse(balance) ?: return null
-&nbsp;        return if (parsed &lt; 0 &amp;&amp; !type.allowsNegativeBalance) {
-&nbsp;            InitialBalanceError.NEGATIVE_NOT_ALLOWED
-&nbsp;        } else {
-&nbsp;            null
+&nbsp;@Composable
+&nbsp;private fun AccountCreationLoading(
+&nbsp;    firstRun: Boolean,
+&nbsp;    onEvent: (AccountCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier.surferSafeInsets(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(accountCreationTitle(firstRun)),
+&nbsp;                // No way back out of the first-launch step — there is nowhere to go yet.
+&nbsp;                onBack = if (firstRun) null else ({ onEvent(AccountCreationEvent.OnBackClick) }),
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun AccountCreationContent(
+&nbsp;    state: AccountCreationState.Content,
+&nbsp;    firstRun: Boolean,
+&nbsp;    onEvent: (AccountCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(AccountCreationTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(accountCreationTitle(firstRun)),
+&nbsp;                onBack = if (firstRun) null else ({ onEvent(AccountCreationEvent.OnBackClick) }),
+&nbsp;                actions = {
+&nbsp;                    SurferToolbarButtonAction(
+&nbsp;                        icon = SurferIcons.Check,
+&nbsp;                        text = stringResource(Res.string.account_creation_save),
+&nbsp;                        onClick = { onEvent(AccountCreationEvent.OnSaveClick) },
+&nbsp;                        enabled = state.canSave,
+&nbsp;                        modifier = Modifier.testTag(AccountCreationTestTags.Save),
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .verticalScroll(rememberScrollState())
+&nbsp;                .padding(horizontal = AppTheme.spacing.large)
+&nbsp;                .padding(top = AppTheme.spacing.small),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.large),
+&nbsp;        ) {
+&nbsp;            if (firstRun) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.account_creation_first_run_subtitle),
+&nbsp;                    style = AppTheme.typography.bodyMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            TypePicker(
+&nbsp;                selected = state.type,
+&nbsp;                onSelect = { onEvent(AccountCreationEvent.OnTypeChanged(it)) },
+&nbsp;            )
+&nbsp;
+&nbsp;            SurferTextField(
+&nbsp;                value = state.name,
+&nbsp;                onValueChange = { onEvent(AccountCreationEvent.OnNameChanged(it)) },
+&nbsp;                label = stringResource(Res.string.account_creation_name_label),
+&nbsp;                errorText = stringResource(Res.string.account_creation_name_error_required)
+&nbsp;                    .takeIf { state.nameMissing },
+&nbsp;                fieldTestTag = AccountCreationTestTags.Name,
+&nbsp;            )
+&nbsp;
+&nbsp;            if (!state.isEditMode) {
+&nbsp;                if (state.currencies.isNotEmpty()) {
+&nbsp;                    CurrencyPicker(
+&nbsp;                        currencies = state.currencies,
+&nbsp;                        selected = state.currency,
+&nbsp;                        onSelect = { onEvent(AccountCreationEvent.OnCurrencyChanged(it)) },
+&nbsp;                    )
+&nbsp;                }
+&nbsp;
+&nbsp;                val balanceError = state.balanceError
+&nbsp;                SurferTextField(
+&nbsp;                    value = state.balance,
+&nbsp;                    onValueChange = { onEvent(AccountCreationEvent.OnBalanceChanged(it)) },
+&nbsp;                    label = stringResource(Res.string.account_creation_balance_label),
+&nbsp;                    errorText = balanceError?.let { stringResource(it.messageRes()) },
+&nbsp;                    helperText = stringResource(Res.string.account_creation_balance_helper),
+&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+&nbsp;                    prefix = { Text(state.currencySymbol) },
+&nbsp;                    fieldTestTag = AccountCreationTestTags.OpeningBalance,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            if (state.extraDetailsEnabled) {
+&nbsp;                ExtraDetailsSection(
+&nbsp;                    addedFields = state.extraFields,
+&nbsp;                    availableKeys = state.availableExtraFieldKeys,
+&nbsp;                    canAddField = state.canAddExtraField,
+&nbsp;                    onValueChanged = { key, value -&gt;
+&nbsp;                        onEvent(AccountCreationEvent.OnExtraFieldValueChanged(key, value))
+&nbsp;                    },
+&nbsp;                    onAdd = { onEvent(AccountCreationEvent.OnAddExtraField(it)) },
+&nbsp;                    onAddCustom = { onEvent(AccountCreationEvent.OnAddCustomExtraField(it)) },
+&nbsp;                    onRemove = { onEvent(AccountCreationEvent.OnRemoveExtraField(it)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Validation failures for the opening balance field. */
-&nbsp;enum class InitialBalanceError { NEGATIVE_NOT_ALLOWED, }
+&nbsp;@Composable
+&nbsp;private fun TypePicker(
+&nbsp;    selected: AccountType,
+&nbsp;    onSelect: (AccountType) -&gt; Unit,
+&nbsp;) {
+&nbsp;    SurferFormSection(label = stringResource(Res.string.account_creation_type_label)) {
+&nbsp;        SurferSegmentedControl(
+&nbsp;            options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
+&nbsp;            selected = selected,
+&nbsp;            label = { type -&gt; stringResource(type.labelRes()) },
+&nbsp;            onSelect = onSelect,
+&nbsp;            optionTestTag = { type -&gt; AccountCreationTestTags.TypePrefix + type.name.lowercase() },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Whether an account of this type can be created with a negative opening
-&nbsp; * balance. Only credit-style accounts (Card) carry debt; cash/bank/savings
-&nbsp; * balances start at zero or above.
+&nbsp; * A field that opens the currency bottom sheet. The supported list is already eight entries and
+&nbsp; * still growing, which a segmented control cannot hold on a phone (see issue #277).
 &nbsp; */
-&nbsp;internal val AccountType.allowsNegativeBalance: Boolean
-<b class="fc">&nbsp;    get() = this == AccountType.CARD</b>
+&nbsp;@Composable
+&nbsp;private fun CurrencyPicker(
+&nbsp;    currencies: List&lt;Currency&gt;,
+&nbsp;    selected: CurrencyCode,
+&nbsp;    onSelect: (CurrencyCode) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
+&nbsp;    var sheetOpen by rememberSaveable { mutableStateOf(false) }
+&nbsp;
+&nbsp;    SurferFormSection(label = stringResource(Res.string.account_creation_currency_label)) {
+&nbsp;        SurferCurrencyPickerField(
+&nbsp;            symbol = resolved.symbol,
+&nbsp;            code = resolved.code.value,
+&nbsp;            name = resolved.displayName,
+&nbsp;            onClick = { sheetOpen = true },
+&nbsp;            expanded = sheetOpen,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    if (sheetOpen) {
+&nbsp;        SurferCurrencyBottomSheet(
+&nbsp;            title = stringResource(Res.string.account_creation_currency_label),
+&nbsp;            searchPlaceholder = stringResource(Res.string.account_creation_currency_search_placeholder),
+&nbsp;            currencies = currencies.map {
+&nbsp;                SurferCurrencyOption(code = it.code.value, symbol = it.symbol, name = it.displayName)
+&nbsp;            },
+&nbsp;            selectedCode = resolved.code.value,
+&nbsp;            onSelect = {
+&nbsp;                onSelect(CurrencyCode(it.code))
+&nbsp;                sheetOpen = false
+&nbsp;            },
+&nbsp;            onDismiss = { sheetOpen = false },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalLayoutApi::class)
+&nbsp;@Composable
+&nbsp;private fun ExtraDetailsSection(
+&nbsp;    addedFields: List&lt;AccountExtraField&gt;,
+&nbsp;    availableKeys: List&lt;AccountExtraDetailKey&gt;,
+&nbsp;    canAddField: Boolean,
+&nbsp;    onValueChanged: (String, String) -&gt; Unit,
+&nbsp;    onAdd: (AccountExtraDetailKey) -&gt; Unit,
+&nbsp;    onAddCustom: (String) -&gt; Unit,
+&nbsp;    onRemove: (String) -&gt; Unit,
+&nbsp;) {
+&nbsp;    var namingCustomField by remember { mutableStateOf(false) }
+&nbsp;
+&nbsp;    if (namingCustomField) {
+&nbsp;        CustomFieldNameDialog(
+&nbsp;            onDismiss = { namingCustomField = false },
+&nbsp;            onConfirm = { name -&gt;
+&nbsp;                namingCustomField = false
+&nbsp;                onAddCustom(name)
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    Column {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(bottom = AppTheme.spacing.medium),
+&nbsp;            verticalAlignment = Alignment.CenterVertically,
+&nbsp;        ) {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.account_creation_extra_details_label),
+&nbsp;                style = AppTheme.typography.labelLarge,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.account_creation_extra_details_optional),
+&nbsp;                style = AppTheme.typography.labelSmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default)) {
+&nbsp;            addedFields.forEach { field -&gt;
+&nbsp;                ExtraFieldItem(
+&nbsp;                    field = field,
+&nbsp;                    onValueChanged = { onValueChanged(field.key, it) },
+&nbsp;                    onRemove = { onRemove(field.key) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        if (canAddField) {
+&nbsp;            Spacer(Modifier.height(14.dp))
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.account_creation_add_another_label),
+&nbsp;                style = AppTheme.typography.labelMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+&nbsp;            )
+&nbsp;            FlowRow(
+&nbsp;                horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;            ) {
+&nbsp;                availableKeys.forEach { key -&gt;
+&nbsp;                    SurferOutlinedChip(
+&nbsp;                        label = stringResource(key.labelRes()),
+&nbsp;                        icon = SurferIcons.Add,
+&nbsp;                        onClick = { onAdd(key) },
+&nbsp;                        modifier = Modifier.testTag(
+&nbsp;                            AccountCreationTestTags.AddExtraDetailPrefix + key.name.lowercase(),
+&nbsp;                        ),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                SurferOutlinedChip(
+&nbsp;                    label = stringResource(Res.string.account_creation_field_custom),
+&nbsp;                    icon = SurferIcons.Add,
+&nbsp;                    onClick = { namingCustomField = true },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Names a &quot;Custom field…&quot; before it is added. Confirming with a blank name is blocked here; a
+&nbsp; * name that duplicates a field already on the form is dropped by the ViewModel, which is the only
+&nbsp; * place that knows the current rows.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun CustomFieldNameDialog(
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;    onConfirm: (String) -&gt; Unit,
+&nbsp;) {
+&nbsp;    var name by remember { mutableStateOf(&quot;&quot;) }
+&nbsp;    AlertDialog(
+&nbsp;        onDismissRequest = onDismiss,
+&nbsp;        title = { Text(stringResource(Res.string.account_creation_custom_field_dialog_title)) },
+&nbsp;        text = {
+&nbsp;            OutlinedTextField(
+&nbsp;                value = name,
+&nbsp;                onValueChange = { if (it.length &lt;= AccountExtraDetails.MAX_KEY_LENGTH) name = it },
+&nbsp;                label = { Text(stringResource(Res.string.account_creation_custom_field_name_label)) },
+&nbsp;                singleLine = true,
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;            )
+&nbsp;        },
+&nbsp;        confirmButton = {
+&nbsp;            TextButton(
+&nbsp;                onClick = { onConfirm(name) },
+&nbsp;                enabled = name.isNotBlank(),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.account_creation_custom_field_add))
+&nbsp;            }
+&nbsp;        },
+&nbsp;        dismissButton = {
+&nbsp;            TextButton(onClick = onDismiss) {
+&nbsp;                Text(stringResource(Res.string.account_creation_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ExtraFieldItem(
+&nbsp;    field: AccountExtraField,
+&nbsp;    onValueChanged: (String) -&gt; Unit,
+&nbsp;    onRemove: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val label = extraDetailLabel(field.key)
+&nbsp;    // Only the well-known IBAN row gets a stable selector: every other row is either a different
+&nbsp;    // well-known key or a user-named custom field, neither of which the E2E flows target.
+&nbsp;    val fieldTag = if (field.wellKnownKey == AccountExtraDetailKey.IBAN) {
+&nbsp;        AccountCreationTestTags.Iban
+&nbsp;    } else {
+&nbsp;        null
+&nbsp;    }
+&nbsp;    Column {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxWidth()
+&nbsp;                .padding(bottom = 4.dp),
+&nbsp;            horizontalArrangement = Arrangement.End,
+&nbsp;        ) {
+&nbsp;            TextButton(
+&nbsp;                onClick = onRemove,
+&nbsp;                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+&nbsp;                    horizontal = AppTheme.spacing.small,
+&nbsp;                    vertical = 0.dp,
+&nbsp;                ),
+&nbsp;            ) {
+&nbsp;                Icon(
+&nbsp;                    imageVector = SurferIcons.Close,
+&nbsp;                    contentDescription = stringResource(
+&nbsp;                        Res.string.account_creation_remove_content_description,
+&nbsp;                        label,
+&nbsp;                    ),
+&nbsp;                    tint = AppTheme.materialColors.primary,
+&nbsp;                    modifier = Modifier.size(14.dp),
+&nbsp;                )
+&nbsp;                Spacer(Modifier.width(4.dp))
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.account_creation_remove),
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.primary,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;        OutlinedTextField(
+&nbsp;            value = field.value,
+&nbsp;            onValueChange = onValueChanged,
+&nbsp;            label = { Text(label) },
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxWidth()
+&nbsp;                .then(fieldTag?.let { Modifier.testTag(it) } ?: Modifier),
+&nbsp;            singleLine = !field.isMultiline,
+&nbsp;            minLines = if (field.isMultiline) 3 else 1,
+&nbsp;            maxLines = if (field.isMultiline) 5 else 1,
+&nbsp;            textStyle = if (isMonospaceExtraDetail(field.key)) {
+&nbsp;                AppTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace)
+&nbsp;            } else {
+&nbsp;                AppTheme.typography.bodyLarge
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private val AccountExtraField.isMultiline: Boolean
+&nbsp;    get() = wellKnownKey == AccountExtraDetailKey.DESCRIPTION
+&nbsp;
+&nbsp;private fun InitialBalanceError.messageRes(): StringResource = when (this) {
+&nbsp;    InitialBalanceError.NEGATIVE_NOT_ALLOWED -&gt; Res.string.account_creation_balance_error_negative
+&nbsp;}
+&nbsp;
+&nbsp;/** First launch gets a welcoming title; every other entry keeps the plain screen title. */
+&nbsp;private fun accountCreationTitle(firstRun: Boolean): StringResource =
+&nbsp;    if (firstRun) Res.string.account_creation_first_run_title else Res.string.account_creation_title
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun AccountCreationScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        AccountCreationContent(
+&nbsp;            state = AccountCreationState.Content(
+&nbsp;                name = &quot;Emergency fund&quot;,
+&nbsp;                balance = &quot;2,480.00&quot;,
+&nbsp;                type = AccountType.BANK,
+&nbsp;                currency = CurrencyCode(&quot;EUR&quot;),
+&nbsp;                currencies = listOf(
+&nbsp;                    Currency(CurrencyCode(&quot;EUR&quot;), symbol = &quot;€&quot;, displayName = &quot;Euro&quot;),
+&nbsp;                    Currency(CurrencyCode(&quot;USD&quot;), symbol = &quot;$&quot;, displayName = &quot;US Dollar&quot;),
+&nbsp;                    Currency(CurrencyCode(&quot;GBP&quot;), symbol = &quot;£&quot;, displayName = &quot;British Pound&quot;),
+&nbsp;                    Currency(CurrencyCode(&quot;PLN&quot;), symbol = &quot;zł&quot;, displayName = &quot;Polish Zloty&quot;),
+&nbsp;                ),
+&nbsp;                extraFields = listOf(
+&nbsp;                    AccountExtraField(
+&nbsp;                        key = AccountExtraDetailKey.IBAN.name,
+&nbsp;                        value = &quot;PL61 1090 1014 0000 0712 1981 2874&quot;,
+&nbsp;                    ),
+&nbsp;                    AccountExtraField(
+&nbsp;                        key = AccountExtraDetailKey.DESCRIPTION.name,
+&nbsp;                        value = &quot;Joint emergency reserve — 6 months of expenses.&quot;,
+&nbsp;                    ),
+&nbsp;                    AccountExtraField(key = &quot;Broker code&quot;, value = &quot;MS-4417&quot;),
+&nbsp;                ),
+&nbsp;                editingAccountId = null,
+&nbsp;            ),
+&nbsp;            firstRun = false,
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -182,7 +615,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

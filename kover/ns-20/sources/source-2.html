@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MoneyFormatter</title>
+  <title>MoneySurfer Coverage Report > InsightInput</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.formatter</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.insight</a>
 </div>
 
-<h1>Coverage Summary for Class: MoneyFormatter (com.georgeci.moneysurfer.domain.formatter)</h1>
+<h1>Coverage Summary for Class: InsightInput (com.georgeci.moneysurfer.domain.insight)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MoneyFormatter</td>
+  <td class="name">InsightInput</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (16/16)
+    (37/37)
   </span>
 </td>
 </tr>
@@ -92,21 +92,225 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.formatter
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.insight
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
+&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringFrequency
+&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import java.text.NumberFormat
-&nbsp;import java.util.Currency
-&nbsp;import java.util.Locale
+&nbsp;import kotlin.math.abs
+&nbsp;import kotlin.math.roundToInt
+&nbsp;import kotlin.math.roundToLong
 &nbsp;
-&nbsp;actual object MoneyFormatter {
-&nbsp;    actual fun format(money: Money, currencyCode: CurrencyCode): String {
-<b class="fc">&nbsp;        val formatter = NumberFormat.getCurrencyInstance(Locale.getDefault())</b>
-<b class="fc">&nbsp;        formatter.currency = Currency.getInstance(currencyCode.value)</b>
-<b class="fc">&nbsp;        return formatter.format(money.minor / Money.MINOR_PER_MAJOR)</b>
+&nbsp;/**
+&nbsp; * Everything the rules read, gathered by
+&nbsp; * [com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase].
+&nbsp; *
+&nbsp; * A parameter object rather than six arguments so [generateInsights] stays a pure function of one
+&nbsp; * value: a rule spec builds the input it wants and asserts on the output, with no fakes and no
+&nbsp; * coroutines in between.
+&nbsp; *
+&nbsp; * The two spend lists must cover comparable stretches of the calendar — month-to-date against the
+&nbsp; * same stretch of the previous month, not against a whole month. Nothing here can check that; see
+&nbsp; * the use case for why it matters.
+&nbsp; */
+<b class="fc">&nbsp;data class InsightInput(</b>
+&nbsp;    /** Names the period the ids belong to, e.g. `2026-07`. See [Insight.id]. */
+<b class="fc">&nbsp;    val periodKey: String,</b>
+&nbsp;    /**
+&nbsp;     * How many days [currentSpend] covers — and, by construction, how many [previousSpend] covers
+&nbsp;     * too. Below [MIN_COMPARISON_DAYS] the comparison rules stand down; see [generateInsights].
+&nbsp;     */
+<b class="fc">&nbsp;    val elapsedDays: Int,</b>
+<b class="fc">&nbsp;    val currency: CurrencyCode,</b>
+<b class="fc">&nbsp;    val currentSpend: List&lt;CategorySpendSlice&gt;,</b>
+<b class="fc">&nbsp;    val previousSpend: List&lt;CategorySpendSlice&gt;,</b>
+&nbsp;    /** Display names for the categories the slices reference. A missing id reads as uncategorized. */
+<b class="fc">&nbsp;    val categoryNames: Map&lt;CategoryId, String&gt;,</b>
+&nbsp;    /**
+&nbsp;     * Recurring rules that book an expense. Telling an expense schedule from an income one needs
+&nbsp;     * the category tree, so the caller does that; whether a rule is live is a property of the rule
+&nbsp;     * itself, so [generateInsights] does that.
+&nbsp;     */
+<b class="fc">&nbsp;    val expenseSchedules: List&lt;RecurringRule&gt;,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Every rule, run once, ordered for a card that may only have room for the first one.
+&nbsp; *
+&nbsp; * Each rule returns at most one insight — the point of the widget is two or three sentences worth
+&nbsp; * reading, not a log. Warn comes before Good and Good before Neutral so the compact card, which
+&nbsp; * shows exactly one, shows the actionable one.
+&nbsp; *
+&nbsp; * The comparison rules wait for [MIN_COMPARISON_DAYS]; the subscription count does not, because it
+&nbsp; * reads the schedules rather than the window and is just as true on the 1st as on the 30th.
+&nbsp; */
+&nbsp;fun generateInsights(input: InsightInput): List&lt;Insight&gt; {
+&nbsp;    val comparisons =
+&nbsp;        if (input.elapsedDays &gt;= MIN_COMPARISON_DAYS) periodComparisons(input) else emptyList()
+&nbsp;    return (comparisons + listOfNotNull(activeSubscriptions(input)))
+&nbsp;        .sortedBy { TONE_PRIORITY.indexOf(it.tone) }
+&nbsp;}
+&nbsp;
+&nbsp;/** The rules that need a baseline: the two category movers, and the period total. */
+&nbsp;private fun periodComparisons(input: InsightInput): List&lt;Insight&gt; {
+&nbsp;    val previousTotal = input.previousSpend.total()
+&nbsp;    val changes = categoryChanges(input, floor = previousTotal.share(MIN_DELTA_SHARE))
+&nbsp;    return listOfNotNull(
+&nbsp;        changes.firstOrNull { it.isIncrease },
+&nbsp;        changes.firstOrNull { !it.isIncrease },
+&nbsp;        periodSpend(input, current = input.currentSpend.total(), previous = previousTotal),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Every category that moved enough to be worth a sentence, biggest move in money first. */
+&nbsp;private fun categoryChanges(input: InsightInput, floor: Money): List&lt;Insight.CategoryChange&gt; {
+&nbsp;    val current = input.currentSpend.associate { it.categoryId to it.total }
+&nbsp;    val previous = input.previousSpend.associate { it.categoryId to it.total }
+&nbsp;    return (current.keys + previous.keys)
+&nbsp;        .mapNotNull { categoryId -&gt;
+&nbsp;            categoryChange(
+&nbsp;                input = input,
+&nbsp;                categoryId = categoryId,
+&nbsp;                current = current[categoryId] ?: Money.zero(),
+&nbsp;                previous = previous[categoryId] ?: Money.zero(),
+&nbsp;                floor = floor,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        .sortedByDescending { (it.current - it.previous).abs().minor }
+&nbsp;}
+&nbsp;
+&nbsp;private fun categoryChange(
+&nbsp;    input: InsightInput,
+&nbsp;    categoryId: CategoryId?,
+&nbsp;    current: Money,
+&nbsp;    previous: Money,
+&nbsp;    floor: Money,
+&nbsp;): Insight.CategoryChange? {
+&nbsp;    // No baseline, no percentage. A category that booked nothing last period cannot be &quot;up 40%&quot;,
+&nbsp;    // and reading it as an infinite rise would push every real finding off the card.
+&nbsp;    if (!previous.isPositive()) return null
+&nbsp;    val delta = current - previous
+&nbsp;    val ratio = delta.minor.toDouble() / previous.minor.toDouble()
+&nbsp;    // Both terms have to clear. A large percentage of pocket change is noise, and a large amount
+&nbsp;    // that barely shifted a large category is not news either.
+&nbsp;    if (delta.abs() &lt; floor || abs(ratio) &lt; CATEGORY_CHANGE_RATIO) return null
+&nbsp;    return Insight.CategoryChange(
+&nbsp;        id = &quot;category-change:${categoryId?.value ?: UNCATEGORIZED_KEY}:${input.periodKey}&quot;,
+&nbsp;        categoryId = categoryId,
+&nbsp;        categoryName = categoryId?.let(input.categoryNames::get),
+&nbsp;        current = current,
+&nbsp;        previous = previous,
+&nbsp;        changePercent = ratio.toWholePercent(),
+&nbsp;        currency = input.currency,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The whole period against the whole previous one.
+&nbsp; *
+&nbsp; * Fires even when the total barely moved, as [SpendTrend.Flat]: &quot;in line with last month&quot; is an
+&nbsp; * answer to the question the widget exists to answer, and a workspace whose categories all sat
+&nbsp; * still would otherwise show an empty card.
+&nbsp; *
+&nbsp; * No floor here, unlike the category rules: this figure *is* the total the floor is a share of.
+&nbsp; */
+&nbsp;private fun periodSpend(input: InsightInput, current: Money, previous: Money): Insight.PeriodSpend? {
+&nbsp;    if (!previous.isPositive()) return null
+&nbsp;    val ratio = (current - previous).minor.toDouble() / previous.minor.toDouble()
+&nbsp;    return Insight.PeriodSpend(
+&nbsp;        id = &quot;period-spend:${input.periodKey}&quot;,
+&nbsp;        trend = when {
+&nbsp;            ratio &gt;= PERIOD_CHANGE_RATIO -&gt; SpendTrend.Up
+&nbsp;            ratio &lt;= -PERIOD_CHANGE_RATIO -&gt; SpendTrend.Down
+&nbsp;            else -&gt; SpendTrend.Flat
+&nbsp;        },
+&nbsp;        current = current,
+&nbsp;        previous = previous,
+&nbsp;        changePercent = ratio.toWholePercent(),
+&nbsp;        currency = input.currency,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private fun activeSubscriptions(input: InsightInput): Insight.ActiveSubscriptions? {
+&nbsp;    val active = input.expenseSchedules.filter { it.isActive }
+&nbsp;    if (active.isEmpty()) return null
+&nbsp;    return Insight.ActiveSubscriptions(
+&nbsp;        id = &quot;active-subscriptions:${input.periodKey}&quot;,
+&nbsp;        count = active.size,
+&nbsp;        monthlyTotal = active.fold(Money.zero()) { total, rule -&gt; total + rule.monthlyCost() },
+&nbsp;        currency = input.currency,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * What one schedule costs in a month, to the nearest minor unit.
+&nbsp; *
+&nbsp; * An estimate by construction: a 30-day month and a 12-month year put daily, weekly, monthly and
+&nbsp; * yearly rules on one scale so they can be added together at all. It fills one sentence on the
+&nbsp; * dashboard — nothing is booked against it, and no balance is derived from it.
+&nbsp; *
+&nbsp; * [RecurringRule.amount] carries no currency of its own; a rule is written in the workspace base
+&nbsp; * currency, which is the currency the rest of the insight is already in. The magnitude is taken
+&nbsp; * because the aggregates this sits beside are magnitudes too.
+&nbsp; */
+&nbsp;private fun RecurringRule.monthlyCost(): Money {
+&nbsp;    val every = schedule.interval.coerceAtLeast(1)
+&nbsp;    val amount = amount.abs()
+&nbsp;    return when (schedule.frequency) {
+&nbsp;        RecurringFrequency.DAILY -&gt; amount * DAYS_PER_MONTH / every
+&nbsp;        RecurringFrequency.WEEKLY -&gt; amount * DAYS_PER_MONTH / (DAYS_PER_WEEK * every)
+&nbsp;        RecurringFrequency.MONTHLY -&gt; amount / every
+&nbsp;        RecurringFrequency.YEARLY -&gt; amount / (MONTHS_PER_YEAR * every)
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;private fun List&lt;CategorySpendSlice&gt;.total(): Money =
+&nbsp;    fold(Money.zero()) { running, slice -&gt; running + slice.total }
+&nbsp;
+&nbsp;/** [fraction] of this amount, rounded to the nearest minor unit. */
+&nbsp;private fun Money.share(fraction: Double): Money = Money((minor.toDouble() * fraction).roundToLong())
+&nbsp;
+&nbsp;private fun Double.toWholePercent(): Int = (abs(this) * PERCENT_SCALE).roundToInt()
+&nbsp;
+&nbsp;/** Warn first: the compact card shows one insight, and it should be the one worth acting on. */
+&nbsp;private val TONE_PRIORITY = listOf(InsightTone.Warn, InsightTone.Good, InsightTone.Neutral)
+&nbsp;
+&nbsp;/**
+&nbsp; * Days of the period that must have passed before the comparison rules say anything.
+&nbsp; *
+&nbsp; * A month-to-date window against the same stretch of last month is symmetric by construction, but
+&nbsp; * on the 1st that stretch is a *single day*, and one bill landing a day either side of the
+&nbsp; * boundary swings the answer by 100%. A user who pays rent on the 1st and has not been billed yet
+&nbsp; * would be congratulated with &quot;Rent is down 100%&quot; every month. The relative floor cannot filter
+&nbsp; * that — the floor is a share of the very same one-day baseline. A week is the shortest span over
+&nbsp; * which a single charge&#39;s timing stops dominating the comparison.
+&nbsp; */
+&nbsp;private const val MIN_COMPARISON_DAYS = 7
+&nbsp;
+&nbsp;/** A single category has to move by a fifth before the move is worth a sentence. */
+&nbsp;private const val CATEGORY_CHANGE_RATIO = 0.20
+&nbsp;
+&nbsp;/** The whole period&#39;s spend is a steadier number, so a tenth of it is already notable. */
+&nbsp;private const val PERIOD_CHANGE_RATIO = 0.10
+&nbsp;
+&nbsp;/**
+&nbsp; * Floor under the category rules, as a share of the previous period&#39;s *total* spend.
+&nbsp; *
+&nbsp; * Relative rather than absolute: a fixed &quot;20&quot; floor means something different in every currency
+&nbsp; * the app supports, while &quot;a twentieth of what you spent last month&quot; reads the same everywhere.
+&nbsp; * It is what keeps a category that went from 2 to 5 — up 150% — from pushing the one that went
+&nbsp; * from 300 to 380 off the card.
+&nbsp; */
+&nbsp;private const val MIN_DELTA_SHARE = 0.05
+&nbsp;
+&nbsp;private const val UNCATEGORIZED_KEY = &quot;uncategorized&quot;
+&nbsp;private const val PERCENT_SCALE = 100
+&nbsp;private const val DAYS_PER_MONTH = 30
+&nbsp;private const val DAYS_PER_WEEK = 7
+&nbsp;private const val MONTHS_PER_YEAR = 12
 </code>
 </pre>
 </div>
@@ -130,7 +334,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

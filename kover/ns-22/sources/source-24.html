@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContribution</title>
+  <title>MoneySurfer Coverage Report > CurrencyTotal</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CurrencyTotal (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContribution</td>
+  <td class="name">CurrencyTotal</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (84/84)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -94,33 +94,52 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/** Sum of every account balance that shares [currencyCode]. */
+<b class="fc">&nbsp;data class CurrencyTotal(</b>
+<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
-&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
+&nbsp; * Balance totals per currency, most-used currency first (ties broken by currency code so the
+&nbsp; * order never depends on how the accounts happen to be sorted).
 &nbsp; *
-&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
-&nbsp; * touched. It exists so the money-backed model can later store the id of a real
-&nbsp; * transfer here without a schema change on either side of the wire.
+&nbsp; * Callers used to sum whatever matched the *first* account&#39;s currency and present that as &quot;the&quot;
+&nbsp; * total, which silently dropped every other currency. Adding across currencies is not possible
+&nbsp; * without FX rates, so the honest answer is one figure per currency: the head is the headline,
+&nbsp; * the tail has to be shown somewhere rather than swallowed.
 &nbsp; */
-<b class="fc">&nbsp;data class GoalContribution(</b>
-<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val goalId: GoalId,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
-<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+&nbsp;fun List&lt;Account&gt;.totalsByCurrency(): List&lt;CurrencyTotal&gt; =
+&nbsp;    groupBy { it.currencyCode }
+&nbsp;        .map { (currency, accounts) -&gt;
+&nbsp;            // Carry the bucket size through the sort — it is what &quot;most-used&quot; means, and
+&nbsp;            // re-deriving it per comparison would rescan the whole list for every currency.
+&nbsp;            CurrencyTotalWithCount(
+&nbsp;                total = CurrencyTotal(
+&nbsp;                    currencyCode = currency,
+&nbsp;                    amount = accounts.fold(Money.zero()) { acc, account -&gt; acc + account.balance },
+&nbsp;                ),
+&nbsp;                accountCount = accounts.size,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        .sortedWith(
+&nbsp;            compareByDescending&lt;CurrencyTotalWithCount&gt; { it.accountCount }
+&nbsp;                .thenBy { it.total.currencyCode.value },
+&nbsp;        )
+&nbsp;        .map { it.total }
+&nbsp;
+&nbsp;private data class CurrencyTotalWithCount(
+&nbsp;    val total: CurrencyTotal,
+&nbsp;    val accountCount: Int,
 &nbsp;)
+&nbsp;
+&nbsp;/** [totalsByCurrency] rendered for display, same order — head first, everything else after it. */
+&nbsp;fun List&lt;Account&gt;.formattedTotalsByCurrency(): List&lt;String&gt; =
+&nbsp;    totalsByCurrency().map { MoneyFormatter.format(it.amount, it.currencyCode) }
 </code>
 </pre>
 </div>
@@ -144,7 +163,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/30)
+    (0/28)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/110)
+    (0/104)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/176)
+    (0/162)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2170)
+    (0/1976)
   </span>
 </td>
 </tr>
@@ -295,7 +295,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/42)
+    (0/40)
   </span>
 </td>
 <td class="coverageStat">
@@ -303,7 +303,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/110)
+    (0/104)
   </span>
 </td>
 <td class="coverageStat">
@@ -311,7 +311,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/180)
+    (0/166)
   </span>
 </td>
 <td class="coverageStat">
@@ -319,7 +319,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2214)
+    (0/2020)
   </span>
 </td>
 </tr>
@@ -424,11 +424,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
 &nbsp;
 <b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
-<b class="nc">&nbsp;        when (effect) {</b>
-<b class="nc">&nbsp;            AccountsManageEffect.NavigateBack -&gt; onNavigateBack()</b>
-<b class="nc">&nbsp;            AccountsManageEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()</b>
-<b class="nc">&nbsp;            is AccountsManageEffect.NavigateToAccountDetails -&gt; onNavigateToAccountDetails(effect.accountId)</b>
-<b class="nc">&nbsp;            is AccountsManageEffect.NavigateToAccountEdit -&gt; onNavigateToAccountEdit(effect.accountId)</b>
+&nbsp;        when (effect) {
+&nbsp;            AccountsManageEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            AccountsManageEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()
+&nbsp;            is AccountsManageEffect.NavigateToAccountDetails -&gt; onNavigateToAccountDetails(effect.accountId)
+&nbsp;            is AccountsManageEffect.NavigateToAccountEdit -&gt; onNavigateToAccountEdit(effect.accountId)
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -734,8 +734,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun AccountsManageScreenViewPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;private fun AccountsManageScreenViewPreview() {
+&nbsp;    AppTheme {
 &nbsp;        AccountsManageContent(
 &nbsp;            state = AccountsManageState.Content(
 &nbsp;                isEditing = false,
@@ -746,12 +746,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun AccountsManageScreenEditingPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;private fun AccountsManageScreenEditingPreview() {
+&nbsp;    AppTheme {
 &nbsp;        AccountsManageContent(
 &nbsp;            state = AccountsManageState.Content(
 &nbsp;                isEditing = true,
@@ -762,12 +762,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun AccountsManageEmptyPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;private fun AccountsManageEmptyPreview() {
+&nbsp;    AppTheme {
 &nbsp;        AccountsManageContent(
 &nbsp;            state = AccountsManageState.Content(
 &nbsp;                isEditing = false,
@@ -778,7 +778,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -802,7 +802,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

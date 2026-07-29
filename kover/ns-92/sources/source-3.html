@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Plurals0_commonMainKt</title>
+  <title>MoneySurfer Coverage Report > String0_commonMainKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.feature.category.generated.resources</a>
+    <a href="../index.html">moneysurfer.feature.goal.generated.resources</a>
 </div>
 
-<h1>Coverage Summary for Class: Plurals0_commonMainKt (moneysurfer.feature.category.generated.resources)</h1>
+<h1>Coverage Summary for Class: String0_commonMainKt (moneysurfer.feature.goal.generated.resources)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Plurals0_commonMainKt</td>
+  <td class="name">String0_commonMainKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    53.6%
   </span>
   <span class="absValue">
-    (0/3)
+    (67/125)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    24.8%
   </span>
   <span class="absValue">
-    (0/5)
+    (77/310)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    22.4%
   </span>
   <span class="absValue">
-    (0/48)
+    (666/2976)
   </span>
 </td>
 </tr>
@@ -94,30 +94,579 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
 &nbsp;
-&nbsp;package moneysurfer.feature.category.generated.resources
+&nbsp;package moneysurfer.feature.goal.generated.resources
 &nbsp;
 &nbsp;import kotlin.OptIn
 &nbsp;import kotlin.String
 &nbsp;import kotlin.collections.MutableMap
 &nbsp;import org.jetbrains.compose.resources.InternalResourceApi
 &nbsp;import org.jetbrains.compose.resources.LanguageQualifier
-&nbsp;import org.jetbrains.compose.resources.PluralStringResource
 &nbsp;import org.jetbrains.compose.resources.ResourceContentHash
 &nbsp;import org.jetbrains.compose.resources.ResourceItem
+&nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;
-&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.category.generated.resources/&quot;
+&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.goal.generated.resources/&quot;
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_176_775_719)
-<b class="nc">&nbsp;internal val Res.plurals.category_picker_subcategories: PluralStringResource by lazy {</b>
-<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:category_picker_subcategories&quot;, &quot;category_picker_subcategories&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 10, 220),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 10, 97),</b>
+&nbsp;@delegate:ResourceContentHash(810_394_802)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_added_snackbar: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:goal_contribution_added_snackbar&quot;, &quot;goal_contribution_added_snackbar&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10, 88),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10, 68),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-2_040_437_748)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_amount_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_amount_label&quot;, &quot;goal_contribution_amount_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 99, 54),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 79, 46),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-423_648_048)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_date_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_date_label&quot;, &quot;goal_contribution_date_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 154, 48),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 126, 44),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-668_939_423)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_error_amount: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_error_amount&quot;, &quot;goal_contribution_error_amount&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 203, 102),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 171, 74),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_461_180_532)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_error_below_zero: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:goal_contribution_error_below_zero&quot;, &quot;goal_contribution_error_below_zero&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 306, 90),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 246, 86),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_823_059_619)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_error_generic: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_error_generic&quot;, &quot;goal_contribution_error_generic&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 397, 139),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 333, 75),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(2_041_042_264)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_error_paused: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:goal_contribution_error_paused&quot;, &quot;goal_contribution_error_paused&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 537, 130),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 409, 86),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_184_787_068)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_note_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_note_label&quot;, &quot;goal_contribution_note_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 668, 56),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 496, 44),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(275_319_901)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_note_manual: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_note_manual&quot;, &quot;goal_contribution_note_manual&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 725, 57),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 541, 45),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_109_230_399)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_save: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_save&quot;, &quot;goal_contribution_save&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 853, 54),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 649, 38),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-621_150_014)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_saved_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_saved_label&quot;, &quot;goal_contribution_saved_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 783, 69),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 587, 61),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_664_211_778)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_title_add: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_title_add&quot;, &quot;goal_contribution_title_add&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 908, 63),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 688, 47),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-688_042_378)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_title_withdraw: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_title_withdraw&quot;, &quot;goal_contribution_title_withdraw&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 972, 56),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 736, 52),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(804_708_583)
+<b class="fc">&nbsp;internal val Res.string.goal_contribution_withdrawn_snackbar: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_contribution_withdrawn_snackbar&quot;, &quot;goal_contribution_withdrawn_snackbar&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1029, 80),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 789, 80),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_664_315_675)
+<b class="fc">&nbsp;internal val Res.string.goal_details_actions: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_actions&quot;, &quot;goal_details_actions&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1110, 68),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 870, 44),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_937_436_543)
+<b class="fc">&nbsp;internal val Res.string.goal_details_add: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_add&quot;, &quot;goal_details_add&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1179, 48),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 915, 36),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_979_464_778)
+<b class="fc">&nbsp;internal val Res.string.goal_details_archive: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_archive&quot;, &quot;goal_details_archive&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1228, 48),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 952, 44),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(452_921_572)
+<b class="fc">&nbsp;internal val Res.string.goal_details_delete: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_delete&quot;, &quot;goal_details_delete&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1716, 59),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1340, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-347_039_336)
+<b class="fc">&nbsp;internal val Res.string.goal_details_delete_cancel: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_delete_cancel&quot;, &quot;goal_details_delete_cancel&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1277, 50),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 997, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(2_122_233_061)
+<b class="fc">&nbsp;internal val Res.string.goal_details_delete_confirm: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_delete_confirm&quot;, &quot;goal_details_delete_confirm&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1328, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1040, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_531_222_258)
+<b class="fc">&nbsp;internal val Res.string.goal_details_delete_message: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_delete_message&quot;, &quot;goal_details_delete_message&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1384, 195),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1084, 139),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_526_403_353)
+<b class="fc">&nbsp;internal val Res.string.goal_details_delete_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_delete_title&quot;, &quot;goal_details_delete_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1580, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1224, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_117_210_976)
+<b class="fc">&nbsp;internal val Res.string.goal_details_deleted_snackbar: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_deleted_snackbar&quot;, &quot;goal_details_deleted_snackbar&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1646, 69),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1282, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(637_262_109)
+<b class="fc">&nbsp;internal val Res.string.goal_details_edit: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_edit&quot;, &quot;goal_details_edit&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1776, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1384, 37),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-194_518_151)
+<b class="fc">&nbsp;internal val Res.string.goal_details_history: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_history&quot;, &quot;goal_details_history&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1993, 48),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1525, 40),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-645_224_296)
+<b class="fc">&nbsp;internal val Res.string.goal_details_history_empty: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_history_empty&quot;, &quot;goal_details_history_empty&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1838, 154),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1422, 102),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_831_422_363)
+<b class="fc">&nbsp;internal val Res.string.goal_details_linked_account: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_linked_account&quot;, &quot;goal_details_linked_account&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2247, 83),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1703, 59),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_041_613_101)
+<b class="fc">&nbsp;internal val Res.string.goal_details_linked_account_note: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_linked_account_note&quot;, &quot;goal_details_linked_account_note&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2042, 204),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1566, 136),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-519_914_847)
+<b class="fc">&nbsp;internal val Res.string.goal_details_of_target: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_of_target&quot;, &quot;goal_details_of_target&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2331, 42),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1763, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-728_603_890)
+<b class="fc">&nbsp;internal val Res.string.goal_details_pause: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_pause&quot;, &quot;goal_details_pause&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2374, 74),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1806, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_241_319_929)
+<b class="fc">&nbsp;internal val Res.string.goal_details_reached: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_reached&quot;, &quot;goal_details_reached&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2449, 68),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1849, 48),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-242_911_198)
+<b class="fc">&nbsp;internal val Res.string.goal_details_remaining: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_remaining&quot;, &quot;goal_details_remaining&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2518, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1898, 46),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_630_127_866)
+<b class="fc">&nbsp;internal val Res.string.goal_details_resume: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_resume&quot;, &quot;goal_details_resume&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2577, 59),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1945, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_356_048_733)
+<b class="fc">&nbsp;internal val Res.string.goal_details_unarchive: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_unarchive&quot;, &quot;goal_details_unarchive&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2637, 74),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1989, 46),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-669_964_635)
+<b class="fc">&nbsp;internal val Res.string.goal_details_withdraw: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_details_withdraw&quot;, &quot;goal_details_withdraw&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2712, 45),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2036, 41),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-347_039_336)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_cancel: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_cancel&quot;, &quot;goal_edit_cancel&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2758, 40),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2078, 32),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_160_385_639)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_color_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_color_label&quot;, &quot;goal_edit_color_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2799, 41),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2111, 37),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_299_364_349)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_created_snackbar: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:goal_edit_created_snackbar&quot;, &quot;goal_edit_created_snackbar&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2841, 78),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2149, 54),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(168_109_436)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_error_currency: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_error_currency&quot;, &quot;goal_edit_error_currency&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2920, 144),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2204, 92),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(2_072_877_229)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_error_generic: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:goal_edit_error_generic&quot;, &quot;goal_edit_error_generic&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3065, 143),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2297, 79),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-751_724_347)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_icon_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_icon_label&quot;, &quot;goal_edit_icon_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3209, 44),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2377, 36),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(776_932_403)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_name_error_required: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_name_error_required&quot;, &quot;goal_edit_name_error_required&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3254, 93),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2414, 65),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_351_994_899)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_name_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_name_label&quot;, &quot;goal_edit_name_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3348, 52),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2480, 36),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_109_230_399)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_save: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_save&quot;, &quot;goal_edit_save&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3401, 46),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2517, 30),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(74_917_909)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_target_date_clear: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_target_date_clear&quot;, &quot;goal_edit_target_date_clear&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3448, 63),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2548, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_089_981_175)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_target_date_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_target_date_label&quot;, &quot;goal_edit_target_date_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3512, 47),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2600, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-219_003_235)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_target_date_placeholder: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_target_date_placeholder&quot;, &quot;goal_edit_target_date_placeholder&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3560, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2652, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-668_939_423)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_target_error: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_target_error&quot;, &quot;goal_edit_target_error&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3626, 94),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2710, 66),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_148_831_652)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_target_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_target_label&quot;, &quot;goal_edit_target_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3721, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2777, 38),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_519_266_386)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_title_create: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_title_create&quot;, &quot;goal_edit_title_create&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3780, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2816, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(637_262_109)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_title_edit: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_title_edit&quot;, &quot;goal_edit_title_edit&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3839, 64),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2859, 40),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_897_270_265)
+<b class="fc">&nbsp;internal val Res.string.goal_edit_updated_snackbar: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_edit_updated_snackbar&quot;, &quot;goal_edit_updated_snackbar&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3904, 82),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2900, 54),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(2_117_855_645)
+<b class="fc">&nbsp;internal val Res.string.goal_status_active: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_status_active&quot;, &quot;goal_status_active&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3987, 46),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2955, 34),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_092_500_802)
+<b class="fc">&nbsp;internal val Res.string.goal_status_archived: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_status_archived&quot;, &quot;goal_status_archived&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4034, 48),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2990, 40),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_133_096_671)
+<b class="fc">&nbsp;internal val Res.string.goal_status_completed: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_status_completed&quot;, &quot;goal_status_completed&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4083, 57),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3031, 41),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-349_575_752)
+<b class="fc">&nbsp;internal val Res.string.goal_status_paused: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goal_status_paused&quot;, &quot;goal_status_paused&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4141, 46),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3073, 34),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_519_266_386)
+<b class="fc">&nbsp;internal val Res.string.goals_add: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goals_add&quot;, &quot;goals_add&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4188, 45),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3108, 29),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_923_713_232)
+<b class="fc">&nbsp;internal val Res.string.goals_card_deadline: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goals_card_deadline&quot;, &quot;goals_card_deadline&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4234, 39),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3138, 39),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-219_003_235)
+<b class="fc">&nbsp;internal val Res.string.goals_card_no_deadline: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goals_card_no_deadline&quot;, &quot;goals_card_no_deadline&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4274, 54),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3178, 46),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(518_530_054)
+<b class="fc">&nbsp;internal val Res.string.goals_empty_subtitle: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goals_empty_subtitle&quot;, &quot;goals_empty_subtitle&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4329, 144),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3225, 76),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_485_659_345)
+<b class="fc">&nbsp;internal val Res.string.goals_empty_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goals_empty_title&quot;, &quot;goals_empty_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4474, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3302, 41),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_213_723_221)
+<b class="fc">&nbsp;internal val Res.string.goals_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:goals_title&quot;, &quot;goals_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4536, 31),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3344, 39),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@InternalResourceApi
-&nbsp;internal fun _collectCommonMainPlurals0Resources(map: MutableMap&lt;String, PluralStringResource&gt;) {
-<b class="nc">&nbsp;  map.put(&quot;category_picker_subcategories&quot;, Res.plurals.category_picker_subcategories)</b>
+&nbsp;internal fun _collectCommonMainString0Resources(map: MutableMap&lt;String, StringResource&gt;) {
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_added_snackbar&quot;, Res.string.goal_contribution_added_snackbar)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_amount_label&quot;, Res.string.goal_contribution_amount_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_date_label&quot;, Res.string.goal_contribution_date_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_error_amount&quot;, Res.string.goal_contribution_error_amount)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_error_below_zero&quot;, Res.string.goal_contribution_error_below_zero)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_error_generic&quot;, Res.string.goal_contribution_error_generic)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_error_paused&quot;, Res.string.goal_contribution_error_paused)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_note_label&quot;, Res.string.goal_contribution_note_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_note_manual&quot;, Res.string.goal_contribution_note_manual)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_save&quot;, Res.string.goal_contribution_save)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_saved_label&quot;, Res.string.goal_contribution_saved_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_title_add&quot;, Res.string.goal_contribution_title_add)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_title_withdraw&quot;, Res.string.goal_contribution_title_withdraw)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_contribution_withdrawn_snackbar&quot;, Res.string.goal_contribution_withdrawn_snackbar)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_actions&quot;, Res.string.goal_details_actions)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_add&quot;, Res.string.goal_details_add)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_archive&quot;, Res.string.goal_details_archive)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_delete&quot;, Res.string.goal_details_delete)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_delete_cancel&quot;, Res.string.goal_details_delete_cancel)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_delete_confirm&quot;, Res.string.goal_details_delete_confirm)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_delete_message&quot;, Res.string.goal_details_delete_message)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_delete_title&quot;, Res.string.goal_details_delete_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_deleted_snackbar&quot;, Res.string.goal_details_deleted_snackbar)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_edit&quot;, Res.string.goal_details_edit)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_history&quot;, Res.string.goal_details_history)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_history_empty&quot;, Res.string.goal_details_history_empty)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_linked_account&quot;, Res.string.goal_details_linked_account)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_linked_account_note&quot;, Res.string.goal_details_linked_account_note)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_of_target&quot;, Res.string.goal_details_of_target)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_pause&quot;, Res.string.goal_details_pause)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_reached&quot;, Res.string.goal_details_reached)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_remaining&quot;, Res.string.goal_details_remaining)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_resume&quot;, Res.string.goal_details_resume)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_unarchive&quot;, Res.string.goal_details_unarchive)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_details_withdraw&quot;, Res.string.goal_details_withdraw)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_cancel&quot;, Res.string.goal_edit_cancel)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_color_label&quot;, Res.string.goal_edit_color_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_created_snackbar&quot;, Res.string.goal_edit_created_snackbar)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_error_currency&quot;, Res.string.goal_edit_error_currency)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_error_generic&quot;, Res.string.goal_edit_error_generic)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_icon_label&quot;, Res.string.goal_edit_icon_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_name_error_required&quot;, Res.string.goal_edit_name_error_required)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_name_label&quot;, Res.string.goal_edit_name_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_save&quot;, Res.string.goal_edit_save)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_target_date_clear&quot;, Res.string.goal_edit_target_date_clear)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_target_date_label&quot;, Res.string.goal_edit_target_date_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_target_date_placeholder&quot;, Res.string.goal_edit_target_date_placeholder)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_target_error&quot;, Res.string.goal_edit_target_error)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_target_label&quot;, Res.string.goal_edit_target_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_title_create&quot;, Res.string.goal_edit_title_create)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_title_edit&quot;, Res.string.goal_edit_title_edit)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_edit_updated_snackbar&quot;, Res.string.goal_edit_updated_snackbar)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_status_active&quot;, Res.string.goal_status_active)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_status_archived&quot;, Res.string.goal_status_archived)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_status_completed&quot;, Res.string.goal_status_completed)</b>
+<b class="nc">&nbsp;  map.put(&quot;goal_status_paused&quot;, Res.string.goal_status_paused)</b>
+<b class="nc">&nbsp;  map.put(&quot;goals_add&quot;, Res.string.goals_add)</b>
+<b class="nc">&nbsp;  map.put(&quot;goals_card_deadline&quot;, Res.string.goals_card_deadline)</b>
+<b class="nc">&nbsp;  map.put(&quot;goals_card_no_deadline&quot;, Res.string.goals_card_no_deadline)</b>
+<b class="nc">&nbsp;  map.put(&quot;goals_empty_subtitle&quot;, Res.string.goals_empty_subtitle)</b>
+<b class="nc">&nbsp;  map.put(&quot;goals_empty_title&quot;, Res.string.goals_empty_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;goals_title&quot;, Res.string.goals_title)</b>
 &nbsp;}
 </code>
 </pre>
@@ -142,7 +691,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CsvBackupState</title>
+  <title>MoneySurfer Coverage Report > CsvBackupViewModel</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: CsvBackupState (com.georgeci.moneysurfer.feature.settings.csv)</h1>
+<h1>Coverage Summary for Class: CsvBackupViewModel (com.georgeci.moneysurfer.feature.settings.csv)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,15 +46,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CsvBackupState</td>
+  <td class="name">CsvBackupViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    77.8%
   </span>
   <span class="absValue">
-    (1/1)
+    (7/9)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    68.8%
+  </span>
+  <span class="absValue">
+    (11/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (24/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    74.1%
+  </span>
+  <span class="absValue">
+    (149/201)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CsvBackupViewModel$handleOpenSource$3</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +96,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +104,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (59/59)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CsvBackupViewModel$handleSaveSink$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (58/58)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.8%
+  </span>
+  <span class="absValue">
+    (11/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.7%
+  </span>
+  <span class="absValue">
+    (35/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.6%
+  </span>
+  <span class="absValue">
+    (266/318)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -106,62 +192,62 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import okio.use
 &nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;@KoinViewModel
+<b class="fc">&nbsp;@KoinViewModel</b>
 &nbsp;class CsvBackupViewModel(
-&nbsp;    private val exportTransactions: ExportTransactionsUseCase,
-&nbsp;    private val importTransactions: ImportTransactionsUseCase,
-&nbsp;    private val clock: ClockUseCase,
-&nbsp;) : MviViewModel&lt;CsvBackupState, CsvBackupEvent, CsvBackupEffect&gt;(initialState = CsvBackupState()) {
+<b class="fc">&nbsp;    private val exportTransactions: ExportTransactionsUseCase,</b>
+<b class="fc">&nbsp;    private val importTransactions: ImportTransactionsUseCase,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
+<b class="fc">&nbsp;) : MviViewModel&lt;CsvBackupState, CsvBackupEvent, CsvBackupEffect&gt;(initialState = CsvBackupState()) {</b>
 &nbsp;
 &nbsp;    override fun onEvent(event: CsvBackupEvent) {
-&nbsp;        when (event) {
-&nbsp;            CsvBackupEvent.OnBackClick -&gt; postSideEffect(CsvBackupEffect.NavigateBack)
-&nbsp;            CsvBackupEvent.OnExportClick -&gt;
-&nbsp;                postSideEffect(CsvBackupEffect.RequestSaveFile(suggestedFilename()))
-&nbsp;            is CsvBackupEvent.OnSaveSinkChosen -&gt; handleSaveSink(event.sink)
-&nbsp;            CsvBackupEvent.OnImportClick -&gt; postSideEffect(CsvBackupEffect.RequestOpenFile)
-&nbsp;            is CsvBackupEvent.OnOpenSourceChosen -&gt; handleOpenSource(event.source)
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="pc">&nbsp;            CsvBackupEvent.OnBackClick -&gt; postSideEffect(CsvBackupEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            CsvBackupEvent.OnExportClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(CsvBackupEffect.RequestSaveFile(suggestedFilename()))</b>
+<b class="fc">&nbsp;            is CsvBackupEvent.OnSaveSinkChosen -&gt; handleSaveSink(event.sink)</b>
+<b class="pc">&nbsp;            CsvBackupEvent.OnImportClick -&gt; postSideEffect(CsvBackupEffect.RequestOpenFile)</b>
+<b class="fc">&nbsp;            is CsvBackupEvent.OnOpenSourceChosen -&gt; handleOpenSource(event.source)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun handleSaveSink(sink: BufferedSink?) {
-&nbsp;        if (sink == null) return
-&nbsp;        updateState { copy(phase = CsvBackupPhase.Exporting) }
-&nbsp;        launch(
+<b class="fc">&nbsp;        if (sink == null) return</b>
+<b class="fc">&nbsp;        updateState { copy(phase = CsvBackupPhase.Exporting) }</b>
+<b class="fc">&nbsp;        launch(</b>
 &nbsp;            onError = { error -&gt;
 &nbsp;                // MviViewModel.launch catches Exception (including cancellation);
 &nbsp;                // rethrow so a cleared ViewModel doesn&#39;t surface as a fake error.
-&nbsp;                if (error is CancellationException) throw error
-&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }
-&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))
-&nbsp;                runCatching { sink.close() }
+<b class="nc">&nbsp;                if (error is CancellationException) throw error</b>
+<b class="nc">&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }</b>
+<b class="nc">&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))</b>
+<b class="nc">&nbsp;                runCatching { sink.close() }</b>
 &nbsp;            },
 &nbsp;        ) {
-&nbsp;            val count = sink.use { exportTransactions(it).getOrThrow() }
-&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle) }
-&nbsp;            postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.ExportSuccess(count)))
+<b class="fc">&nbsp;            val count = sink.use { exportTransactions(it).getOrThrow() }</b>
+<b class="fc">&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle) }</b>
+<b class="fc">&nbsp;            postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.ExportSuccess(count)))</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun handleOpenSource(source: BufferedSource?) {
-&nbsp;        if (source == null) return
-&nbsp;        updateState { copy(phase = CsvBackupPhase.Importing) }
-&nbsp;        launch(
+<b class="fc">&nbsp;        if (source == null) return</b>
+<b class="fc">&nbsp;        updateState { copy(phase = CsvBackupPhase.Importing) }</b>
+<b class="fc">&nbsp;        launch(</b>
 &nbsp;            onError = { error -&gt;
-&nbsp;                if (error is CancellationException) throw error
-&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }
-&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))
-&nbsp;                runCatching { source.close() }
+<b class="pc">&nbsp;                if (error is CancellationException) throw error</b>
+<b class="fc">&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }</b>
+<b class="fc">&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))</b>
+<b class="fc">&nbsp;                runCatching { source.close() }</b>
 &nbsp;            },
 &nbsp;        ) {
-&nbsp;            val report = source.use { importTransactions(it).getOrThrow() }
-&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle, lastImportReport = report) }
-&nbsp;            postSideEffect(
-&nbsp;                CsvBackupEffect.Notify(
-&nbsp;                    CsvBackupNotice.ImportFinished(
-&nbsp;                        imported = report.imported,
-&nbsp;                        skipped = report.skippedDuplicates,
-&nbsp;                        failed = report.errors.size,
+<b class="fc">&nbsp;            val report = source.use { importTransactions(it).getOrThrow() }</b>
+<b class="fc">&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle, lastImportReport = report) }</b>
+<b class="fc">&nbsp;            postSideEffect(</b>
+<b class="fc">&nbsp;                CsvBackupEffect.Notify(</b>
+<b class="fc">&nbsp;                    CsvBackupNotice.ImportFinished(</b>
+<b class="fc">&nbsp;                        imported = report.imported,</b>
+<b class="fc">&nbsp;                        skipped = report.skippedDuplicates,</b>
+<b class="fc">&nbsp;                        failed = report.errors.size,</b>
 &nbsp;                    ),
 &nbsp;                ),
 &nbsp;            )
@@ -169,14 +255,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun suggestedFilename(): String {
-&nbsp;        val now = clock.now().toEpochMilliseconds()
-&nbsp;        return &quot;moneysurfer-transactions-$now.csv&quot;
+<b class="fc">&nbsp;        val now = clock.now().toEpochMilliseconds()</b>
+<b class="fc">&nbsp;        return &quot;moneysurfer-transactions-$now.csv&quot;</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;data class CsvBackupState(
-<b class="fc">&nbsp;    val phase: CsvBackupPhase = CsvBackupPhase.Idle,</b>
-<b class="fc">&nbsp;    val lastImportReport: CsvImportReport? = null,</b>
+&nbsp;    val phase: CsvBackupPhase = CsvBackupPhase.Idle,
+&nbsp;    val lastImportReport: CsvImportReport? = null,
 &nbsp;)
 &nbsp;
 &nbsp;enum class CsvBackupPhase { Idle, Exporting, Importing }
@@ -241,7 +327,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseRemoteDocument</title>
+  <title>MoneySurfer Coverage Report > CategorySyncPlugin</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseRemoteDocument (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: CategorySyncPlugin (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseRemoteDocument</td>
+  <td class="name">CategorySyncPlugin</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (29/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/49)
+    (284/284)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">CategorySyncPlugin$applyDoc$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategorySyncPlugin$push$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (41/41)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (32/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (325/325)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,16 +161,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
-&nbsp;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.remote.CategoryDoc
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
+&nbsp;import com.georgeci.moneysurfer.data.sync.toDoc
+&nbsp;import com.georgeci.moneysurfer.data.sync.toEntity
+&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
+&nbsp;import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
-&nbsp;import dev.gitlive.firebase.firestore.DocumentSnapshot
-&nbsp;import kotlinx.serialization.DeserializationStrategy
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
+&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictMetadata
+&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictResolver
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
 &nbsp;
-<b class="nc">&nbsp;class FirebaseRemoteDocument(val snap: DocumentSnapshot) : RemoteDocument {</b>
-<b class="nc">&nbsp;    override val id: String get() = snap.id</b>
-<b class="nc">&nbsp;    override fun &lt;T&gt; decode(deserializer: DeserializationStrategy&lt;T&gt;): T = snap.data(deserializer)</b>
-<b class="nc">&nbsp;    override fun getLong(field: String): Long? = runCatching { snap.get&lt;Long&gt;(field) }.getOrNull()</b>
+<b class="fc">&nbsp;@Single(binds = [SyncEntityPlugin::class])</b>
+&nbsp;class CategorySyncPlugin(
+<b class="fc">&nbsp;    private val writer: WorkspaceDocumentWriter,</b>
+<b class="fc">&nbsp;    private val appInfo: AppInfo,</b>
+<b class="fc">&nbsp;    private val conflictResolver: ConflictResolver,</b>
+<b class="fc">&nbsp;    private val categoryDao: CategoryDao,</b>
+<b class="fc">&nbsp;    private val transactionDao: TransactionDao,</b>
+&nbsp;) : SyncEntityPlugin {
+&nbsp;
+<b class="fc">&nbsp;    override val entityType: String = SyncEntityTypes.CATEGORY</b>
+<b class="fc">&nbsp;    override val firestoreCollectionName: String = SyncCollection.CATEGORIES</b>
+<b class="fc">&nbsp;    override val pullPriority: Int = SyncPullPriorities.CATEGORIES</b>
+&nbsp;
+<b class="fc">&nbsp;    override suspend fun push(mutation: PendingMutation) = writer.pushToCollection(</b>
+<b class="fc">&nbsp;        mutation = mutation,</b>
+<b class="fc">&nbsp;        collectionName = SyncCollection.CATEGORIES,</b>
+<b class="fc">&nbsp;        clientVersionCode = appInfo.versionCode,</b>
+<b class="fc">&nbsp;        strategy = CategoryDoc.serializer(),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        categoryDao.getById(mutation.entityId)</b>
+<b class="fc">&nbsp;            ?.toDoc()</b>
+<b class="pc">&nbsp;            ?.copy(clientVersionCode = appInfo.versionCode)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
+<b class="fc">&nbsp;        val dto = doc.decodeOrNull(CategoryDoc.serializer()) ?: return SKIPPED_APPLY_RESULT</b>
+<b class="fc">&nbsp;        if (dto.deletedAt != null) {</b>
+<b class="fc">&nbsp;            transactionDao.nullifyCategoryId(doc.id)</b>
+<b class="fc">&nbsp;            categoryDao.delete(doc.id)</b>
+<b class="fc">&nbsp;            return EntityApplyResult(applied = true, wasConflict = false)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        val local = categoryDao.getById(doc.id)</b>
+<b class="fc">&nbsp;        val resolution = conflictResolver.resolve(</b>
+<b class="fc">&nbsp;            local = local,</b>
+<b class="fc">&nbsp;            remote = dto.toEntity(id = doc.id, workspaceId = scopeKey),</b>
+<b class="fc">&nbsp;            metadata = ConflictMetadata(</b>
+<b class="fc">&nbsp;                entityType = SyncEntityTypes.CATEGORY,</b>
+<b class="fc">&nbsp;                entityId = doc.id,</b>
+<b class="fc">&nbsp;                localUpdatedAt = local?.updatedAt?.let(Instant::fromEpochMilliseconds),</b>
+<b class="fc">&nbsp;                remoteUpdatedAt = Instant.fromEpochMilliseconds(dto.updatedAt),</b>
+&nbsp;            ),
+&nbsp;        )
+<b class="fc">&nbsp;        return applyResolution(resolution) { categoryDao.upsertAll(listOf(it)) }</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -133,7 +248,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

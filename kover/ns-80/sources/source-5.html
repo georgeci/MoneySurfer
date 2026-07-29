@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferAccountStatCardKt</title>
+  <title>MoneySurfer Coverage Report > SurferBudgetCategoryVisual</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.account</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferAccountStatCardKt (com.georgeci.moneysurfer.uikit.components.account)</h1>
+<h1>Coverage Summary for Class: SurferBudgetCategoryVisual (com.georgeci.moneysurfer.uikit.components.budget)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferAccountStatCardKt</td>
+  <td class="name">SurferBudgetCategoryVisual</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    0%
   </span>
   <span class="absValue">
-    (2/4)
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    0%
   </span>
   <span class="absValue">
-    (6/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    72.2%
-  </span>
-  <span class="absValue">
-    (26/36)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    67.3%
-  </span>
-  <span class="absValue">
-    (300/446)
+    (0/12)
   </span>
 </td>
 </tr>
@@ -99,133 +92,234 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.account
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
 &nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
 &nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.offset
+&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+&nbsp;/** One category&#39;s mark on a budget card. */
+<b class="nc">&nbsp;data class SurferBudgetCategoryVisual(</b>
+<b class="nc">&nbsp;    val icon: ImageVector,</b>
+<b class="nc">&nbsp;    val tint: Color,</b>
+&nbsp;)
+&nbsp;
 &nbsp;/**
-&nbsp; * Compact &quot;in / out / balance · period&quot; stat tile used on Account Details (and other surfaces
-&nbsp; * that need a small KPI). Built on [SurferCard] so it inherits the active container style; the
-&nbsp; * caller picks the leading icon and its tint to denote direction (income, expense, neutral).
-&nbsp; *
-&nbsp; * Pass [value] as a pre-formatted amount string. When unknown, pass `null` to render an em-dash
-&nbsp; * placeholder; an empty string is treated the same way.
+&nbsp; * The pre-formatted numbers on a budget card. Grouped so the card stays a slot component with a
+&nbsp; * short parameter list — uikit knows nothing about `Money` or currencies, only these strings.
+&nbsp; */
+&nbsp;data class SurferBudgetCardMetrics(
+&nbsp;    val spentOfLimit: String,
+&nbsp;    val remaining: String,
+&nbsp;    val progress: Float,
+&nbsp;    val footer: String,
+&nbsp;    val alertFraction: Float? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * A budget row on the list screen. Everything numeric arrives pre-formatted via [metrics].
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferAccountStatCard(
-&nbsp;    label: String,
-&nbsp;    value: String?,
-&nbsp;    icon: ImageVector,
-&nbsp;    iconTint: Color,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="pc">&nbsp;    val displayValue = value?.takeIf { it.isNotBlank() }</b>
-<b class="fc">&nbsp;    SurferCard(modifier = modifier) {</b>
-<b class="fc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {</b>
-<b class="fc">&nbsp;            Row(</b>
-<b class="fc">&nbsp;                verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;                horizontalArrangement = Arrangement.spacedBy(6.dp),</b>
-&nbsp;            ) {
-<b class="fc">&nbsp;                Icon(</b>
-<b class="fc">&nbsp;                    imageVector = icon,</b>
-<b class="fc">&nbsp;                    contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;                    tint = iconTint,</b>
-<b class="fc">&nbsp;                    modifier = Modifier.size(14.dp),</b>
+&nbsp;fun SurferBudgetCard(
+&nbsp;    name: String,
+&nbsp;    statusLabel: String,
+&nbsp;    status: SurferBudgetStatus,
+&nbsp;    metrics: SurferBudgetCardMetrics,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    categories: List&lt;SurferBudgetCategoryVisual&gt; = emptyList(),
+&nbsp;    onClick: (() -&gt; Unit)? = null,
+&nbsp;) {
+&nbsp;    SurferCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
+&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;                if (categories.isNotEmpty()) {
+&nbsp;                    SurferStackedCategoryBubbles(categories)
+&nbsp;                    Spacer(Modifier.size(10.dp))
+&nbsp;                }
+&nbsp;                Text(
+&nbsp;                    text = name,
+&nbsp;                    style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                    maxLines = 1,
+&nbsp;                    overflow = TextOverflow.Ellipsis,
+&nbsp;                    modifier = Modifier.weight(1f, fill = false),
 &nbsp;                )
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = label,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                Spacer(Modifier.weight(1f))
+&nbsp;                SurferBudgetStatusPill(label = statusLabel, status = status)
+&nbsp;            }
+&nbsp;
+&nbsp;            Row(verticalAlignment = Alignment.Bottom) {
+&nbsp;                Text(
+&nbsp;                    text = metrics.spentOfLimit,
+&nbsp;                    style = AppTheme.typography.bodyMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
 &nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="pc">&nbsp;            if (displayValue == null) {</b>
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = &quot;—&quot;,</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.titleLarge,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            } else {</b>
-<b class="fc">&nbsp;                SurferSplitAmount(</b>
-<b class="fc">&nbsp;                    formattedAmount = displayValue,</b>
-<b class="fc">&nbsp;                    tier = SurferSplitAmountTier.Stat,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+&nbsp;                Spacer(Modifier.weight(1f))
+&nbsp;                Text(
+&nbsp;                    text = metrics.remaining,
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = if (status == SurferBudgetStatus.Over) {
+&nbsp;                        AppTheme.materialColors.error
+&nbsp;                    } else {
+&nbsp;                        AppTheme.materialColors.onSurfaceVariant
+&nbsp;                    },
 &nbsp;                )
 &nbsp;            }
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferAccountStatCardPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;        ) {
-&nbsp;            SurferAccountStatCard(
-&nbsp;                label = &quot;In this month&quot;,
-&nbsp;                value = &quot;€3,200.00&quot;,
-&nbsp;                icon = SurferIcons.ArrowDown,
-&nbsp;                iconTint = Color(0xFF2E9A6A),
-&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            SurferBudgetProgressBar(
+&nbsp;                progress = metrics.progress,
+&nbsp;                status = status,
+&nbsp;                tickFraction = metrics.alertFraction,
 &nbsp;            )
-&nbsp;            SurferAccountStatCard(
-&nbsp;                label = &quot;Out this month&quot;,
-&nbsp;                value = &quot;€1,148.49&quot;,
-&nbsp;                icon = SurferIcons.ArrowUp,
-&nbsp;                iconTint = AppTheme.materialColors.error,
-&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;
+&nbsp;            Text(
+&nbsp;                text = metrics.footer,
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Up to [MAX_BUBBLES] overlapping category bubbles, then a `+N` counter. Overlapping keeps a
+&nbsp; * five-category budget the same width as a one-category budget, so the rows stay aligned.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun SurferStackedCategoryBubbles(categories: List&lt;SurferBudgetCategoryVisual&gt;) {
+&nbsp;    val visible = categories.take(MAX_BUBBLES)
+&nbsp;    val overflow = categories.size - visible.size
+&nbsp;    val border = AppTheme.materialColors.surface
+&nbsp;    Row(horizontalArrangement = Arrangement.spacedBy(BUBBLE_OVERLAP)) {
+&nbsp;        visible.forEach { visual -&gt;
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .size(BUBBLE_SIZE)
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(visual.tint.copy(alpha = 0.18f))
+&nbsp;                    .border(1.5.dp, border, CircleShape),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                Icon(
+&nbsp;                    imageVector = visual.icon,
+&nbsp;                    contentDescription = SurferSemantics.Decorative,
+&nbsp;                    tint = visual.tint,
+&nbsp;                    modifier = Modifier.size(BUBBLE_SIZE / 2),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;        if (overflow &gt; 0) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .size(BUBBLE_SIZE)
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(AppTheme.materialColors.surfaceContainerHighest)
+&nbsp;                    .border(1.5.dp, border, CircleShape),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                Text(
+&nbsp;                    text = &quot;+$overflow&quot;,
+&nbsp;                    style = AppTheme.typography.labelSmall,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    modifier = Modifier.offset(y = (-1).dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private const val MAX_BUBBLES = 3
+&nbsp;private val BUBBLE_SIZE = 28.dp
+&nbsp;
+&nbsp;/** Negative spacing — each bubble sits partly on top of the one before it. */
+&nbsp;private val BUBBLE_OVERLAP = (-8).dp
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferAccountStatCardEmptyPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;private fun SurferBudgetCardPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
 &nbsp;        ) {
-&nbsp;            SurferAccountStatCard(
-&nbsp;                label = &quot;In this month&quot;,
-&nbsp;                value = null,
-&nbsp;                icon = SurferIcons.ArrowDown,
-&nbsp;                iconTint = Color(0xFF2E9A6A),
-&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            SurferBudgetCard(
+&nbsp;                name = &quot;Groceries&quot;,
+&nbsp;                statusLabel = &quot;Near limit&quot;,
+&nbsp;                status = SurferBudgetStatus.Warn,
+&nbsp;                metrics = SurferBudgetCardMetrics(
+&nbsp;                    spentOfLimit = &quot;€312.40 of €400.00&quot;,
+&nbsp;                    remaining = &quot;€87.60 left&quot;,
+&nbsp;                    progress = 0.78f,
+&nbsp;                    footer = &quot;Monthly · Apr 1 – Apr 30 · 12 days left&quot;,
+&nbsp;                    alertFraction = 0.8f,
+&nbsp;                ),
+&nbsp;                categories = listOf(
+&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Receipt, SurferCategoryPalette.tints[0]),
+&nbsp;                ),
+&nbsp;                onClick = {},
 &nbsp;            )
-&nbsp;            SurferAccountStatCard(
-&nbsp;                label = &quot;Out this month&quot;,
-&nbsp;                value = null,
-&nbsp;                icon = SurferIcons.ArrowUp,
-&nbsp;                iconTint = AppTheme.materialColors.error,
-&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            SurferBudgetCard(
+&nbsp;                name = &quot;Transport &amp; fuel&quot;,
+&nbsp;                statusLabel = &quot;Over&quot;,
+&nbsp;                status = SurferBudgetStatus.Over,
+&nbsp;                metrics = SurferBudgetCardMetrics(
+&nbsp;                    spentOfLimit = &quot;€245.10 of €220.00&quot;,
+&nbsp;                    remaining = &quot;€25.10 over&quot;,
+&nbsp;                    progress = 1.11f,
+&nbsp;                    footer = &quot;Monthly · Apr 1 – Apr 30 · 12 days left&quot;,
+&nbsp;                    alertFraction = 0.75f,
+&nbsp;                ),
+&nbsp;                categories = listOf(
+&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Cash, SurferCategoryPalette.tints[1]),
+&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Wallet, SurferCategoryPalette.tints[2]),
+&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Tag, SurferCategoryPalette.tints[3]),
+&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Event, SurferCategoryPalette.tints[4]),
+&nbsp;                ),
+&nbsp;                onClick = {},
+&nbsp;            )
+&nbsp;            SurferBudgetCard(
+&nbsp;                name = &quot;Total monthly cap&quot;,
+&nbsp;                statusLabel = &quot;On track&quot;,
+&nbsp;                status = SurferBudgetStatus.Ok,
+&nbsp;                metrics = SurferBudgetCardMetrics(
+&nbsp;                    spentOfLimit = &quot;€1,408.30 of €2,200.00&quot;,
+&nbsp;                    remaining = &quot;€791.70 left&quot;,
+&nbsp;                    progress = 0.64f,
+&nbsp;                    footer = &quot;Monthly · all categories · 12 days left&quot;,
+&nbsp;                    alertFraction = 0.8f,
+&nbsp;                ),
+&nbsp;                onClick = {},
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -249,7 +343,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

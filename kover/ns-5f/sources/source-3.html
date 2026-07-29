@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > IncomingInvitesEffect</title>
+  <title>MoneySurfer Coverage Report > IncomingInvitesEvent</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.incoming</a>
 </div>
 
-<h1>Coverage Summary for Class: IncomingInvitesEffect (com.georgeci.moneysurfer.feature.workspace.incoming)</h1>
+<h1>Coverage Summary for Class: IncomingInvitesEvent (com.georgeci.moneysurfer.feature.workspace.incoming)</h1>
 
 <table class="coverageStats">
 
@@ -46,35 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">IncomingInvitesEffect$NavigateBack</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">IncomingInvitesEffect$ShowError</td>
+    <td class="name">IncomingInvitesEvent$OnAccept</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -101,14 +73,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
   </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
+  <tr>
+    <td class="name">IncomingInvitesEvent$OnBackClick</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -117,7 +89,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -125,7 +97,91 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/9)
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IncomingInvitesEvent$OnDecline</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IncomingInvitesEvent$OnRefresh</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
   </span>
 </td>
 </tr>
@@ -342,15 +398,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;sealed interface IncomingInvitesEvent {
-&nbsp;    data object OnBackClick : IncomingInvitesEvent
-&nbsp;    data object OnRefresh : IncomingInvitesEvent
-&nbsp;    data class OnAccept(val id: WorkspaceInviteId) : IncomingInvitesEvent
-&nbsp;    data class OnDecline(val id: WorkspaceInviteId) : IncomingInvitesEvent
+<b class="nc">&nbsp;    data object OnBackClick : IncomingInvitesEvent</b>
+<b class="nc">&nbsp;    data object OnRefresh : IncomingInvitesEvent</b>
+<b class="nc">&nbsp;    data class OnAccept(val id: WorkspaceInviteId) : IncomingInvitesEvent</b>
+<b class="nc">&nbsp;    data class OnDecline(val id: WorkspaceInviteId) : IncomingInvitesEvent</b>
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface IncomingInvitesEffect {
-<b class="nc">&nbsp;    data object NavigateBack : IncomingInvitesEffect</b>
-<b class="nc">&nbsp;    data class ShowError(val error: InviteError) : IncomingInvitesEffect</b>
+&nbsp;    data object NavigateBack : IncomingInvitesEffect
+&nbsp;    data class ShowError(val error: InviteError) : IncomingInvitesEffect
 &nbsp;}
 </code>
 </pre>
@@ -375,7 +431,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

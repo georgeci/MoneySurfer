@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CurrencySpendEntity</title>
+  <title>MoneySurfer Coverage Report > TransactionSplitIdMigrationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
 </div>
 
-<h1>Coverage Summary for Class: CurrencySpendEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: TransactionSplitIdMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,15 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CurrencySpendEntity</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">TransactionSplitIdMigrationKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (6/6)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">TransactionSplitIdMigrationKt$MIGRATION_34_35$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,51 +136,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
 &nbsp;
-&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.migration.Migration
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.execSQL
 &nbsp;
-&nbsp;/*
-&nbsp; * Projections returned by the spend aggregate queries in TransactionDao. None of them is a table
-&nbsp; * — Room maps a `GROUP BY` result onto each, so there is no `@Entity` and no schema footprint.
+&nbsp;/**
+&nbsp; * v34 → v35: add `transactions.splitId`, the shared id of the sibling rows one receipt was split
+&nbsp; * across (issue #399).
 &nbsp; *
-&nbsp; * They stay one file because they exist only as the shape of five sibling queries; splitting them
-&nbsp; * would spread one decision across five files without adding a seam anywhere.
+&nbsp; * Pure addition, and nothing is backfilled: every existing row is a single-category transaction,
+&nbsp; * which is exactly what `NULL` means here.
 &nbsp; *
-&nbsp; * Dates arrive as the raw column text (`YYYY-MM-DD`, or `YYYY-MM` sliced out of it). Parsing is
-&nbsp; * the repository&#39;s job: a string the domain cannot read must drop one row, not fail a screen.
+&nbsp; * The index comes with the column rather than later. `getCategorizedWindow` correlates on
+&nbsp; * `splitId` per row to learn a group&#39;s size, and — more immediately — Room validates the schema at
+&nbsp; * open time, so a migrated database missing the index would fail to open where a freshly created
+&nbsp; * one succeeds.
 &nbsp; */
-&nbsp;
-&nbsp;/** Spend for one category inside the window, or for the uncategorized bucket. */
-&nbsp;data class CategorySpendSliceEntity(
-&nbsp;    /** Null for the uncategorized bucket — `transactions.categoryId` is nullable. */
-&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String?,
-&nbsp;    @ColumnInfo(name = &quot;totalMinor&quot;) val totalMinor: Long,
-&nbsp;    @ColumnInfo(name = &quot;transactionCount&quot;) val transactionCount: Int,
-&nbsp;)
-&nbsp;
-&nbsp;/** One `(month, type)` cell of the income-vs-expense trend; the two types arrive as two rows. */
-&nbsp;data class MonthlyTypeTotalEntity(
-&nbsp;    @ColumnInfo(name = &quot;month&quot;) val month: String,
-&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,
-&nbsp;    @ColumnInfo(name = &quot;totalMinor&quot;) val totalMinor: Long,
-&nbsp;)
-&nbsp;
-&nbsp;data class DailySpendEntity(
-&nbsp;    @ColumnInfo(name = &quot;operationDate&quot;) val operationDate: String,
-&nbsp;    @ColumnInfo(name = &quot;totalMinor&quot;) val totalMinor: Long,
-&nbsp;)
-&nbsp;
-&nbsp;data class MerchantSpendEntity(
-&nbsp;    @ColumnInfo(name = &quot;merchant&quot;) val merchant: String,
-&nbsp;    @ColumnInfo(name = &quot;totalMinor&quot;) val totalMinor: Long,
-&nbsp;    @ColumnInfo(name = &quot;transactionCount&quot;) val transactionCount: Int,
-&nbsp;)
-&nbsp;
-<b class="fc">&nbsp;data class CurrencySpendEntity(</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;currencyCode&quot;) val currencyCode: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;totalMinor&quot;) val totalMinor: Long,</b>
-&nbsp;)
+<b class="fc">&nbsp;val MIGRATION_34_35: Migration = object : Migration(34, 35) {</b>
+&nbsp;    override fun migrate(connection: SQLiteConnection) {
+<b class="fc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `transactions` ADD COLUMN `splitId` TEXT DEFAULT NULL&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(</b>
+<b class="fc">&nbsp;            &quot;CREATE INDEX IF NOT EXISTS `index_transactions_splitId` ON `transactions` (`splitId`)&quot;,</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -160,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

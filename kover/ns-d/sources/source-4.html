@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FtsQuery</title>
+  <title>MoneySurfer Coverage Report > UserDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,77 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: FtsQuery (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: UserDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">FtsQuery</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (73/73)
-  </span>
-</td>
+  <td class="name">UserDao</td>
+    <td class="coverageStat"/>
 </tr>
 
 </table>
@@ -99,31 +44,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
 &nbsp;
-&nbsp;/**
-&nbsp; * Turns free-form user input into an FTS4 MATCH expression.
-&nbsp; *
-&nbsp; * Raw input must never reach `MATCH`: unbalanced quotes are a syntax error (SQLite
-&nbsp; * throws, the Flow dies), and bare `OR` / `NOT` / `NEAR` are operators, not words.
-&nbsp; * Everything that is not a letter or a digit is therefore treated as a separator, and
-&nbsp; * each surviving token gets a `*` so typing progressively narrows results instead of
-&nbsp; * matching nothing until the word is complete — the trailing `*` also demotes operator
-&nbsp; * keywords back to ordinary terms.
-&nbsp; *
-&nbsp; * Tokens are space-joined, i.e. implicitly AND-ed by FTS4.
-&nbsp; */
-&nbsp;object FtsQuery {
+&nbsp;import androidx.room.Dao
+&nbsp;import androidx.room.Insert
+&nbsp;import androidx.room.OnConflictStrategy
+&nbsp;import androidx.room.Query
+&nbsp;import androidx.room.Update
+&nbsp;import androidx.room.Upsert
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;    /** Returns null when [raw] carries no searchable token — callers should skip the query. */
-&nbsp;    fun fromUserInput(raw: String): String? {
-<b class="fc">&nbsp;        val tokens = raw</b>
-<b class="fc">&nbsp;            .map { if (it.isLetterOrDigit()) it else &#39; &#39; }</b>
-<b class="fc">&nbsp;            .joinToString(separator = &quot;&quot;)</b>
-<b class="fc">&nbsp;            .split(&#39; &#39;)</b>
-<b class="fc">&nbsp;            .filter { it.isNotEmpty() }</b>
-<b class="fc">&nbsp;        return if (tokens.isEmpty()) null else tokens.joinToString(separator = &quot; &quot;) { &quot;$it*&quot; }</b>
-&nbsp;    }
+&nbsp;@Dao
+&nbsp;interface UserDao {
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM users&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;UserEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM users WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): UserEntity?
+&nbsp;
+&nbsp;    @Insert
+&nbsp;    suspend fun insert(entity: UserEntity)
+&nbsp;
+&nbsp;    @Insert
+&nbsp;    suspend fun insertAll(entities: List&lt;UserEntity&gt;)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stub-insert for foreign user ids that show up via workspace members during a
+&nbsp;     * pull. Skips the row if the id is already present so the local user&#39;s
+&nbsp;     * `displayName` / `isAnon` fields are not overwritten with peer placeholders.
+&nbsp;     */
+&nbsp;    @Insert(onConflict = OnConflictStrategy.IGNORE)
+&nbsp;    suspend fun insertIgnore(entity: UserEntity)
+&nbsp;
+&nbsp;    @Update
+&nbsp;    suspend fun update(entity: UserEntity)
+&nbsp;
+&nbsp;    @Upsert
+&nbsp;    suspend fun upsert(entity: UserEntity)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM users WHERE id = :id&quot;)
+&nbsp;    suspend fun delete(id: String)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM users&quot;)
+&nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
 </pre>
@@ -148,7 +113,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

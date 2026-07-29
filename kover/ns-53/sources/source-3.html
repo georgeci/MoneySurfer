@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PreferenceOption</title>
+  <title>MoneySurfer Coverage Report > PreferenceOptionsSheetKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: PreferenceOption (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
+<h1>Coverage Summary for Class: PreferenceOptionsSheetKt (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PreferenceOption</td>
+  <td class="name">PreferenceOptionsSheetKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,16 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
+    (0/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/381)
   </span>
 </td>
 </tr>
@@ -115,17 +122,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/** One choice in a [PreferenceOptionsSheet]: the value to store and how to write it out. */
-<b class="nc">&nbsp;internal data class PreferenceOption&lt;T&gt;(</b>
-<b class="nc">&nbsp;    val value: T,</b>
-<b class="nc">&nbsp;    val label: String,</b>
+&nbsp;internal data class PreferenceOption&lt;T&gt;(
+&nbsp;    val value: T,
+&nbsp;    val label: String,
 &nbsp;    /** Stable selector for the row, independent of the label — see [PreferencesTestTags]. */
-<b class="nc">&nbsp;    val tag: String,</b>
+&nbsp;    val tag: String,
 &nbsp;)
 &nbsp;
-&nbsp;private val SHEET_PADDING = 20.dp
+<b class="nc">&nbsp;private val SHEET_PADDING = 20.dp</b>
 &nbsp;
 &nbsp;/** Caps the list so a nine-region sheet scrolls instead of pushing the title off the screen. */
-&nbsp;private val LIST_MAX_HEIGHT = 420.dp
+<b class="nc">&nbsp;private val LIST_MAX_HEIGHT = 420.dp</b>
 &nbsp;
 &nbsp;/**
 &nbsp; * Single-choice chooser for one preference row, in the same modal shape the dashboard card-style
@@ -143,34 +150,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    selected: T,
 &nbsp;    onSelect: (T) -&gt; Unit,
 &nbsp;    onDismiss: () -&gt; Unit,
-&nbsp;) {
-&nbsp;    ModalBottomSheet(
-&nbsp;        onDismissRequest = onDismiss,
-&nbsp;        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-&nbsp;        containerColor = AppTheme.materialColors.surfaceContainerLow,
-&nbsp;        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-&nbsp;    ) {
-&nbsp;        SurferBottomSheetContent(title = title) {
-&nbsp;            Column(
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .heightIn(max = LIST_MAX_HEIGHT)
-&nbsp;                    .verticalScroll(rememberScrollState())
-&nbsp;                    .padding(horizontal = SHEET_PADDING),
-&nbsp;                verticalArrangement = Arrangement.spacedBy(8.dp),
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    ModalBottomSheet(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+<b class="nc">&nbsp;        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),</b>
+<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surfaceContainerLow,</b>
+<b class="nc">&nbsp;        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),</b>
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        SurferBottomSheetContent(title = title) {</b>
+<b class="nc">&nbsp;            Column(</b>
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .fillMaxWidth()</b>
+<b class="nc">&nbsp;                    .heightIn(max = LIST_MAX_HEIGHT)</b>
+<b class="nc">&nbsp;                    .verticalScroll(rememberScrollState())</b>
+<b class="nc">&nbsp;                    .padding(horizontal = SHEET_PADDING),</b>
+<b class="nc">&nbsp;                verticalArrangement = Arrangement.spacedBy(8.dp),</b>
 &nbsp;            ) {
-&nbsp;                options.forEach { option -&gt;
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        title = option.label,
-&nbsp;                        onClick = { onSelect(option.value) },
-&nbsp;                        trailing = { SurferSettingsRadio(selected = option.value == selected) },
-&nbsp;                        modifier = Modifier.testTag(option.tag),
+<b class="nc">&nbsp;                options.forEach { option -&gt;</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        title = option.label,</b>
+<b class="nc">&nbsp;                        onClick = { onSelect(option.value) },</b>
+<b class="nc">&nbsp;                        trailing = { SurferSettingsRadio(selected = option.value == selected) },</b>
+<b class="nc">&nbsp;                        modifier = Modifier.testTag(option.tag),</b>
 &nbsp;                    )
-&nbsp;                }
-&nbsp;            }
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -194,7 +201,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountDao</title>
+  <title>MoneySurfer Coverage Report > AccountEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: AccountEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,16 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AccountDao</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
+  <td class="name">AccountEntity</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -69,70 +63,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (45/45)
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (67/67)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">AccountDao$DefaultImpls</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">AccountDao$setSortOrders$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    90%
-  </span>
-  <span class="absValue">
-    (45/50)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -140,75 +92,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
 &nbsp;
-&nbsp;import androidx.room.Dao
-&nbsp;import androidx.room.Insert
-&nbsp;import androidx.room.Query
-&nbsp;import androidx.room.Transaction
-&nbsp;import androidx.room.Update
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.ForeignKey
+&nbsp;import androidx.room.Index
+&nbsp;import androidx.room.PrimaryKey
 &nbsp;
-&nbsp;@Dao
-&nbsp;interface AccountDao {
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM accounts ORDER BY sortOrder ASC, name ASC, id ASC&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;AccountEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM accounts WHERE workspaceId = :workspaceId ORDER BY sortOrder ASC, name ASC, id ASC&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;AccountEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM accounts WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): AccountEntity?
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: AccountEntity)
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;AccountEntity&gt;)
-&nbsp;
-&nbsp;    @Update
-&nbsp;    suspend fun update(entity: AccountEntity)
-&nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;AccountEntity&gt;)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM accounts WHERE id = :id&quot;)
-&nbsp;    suspend fun delete(id: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM accounts&quot;)
-&nbsp;    suspend fun deleteAll()
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE accounts SET balance = balance + :delta, updatedAt = :updatedAt WHERE id = :id&quot;)
-&nbsp;    suspend fun applyDelta(id: String, delta: Long, updatedAt: Long)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE accounts SET balance = :balance, updatedAt = :updatedAt WHERE id = :id&quot;)
-&nbsp;    suspend fun setBalance(id: String, balance: Long, updatedAt: Long)
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;UPDATE accounts SET archived = :archived, archivedAt = :archivedAt, updatedAt = :updatedAt WHERE id = :id&quot;,
-&nbsp;    )
-&nbsp;    suspend fun setArchived(id: String, archived: Boolean, archivedAt: Long?, updatedAt: Long)
-&nbsp;
-&nbsp;    /** Position one past the last account of [workspaceId], i.e. where a new account belongs. */
-&nbsp;    @Query(&quot;SELECT COALESCE(MAX(sortOrder), -1) + 1 FROM accounts WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    suspend fun nextSortOrder(workspaceId: String): Int
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE accounts SET sortOrder = :sortOrder, updatedAt = :updatedAt WHERE id = :id&quot;)
-&nbsp;    suspend fun setSortOrder(id: String, sortOrder: Int, updatedAt: Long)
-&nbsp;
+<b class="fc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;accounts&quot;,
+&nbsp;    foreignKeys = [
+&nbsp;        ForeignKey(
+&nbsp;            entity = WorkspaceEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;workspaceId&quot;],
+&nbsp;        ),
+&nbsp;    ],
+&nbsp;    indices = [Index(&quot;workspaceId&quot;)],
+&nbsp;)
+&nbsp;data class AccountEntity(
+<b class="fc">&nbsp;    @PrimaryKey</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;currency&quot;) val currency: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;balance&quot;) val balance: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;archived&quot;, defaultValue = &quot;0&quot;) val archived: Boolean = false,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+&nbsp;    /** Epoch millis of the archive write, `null` while the account is active. */
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;archivedAt&quot;) val archivedAt: Long? = null,</b>
 &nbsp;    /**
-&nbsp;     * Applies a whole reorder as one write. Row-at-a-time outside a transaction would leave the
-&nbsp;     * list half-reordered for anyone observing the table between the updates, and a failure
-&nbsp;     * midway would leave it there for good.
+&nbsp;     * &quot;Extra details&quot; as a JSON array of `{&quot;key&quot;,&quot;value&quot;}` objects — see
+&nbsp;     * [com.georgeci.moneysurfer.data.db.entity.AccountExtraDetailsColumn]. One column rather than
+&nbsp;     * a child table because the entries have no identity of their own: nothing queries, renames
+&nbsp;     * or counts them across accounts, and they are written and read as one blob with the account.
 &nbsp;     */
-&nbsp;    @Transaction
-<b class="nc">&nbsp;    suspend fun setSortOrders(sortOrders: Map&lt;String, Int&gt;, updatedAt: Long) {</b>
-<b class="fc">&nbsp;        sortOrders.forEach { (id, sortOrder) -&gt; setSortOrder(id, sortOrder, updatedAt) }</b>
-&nbsp;    }
-&nbsp;}
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;extraDetails&quot;, defaultValue = &quot;&#39;[]&#39;&quot;) val extraDetails: String = &quot;[]&quot;,</b>
+&nbsp;    /**
+&nbsp;     * User-defined position within the workspace, ascending. Every read orders by it and falls
+&nbsp;     * back to `name` so rows that share a value — a workspace nobody has reordered yet — still
+&nbsp;     * come out in a stable order.
+&nbsp;     */
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;sortOrder&quot;, defaultValue = &quot;0&quot;) val sortOrder: Int = 0,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -232,7 +160,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferBudgetRingKt</title>
+  <title>MoneySurfer Coverage Report > SurferGoalProgressKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.goal</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferBudgetRingKt (com.georgeci.moneysurfer.uikit.components.budget)</h1>
+<h1>Coverage Summary for Class: SurferGoalProgressKt (com.georgeci.moneysurfer.uikit.components.goal)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferBudgetRingKt</td>
+  <td class="name">SurferGoalProgressKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71.4%
+    80%
   </span>
   <span class="absValue">
-    (5/7)
+    (4/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    41.4%
+    38%
   </span>
   <span class="absValue">
-    (29/70)
+    (19/50)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.1%
+    95.9%
   </span>
   <span class="absValue">
-    (62/72)
+    (70/73)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.9%
+    89.3%
   </span>
   <span class="absValue">
-    (872/1078)
+    (885/991)
   </span>
 </td>
 </tr>
@@ -99,27 +99,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.goal
 &nbsp;
 &nbsp;import androidx.compose.foundation.Canvas
+&nbsp;import androidx.compose.foundation.background
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.geometry.Offset
 &nbsp;import androidx.compose.ui.geometry.Size
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.StrokeCap
 &nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
+&nbsp;import androidx.compose.ui.graphics.drawscope.rotate
+&nbsp;import androidx.compose.ui.text.font.FontWeight
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
@@ -127,205 +132,136 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/**
-&nbsp; * Donut version of [SurferBudgetProgressBar] — the hero on Budget details. Sweeps clockwise
-&nbsp; * from twelve o&#39;clock, capped at a full turn so an overspent budget shows a closed ring in the
-&nbsp; * error colour rather than lapping itself.
-&nbsp; *
-&nbsp; * [content] is stacked in the hole (percent, spent, &quot;of limit&quot;); the caller owns that text so
-&nbsp; * the ring stays free of formatting concerns.
-&nbsp; *
-&nbsp; * [color] defaults to the colour [status] maps to, which is what a budget screen wants. A caller
-&nbsp; * whose shape is not primarily about a budget overrides it — the dashboard&#39;s spent-by-category card
-&nbsp; * paints a category in its own tint until its cap has something to report, and passes that decision
-&nbsp; * here so its ring cannot disagree with the legend beside it.
+&nbsp; * Flat progress bar for a goal card. v1 draws the fill only — the mockup&#39;s &quot;expected today&quot;
+&nbsp; * tick ships with the forecast work (md/goals.md).
 &nbsp; */
 &nbsp;@Composable
-<b class="nc">&nbsp;fun SurferBudgetRing(</b>
+<b class="nc">&nbsp;fun SurferGoalProgressBar(</b>
 &nbsp;    progress: Float,
-&nbsp;    status: SurferBudgetStatus,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    size: Dp = 176.dp,</b>
-<b class="fc">&nbsp;    strokeWidth: Dp = 14.dp,</b>
-<b class="fc">&nbsp;    color: Color = status.color,</b>
-&nbsp;    content: @Composable () -&gt; Unit = {},
+<b class="fc">&nbsp;    color: Color = AppTheme.materialColors.primary,</b>
+<b class="fc">&nbsp;    height: Dp = 8.dp,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    ArcMeter(</b>
-<b class="fc">&nbsp;        progress = progress,</b>
-<b class="fc">&nbsp;        color = color,</b>
-<b class="fc">&nbsp;        span = ArcSpan.FullTurn,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        width = size,</b>
-<b class="fc">&nbsp;        strokeWidth = strokeWidth,</b>
-<b class="fc">&nbsp;        content = content,</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Half-turn sibling of [SurferBudgetRing] — the dial the dashboard&#39;s spent-by-category card draws
-&nbsp; * for a single category. Sweeps clockwise from nine o&#39;clock through twelve to three, so [content]
-&nbsp; * sits under the arc rather than inside a hole, and the card only pays for the height the dial
-&nbsp; * actually uses.
-&nbsp; *
-&nbsp; * Shares [ArcMeter] with the ring on purpose: the two differ in the arc they span and nothing else,
-&nbsp; * and a second copy of the geometry is how a status colour or a cap ends up fixed in one shape and
-&nbsp; * not the other. [color] overrides the status colour exactly as it does on [SurferBudgetRing].
-&nbsp; */
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SurferBudgetGauge(</b>
-&nbsp;    progress: Float,
-&nbsp;    status: SurferBudgetStatus,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    width: Dp = 176.dp,</b>
-<b class="nc">&nbsp;    strokeWidth: Dp = 12.dp,</b>
-<b class="fc">&nbsp;    color: Color = status.color,</b>
-&nbsp;    content: @Composable () -&gt; Unit = {},
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    ArcMeter(</b>
-<b class="fc">&nbsp;        progress = progress,</b>
-<b class="fc">&nbsp;        color = color,</b>
-<b class="fc">&nbsp;        span = ArcSpan.TopHalf,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        width = width,</b>
-<b class="fc">&nbsp;        strokeWidth = strokeWidth,</b>
-<b class="fc">&nbsp;        content = content,</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * How much of the circle a meter draws, and what that leaves for its content.
-&nbsp; *
-&nbsp; * [heightRatio] is the share of the meter&#39;s width the box keeps: a full turn needs a square, a top
-&nbsp; * half only needs enough for the arc plus the line under it.
-&nbsp; */
-&nbsp;private data class ArcSpan(
-&nbsp;    val startDegrees: Float,
-&nbsp;    val sweepDegrees: Float,
-&nbsp;    val heightRatio: Float,
-&nbsp;    val contentAlignment: Alignment,
-&nbsp;) {
-&nbsp;    companion object {
-&nbsp;        /** Twelve o&#39;clock all the way round — Compose measures arc angles from three o&#39;clock. */
-&nbsp;        val FullTurn = ArcSpan(
-&nbsp;            startDegrees = -90f,
-&nbsp;            sweepDegrees = 360f,
-&nbsp;            heightRatio = 1f,
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        )
-&nbsp;
-&nbsp;        /** Nine o&#39;clock to three o&#39;clock over the top. */
-&nbsp;        val TopHalf = ArcSpan(
-&nbsp;            startDegrees = 180f,
-&nbsp;            sweepDegrees = 180f,
-&nbsp;            heightRatio = 0.62f,
-&nbsp;            contentAlignment = Alignment.BottomCenter,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ArcMeter(
-&nbsp;    progress: Float,
-&nbsp;    color: Color,
-&nbsp;    span: ArcSpan,
-&nbsp;    modifier: Modifier,
-&nbsp;    width: Dp,
-&nbsp;    strokeWidth: Dp,
-&nbsp;    content: @Composable () -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val track = AppTheme.materialColors.surfaceContainerHighest</b>
-<b class="fc">&nbsp;    val capped = progress.coerceIn(0f, 1f)</b>
-&nbsp;
 <b class="fc">&nbsp;    Box(</b>
 <b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .width(width)</b>
-<b class="fc">&nbsp;            .height(width * span.heightRatio),</b>
-<b class="fc">&nbsp;        contentAlignment = span.contentAlignment,</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .height(height)</b>
+<b class="fc">&nbsp;            .clip(CircleShape)</b>
+<b class="fc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerHighest),</b>
 &nbsp;    ) {
-<b class="fc">&nbsp;        Canvas(modifier = Modifier.fillMaxSize()) {</b>
-&nbsp;            // The arc always lives in a square the width of the box, anchored at its top — a
-&nbsp;            // partial span simply leaves the rest of that square outside the box, unpainted.
-<b class="fc">&nbsp;            val stroke = strokeWidth.toPx()</b>
-<b class="fc">&nbsp;            val inset = stroke / 2f</b>
-<b class="fc">&nbsp;            val arcSize = Size(size.width - stroke, size.width - stroke)</b>
-<b class="fc">&nbsp;            drawArc(</b>
-<b class="fc">&nbsp;                color = track,</b>
-<b class="fc">&nbsp;                startAngle = span.startDegrees,</b>
-<b class="fc">&nbsp;                sweepAngle = span.sweepDegrees,</b>
-<b class="fc">&nbsp;                useCenter = false,</b>
-<b class="fc">&nbsp;                topLeft = Offset(inset, inset),</b>
-<b class="fc">&nbsp;                size = arcSize,</b>
-<b class="fc">&nbsp;                style = Stroke(width = stroke),</b>
-&nbsp;            )
-<b class="pc">&nbsp;            if (capped &gt; 0f) {</b>
-<b class="fc">&nbsp;                drawArc(</b>
-<b class="fc">&nbsp;                    color = color,</b>
-<b class="fc">&nbsp;                    startAngle = span.startDegrees,</b>
-<b class="fc">&nbsp;                    sweepAngle = span.sweepDegrees * capped,</b>
-<b class="fc">&nbsp;                    useCenter = false,</b>
-<b class="fc">&nbsp;                    topLeft = Offset(inset, inset),</b>
-<b class="fc">&nbsp;                    size = arcSize,</b>
-<b class="fc">&nbsp;                    style = Stroke(width = stroke, cap = StrokeCap.Round),</b>
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-<b class="fc">&nbsp;        content()</b>
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth(progress.coerceIn(0f, 1f))</b>
+<b class="fc">&nbsp;                .fillMaxHeight()</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(color),</b>
+&nbsp;        )
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
-<b class="fc">&nbsp;private val previewSamples = listOf(</b>
-<b class="fc">&nbsp;    0.42f to SurferBudgetStatus.Ok,</b>
-<b class="fc">&nbsp;    0.86f to SurferBudgetStatus.Warn,</b>
-<b class="fc">&nbsp;    1.2f to SurferBudgetStatus.Over,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * Details-screen hero: a progress ring with `% → saved → of target` stacked inside it.
+&nbsp; *
+&nbsp; * The arc is shared with the dashboard [com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget]
+&nbsp; * via [SurferGoalRingArc] so the two never drift apart.
+&nbsp; */
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferGoalProgressRing(</b>
+&nbsp;    progress: Float,
+&nbsp;    percentLabel: String,
+&nbsp;    savedLabel: String,
+&nbsp;    targetLabel: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    size: Dp = 176.dp,</b>
+<b class="fc">&nbsp;    color: Color = AppTheme.materialColors.primary,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Box(modifier = modifier.size(size), contentAlignment = Alignment.Center) {</b>
+<b class="fc">&nbsp;        SurferGoalRingArc(progress = progress, size = size, color = color)</b>
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(2.dp),</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = percentLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold),</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = savedLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = targetLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** The bare ring: track plus a rounded fill arc starting at twelve o&#39;clock. */
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferGoalRingArc(</b>
+&nbsp;    progress: Float,
+&nbsp;    size: Dp,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    color: Color = AppTheme.materialColors.primary,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val track = AppTheme.materialColors.surfaceContainerHigh</b>
+<b class="pc">&nbsp;    Canvas(modifier = modifier.size(size)) {</b>
+<b class="fc">&nbsp;        val stroke = (this.size.minDimension / RING_STROKE_DIVISOR).coerceAtLeast(MIN_STROKE)</b>
+<b class="fc">&nbsp;        val inset = stroke / 2f</b>
+<b class="fc">&nbsp;        val box = Size(this.size.width - stroke, this.size.height - stroke)</b>
+<b class="fc">&nbsp;        val topLeft = Offset(inset, inset)</b>
+<b class="fc">&nbsp;        drawArc(</b>
+<b class="fc">&nbsp;            color = track,</b>
+<b class="fc">&nbsp;            startAngle = 0f,</b>
+<b class="fc">&nbsp;            sweepAngle = FULL_TURN,</b>
+<b class="fc">&nbsp;            useCenter = false,</b>
+<b class="fc">&nbsp;            topLeft = topLeft,</b>
+<b class="fc">&nbsp;            size = box,</b>
+<b class="fc">&nbsp;            style = Stroke(width = stroke),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        rotate(degrees = QUARTER_TURN_BACK) {</b>
+<b class="fc">&nbsp;            drawArc(</b>
+<b class="fc">&nbsp;                color = color,</b>
+<b class="fc">&nbsp;                startAngle = 0f,</b>
+<b class="fc">&nbsp;                sweepAngle = FULL_TURN * progress.coerceIn(0f, 1f),</b>
+<b class="fc">&nbsp;                useCenter = false,</b>
+<b class="fc">&nbsp;                topLeft = topLeft,</b>
+<b class="fc">&nbsp;                size = box,</b>
+<b class="fc">&nbsp;                style = Stroke(width = stroke, cap = StrokeCap.Round),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val RING_STROKE_DIVISOR = 16f
+&nbsp;private const val MIN_STROKE = 3f
+&nbsp;private const val FULL_TURN = 360f
+&nbsp;private const val QUARTER_TURN_BACK = -90f
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferBudgetRingPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
+&nbsp;private fun SurferGoalProgressPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
 &nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(16.dp),
 &nbsp;        ) {
-&nbsp;            previewSamples.forEach { (progress, status) -&gt;
-&nbsp;                SurferBudgetRing(progress = progress, status = status, size = 120.dp) {
-&nbsp;                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-&nbsp;                        Text(
-&nbsp;                            text = &quot;${(progress * 100).toInt()}%&quot;,
-&nbsp;                            style = AppTheme.typography.headlineSmall,
-&nbsp;                            color = AppTheme.materialColors.onSurface,
-&nbsp;                        )
-&nbsp;                        Text(
-&nbsp;                            text = &quot;of €400&quot;,
-&nbsp;                            style = AppTheme.typography.bodySmall,
-&nbsp;                            color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                }
+&nbsp;            SurferGoalProgressBar(progress = 0.62f)
+&nbsp;            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+&nbsp;                SurferGoalProgressRing(
+&nbsp;                    progress = 0.74f,
+&nbsp;                    percentLabel = &quot;74%&quot;,
+&nbsp;                    savedLabel = &quot;€8,915&quot;,
+&nbsp;                    targetLabel = &quot;of €12,000&quot;,
+&nbsp;                )
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferBudgetGaugePreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(16.dp),
-&nbsp;        ) {
-&nbsp;            previewSamples.forEach { (progress, status) -&gt;
-&nbsp;                SurferBudgetGauge(progress = progress, status = status, width = 120.dp) {
-&nbsp;                    Text(
-&nbsp;                        text = &quot;${(progress * 100).toInt()}%&quot;,
-&nbsp;                        style = AppTheme.typography.titleMedium,
-&nbsp;                        color = AppTheme.materialColors.onSurface,
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -349,7 +285,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CsvBackupViewModel</title>
+  <title>MoneySurfer Coverage Report > DebugLogTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,158 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.csv</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.debug</a>
 </div>
 
-<h1>Coverage Summary for Class: CsvBackupViewModel (com.georgeci.moneysurfer.feature.settings.csv)</h1>
+<h1>Coverage Summary for Class: DebugLogTestTags (com.georgeci.moneysurfer.feature.settings.debug)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">CsvBackupViewModel</td>
-<td class="coverageStat">
-  <span class="percent">
-    77.8%
-  </span>
-  <span class="absValue">
-    (7/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    68.8%
-  </span>
-  <span class="absValue">
-    (11/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    85.7%
-  </span>
-  <span class="absValue">
-    (24/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    74.1%
-  </span>
-  <span class="absValue">
-    (149/201)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">CsvBackupViewModel$handleOpenSource$3</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">DebugLogTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (59/59)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">CsvBackupViewModel$handleSaveSink$3</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (58/58)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    81.8%
-  </span>
-  <span class="absValue">
-    (9/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    68.8%
-  </span>
-  <span class="absValue">
-    (11/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    89.7%
-  </span>
-  <span class="absValue">
-    (35/39)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    83.6%
-  </span>
-  <span class="absValue">
-    (266/318)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
@@ -178,131 +44,172 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.csv
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.debug
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.csv.CsvImportReport
-&nbsp;import com.georgeci.moneysurfer.domain.csv.ExportTransactionsUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.csv.ImportTransactionsUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.csv.TransactionCsvError
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.CancellationException
-&nbsp;import okio.BufferedSink
-&nbsp;import okio.BufferedSource
-&nbsp;import okio.use
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import androidx.compose.foundation.horizontalScroll
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.collectAsState
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.key
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.font.FontFamily
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.logging.DebugLogBuffer
+&nbsp;import com.georgeci.moneysurfer.domain.logging.DebugLogEntry
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_clear
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_empty
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_footnote
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-<b class="fc">&nbsp;@KoinViewModel</b>
-&nbsp;class CsvBackupViewModel(
-<b class="fc">&nbsp;    private val exportTransactions: ExportTransactionsUseCase,</b>
-<b class="fc">&nbsp;    private val importTransactions: ImportTransactionsUseCase,</b>
-<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
-<b class="fc">&nbsp;) : MviViewModel&lt;CsvBackupState, CsvBackupEvent, CsvBackupEffect&gt;(initialState = CsvBackupState()) {</b>
-&nbsp;
-&nbsp;    override fun onEvent(event: CsvBackupEvent) {
-<b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            CsvBackupEvent.OnBackClick -&gt; postSideEffect(CsvBackupEffect.NavigateBack)</b>
-<b class="fc">&nbsp;            CsvBackupEvent.OnExportClick -&gt;</b>
-<b class="fc">&nbsp;                postSideEffect(CsvBackupEffect.RequestSaveFile(suggestedFilename()))</b>
-<b class="fc">&nbsp;            is CsvBackupEvent.OnSaveSinkChosen -&gt; handleSaveSink(event.sink)</b>
-<b class="pc">&nbsp;            CsvBackupEvent.OnImportClick -&gt; postSideEffect(CsvBackupEffect.RequestOpenFile)</b>
-<b class="fc">&nbsp;            is CsvBackupEvent.OnOpenSourceChosen -&gt; handleOpenSource(event.source)</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun handleSaveSink(sink: BufferedSink?) {
-<b class="fc">&nbsp;        if (sink == null) return</b>
-<b class="fc">&nbsp;        updateState { copy(phase = CsvBackupPhase.Exporting) }</b>
-<b class="fc">&nbsp;        launch(</b>
-&nbsp;            onError = { error -&gt;
-&nbsp;                // MviViewModel.launch catches Exception (including cancellation);
-&nbsp;                // rethrow so a cleared ViewModel doesn&#39;t surface as a fake error.
-<b class="nc">&nbsp;                if (error is CancellationException) throw error</b>
-<b class="nc">&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }</b>
-<b class="nc">&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))</b>
-<b class="nc">&nbsp;                runCatching { sink.close() }</b>
-&nbsp;            },
-&nbsp;        ) {
-<b class="fc">&nbsp;            val count = sink.use { exportTransactions(it).getOrThrow() }</b>
-<b class="fc">&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle) }</b>
-<b class="fc">&nbsp;            postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.ExportSuccess(count)))</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun handleOpenSource(source: BufferedSource?) {
-<b class="fc">&nbsp;        if (source == null) return</b>
-<b class="fc">&nbsp;        updateState { copy(phase = CsvBackupPhase.Importing) }</b>
-<b class="fc">&nbsp;        launch(</b>
-&nbsp;            onError = { error -&gt;
-<b class="pc">&nbsp;                if (error is CancellationException) throw error</b>
-<b class="fc">&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }</b>
-<b class="fc">&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))</b>
-<b class="fc">&nbsp;                runCatching { source.close() }</b>
-&nbsp;            },
-&nbsp;        ) {
-<b class="fc">&nbsp;            val report = source.use { importTransactions(it).getOrThrow() }</b>
-<b class="fc">&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle, lastImportReport = report) }</b>
-<b class="fc">&nbsp;            postSideEffect(</b>
-<b class="fc">&nbsp;                CsvBackupEffect.Notify(</b>
-<b class="fc">&nbsp;                    CsvBackupNotice.ImportFinished(</b>
-<b class="fc">&nbsp;                        imported = report.imported,</b>
-<b class="fc">&nbsp;                        skipped = report.skippedDuplicates,</b>
-<b class="fc">&nbsp;                        failed = report.errors.size,</b>
-&nbsp;                    ),
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun suggestedFilename(): String {
-<b class="fc">&nbsp;        val now = clock.now().toEpochMilliseconds()</b>
-<b class="fc">&nbsp;        return &quot;moneysurfer-transactions-$now.csv&quot;</b>
-&nbsp;    }
+&nbsp;/** Stable selectors for the QA log panel — see docs/testing/testing-strategy.md. */
+&nbsp;object DebugLogTestTags {
+&nbsp;    const val Root = &quot;debugLog:root&quot;
+&nbsp;    const val ClearRow = &quot;debugLog:clear&quot;
+&nbsp;    const val Empty = &quot;debugLog:empty&quot;
 &nbsp;}
-&nbsp;
-&nbsp;data class CsvBackupState(
-&nbsp;    val phase: CsvBackupPhase = CsvBackupPhase.Idle,
-&nbsp;    val lastImportReport: CsvImportReport? = null,
-&nbsp;)
-&nbsp;
-&nbsp;enum class CsvBackupPhase { Idle, Exporting, Importing }
 &nbsp;
 &nbsp;/**
-&nbsp; * User-facing notice raised by the CSV flow. Resolution to localised strings
-&nbsp; * happens in the screen layer via Compose resources — keeping the ViewModel
-&nbsp; * free of platform string APIs.
+&nbsp; * The last Warn/Error lines Kermit produced in this process, straight off [DebugLogBuffer].
+&nbsp; *
+&nbsp; * No ViewModel: the buffer is already a process-wide `StateFlow` with nothing to fetch, map or
+&nbsp; * persist, and clearing it is a direct call. Threading it through Koin would buy a constructor
+&nbsp; * parameter and nothing else.
 &nbsp; */
-&nbsp;sealed interface CsvBackupNotice {
-&nbsp;    data class ExportSuccess(val count: Int) : CsvBackupNotice
-&nbsp;    data class ImportFinished(val imported: Int, val skipped: Int, val failed: Int) : CsvBackupNotice
-&nbsp;    data object InvalidFile : CsvBackupNotice
-&nbsp;    data object FileTooLarge : CsvBackupNotice
-&nbsp;    data object Generic : CsvBackupNotice
+&nbsp;@Composable
+&nbsp;fun DebugLogScreen(onNavigateBack: () -&gt; Unit) {
+&nbsp;    val entries by DebugLogBuffer.entries.collectAsState()
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        fun fromError(error: Throwable): CsvBackupNotice = when (error) {
-&nbsp;            is TransactionCsvError.EmptyFile,
-&nbsp;            is TransactionCsvError.HeaderMismatch,
-&nbsp;            -&gt; InvalidFile
-&nbsp;            is TransactionCsvError.FileTooLarge -&gt; FileTooLarge
-&nbsp;            else -&gt; Generic
+&nbsp;    DebugLogContent(
+&nbsp;        entries = entries,
+&nbsp;        onBack = onNavigateBack,
+&nbsp;        onClear = DebugLogBuffer::clear,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Stateless content, public so `:composeApp`&#39;s desktop UI tests can mount it — as with the other screens. */
+&nbsp;@Composable
+&nbsp;fun DebugLogContent(
+&nbsp;    entries: List&lt;DebugLogEntry&gt;,
+&nbsp;    onBack: () -&gt; Unit,
+&nbsp;    onClear: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val snackbarHostState = remember { SnackbarHostState() }
+&nbsp;
+&nbsp;    SettingsSubScreenScaffold(
+&nbsp;        title = stringResource(Res.string.settings_debug_log_title),
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onBack = onBack,
+&nbsp;        showProgressOverlay = false,
+&nbsp;    ) { padding -&gt;
+&nbsp;        if (entries.isEmpty()) {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_debug_log_empty),
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier
+&nbsp;                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.default)
+&nbsp;                    .testTag(DebugLogTestTags.Empty),
+&nbsp;            )
+&nbsp;            return@SettingsSubScreenScaffold
 &nbsp;        }
+&nbsp;
+&nbsp;        // Above the list, not under it: a full buffer is 100 entries deep with stack traces, and a
+&nbsp;        // Clear button at the bottom of that is a button nobody reaches.
+&nbsp;        SurferSettingsGroup {
+&nbsp;            SurferSettingsRow(
+&nbsp;                icon = SurferIcons.Delete,
+&nbsp;                title = stringResource(Res.string.settings_debug_log_clear),
+&nbsp;                danger = true,
+&nbsp;                onClick = onClear,
+&nbsp;                modifier = Modifier.testTag(DebugLogTestTags.ClearRow),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        SurferSettingsGroup(
+&nbsp;            modifier = Modifier.testTag(DebugLogTestTags.Root),
+&nbsp;            footnote = stringResource(Res.string.settings_debug_log_footnote),
+&nbsp;        ) {
+&nbsp;            // A plain column rather than a LazyColumn: the scaffold already scrolls vertically, and
+&nbsp;            // nesting a lazy list in it measures with infinite height. The buffer is capped at 100
+&nbsp;            // entries, so composing them all is affordable — as long as they are keyed. New lines
+&nbsp;            // are prepended, so an unkeyed loop shifts every row by one position and recomposes the
+&nbsp;            // whole list on each of them, which at 100 stack traces is enough to stall the screen
+&nbsp;            // during exactly the error burst it exists to show.
+&nbsp;            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default)) {
+&nbsp;                entries.forEach { entry -&gt;
+&nbsp;                    key(entry.id) { DebugLogEntryRow(entry) }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface CsvBackupEvent {
-&nbsp;    data object OnBackClick : CsvBackupEvent
-&nbsp;    data object OnExportClick : CsvBackupEvent
-&nbsp;    data class OnSaveSinkChosen(val sink: BufferedSink?) : CsvBackupEvent
-&nbsp;    data object OnImportClick : CsvBackupEvent
-&nbsp;    data class OnOpenSourceChosen(val source: BufferedSource?) : CsvBackupEvent
-&nbsp;}
+&nbsp;/**
+&nbsp; * Severity and tag on one line, then the message, then the stack trace when the line carried a
+&nbsp; * throwable — which is the part worth reading on a device with no console attached, so it scrolls
+&nbsp; * sideways rather than wrapping into unreadable ribbons.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun DebugLogEntryRow(entry: DebugLogEntry) {
+&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.fillMaxWidth(),
+&nbsp;            horizontalArrangement = Arrangement.SpaceBetween,
+&nbsp;        ) {
+&nbsp;            Text(
+&nbsp;                text = entry.severity.name,
+&nbsp;                style = AppTheme.typography.labelMedium,
+&nbsp;                color = AppTheme.materialColors.error,
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = entry.tag.ifBlank { &quot;NoTag&quot; },
+&nbsp;                style = AppTheme.typography.labelMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
 &nbsp;
-&nbsp;sealed interface CsvBackupEffect {
-&nbsp;    data object NavigateBack : CsvBackupEffect
-&nbsp;    data class RequestSaveFile(val suggestedName: String) : CsvBackupEffect
-&nbsp;    data object RequestOpenFile : CsvBackupEffect
-&nbsp;    data class Notify(val notice: CsvBackupNotice) : CsvBackupEffect
+&nbsp;        Text(
+&nbsp;            text = entry.message,
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;        )
+&nbsp;
+&nbsp;        entry.throwable?.let { throwable -&gt;
+&nbsp;            // Remembered: serialising a deep coroutine stack is not something to redo on every
+&nbsp;            // recomposition of a screen that recomposes whenever anything logs.
+&nbsp;            val stackTrace = remember(throwable) { throwable.stackTraceToString() }
+&nbsp;
+&nbsp;            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+&nbsp;                Text(
+&nbsp;                    text = stackTrace,
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    fontFamily = FontFamily.Monospace,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -327,7 +234,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppRestarter</title>
+  <title>MoneySurfer Coverage Report > ConfigDebugLayerCell</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.backup</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: AppRestarter (com.georgeci.moneysurfer.domain.backup)</h1>
+<h1>Coverage Summary for Class: ConfigDebugLayerCell (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppRestarter</td>
+  <td class="name">ConfigDebugLayerCell</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -61,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,66 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (17/17)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">AppRestarter$DefaultImpls</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    33.3%
-  </span>
-  <span class="absValue">
-    (1/3)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,39 +92,83 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.backup
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;import okio.Path
-&nbsp;
-&nbsp;/**
-&nbsp; * Locates the on-disk files that participate in a backup, per platform.
-&nbsp; * Implementations live in `:data-local` (`{Android,Ios,Jvm}BackupStorageLocator`)
-&nbsp; * and are bound to this interface in `SharedPlatformModule`.
-&nbsp; */
-&nbsp;interface BackupStorageLocator {
-&nbsp;    val platformName: String
-&nbsp;    fun moneySurferDbFile(): Path
-&nbsp;    fun syncDbFile(): Path
-&nbsp;    fun dataStoreFile(): Path
-&nbsp;}
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;/**
-&nbsp; * Restarts the host process so newly-imported on-disk state is observed.
+&nbsp; * Read/write view of every configuration key, for the QA panel in debug builds.
 &nbsp; *
-&nbsp; * iOS implementations cannot relaunch programmatically; they exit cleanly
-&nbsp; * and the calling layer surfaces a &quot;please reopen&quot; message.
+&nbsp; * Everything is pre-rendered as strings and the write path is keyed by name, so no `ConfigKey&lt;*&gt;`
+&nbsp; * — and no `app-config` dependency — reaches `feature/settings`.
 &nbsp; */
-&nbsp;interface AppRestarter {
-&nbsp;    /**
-&nbsp;     * `true` when [restart] only terminates the process and the user has to
-&nbsp;     * open the app again by hand (iOS). Callers must show that as an explicit
-&nbsp;     * message *before* invoking [restart], or a successful restore looks like
-&nbsp;     * a crash.
-&nbsp;     */
-<b class="pc">&nbsp;    val requiresManualRelaunch: Boolean get() = false</b>
+&nbsp;interface DebugConfigInspector {
 &nbsp;
-&nbsp;    fun restart()
+&nbsp;    /**
+&nbsp;     * `false` in release builds, where the Debug layer is empty. The panel and its entry point are
+&nbsp;     * hidden rather than shown broken.
+&nbsp;     */
+&nbsp;    val isAvailable: Boolean
+&nbsp;
+&nbsp;    val rows: Flow&lt;List&lt;ConfigDebugRow&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Names of layers whose store could not be read at startup, pre-rendered. Empty on the happy
+&nbsp;     * path.
+&nbsp;     *
+&nbsp;     * Their rows resolve as if the layer were empty, so without this the panel would report a stale
+&nbsp;     * fallback as the real answer. Recovery is automatic once the store is readable again.
+&nbsp;     */
+&nbsp;    val degradedLayers: List&lt;String&gt;
+&nbsp;
+&nbsp;    /** Fails when [raw] does not decode through the key&#39;s codec, or when the key is unknown. */
+&nbsp;    suspend fun override(name: String, raw: String): Result&lt;Unit&gt;
+&nbsp;
+&nbsp;    suspend fun clearOverride(name: String)
+&nbsp;
+&nbsp;    suspend fun resetAll()
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One key as the panel sees it.
+&nbsp; *
+&nbsp; * @param effectiveValue the resolved value, encoded.
+&nbsp; * @param winner name of the layer that won, or `&quot;default&quot;` when no layer holds the key.
+&nbsp; * @param kind which control to render — a text field for `PaletteSource`&#39;s `PRESET:&lt;seed&gt;` format
+&nbsp; *   is a routine way to fail.
+&nbsp; * @param overridden `true` when the Debug layer holds anything for this key, i.e. this row can be
+&nbsp; *   cleared. Deliberately not &quot;the Debug layer won&quot;: an override the codec can no longer read does
+&nbsp; *   not win, and it is exactly the one a tester needs to remove.
+&nbsp; * @param hostOwned `true` for a key that describes the build itself (`host.*`). Overriding one of
+&nbsp; *   these changes what the app believes it is while its DI graph stays as compiled — useful for QA,
+&nbsp; *   but not the same kind of switch as a feature flag, so the panel says so.
+&nbsp; */
+&nbsp;data class ConfigDebugRow(
+&nbsp;    val name: String,
+&nbsp;    val effectiveValue: String,
+&nbsp;    val winner: String,
+&nbsp;    val kind: ConfigDebugRowKind,
+&nbsp;    val overridden: Boolean,
+&nbsp;    val hostOwned: Boolean = false,
+&nbsp;    val layers: List&lt;ConfigDebugLayerCell&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface ConfigDebugRowKind {
+&nbsp;    data object Bool : ConfigDebugRowKind
+&nbsp;    data class Choice(val choices: List&lt;String&gt;) : ConfigDebugRowKind
+&nbsp;    data object FreeText : ConfigDebugRowKind
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One layer&#39;s contribution. [value] is `null` when the layer does not hold the key; [undecodable]
+&nbsp; * distinguishes &quot;stored but rejected by the codec&quot; from that, which is the whole reason the panel
+&nbsp; * shows per-layer cells at all.
+&nbsp; */
+<b class="fc">&nbsp;data class ConfigDebugLayerCell(</b>
+<b class="fc">&nbsp;    val layer: String,</b>
+<b class="fc">&nbsp;    val value: String?,</b>
+<b class="fc">&nbsp;    val undecodable: Boolean,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -192,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

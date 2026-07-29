@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MoneySurferDatabaseKt</title>
+  <title>MoneySurfer Coverage Report > GoalDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: MoneySurferDatabaseKt (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: GoalDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MoneySurferDatabaseKt</td>
+  <td class="name">GoalDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,85 +44,46 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
 &nbsp;
-&nbsp;import androidx.room.ConstructedBy
-&nbsp;import androidx.room.Database
-&nbsp;import androidx.room.RoomDatabase
-&nbsp;import androidx.room.RoomDatabaseConstructor
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.ConfigEntryDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.ExchangeRateDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.ConfigEntryEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.ExchangeRateEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+&nbsp;import androidx.room.Dao
+&nbsp;import androidx.room.Insert
+&nbsp;import androidx.room.Query
+&nbsp;import androidx.room.Update
+&nbsp;import androidx.room.Upsert
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Schema version of [MoneySurferDatabase]. Single source of truth so the
-&nbsp; * Room annotation, the backup manifest, and tests can never drift.
-&nbsp; */
-&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 36
+&nbsp;@Dao
+&nbsp;interface GoalDao {
 &nbsp;
-&nbsp;@Database(
-&nbsp;    entities = [
-&nbsp;        UserEntity::class,
-&nbsp;        WorkspaceEntity::class,
-&nbsp;        WorkspaceMemberEntity::class,
-&nbsp;        WorkspaceInviteEntity::class,
-&nbsp;        AccountEntity::class,
-&nbsp;        CategoryEntity::class,
-&nbsp;        TransactionEntity::class,
-&nbsp;        TransactionFtsEntity::class,
-&nbsp;        BudgetEntity::class,
-&nbsp;        RecurringRuleEntity::class,
-&nbsp;        GoalEntity::class,
-&nbsp;        GoalContributionEntity::class,
-&nbsp;        ExchangeRateEntity::class,
-&nbsp;        ConfigEntryEntity::class,
-&nbsp;    ],
-&nbsp;    version = MONEY_SURFER_DB_VERSION,
-&nbsp;)
-&nbsp;@ConstructedBy(MoneySurferDatabaseConstructor::class)
-&nbsp;abstract class MoneySurferDatabase : RoomDatabase() {
-&nbsp;    abstract fun userDao(): UserDao
-&nbsp;    abstract fun workspaceDao(): WorkspaceDao
-&nbsp;    abstract fun workspaceMemberDao(): WorkspaceMemberDao
-&nbsp;    abstract fun workspaceInviteDao(): WorkspaceInviteDao
-&nbsp;    abstract fun accountDao(): AccountDao
-&nbsp;    abstract fun categoryDao(): CategoryDao
-&nbsp;    abstract fun transactionDao(): TransactionDao
-&nbsp;    abstract fun budgetDao(): BudgetDao
-&nbsp;    abstract fun recurringRuleDao(): RecurringRuleDao
-&nbsp;    abstract fun goalDao(): GoalDao
-&nbsp;    abstract fun goalContributionDao(): GoalContributionDao
-&nbsp;    abstract fun exchangeRateDao(): ExchangeRateDao
-&nbsp;    abstract fun configEntryDao(): ConfigEntryDao
-&nbsp;}
+&nbsp;    @Query(&quot;SELECT * FROM goals&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;GoalEntity&gt;&gt;
 &nbsp;
-&nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
-&nbsp;expect object MoneySurferDatabaseConstructor : RoomDatabaseConstructor&lt;MoneySurferDatabase&gt; {
-&nbsp;    override fun initialize(): MoneySurferDatabase
+&nbsp;    @Query(&quot;SELECT * FROM goals WHERE workspaceId = :workspaceId ORDER BY createdAt DESC&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;GoalEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM goals WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): GoalEntity?
+&nbsp;
+&nbsp;    /** Emits `null` once the goal is deleted, so the details screen can close itself. */
+&nbsp;    @Query(&quot;SELECT * FROM goals WHERE id = :id&quot;)
+&nbsp;    fun observeById(id: String): Flow&lt;GoalEntity?&gt;
+&nbsp;
+&nbsp;    @Insert
+&nbsp;    suspend fun insert(entity: GoalEntity)
+&nbsp;
+&nbsp;    @Update
+&nbsp;    suspend fun update(entity: GoalEntity)
+&nbsp;
+&nbsp;    @Upsert
+&nbsp;    suspend fun upsertAll(entities: List&lt;GoalEntity&gt;)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM goals WHERE id = :id&quot;)
+&nbsp;    suspend fun delete(id: String)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM goals&quot;)
+&nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
 </pre>
@@ -147,7 +108,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteConfigModule</title>
+  <title>MoneySurfer Coverage Report > Platform_jvmKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.appconfig.remote.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteConfigModule (com.georgeci.moneysurfer.appconfig.remote.di)</h1>
+<h1>Coverage Summary for Class: Platform_jvmKt (com.georgeci.moneysurfer.data)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteConfigModule</td>
+  <td class="name">Platform_jvmKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/1)
   </span>
 </td>
 </tr>
@@ -92,21 +92,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig.remote.di
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data
 &nbsp;
-&nbsp;import org.koin.core.annotation.ComponentScan
-&nbsp;import org.koin.core.annotation.Module
-&nbsp;
-&nbsp;/**
-&nbsp; * The RemoteGlobal layer&#39;s assembly, included by the online host&#39;s `@KoinApplication` aggregator
-&nbsp; * next to the other Firestore-bound modules.
-&nbsp; *
-&nbsp; * Separate from `app-config/default`&#39;s `ConfigModule` because that one is included by **both** hosts:
-&nbsp; * the offline build assembles the same engine and binds `RemoteGlobalConfigSource.Empty` itself.
-&nbsp; */
-<b class="fc">&nbsp;@Module</b>
-&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.appconfig.remote&quot;)
-&nbsp;class RemoteConfigModule
+<b class="nc">&nbsp;actual fun platform() = &quot;JVM&quot;</b>
 </code>
 </pre>
 </div>
@@ -130,7 +118,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

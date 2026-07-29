@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoriesManageTestTags</title>
+  <title>MoneySurfer Coverage Report > CategoryPickerRows</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,77 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.category.manage</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoriesManageTestTags (com.georgeci.moneysurfer.feature.category.manage)</h1>
+<h1>Coverage Summary for Class: CategoryPickerRows (com.georgeci.moneysurfer.feature.category.picker)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">CategoriesManageTestTags</td>
-    <td class="coverageStat"/>
+  <td class="name">CategoryPickerRows</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.7%
+  </span>
+  <span class="absValue">
+    (49/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (322/339)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,288 +99,97 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.manage
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.picker
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.lazy.LazyColumn
-&nbsp;import androidx.compose.foundation.lazy.items
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryManageCard
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.category.generated.resources.Res
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_add
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_edit
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_empty
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_remove
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_title
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_expense
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_income
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_transfer
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/** Extra leading inset per nesting level. One level is all [CategoryTree.MAX_DEPTH] allows. */
-&nbsp;private val ChildIndent = 24.dp
+&nbsp;/**
+&nbsp; * Turns the raw category list into what each picker variant renders.
+&nbsp; *
+&nbsp; * Kept as pure functions rather than folded into the composables so both shapes — the flat grid
+&nbsp; * and the parent/child tree — are asserted by the state tests instead of by eyeballing a sheet.
+&nbsp; */
+&nbsp;internal object CategoryPickerRows {
 &nbsp;
-&nbsp;/** Stable selectors for the Categories management screen — see docs/testing/testing-strategy.md. */
-&nbsp;object CategoriesManageTestTags {
-&nbsp;    const val Root = &quot;categoriesManage:root&quot;
-&nbsp;    const val AddButton = &quot;categoriesManage:add&quot;
-&nbsp;}
+&nbsp;    /** Type the sheet opens on: what the caller pinned, else the selection&#39;s own type. */
+&nbsp;    fun initialType(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        selectedId: CategoryId?,
+&nbsp;        filterType: CategoryType?,
+<b class="fc">&nbsp;    ): CategoryType = filterType</b>
+<b class="fc">&nbsp;        ?: categories.firstOrNull { it.id == selectedId }?.type</b>
+<b class="fc">&nbsp;        ?: CategoryType.EXPENSE</b>
 &nbsp;
-&nbsp;@Composable
-&nbsp;fun CategoriesManageScreen(
-&nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    onNavigateToCategoryCreation: () -&gt; Unit,
-&nbsp;    onNavigateToCategoryEdit: (CategoryId) -&gt; Unit,
-&nbsp;    onNavigateToCategoryDetails: (CategoryId) -&gt; Unit = {},
-&nbsp;    viewModel: CategoriesManageViewModel = koinViewModel(),
-&nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;    /**
+&nbsp;     * Parents that start expanded: the one holding the current selection, so a selected child is
+&nbsp;     * on screen the moment the sheet opens instead of hidden behind a chevron.
+&nbsp;     */
+&nbsp;    fun expandedForSelection(categories: List&lt;Category&gt;, selectedId: CategoryId?): Set&lt;CategoryId&gt; =
+<b class="fc">&nbsp;        categories.firstOrNull { it.id == selectedId }?.parentId?.let(::setOf).orEmpty()</b>
 &nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            CategoriesManageEffect.NavigateBack -&gt; onNavigateBack()
-&nbsp;            CategoriesManageEffect.NavigateToCategoryCreation -&gt; onNavigateToCategoryCreation()
-&nbsp;            is CategoriesManageEffect.NavigateToCategoryDetails -&gt;
-&nbsp;                onNavigateToCategoryDetails(effect.categoryId)
-&nbsp;            is CategoriesManageEffect.NavigateToCategoryEdit -&gt; onNavigateToCategoryEdit(effect.categoryId)
+&nbsp;    /** Variant A: every category of [type], hierarchy flattened away, in arrival order. */
+&nbsp;    fun grid(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        type: CategoryType,
+&nbsp;        query: String,
+&nbsp;        selectedId: CategoryId?,
+<b class="fc">&nbsp;    ): List&lt;CategoryPickerItem&gt; = categories</b>
+<b class="fc">&nbsp;        .filter { it.type == type &amp;&amp; it.matches(query) }</b>
+<b class="fc">&nbsp;        .map { it.toItem(selectedId) }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Variant B: top-level categories of [type], each carrying the children it currently shows.
+&nbsp;     *
+&nbsp;     * A category whose parent is missing from [categories] — filtered out by type, or not yet
+&nbsp;     * synced — is drawn at the top level rather than dropped, the same call `CategoryTree.flatten`
+&nbsp;     * makes on the manage screen.
+&nbsp;     *
+&nbsp;     * Search overrides [expandedIds]: a parent is kept when it matches or holds a match, and it is
+&nbsp;     * force-expanded down to the matching children, since a hit the user cannot see is no hit.
+&nbsp;     */
+&nbsp;    fun tree(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        type: CategoryType,
+&nbsp;        query: String,
+&nbsp;        selectedId: CategoryId?,
+&nbsp;        expandedIds: Set&lt;CategoryId&gt;,
+&nbsp;    ): List&lt;CategoryTreeGroup&gt; {
+<b class="fc">&nbsp;        val ofType = categories.filter { it.type == type }</b>
+<b class="fc">&nbsp;        val present = ofType.mapTo(mutableSetOf()) { it.id }</b>
+<b class="fc">&nbsp;        val childrenByParent = ofType</b>
+<b class="pc">&nbsp;            .filter { it.parentId != null &amp;&amp; it.parentId in present }</b>
+<b class="pc">&nbsp;            .groupBy { requireNotNull(it.parentId) }</b>
+<b class="pc">&nbsp;        val roots = ofType.filter { it.parentId == null || it.parentId !in present }</b>
+<b class="fc">&nbsp;        val searching = query.isNotBlank()</b>
+&nbsp;
+<b class="fc">&nbsp;        return roots.mapNotNull { root -&gt;</b>
+<b class="fc">&nbsp;            val children = childrenByParent[root.id].orEmpty()</b>
+<b class="fc">&nbsp;            val visible = if (searching) children.filter { it.matches(query) } else children</b>
+<b class="fc">&nbsp;            if (searching &amp;&amp; !root.matches(query) &amp;&amp; visible.isEmpty()) return@mapNotNull null</b>
+&nbsp;
+<b class="fc">&nbsp;            val expanded = if (searching) visible.isNotEmpty() else root.id in expandedIds</b>
+<b class="fc">&nbsp;            CategoryTreeGroup(</b>
+<b class="fc">&nbsp;                parent = root.toItem(selectedId),</b>
+<b class="fc">&nbsp;                childCount = children.size,</b>
+<b class="fc">&nbsp;                expanded = expanded,</b>
+<b class="fc">&nbsp;                children = if (expanded) visible.map { it.toItem(selectedId) } else emptyList(),</b>
+<b class="fc">&nbsp;            )</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    when (val current = state) {
-&nbsp;        CategoriesManageState.Loading -&gt; CategoriesManageLoading(onEvent = viewModel::onEvent)
-&nbsp;        is CategoriesManageState.Content -&gt; CategoriesManageContent(
-&nbsp;            state = current,
-&nbsp;            onEvent = viewModel::onEvent,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+&nbsp;    private fun Category.matches(query: String): Boolean =
+<b class="fc">&nbsp;        query.isBlank() || name.contains(query.trim(), ignoreCase = true)</b>
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun CategoriesManageLoading(onEvent: (CategoriesManageEvent) -&gt; Unit) {
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier.surferSafeInsets(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.categories_manage_title),
-&nbsp;                onBack = { onEvent(CategoriesManageEvent.OnBackClick) },
-&nbsp;            )
-&nbsp;        },
-&nbsp;    ) { padding -&gt;
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(padding)
-&nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
-&nbsp;        ) {
-&nbsp;            repeat(SKELETON_ROWS) {
-&nbsp;                SurferSkeletonRow()
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;private const val SKELETON_ROWS = 5
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun CategoriesManageContent(
-&nbsp;    state: CategoriesManageState.Content,
-&nbsp;    onEvent: (CategoriesManageEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
-&nbsp;            .testTag(CategoriesManageTestTags.Root)
-&nbsp;            .surferTestTagAsId(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.categories_manage_title),
-&nbsp;                onBack = { onEvent(CategoriesManageEvent.OnBackClick) },
-&nbsp;            )
-&nbsp;        },
-&nbsp;        floatingActionButton = {
-&nbsp;            SurferAddFab(
-&nbsp;                label = stringResource(Res.string.categories_manage_add),
-&nbsp;                onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },
-&nbsp;                modifier = Modifier.testTag(CategoriesManageTestTags.AddButton),
-&nbsp;            )
-&nbsp;        },
-&nbsp;    ) { padding -&gt;
-&nbsp;        if (state.categories.isEmpty()) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
-&nbsp;                contentAlignment = Alignment.Center,
-&nbsp;            ) {
-&nbsp;                SurferEmptyState(
-&nbsp;                    title = stringResource(Res.string.categories_manage_empty),
-&nbsp;                    icon = SurferIcons.Category,
-&nbsp;                )
-&nbsp;            }
-&nbsp;            return@Scaffold
-&nbsp;        }
-&nbsp;
-&nbsp;        LazyColumn(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(top = padding.calculateTopPadding()),
-&nbsp;            contentPadding = PaddingValues(
-&nbsp;                top = AppTheme.spacing.small,
-&nbsp;                bottom = padding.calculateBottomPadding() +
-&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
-&nbsp;            ),
-&nbsp;        ) {
-&nbsp;            items(state.categories, key = { it.id.value }) { category -&gt;
-&nbsp;                CategoryManageRow(
-&nbsp;                    category = category,
-&nbsp;                    deleteLabel = stringResource(Res.string.categories_manage_remove),
-&nbsp;                    editLabel = stringResource(Res.string.categories_manage_edit),
-&nbsp;                    onClick = { onEvent(CategoriesManageEvent.OnCategoryClick(category.id)) },
-&nbsp;                    onEditClick = { onEvent(CategoriesManageEvent.OnEditCategoryClick(category.id)) },
-&nbsp;                    onRemoveClick = { onEvent(CategoriesManageEvent.OnRemoveCategoryClick(category.id)) },
-&nbsp;                    modifier = Modifier
-&nbsp;                        .fillMaxWidth()
-&nbsp;                        .padding(
-&nbsp;                            // Children are indented under the parent they follow — the list is
-&nbsp;                            // already in tree order, so the indent is all the nesting needs.
-&nbsp;                            start = AppTheme.spacing.default + ChildIndent * category.depth,
-&nbsp;                            end = AppTheme.spacing.default,
-&nbsp;                        )
-&nbsp;                        .padding(vertical = AppTheme.spacing.xSmall),
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    state.pendingDelete?.let { pending -&gt;
-&nbsp;        DeleteCategoryDialog(
-&nbsp;            categoryName = pending.name,
-&nbsp;            childCount = pending.childCount,
-&nbsp;            onConfirm = { onEvent(CategoriesManageEvent.OnDeleteConfirm) },
-&nbsp;            onDismiss = { onEvent(CategoriesManageEvent.OnDeleteCancel) },
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun CategoryManageRow(
-&nbsp;    category: CategoryManageUi,
-&nbsp;    deleteLabel: String,
-&nbsp;    editLabel: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    onEditClick: () -&gt; Unit,
-&nbsp;    onRemoveClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    SurferSwipeRevealRow(
-&nbsp;        // Two actions now that tapping the row opens the detail screen instead of the editor —
-&nbsp;        // edit has to stay reachable from the list itself. 156dp is what two 72dp actions plus
-&nbsp;        // the gaps measure, matching AccountsManage.
-&nbsp;        revealWidth = 156.dp,
-&nbsp;        modifier = modifier,
-&nbsp;        actions = {
-&nbsp;            SurferSwipeAction(
-&nbsp;                icon = SurferIcons.Edit,
-&nbsp;                label = editLabel,
-&nbsp;                onClick = onEditClick,
-&nbsp;            )
-&nbsp;            SurferSwipeAction(
-&nbsp;                icon = SurferIcons.Delete,
-&nbsp;                label = deleteLabel,
-&nbsp;                onClick = onRemoveClick,
-&nbsp;                destructive = true,
-&nbsp;            )
-&nbsp;        },
-&nbsp;    ) {
-&nbsp;        CategoryManageCard(category = category, onClick = onClick)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun CategoryManageCard(
-&nbsp;    category: CategoryManageUi,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    val visual = SurferCategoryPalette.visualFor(
-&nbsp;        id = category.id.value,
-&nbsp;        iconKey = category.iconKey,
-&nbsp;        hue = category.hue,
-&nbsp;        systemKind = category.systemKind,
+<b class="fc">&nbsp;    private fun Category.toItem(selectedId: CategoryId?) = CategoryPickerItem(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        name = name,</b>
+<b class="fc">&nbsp;        iconKey = iconKey,</b>
+<b class="fc">&nbsp;        hue = hue,</b>
+<b class="pc">&nbsp;        systemKind = systemKind?.name,</b>
+<b class="fc">&nbsp;        selected = id == selectedId,</b>
 &nbsp;    )
-&nbsp;    SurferCategoryManageCard(
-&nbsp;        name = category.name,
-&nbsp;        typeLabel = categoryTypeLabel(category.type),
-&nbsp;        icon = visual.icon,
-&nbsp;        tint = visual.tint,
-&nbsp;        onClick = onClick,
-&nbsp;        modifier = modifier,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun categoryTypeLabel(type: CategoryType): String =
-&nbsp;    when (type) {
-&nbsp;        CategoryType.EXPENSE -&gt; stringResource(Res.string.category_creation_type_expense)
-&nbsp;        CategoryType.INCOME -&gt; stringResource(Res.string.category_creation_type_income)
-&nbsp;        CategoryType.TRANSFER -&gt; stringResource(Res.string.category_creation_type_transfer)
-&nbsp;    }
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun CategoriesManageContentPreview() {
-&nbsp;    AppTheme {
-&nbsp;        CategoriesManageContent(
-&nbsp;            state = CategoriesManageState.Content(
-&nbsp;                categories = listOf(
-&nbsp;                    CategoryManageUi(CategoryId(&quot;1&quot;), &quot;Food&quot;, CategoryType.EXPENSE),
-&nbsp;                    CategoryManageUi(
-&nbsp;                        id = CategoryId(&quot;2&quot;),
-&nbsp;                        name = &quot;Groceries&quot;,
-&nbsp;                        type = CategoryType.EXPENSE,
-&nbsp;                        parentId = CategoryId(&quot;1&quot;),
-&nbsp;                        depth = 1,
-&nbsp;                    ),
-&nbsp;                    CategoryManageUi(CategoryId(&quot;3&quot;), &quot;Salary&quot;, CategoryType.INCOME),
-&nbsp;                ),
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -350,7 +214,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

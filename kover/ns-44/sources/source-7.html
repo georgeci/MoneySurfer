@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalEditTestTags</title>
+  <title>MoneySurfer Coverage Report > GoalsTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.edit</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.list</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalEditTestTags (com.georgeci.moneysurfer.feature.goal.edit)</h1>
+<h1>Coverage Summary for Class: GoalsTestTags (com.georgeci.moneysurfer.feature.goal.list)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalEditTestTags</td>
+  <td class="name">GoalsTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,230 +44,190 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal.edit
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal.list
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
 &nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
 &nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.runtime.getValue
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalDateField
-&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalDatePickerDialog
 &nbsp;import com.georgeci.moneysurfer.feature.goal.formatGoalDate
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
+&nbsp;import com.georgeci.moneysurfer.feature.goal.labelRes
+&nbsp;import com.georgeci.moneysurfer.feature.goal.toUi
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferEmojiPicker
-&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalHueRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
+&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.AsyncState
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import moneysurfer.feature.goal.generated.resources.Res
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_color_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_icon_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_name_error_required
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_name_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_save
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_date_clear
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_date_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_date_placeholder
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_error
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_title_create
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_title_edit
+&nbsp;import moneysurfer.feature.goal.generated.resources.goals_add
+&nbsp;import moneysurfer.feature.goal.generated.resources.goals_card_deadline
+&nbsp;import moneysurfer.feature.goal.generated.resources.goals_empty_subtitle
+&nbsp;import moneysurfer.feature.goal.generated.resources.goals_empty_title
+&nbsp;import moneysurfer.feature.goal.generated.resources.goals_title
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
-&nbsp;/** Stable selectors for the goal create/edit screen — see docs/testing/testing-strategy.md. */
-&nbsp;object GoalEditTestTags {
-&nbsp;    const val Root = &quot;goalEdit:root&quot;
-&nbsp;    const val TitleField = &quot;goalEdit:title&quot;
-&nbsp;    const val TargetField = &quot;goalEdit:target&quot;
-&nbsp;    const val SaveButton = &quot;goalEdit:save&quot;
+&nbsp;/**
+&nbsp; * Stable selectors for the Goals list — see docs/testing/testing-strategy.md.
+&nbsp; *
+&nbsp; * The FAB is always composed, so on an empty list it sits alongside the empty-state CTA that
+&nbsp; * fires the same event. [AddButton] names the FAB, which is the one reachable in both states;
+&nbsp; * the empty-state CTA carries no tag because no flow needs to single it out. Add one — through
+&nbsp; * `SurferEmptyState`&#39;s `modifier` — if that changes.
+&nbsp; */
+&nbsp;object GoalsTestTags {
+&nbsp;    const val Root = &quot;goals:root&quot;
+&nbsp;    const val AddButton = &quot;goals:add&quot;
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;fun GoalEditScreen(
-&nbsp;    goalId: GoalId? = null,
+&nbsp;fun GoalsScreen(
 &nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    viewModel: GoalEditViewModel = koinViewModel(key = goalId?.value ?: &quot;new&quot;) { parametersOf(goalId) },
+&nbsp;    onNavigateToGoalCreation: () -&gt; Unit,
+&nbsp;    onNavigateToGoalDetails: (GoalId) -&gt; Unit,
+&nbsp;    viewModel: GoalsViewModel = koinViewModel(),
 &nbsp;) {
 &nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
 &nbsp;    viewModel.HandleSideEffect { effect -&gt;
 &nbsp;        when (effect) {
-&nbsp;            GoalEditEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            GoalsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            GoalsEffect.NavigateToGoalCreation -&gt; onNavigateToGoalCreation()
+&nbsp;            is GoalsEffect.NavigateToGoalDetails -&gt; onNavigateToGoalDetails(effect.goalId)
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    GoalEditContent(state = state, onEvent = viewModel::onEvent)
+&nbsp;    GoalsContent(
+&nbsp;        goals = (state as? AsyncState.Content)?.value?.goals.orEmpty(),
+&nbsp;        isLoading = state is AsyncState.Loading,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;private fun GoalEditContent(
-&nbsp;    state: GoalEditState,
-&nbsp;    onEvent: (GoalEditEvent) -&gt; Unit,
+&nbsp;private fun GoalsContent(
+&nbsp;    goals: List&lt;GoalListItem&gt;,
+&nbsp;    isLoading: Boolean,
+&nbsp;    onEvent: (GoalsEvent) -&gt; Unit,
 &nbsp;) {
 &nbsp;    Scaffold(
 &nbsp;        modifier = Modifier
 &nbsp;            .surferSafeInsets()
-&nbsp;            .testTag(GoalEditTestTags.Root)
+&nbsp;            .testTag(GoalsTestTags.Root)
 &nbsp;            .surferTestTagAsId(),
 &nbsp;        containerColor = AppTheme.materialColors.surface,
 &nbsp;        topBar = {
 &nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(
-&nbsp;                    if (state.isEdit) Res.string.goal_edit_title_edit else Res.string.goal_edit_title_create,
-&nbsp;                ),
-&nbsp;                onBack = { onEvent(GoalEditEvent.OnBackClick) },
-&nbsp;                actions = {
-&nbsp;                    SurferToolbarButtonAction(
-&nbsp;                        icon = SurferIcons.Check,
-&nbsp;                        text = stringResource(Res.string.goal_edit_save),
-&nbsp;                        enabled = state.canSave,
-&nbsp;                        onClick = { onEvent(GoalEditEvent.OnSaveClick) },
-&nbsp;                        modifier = Modifier.testTag(GoalEditTestTags.SaveButton),
-&nbsp;                    )
-&nbsp;                },
+&nbsp;                title = stringResource(Res.string.goals_title),
+&nbsp;                onBack = { onEvent(GoalsEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        floatingActionButton = {
+&nbsp;            val addLabel = stringResource(Res.string.goals_add)
+&nbsp;            SurferAddFab(
+&nbsp;                label = addLabel,
+&nbsp;                onClick = { onEvent(GoalsEvent.OnAddGoalClick) },
+&nbsp;                modifier = Modifier.testTag(GoalsTestTags.AddButton),
 &nbsp;            )
 &nbsp;        },
 &nbsp;    ) { padding -&gt;
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(padding)
-&nbsp;                .verticalScroll(rememberScrollState())
-&nbsp;                .padding(AppTheme.spacing.default),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default),
-&nbsp;        ) {
-&nbsp;            Row(
-&nbsp;                verticalAlignment = Alignment.CenterVertically,
-&nbsp;                horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;        when {
+&nbsp;            isLoading -&gt; Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;            goals.isEmpty() -&gt; Box(
+&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
+&nbsp;                contentAlignment = Alignment.Center,
 &nbsp;            ) {
-&nbsp;                SurferGoalIcon(emoji = state.emoji, hue = state.hue, size = 56.dp)
-&nbsp;                OutlinedTextField(
-&nbsp;                    value = state.title,
-&nbsp;                    onValueChange = { onEvent(GoalEditEvent.OnTitleChanged(it)) },
-&nbsp;                    label = { Text(stringResource(Res.string.goal_edit_name_label)) },
-&nbsp;                    isError = state.titleMissing,
-&nbsp;                    supportingText = if (state.titleMissing) {
-&nbsp;                        { Text(stringResource(Res.string.goal_edit_name_error_required)) }
-&nbsp;                    } else {
-&nbsp;                        null
-&nbsp;                    },
-&nbsp;                    singleLine = true,
-&nbsp;                    modifier = Modifier
-&nbsp;                        .weight(1f)
-&nbsp;                        .testTag(GoalEditTestTags.TitleField),
+&nbsp;                SurferEmptyState(
+&nbsp;                    icon = SurferIcons.Savings,
+&nbsp;                    title = stringResource(Res.string.goals_empty_title),
+&nbsp;                    subtitle = stringResource(Res.string.goals_empty_subtitle),
+&nbsp;                    actionLabel = stringResource(Res.string.goals_add),
+&nbsp;                    onActionClick = { onEvent(GoalsEvent.OnAddGoalClick) },
 &nbsp;                )
 &nbsp;            }
 &nbsp;
-&nbsp;            OutlinedTextField(
-&nbsp;                value = state.target,
-&nbsp;                onValueChange = { onEvent(GoalEditEvent.OnTargetChanged(it)) },
-&nbsp;                label = { Text(stringResource(Res.string.goal_edit_target_label)) },
-&nbsp;                isError = state.targetMissing,
-&nbsp;                supportingText = if (state.targetMissing) {
-&nbsp;                    { Text(stringResource(Res.string.goal_edit_target_error)) }
-&nbsp;                } else {
-&nbsp;                    null
-&nbsp;                },
-&nbsp;                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-&nbsp;                singleLine = true,
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .testTag(GoalEditTestTags.TargetField),
-&nbsp;            )
-&nbsp;
-&nbsp;            GoalDateField(
-&nbsp;                label = stringResource(Res.string.goal_edit_target_date_label),
-&nbsp;                value = state.targetDate?.let(::formatGoalDate)
-&nbsp;                    ?: stringResource(Res.string.goal_edit_target_date_placeholder),
-&nbsp;                onClick = { onEvent(GoalEditEvent.OnDatePickerOpen) },
-&nbsp;                trailing = if (state.targetDate == null) {
-&nbsp;                    null
-&nbsp;                } else {
-&nbsp;                    {
-&nbsp;                        TextButton(onClick = { onEvent(GoalEditEvent.OnTargetDateCleared) }) {
-&nbsp;                            Text(stringResource(Res.string.goal_edit_target_date_clear))
-&nbsp;                        }
-&nbsp;                    }
-&nbsp;                },
-&nbsp;            )
-&nbsp;
-&nbsp;            state.error?.let { error -&gt;
-&nbsp;                Text(
-&nbsp;                    text = stringResource(error),
-&nbsp;                    style = AppTheme.typography.bodyMedium,
-&nbsp;                    color = AppTheme.materialColors.error,
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSectionLabel(stringResource(Res.string.goal_edit_icon_label))
-&nbsp;            SurferEmojiPicker(
-&nbsp;                selected = state.emoji,
-&nbsp;                onSelect = { onEvent(GoalEditEvent.OnEmojiSelected(it)) },
-&nbsp;            )
-&nbsp;
-&nbsp;            SurferSectionLabel(stringResource(Res.string.goal_edit_color_label))
-&nbsp;            SurferGoalHueRow(
-&nbsp;                selected = state.hue,
-&nbsp;                onSelect = { onEvent(GoalEditEvent.OnHueSelected(it)) },
-&nbsp;            )
+&nbsp;            else -&gt; GoalsList(goals = goals, padding = padding, onEvent = onEvent)
 &nbsp;        }
 &nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    if (state.showDatePicker) {
-&nbsp;        GoalDatePickerDialog(
-&nbsp;            initialDate = state.targetDate,
-&nbsp;            onDismiss = { onEvent(GoalEditEvent.OnDatePickerDismiss) },
-&nbsp;            onConfirm = {
-&nbsp;                onEvent(GoalEditEvent.OnTargetDateChanged(it))
-&nbsp;                onEvent(GoalEditEvent.OnDatePickerDismiss)
-&nbsp;            },
-&nbsp;        )
+&nbsp;@Composable
+&nbsp;private fun GoalsList(
+&nbsp;    goals: List&lt;GoalListItem&gt;,
+&nbsp;    padding: PaddingValues,
+&nbsp;    onEvent: (GoalsEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    LazyColumn(
+&nbsp;        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
+&nbsp;        contentPadding = PaddingValues(
+&nbsp;            start = AppTheme.spacing.default,
+&nbsp;            end = AppTheme.spacing.default,
+&nbsp;            top = AppTheme.spacing.small,
+&nbsp;            bottom = AppTheme.spacing.xxLarge,
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        items(goals, key = { it.id.value }) { goal -&gt;
+&nbsp;            Box(modifier = Modifier.padding(bottom = AppTheme.spacing.medium)) {
+&nbsp;                SurferGoalCard(
+&nbsp;                    title = goal.title,
+&nbsp;                    emoji = goal.emoji,
+&nbsp;                    hue = goal.hue,
+&nbsp;                    status = goal.status.toUi(),
+&nbsp;                    statusLabel = stringResource(goal.status.labelRes()),
+&nbsp;                    progress = goal.progress,
+&nbsp;                    savedLabel = goal.savedLabel,
+&nbsp;                    targetLabel = goal.targetLabel,
+&nbsp;                    percentLabel = goal.percentLabel,
+&nbsp;                    caption = goal.targetDate?.let {
+&nbsp;                        stringResource(Res.string.goals_card_deadline, formatGoalDate(it))
+&nbsp;                    },
+&nbsp;                    onClick = { onEvent(GoalsEvent.OnGoalClick(goal.id)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun GoalEditScreenPreview() {
+&nbsp;private fun GoalsScreenPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        GoalEditContent(
-&nbsp;            state = GoalEditState(
-&nbsp;                title = &quot;Lisbon trip&quot;,
-&nbsp;                emoji = &quot;🏖️&quot;,
-&nbsp;                hue = 30,
-&nbsp;                target = &quot;2400&quot;,
-&nbsp;                targetDate = LocalDate(2026, 9, 1),
+&nbsp;        GoalsContent(
+&nbsp;            goals = listOf(
+&nbsp;                GoalListItem(
+&nbsp;                    id = GoalId(&quot;1&quot;),
+&nbsp;                    title = &quot;Emergency fund&quot;,
+&nbsp;                    emoji = &quot;☂️&quot;,
+&nbsp;                    hue = 210,
+&nbsp;                    status = GoalStatus.ACTIVE,
+&nbsp;                    targetDate = LocalDate(2026, 8, 1),
+&nbsp;                    progress = 0.74f,
+&nbsp;                    percentLabel = &quot;74%&quot;,
+&nbsp;                    savedLabel = &quot;€8,915&quot;,
+&nbsp;                    targetLabel = &quot;€12,000&quot;,
+&nbsp;                ),
 &nbsp;            ),
+&nbsp;            isLoading = false,
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
@@ -295,7 +255,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

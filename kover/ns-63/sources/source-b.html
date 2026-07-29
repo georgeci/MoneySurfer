@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSelectorTestTags</title>
+  <title>MoneySurfer Coverage Report > BottomSheetScene</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.selector</a>
+    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSelectorTestTags (com.georgeci.moneysurfer.feature.workspace.selector)</h1>
+<h1>Coverage Summary for Class: BottomSheetScene (com.georgeci.moneysurfer.navigation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSelectorTestTags</td>
+  <td class="name">BottomSheetScene</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,429 +92,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.selector
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.navigationBarsPadding
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.lazy.LazyColumn
-&nbsp;import androidx.compose.foundation.lazy.items
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.ModalBottomSheet
+&nbsp;import androidx.compose.material3.ModalBottomSheetProperties
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.model.Workspace
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferCreateWorkspaceRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferWorkspaceRow
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.workspace.generated.resources.Res
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_action_edit
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_action_members
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_cloud_unavailable
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_continue
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_create_subtitle
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_create_title
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_empty
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_subtitle
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_subtitle_offline
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_title
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_sign_out
-&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_selector_use_workspace
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
-&nbsp;import kotlin.time.Instant
+&nbsp;import androidx.navigation3.runtime.NavEntry
+&nbsp;import androidx.navigation3.scene.OverlayScene
+&nbsp;import androidx.navigation3.scene.Scene
+&nbsp;import androidx.navigation3.scene.SceneStrategy
+&nbsp;import androidx.navigation3.scene.SceneStrategyScope
 &nbsp;
-&nbsp;/** Stable selectors for the workspace selector screen — see docs/testing/testing-strategy.md. */
-&nbsp;object WorkspaceSelectorTestTags {
-&nbsp;    const val Root = &quot;workspaceSelector:root&quot;
-&nbsp;    const val Create = &quot;workspaceSelector:create&quot;
-&nbsp;    const val Confirm = &quot;workspaceSelector:confirm&quot;
-&nbsp;}
+&nbsp;/** An [OverlayScene] that renders an [entry] within a [ModalBottomSheet]. */
+<b class="nc">&nbsp;@OptIn(ExperimentalMaterial3Api::class)</b>
+&nbsp;internal class BottomSheetScene&lt;T : Any&gt;(
+<b class="nc">&nbsp;    override val key: Any,</b>
+<b class="nc">&nbsp;    private val entry: NavEntry&lt;T&gt;,</b>
+<b class="nc">&nbsp;    override val previousEntries: List&lt;NavEntry&lt;T&gt;&gt;,</b>
+<b class="nc">&nbsp;    override val overlaidEntries: List&lt;NavEntry&lt;T&gt;&gt;,</b>
+<b class="nc">&nbsp;    private val modalBottomSheetProperties: ModalBottomSheetProperties,</b>
+<b class="nc">&nbsp;    private val onBack: () -&gt; Unit,</b>
+&nbsp;) : OverlayScene&lt;T&gt; {
 &nbsp;
-&nbsp;/**
-&nbsp; * The exits [WorkspaceSelectorScreen] offers, one per [WorkspaceSelectorEffect]. Grouped into a
-&nbsp; * holder so the entry point stays under the parameter limit as destinations are added — see
-&nbsp; * AGENTS.md → UI Rules.
-&nbsp; */
-&nbsp;data class WorkspaceSelectorNavigation(
-&nbsp;    val onNavigateBack: () -&gt; Unit,
-&nbsp;    val onNavigateToDashboard: () -&gt; Unit,
-&nbsp;    val onNavigateToSignIn: () -&gt; Unit,
-&nbsp;    val onNavigateToWorkspaceCreation: () -&gt; Unit,
-&nbsp;    val onNavigateToWorkspaceEdit: (WorkspaceId) -&gt; Unit,
-&nbsp;    val onNavigateToWorkspaceMembers: (WorkspaceId) -&gt; Unit,
-&nbsp;)
+<b class="nc">&nbsp;    override val entries: List&lt;NavEntry&lt;T&gt;&gt; = listOf(entry)</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * [cloudDataUnavailable] comes straight from the route: the account owns workspaces that the
-&nbsp; * post-auth pull never brought down, so the empty list below is a hydration failure rather than
-&nbsp; * a new account. Pure presentation — nothing in the view model depends on it (issue #342).
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun WorkspaceSelectorScreen(
-&nbsp;    showActions: Boolean,
-&nbsp;    navigation: WorkspaceSelectorNavigation,
-&nbsp;    cloudDataUnavailable: Boolean = false,
-&nbsp;    viewModel: WorkspaceSelectorViewModel = koinViewModel(
-&nbsp;        key = &quot;selector:$showActions&quot;,
-&nbsp;    ) { parametersOf(showActions) },
-&nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
-&nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            WorkspaceSelectorEffect.NavigateBack -&gt; navigation.onNavigateBack()
-&nbsp;            WorkspaceSelectorEffect.NavigateToDashboard -&gt; navigation.onNavigateToDashboard()
-&nbsp;            WorkspaceSelectorEffect.NavigateToSignIn -&gt; navigation.onNavigateToSignIn()
-&nbsp;            WorkspaceSelectorEffect.NavigateToWorkspaceCreation -&gt; navigation.onNavigateToWorkspaceCreation()
-&nbsp;            is WorkspaceSelectorEffect.NavigateToWorkspaceEdit -&gt;
-&nbsp;                navigation.onNavigateToWorkspaceEdit(effect.workspaceId)
-&nbsp;
-&nbsp;            is WorkspaceSelectorEffect.NavigateToWorkspaceMembers -&gt;
-&nbsp;                navigation.onNavigateToWorkspaceMembers(effect.workspaceId)
+<b class="nc">&nbsp;    override val content: @Composable () -&gt; Unit = {</b>
+<b class="nc">&nbsp;        ModalBottomSheet(</b>
+<b class="nc">&nbsp;            onDismissRequest = onBack,</b>
+<b class="nc">&nbsp;            properties = modalBottomSheetProperties,</b>
+<b class="nc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            entry.Content()</b>
 &nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    when (val current = state) {
-&nbsp;        is WorkspaceSelectorState.Loading -&gt; WorkspaceSelectorLoading(
-&nbsp;            state = current,
-&nbsp;            onEvent = viewModel::onEvent,
-&nbsp;        )
-&nbsp;        is WorkspaceSelectorState.Content -&gt; WorkspaceSelectorContent(
-&nbsp;            state = current,
-&nbsp;            cloudDataUnavailable = cloudDataUnavailable,
-&nbsp;            onEvent = viewModel::onEvent,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorLoading(
-&nbsp;    state: WorkspaceSelectorState.Loading,
-&nbsp;    onEvent: (WorkspaceSelectorEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(modifier = Modifier.fillMaxSize()) {
-&nbsp;        Scaffold(
-&nbsp;            modifier = Modifier.surferSafeInsets(),
-&nbsp;            containerColor = AppTheme.materialColors.surface,
-&nbsp;            topBar = {
-&nbsp;                SurferToolbar(
-&nbsp;                    title = stringResource(Res.string.workspace_selector_heading_title),
-&nbsp;                    // Same rule as the loaded screen, so the arrow does not pop in once the
-&nbsp;                    // workspaces arrive — and so a slow load is not a dead end either.
-&nbsp;                    onBack = backAction(state.showActions, onEvent),
-&nbsp;                )
-&nbsp;            },
-&nbsp;        ) { padding -&gt;
-&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The toolbar&#39;s back action, or null. Only the pushed-from-Settings selector (`showActions`) has
-&nbsp; * somewhere to go back to; as a start route it is the bottom of the stack, and the sign-out action
-&nbsp; * is the way out instead.
+&nbsp; * A [SceneStrategy] that displays entries marked with [bottomSheet] metadata inside a
+&nbsp; * [ModalBottomSheet], keeping the previous entry composed underneath.
+&nbsp; *
+&nbsp; * Based on the Navigation 3 bottom sheet recipe:
+&nbsp; * https://developer.android.com/guide/navigation/navigation-3/recipes/bottomsheet
+&nbsp; *
+&nbsp; * Chain before any non-overlay strategies.
 &nbsp; */
-&nbsp;private fun backAction(
-&nbsp;    showActions: Boolean,
-&nbsp;    onEvent: (WorkspaceSelectorEvent) -&gt; Unit,
-&nbsp;): (() -&gt; Unit)? = if (showActions) {
-&nbsp;    { onEvent(WorkspaceSelectorEvent.OnBackClick) }
-&nbsp;} else {
-&nbsp;    null
-&nbsp;}
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;class BottomSheetSceneStrategy&lt;T : Any&gt; : SceneStrategy&lt;T&gt; {
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorContent(
-&nbsp;    state: WorkspaceSelectorState.Content,
-&nbsp;    onEvent: (WorkspaceSelectorEvent) -&gt; Unit,
-&nbsp;    cloudDataUnavailable: Boolean = false,
-&nbsp;) {
-&nbsp;    val editLabel = stringResource(Res.string.workspace_selector_action_edit)
-&nbsp;    val membersLabel = stringResource(Res.string.workspace_selector_action_members)
-&nbsp;
-&nbsp;    Box(modifier = Modifier.fillMaxSize()) {
-&nbsp;        Scaffold(
-&nbsp;            modifier = Modifier
-&nbsp;                .testTag(WorkspaceSelectorTestTags.Root)
-&nbsp;                .surferTestTagAsId(),
-&nbsp;            containerColor = AppTheme.materialColors.surface,
-&nbsp;            topBar = {
-&nbsp;                SurferToolbar(
-&nbsp;                    title = stringResource(Res.string.workspace_selector_heading_title),
-&nbsp;                    onBack = backAction(state.showActions, onEvent),
-&nbsp;                    actions = {
-&nbsp;                        // The only exit when the selector is the root of the stack: no back
-&nbsp;                        // entry, and Settings sits behind Dashboard, which needs a workspace.
-&nbsp;                        if (state.canSignOut) {
-&nbsp;                            IconButton(onClick = { onEvent(WorkspaceSelectorEvent.OnSignOutClick) }) {
-&nbsp;                                Icon(
-&nbsp;                                    imageVector = SurferIcons.Logout,
-&nbsp;                                    contentDescription = stringResource(
-&nbsp;                                        Res.string.workspace_selector_sign_out,
-&nbsp;                                    ),
-&nbsp;                                )
-&nbsp;                            }
-&nbsp;                        }
-&nbsp;                    },
-&nbsp;                )
-&nbsp;            },
-&nbsp;            bottomBar = {
-&nbsp;                ConfirmBar(
-&nbsp;                    workspace = state.activeWorkspace,
-&nbsp;                    enabled = state.activeWorkspace != null &amp;&amp; !state.isSelecting,
-&nbsp;                    onClick = { onEvent(WorkspaceSelectorEvent.OnConfirmClick) },
-&nbsp;                )
-&nbsp;            },
-&nbsp;        ) { padding -&gt;
-&nbsp;            LazyColumn(
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxSize()
-&nbsp;                    .surferContentContainer()
-&nbsp;                    .padding(top = padding.calculateTopPadding()),
-&nbsp;                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
-&nbsp;                contentPadding = PaddingValues(
-&nbsp;                    bottom = padding.calculateBottomPadding() + AppTheme.spacing.default,
-&nbsp;                ),
-&nbsp;            ) {
-&nbsp;                item(key = &quot;header&quot;) {
-&nbsp;                    Text(
-&nbsp;                        text = stringResource(
-&nbsp;                            if (state.isOffline) {
-&nbsp;                                Res.string.workspace_selector_heading_subtitle_offline
-&nbsp;                            } else {
-&nbsp;                                Res.string.workspace_selector_heading_subtitle
-&nbsp;                            },
-&nbsp;                        ),
-&nbsp;                        style = AppTheme.typography.bodyMedium,
-&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                        modifier = Modifier.padding(
-&nbsp;                            horizontal = AppTheme.spacing.large,
-&nbsp;                            vertical = AppTheme.spacing.xSmall,
-&nbsp;                        ),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;
-&nbsp;                if (state.workspaces.isEmpty()) {
-&nbsp;                    item(key = &quot;empty&quot;) {
-&nbsp;                        Text(
-&nbsp;                            text = stringResource(
-&nbsp;                                if (cloudDataUnavailable) {
-&nbsp;                                    Res.string.workspace_selector_cloud_unavailable
-&nbsp;                                } else {
-&nbsp;                                    Res.string.workspace_selector_empty
-&nbsp;                                },
-&nbsp;                            ),
-&nbsp;                            style = AppTheme.typography.bodyLarge,
-&nbsp;                            color = if (cloudDataUnavailable) {
-&nbsp;                                AppTheme.materialColors.error
-&nbsp;                            } else {
-&nbsp;                                AppTheme.materialColors.onSurfaceVariant
-&nbsp;                            },
-&nbsp;                            modifier = Modifier.padding(
-&nbsp;                                horizontal = AppTheme.spacing.large,
-&nbsp;                                vertical = AppTheme.spacing.small,
-&nbsp;                            ),
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                } else {
-&nbsp;                    items(state.workspaces, key = { it.id.value }) { workspace -&gt;
-&nbsp;                        val subtitle = workspace.description.takeIf { it.isNotBlank() } ?: workspace.baseCurrency.value
-&nbsp;                        SurferWorkspaceRow(
-&nbsp;                            name = workspace.name,
-&nbsp;                            subtitle = subtitle,
-&nbsp;                            selected = workspace.id == state.activeWorkspaceId,
-&nbsp;                            enabled = !state.isSelecting,
-&nbsp;                            showActions = state.showActions,
-&nbsp;                            editLabel = editLabel,
-&nbsp;                            membersLabel = membersLabel.takeIf { state.showMemberActions },
-&nbsp;                            onClick = { onEvent(WorkspaceSelectorEvent.OnWorkspaceClick(workspace)) },
-&nbsp;                            onEditClick = { onEvent(WorkspaceSelectorEvent.OnEditWorkspaceClick(workspace)) },
-&nbsp;                            onMembersClick = { onEvent(WorkspaceSelectorEvent.OnMembersClick(workspace)) },
-&nbsp;                            modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                }
-&nbsp;
-&nbsp;                item(key = &quot;create&quot;) {
-&nbsp;                    SurferCreateWorkspaceRow(
-&nbsp;                        title = stringResource(Res.string.workspace_selector_create_title),
-&nbsp;                        subtitle = stringResource(Res.string.workspace_selector_create_subtitle),
-&nbsp;                        onClick = { onEvent(WorkspaceSelectorEvent.OnCreateWorkspaceClick) },
-&nbsp;                        modifier = Modifier
-&nbsp;                            .padding(
-&nbsp;                                horizontal = AppTheme.spacing.default,
-&nbsp;                                vertical = AppTheme.spacing.small,
-&nbsp;                            )
-&nbsp;                            .testTag(WorkspaceSelectorTestTags.Create),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        if (state.isSelecting) {
-&nbsp;            SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ConfirmBar(
-&nbsp;    workspace: Workspace?,
-&nbsp;    enabled: Boolean,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;) {
-&nbsp;    val label = if (workspace != null) {
-&nbsp;        stringResource(Res.string.workspace_selector_use_workspace, workspace.name)
-&nbsp;    } else {
-&nbsp;        stringResource(Res.string.workspace_selector_continue)
-&nbsp;    }
-&nbsp;    Box(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .background(AppTheme.materialColors.surface)
-&nbsp;            .navigationBarsPadding()
-&nbsp;            // Background and system insets stay full-bleed; only the button takes the content cap,
-&nbsp;            // so it lines up with the list above instead of stretching across the window.
-&nbsp;            .surferContentContainer()
-&nbsp;            .padding(horizontal = AppTheme.spacing.default)
-&nbsp;            .padding(top = AppTheme.spacing.medium, bottom = AppTheme.spacing.large),
-&nbsp;    ) {
-&nbsp;        SurferButton(
-&nbsp;            text = label,
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxWidth()
-&nbsp;                .testTag(WorkspaceSelectorTestTags.Confirm),
-&nbsp;            size = SurferButtonSize.Biggest,
-&nbsp;            enabled = enabled,
-&nbsp;            endIcon = SurferIcons.ChevronRight,
+&nbsp;    override fun SceneStrategyScope&lt;T&gt;.calculateScene(entries: List&lt;NavEntry&lt;T&gt;&gt;): Scene&lt;T&gt;? {
+&nbsp;        val lastEntry = entries.lastOrNull() ?: return null
+&nbsp;        val properties = lastEntry.metadata[BOTTOM_SHEET_KEY] as? ModalBottomSheetProperties
+&nbsp;            ?: return null
+&nbsp;        return BottomSheetScene(
+&nbsp;            key = lastEntry.contentKey,
+&nbsp;            entry = lastEntry,
+&nbsp;            previousEntries = entries.dropLast(1),
+&nbsp;            overlaidEntries = entries.dropLast(1),
+&nbsp;            modalBottomSheetProperties = properties,
+&nbsp;            onBack = onBack,
 &nbsp;        )
 &nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorPreviewNoActions() {
-&nbsp;    AppTheme {
-&nbsp;        WorkspaceSelectorContent(
-&nbsp;            state = WorkspaceSelectorState.Content(
-&nbsp;                workspaces = previewWorkspaces,
-&nbsp;                selectedWorkspaceId = WorkspaceId(&quot;preview-ws-2&quot;),
-&nbsp;                pendingWorkspaceId = WorkspaceId(&quot;preview-ws-2&quot;),
-&nbsp;                showActions = false,
-&nbsp;                isSelecting = false,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
+&nbsp;    companion object {
+&nbsp;        /** Mark a [NavEntry] so this strategy renders it inside a [ModalBottomSheet]. */
+&nbsp;        fun bottomSheet(
+&nbsp;            modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
+&nbsp;        ): Map&lt;String, Any&gt; = mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)
+&nbsp;
+&nbsp;        internal const val BOTTOM_SHEET_KEY = &quot;bottomSheet&quot;
 &nbsp;    }
 &nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorPreviewWithActions() {
-&nbsp;    AppTheme {
-&nbsp;        WorkspaceSelectorContent(
-&nbsp;            state = WorkspaceSelectorState.Content(
-&nbsp;                workspaces = previewWorkspaces,
-&nbsp;                selectedWorkspaceId = WorkspaceId(&quot;preview-ws-2&quot;),
-&nbsp;                pendingWorkspaceId = WorkspaceId(&quot;preview-ws-2&quot;),
-&nbsp;                showActions = true,
-&nbsp;                isSelecting = false,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorEmptyPreview() {
-&nbsp;    AppTheme {
-&nbsp;        WorkspaceSelectorContent(
-&nbsp;            state = WorkspaceSelectorState.Content(
-&nbsp;                workspaces = emptyList(),
-&nbsp;                selectedWorkspaceId = null,
-&nbsp;                pendingWorkspaceId = null,
-&nbsp;                showActions = false,
-&nbsp;                isSelecting = false,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorCloudUnavailablePreview() {
-&nbsp;    AppTheme {
-&nbsp;        WorkspaceSelectorContent(
-&nbsp;            state = WorkspaceSelectorState.Content(
-&nbsp;                workspaces = emptyList(),
-&nbsp;                selectedWorkspaceId = null,
-&nbsp;                pendingWorkspaceId = null,
-&nbsp;                showActions = false,
-&nbsp;                isSelecting = false,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;            cloudDataUnavailable = true,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;private val previewWorkspaces = listOf(
-&nbsp;    Workspace(
-&nbsp;        id = WorkspaceId(&quot;preview-ws-1&quot;),
-&nbsp;        name = &quot;Personal&quot;,
-&nbsp;        description = &quot;Just you&quot;,
-&nbsp;        baseCurrency = CurrencyCode(&quot;EUR&quot;),
-&nbsp;        ownerId = UserId(&quot;preview-user-1&quot;),
-&nbsp;        createdAt = Instant.fromEpochMilliseconds(0),
-&nbsp;    ),
-&nbsp;    Workspace(
-&nbsp;        id = WorkspaceId(&quot;preview-ws-2&quot;),
-&nbsp;        name = &quot;Family&quot;,
-&nbsp;        description = &quot;Household budget&quot;,
-&nbsp;        baseCurrency = CurrencyCode(&quot;EUR&quot;),
-&nbsp;        ownerId = UserId(&quot;preview-user-1&quot;),
-&nbsp;        createdAt = Instant.fromEpochMilliseconds(0),
-&nbsp;    ),
-&nbsp;    Workspace(
-&nbsp;        id = WorkspaceId(&quot;preview-ws-3&quot;),
-&nbsp;        name = &quot;Lisbon trip&quot;,
-&nbsp;        description = &quot;Apr 12 – Apr 22&quot;,
-&nbsp;        baseCurrency = CurrencyCode(&quot;EUR&quot;),
-&nbsp;        ownerId = UserId(&quot;preview-user-1&quot;),
-&nbsp;        createdAt = Instant.fromEpochMilliseconds(0),
-&nbsp;    ),
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -490,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

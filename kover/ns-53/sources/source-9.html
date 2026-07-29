@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PreferencesState</title>
+  <title>MoneySurfer Coverage Report > PreferencesTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: PreferencesState (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
+<h1>Coverage Summary for Class: PreferencesTestTags (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PreferencesState</td>
+  <td class="name">PreferencesTestTags</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    66.7%
   </span>
   <span class="absValue">
-    (2/2)
+    (2/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    41.7%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (14/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    98.3%
-  </span>
-  <span class="absValue">
-    (171/174)
+    (10/24)
   </span>
 </td>
 </tr>
@@ -101,166 +94,388 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.preferences
 &nbsp;
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.domain.model.Currency
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.AppLanguage
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.AppRegion
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.DefaultTransactionType
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.HourFormat
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.NumberFormatStyle
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.WeekStart
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.flow.collect
-&nbsp;import kotlinx.coroutines.flow.onEach
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_auto_categorize_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_auto_categorize_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_behavior_footnote
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_currency_search_placeholder
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_currency_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_currency_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_default_txn_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hide_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hide_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hour_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_language_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_language_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_locale_footnote
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_number_format_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_round_up_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_round_up_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_section_behavior
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_section_calendar
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_section_locale
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_section_money
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_week_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * Every row on the Preferences screen is a [UiPreferences] handle: state is a projection of the
-&nbsp; * stored values and a tap writes straight through, exactly as `AppearanceViewModel` does. Nothing
-&nbsp; * is held in the ViewModel that a pref does not already hold — the one exception is
-&nbsp; * [PreferencesState.activePicker], which is which sheet is open and dies with the screen on
-&nbsp; * purpose.
+&nbsp; * Stable selectors for the Preferences screen — see docs/testing/testing-strategy.md.
 &nbsp; *
-&nbsp; * The choices are stored, not yet obeyed: no locale, calendar or behaviour code reads these keys
-&nbsp; * today (see the `UiPreferences` KDoc). The screen therefore promises persistence and nothing more.
+&nbsp; * Rows and options are named after the [PreferencePicker] and the enum entry they store, not after
+&nbsp; * the localized label, so a re-worded row never breaks a flow.
 &nbsp; */
-&nbsp;@KoinViewModel
-&nbsp;class PreferencesViewModel(
-&nbsp;    private val uiPreferences: UiPreferences,
-&nbsp;    getCurrencies: GetCurrenciesUseCase,
-&nbsp;) : MviViewModel&lt;PreferencesState, PreferencesEvent, PreferencesEffect&gt;(
-&nbsp;    initialState = PreferencesState(),
+&nbsp;object PreferencesTestTags {
+&nbsp;    const val Root = &quot;preferences:root&quot;
+&nbsp;
+<b class="fc">&nbsp;    fun row(picker: PreferencePicker): String = &quot;preferences:row:${picker.name.lowercase()}&quot;</b>
+&nbsp;
+&nbsp;    fun option(picker: PreferencePicker, value: String): String =
+<b class="nc">&nbsp;        &quot;preferences:option:${picker.name.lowercase()}:${value.lowercase()}&quot;</b>
+&nbsp;
+<b class="fc">&nbsp;    fun toggle(name: String): String = &quot;preferences:toggle:$name&quot;</b>
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun PreferencesScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    viewModel: PreferencesViewModel = koinViewModel(),
 &nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
-&nbsp;    init {
-&nbsp;        observe(uiPreferences.appLanguage) { copy(language = it) }
-&nbsp;        observe(uiPreferences.appRegion) { copy(region = it) }
-&nbsp;        observe(uiPreferences.defaultCurrency) { copy(currency = it) }
-&nbsp;        observe(uiPreferences.numberFormat) { copy(numberFormat = it) }
-&nbsp;        observe(uiPreferences.weekStart) { copy(weekStart = it) }
-&nbsp;        observe(uiPreferences.hourFormat) { copy(hourFormat = it) }
-&nbsp;        observe(uiPreferences.defaultTransactionType) { copy(defaultTransactionType = it) }
-&nbsp;        observe(uiPreferences.hideAmounts) { copy(hideAmounts = it) }
-&nbsp;        observe(uiPreferences.autoCategorize) { copy(autoCategorize = it) }
-&nbsp;        observe(uiPreferences.roundUpSavings) { copy(roundUp = it) }
-&nbsp;
-&nbsp;        launch {
-&nbsp;            getCurrencies()
-&nbsp;                .onEach { currencies -&gt; updateState { copy(currencies = currencies) } }
-&nbsp;                .collect()
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            PreferencesEffect.NavigateBack -&gt; onNavigateBack()
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    override fun onEvent(event: PreferencesEvent) {
-&nbsp;        when (event) {
-&nbsp;            PreferencesEvent.OnBackClick -&gt; postSideEffect(PreferencesEffect.NavigateBack)
-&nbsp;            is PreferencesEvent.OnPickerOpen -&gt; updateState { copy(activePicker = event.picker) }
-&nbsp;            PreferencesEvent.OnPickerDismiss -&gt; closePicker()
-&nbsp;
-&nbsp;            is PreferencesEvent.OnLanguageSelect -&gt; select(uiPreferences.appLanguage, event.value)
-&nbsp;            is PreferencesEvent.OnRegionSelect -&gt; select(uiPreferences.appRegion, event.value)
-&nbsp;            is PreferencesEvent.OnCurrencySelect -&gt; select(uiPreferences.defaultCurrency, event.value)
-&nbsp;            is PreferencesEvent.OnNumberFormatSelect -&gt; select(uiPreferences.numberFormat, event.value)
-&nbsp;            is PreferencesEvent.OnWeekStartSelect -&gt; select(uiPreferences.weekStart, event.value)
-&nbsp;            is PreferencesEvent.OnHourFormatSelect -&gt; select(uiPreferences.hourFormat, event.value)
-&nbsp;            is PreferencesEvent.OnDefaultTransactionTypeSelect -&gt;
-&nbsp;                select(uiPreferences.defaultTransactionType, event.value)
-&nbsp;
-&nbsp;            is PreferencesEvent.OnHideAmountsToggle -&gt; write(uiPreferences.hideAmounts, event.enabled)
-&nbsp;            is PreferencesEvent.OnAutoCategorizeToggle -&gt; write(uiPreferences.autoCategorize, event.enabled)
-&nbsp;            is PreferencesEvent.OnRoundUpToggle -&gt; write(uiPreferences.roundUpSavings, event.enabled)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun &lt;T&gt; observe(pref: Pref&lt;T&gt;, reduce: PreferencesState.(T) -&gt; PreferencesState) {
-&nbsp;        launch {
-&nbsp;            pref.flow
-&nbsp;                .onEach { value -&gt; updateState { reduce(value) } }
-&nbsp;                .collect()
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Closes the sheet and writes. The pill is *not* updated here — it re-renders when the pref
-&nbsp;     * flow emits, so what the row shows is what the store accepted and nothing else.
-&nbsp;     */
-&nbsp;    private fun &lt;T&gt; select(pref: Pref&lt;T&gt;, value: T) {
-&nbsp;        closePicker()
-&nbsp;        write(pref, value)
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun &lt;T&gt; write(pref: Pref&lt;T&gt;, value: T) {
-&nbsp;        launch { pref.set(value) }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun closePicker() = updateState { copy(activePicker = null) }
+&nbsp;    PreferencesContent(state = state, onEvent = viewModel::onEvent)
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Defaults here mirror the `UiConfigKeys` defaults on purpose: they are what the screen shows for
-&nbsp; * the frame before the first flow emission, and a mismatch would be a value the store never held.
-&nbsp; *
-&nbsp; * [currency] is nullable because it has no such constant — its default is the platform locale&#39;s
-&nbsp; * currency, resolved by the config engine — so the row shows a placeholder rather than a guess
-&nbsp; * until the flow arrives.
+&nbsp; * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+&nbsp; * injected state, the way [DashboardCustomizeContent][com.georgeci.moneysurfer.feature.dashboard.customize]
+&nbsp; * is mounted. That cover is the point of this screen: the bug being fixed was pills that rendered a
+&nbsp; * fixed string, and only a real render can tell a pill bound to state from one that is not.
 &nbsp; */
-<b class="fc">&nbsp;data class PreferencesState(</b>
-<b class="fc">&nbsp;    val language: AppLanguage = AppLanguage.DEFAULT,</b>
-<b class="fc">&nbsp;    val region: AppRegion = AppRegion.DEFAULT,</b>
-<b class="fc">&nbsp;    val currency: CurrencyCode? = null,</b>
-<b class="fc">&nbsp;    val currencies: List&lt;Currency&gt; = emptyList(),</b>
-<b class="fc">&nbsp;    val numberFormat: NumberFormatStyle = NumberFormatStyle.DEFAULT,</b>
-<b class="fc">&nbsp;    val weekStart: WeekStart = WeekStart.DEFAULT,</b>
-<b class="fc">&nbsp;    val hourFormat: HourFormat = HourFormat.DEFAULT,</b>
-<b class="fc">&nbsp;    val defaultTransactionType: DefaultTransactionType = DefaultTransactionType.DEFAULT,</b>
-<b class="fc">&nbsp;    val hideAmounts: Boolean = false,</b>
-<b class="fc">&nbsp;    val autoCategorize: Boolean = true,</b>
-<b class="fc">&nbsp;    val roundUp: Boolean = false,</b>
-<b class="fc">&nbsp;    val activePicker: PreferencePicker? = null,</b>
+&nbsp;@Composable
+&nbsp;fun PreferencesContent(
+&nbsp;    state: PreferencesState,
+&nbsp;    onEvent: (PreferencesEvent) -&gt; Unit,
 &nbsp;) {
-&nbsp;    /** The catalogue entry for [currency], or `null` while it loads or for a code we do not stock. */
-<b class="pc">&nbsp;    val selectedCurrency: Currency? get() = currencies.firstOrNull { it.code == currency }</b>
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(PreferencesTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferPaneTopBar(
+&nbsp;                title = stringResource(Res.string.settings_preferences_title),
+&nbsp;                onBack = { onEvent(PreferencesEvent.OnBackClick) },
+&nbsp;                colors = TopAppBarDefaults.topAppBarColors(
+&nbsp;                    containerColor = AppTheme.materialColors.surface,
+&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .verticalScroll(rememberScrollState()),
+&nbsp;        ) {
+&nbsp;            SurferSettingsGroup(
+&nbsp;                title = stringResource(Res.string.settings_preferences_section_locale),
+&nbsp;                footnote = stringResource(Res.string.settings_preferences_locale_footnote),
+&nbsp;            ) {
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.Language,
+&nbsp;                    icon = SurferIcons.Globe,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_language_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_language_supporting),
+&nbsp;                    value = state.language.label(),
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.Region,
+&nbsp;                    icon = SurferIcons.Sparkle,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_region_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_region_supporting),
+&nbsp;                    value = state.region.label(),
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_preferences_section_money)) {
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.Currency,
+&nbsp;                    icon = SurferIcons.Wallet,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_currency_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_currency_supporting),
+&nbsp;                    value = currencyLabel(state.currency, state.currencies),
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.NumberFormat,
+&nbsp;                    icon = SurferIcons.Code,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_number_format_title),
+&nbsp;                    value = state.numberFormat.sample,
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;                ToggleRow(
+&nbsp;                    name = &quot;hide_amounts&quot;,
+&nbsp;                    icon = SurferIcons.Visibility,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_hide_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_hide_supporting),
+&nbsp;                    checked = state.hideAmounts,
+&nbsp;                    onCheckedChange = { onEvent(PreferencesEvent.OnHideAmountsToggle(it)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_preferences_section_calendar)) {
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.WeekStart,
+&nbsp;                    icon = SurferIcons.Calendar,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_week_title),
+&nbsp;                    value = state.weekStart.label(),
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.HourFormat,
+&nbsp;                    icon = SurferIcons.Clock,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_hour_title),
+&nbsp;                    value = state.hourFormat.label(),
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SurferSettingsGroup(
+&nbsp;                title = stringResource(Res.string.settings_preferences_section_behavior),
+&nbsp;                footnote = stringResource(Res.string.settings_preferences_behavior_footnote),
+&nbsp;            ) {
+&nbsp;                PickerRow(
+&nbsp;                    picker = PreferencePicker.DefaultTransactionType,
+&nbsp;                    icon = SurferIcons.Add,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_default_txn_title),
+&nbsp;                    value = state.defaultTransactionType.label(),
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;                ToggleRow(
+&nbsp;                    name = &quot;auto_categorize&quot;,
+&nbsp;                    icon = SurferIcons.Sparkle,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_auto_categorize_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_auto_categorize_supporting),
+&nbsp;                    checked = state.autoCategorize,
+&nbsp;                    onCheckedChange = { onEvent(PreferencesEvent.OnAutoCategorizeToggle(it)) },
+&nbsp;                )
+&nbsp;                ToggleRow(
+&nbsp;                    name = &quot;round_up&quot;,
+&nbsp;                    icon = SurferIcons.Notifications,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_round_up_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_round_up_supporting),
+&nbsp;                    checked = state.roundUp,
+&nbsp;                    onCheckedChange = { onEvent(PreferencesEvent.OnRoundUpToggle(it)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    ActivePickerSheet(state = state, onEvent = onEvent)
 &nbsp;}
 &nbsp;
-&nbsp;/** Which row&#39;s chooser is open. One at a time — every picker is a modal sheet. */
-&nbsp;enum class PreferencePicker {
-&nbsp;    Language,
-&nbsp;    Region,
-&nbsp;    Currency,
-&nbsp;    NumberFormat,
-&nbsp;    WeekStart,
-&nbsp;    HourFormat,
-&nbsp;    DefaultTransactionType,
+&nbsp;/** Row whose pill shows the stored value and whose tap opens that value&#39;s chooser. */
+&nbsp;@Composable
+&nbsp;private fun PickerRow(
+&nbsp;    picker: PreferencePicker,
+&nbsp;    icon: ImageVector,
+&nbsp;    title: String,
+&nbsp;    value: String,
+&nbsp;    onEvent: (PreferencesEvent) -&gt; Unit,
+&nbsp;    supportingText: String? = null,
+&nbsp;) {
+&nbsp;    SurferSettingsRow(
+&nbsp;        icon = icon,
+&nbsp;        title = title,
+&nbsp;        supportingText = supportingText,
+&nbsp;        onClick = { onEvent(PreferencesEvent.OnPickerOpen(picker)) },
+&nbsp;        trailing = { SurferSettingsValuePill(value) },
+&nbsp;        modifier = Modifier.testTag(PreferencesTestTags.row(picker)),
+&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface PreferencesEvent {
-&nbsp;    data object OnBackClick : PreferencesEvent
-&nbsp;    data class OnPickerOpen(val picker: PreferencePicker) : PreferencesEvent
-&nbsp;    data object OnPickerDismiss : PreferencesEvent
-&nbsp;
-&nbsp;    data class OnLanguageSelect(val value: AppLanguage) : PreferencesEvent
-&nbsp;    data class OnRegionSelect(val value: AppRegion) : PreferencesEvent
-&nbsp;    data class OnCurrencySelect(val value: CurrencyCode) : PreferencesEvent
-&nbsp;    data class OnNumberFormatSelect(val value: NumberFormatStyle) : PreferencesEvent
-&nbsp;    data class OnWeekStartSelect(val value: WeekStart) : PreferencesEvent
-&nbsp;    data class OnHourFormatSelect(val value: HourFormat) : PreferencesEvent
-&nbsp;    data class OnDefaultTransactionTypeSelect(val value: DefaultTransactionType) : PreferencesEvent
-&nbsp;
-&nbsp;    data class OnHideAmountsToggle(val enabled: Boolean) : PreferencesEvent
-&nbsp;    data class OnAutoCategorizeToggle(val enabled: Boolean) : PreferencesEvent
-&nbsp;    data class OnRoundUpToggle(val enabled: Boolean) : PreferencesEvent
+&nbsp;@Composable
+&nbsp;private fun ToggleRow(
+&nbsp;    name: String,
+&nbsp;    icon: ImageVector,
+&nbsp;    title: String,
+&nbsp;    supportingText: String,
+&nbsp;    checked: Boolean,
+&nbsp;    onCheckedChange: (Boolean) -&gt; Unit,
+&nbsp;) {
+&nbsp;    SurferSettingsRow(
+&nbsp;        icon = icon,
+&nbsp;        title = title,
+&nbsp;        supportingText = supportingText,
+&nbsp;        onClick = { onCheckedChange(!checked) },
+&nbsp;        trailing = { SurferSettingsSwitch(checked = checked, onCheckedChange = onCheckedChange) },
+&nbsp;        modifier = Modifier.testTag(PreferencesTestTags.toggle(name)),
+&nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Only navigation is left: the pickers used to be side effects that the screen mapped to `Unit`,
-&nbsp; * and they are state now — which sheet is open is something the screen must be able to re-render
-&nbsp; * after a configuration change, not a one-shot signal.
+&nbsp; * The one open chooser, if any. Every sheet is driven from [PreferencesState.activePicker] rather
+&nbsp; * than from a side effect, so it survives a configuration change with the right row still open.
 &nbsp; */
-&nbsp;sealed interface PreferencesEffect {
-&nbsp;    data object NavigateBack : PreferencesEffect
+&nbsp;@Composable
+&nbsp;private fun ActivePickerSheet(
+&nbsp;    state: PreferencesState,
+&nbsp;    onEvent: (PreferencesEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val onDismiss = { onEvent(PreferencesEvent.OnPickerDismiss) }
+&nbsp;    when (state.activePicker) {
+&nbsp;        null -&gt; Unit
+&nbsp;
+&nbsp;        PreferencePicker.Language -&gt; PreferenceOptionsSheet(
+&nbsp;            title = stringResource(Res.string.settings_preferences_language_title),
+&nbsp;            options = AppLanguage.entries.map { it.asOption(PreferencePicker.Language, it.label()) },
+&nbsp;            selected = state.language,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnLanguageSelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;
+&nbsp;        PreferencePicker.Region -&gt; PreferenceOptionsSheet(
+&nbsp;            title = stringResource(Res.string.settings_preferences_region_title),
+&nbsp;            options = AppRegion.entries.map { it.asOption(PreferencePicker.Region, it.label()) },
+&nbsp;            selected = state.region,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnRegionSelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;
+&nbsp;        PreferencePicker.Currency -&gt; CurrencySheet(
+&nbsp;            currencies = state.currencies,
+&nbsp;            selected = state.currency,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnCurrencySelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;
+&nbsp;        PreferencePicker.NumberFormat -&gt; PreferenceOptionsSheet(
+&nbsp;            title = stringResource(Res.string.settings_preferences_number_format_title),
+&nbsp;            options = NumberFormatStyle.entries.map { it.asOption(PreferencePicker.NumberFormat, it.sample) },
+&nbsp;            selected = state.numberFormat,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnNumberFormatSelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;
+&nbsp;        PreferencePicker.WeekStart -&gt; PreferenceOptionsSheet(
+&nbsp;            title = stringResource(Res.string.settings_preferences_week_title),
+&nbsp;            options = WeekStart.entries.map { it.asOption(PreferencePicker.WeekStart, it.label()) },
+&nbsp;            selected = state.weekStart,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnWeekStartSelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;
+&nbsp;        PreferencePicker.HourFormat -&gt; PreferenceOptionsSheet(
+&nbsp;            title = stringResource(Res.string.settings_preferences_hour_title),
+&nbsp;            options = HourFormat.entries.map { it.asOption(PreferencePicker.HourFormat, it.label()) },
+&nbsp;            selected = state.hourFormat,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnHourFormatSelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;
+&nbsp;        PreferencePicker.DefaultTransactionType -&gt; PreferenceOptionsSheet(
+&nbsp;            title = stringResource(Res.string.settings_preferences_default_txn_title),
+&nbsp;            options = DefaultTransactionType.entries.map {
+&nbsp;                it.asOption(PreferencePicker.DefaultTransactionType, it.label())
+&nbsp;            },
+&nbsp;            selected = state.defaultTransactionType,
+&nbsp;            onSelect = { onEvent(PreferencesEvent.OnDefaultTransactionTypeSelect(it)) },
+&nbsp;            onDismiss = onDismiss,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun CurrencySheet(
+&nbsp;    currencies: List&lt;Currency&gt;,
+&nbsp;    selected: CurrencyCode?,
+&nbsp;    onSelect: (CurrencyCode) -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    SurferCurrencyBottomSheet(
+&nbsp;        title = stringResource(Res.string.settings_preferences_currency_title),
+&nbsp;        searchPlaceholder = stringResource(Res.string.settings_preferences_currency_search_placeholder),
+&nbsp;        currencies = currencies.map {
+&nbsp;            SurferCurrencyOption(code = it.code.value, symbol = it.symbol, name = it.displayName)
+&nbsp;        },
+&nbsp;        selectedCode = selected?.value,
+&nbsp;        onSelect = { onSelect(CurrencyCode(it.code)) },
+&nbsp;        onDismiss = onDismiss,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private fun &lt;T : Enum&lt;T&gt;&gt; T.asOption(picker: PreferencePicker, label: String): PreferenceOption&lt;T&gt; =
+&nbsp;    PreferenceOption(value = this, label = label, tag = PreferencesTestTags.option(picker, name))
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun PreferencesScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        PreferencesContent(
+&nbsp;            state = PreferencesState(
+&nbsp;                region = AppRegion.Poland,
+&nbsp;                currency = CurrencyCode(&quot;PLN&quot;),
+&nbsp;                currencies = listOf(Currency(CurrencyCode(&quot;PLN&quot;), symbol = &quot;zł&quot;, displayName = &quot;Polish Zloty&quot;)),
+&nbsp;                numberFormat = NumberFormatStyle.SpaceGroupCommaDecimal,
+&nbsp;                hourFormat = HourFormat.TwentyFourHour,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -285,7 +500,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

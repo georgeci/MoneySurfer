@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ChangeMemberRoleUseCase</title>
+  <title>MoneySurfer Coverage Report > SessionMutator</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,138 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.auth</a>
 </div>
 
-<h1>Coverage Summary for Class: ChangeMemberRoleUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: SessionMutator (com.georgeci.moneysurfer.domain.auth)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">ChangeMemberRoleUseCase</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    62.5%
-  </span>
-  <span class="absValue">
-    (15/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    92.6%
-  </span>
-  <span class="absValue">
-    (25/27)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.8%
-  </span>
-  <span class="absValue">
-    (472/498)
-  </span>
-</td>
+  <td class="name">SessionMutator</td>
+    <td class="coverageStat"/>
 </tr>
-  <tr>
-    <td class="name">ChangeMemberRoleUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ChangeMemberRoleUseCase$invoke$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ChangeMemberRoleUseCase$Params</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (17/17)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    62.5%
-  </span>
-  <span class="absValue">
-    (15/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    93.5%
-  </span>
-  <span class="absValue">
-    (29/31)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    95%
-  </span>
-  <span class="absValue">
-    (489/515)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -158,74 +44,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.auth
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
-&nbsp;import arrow.core.raise.ensure
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;/**
-&nbsp; * Owner changes a member&#39;s role. Refuses to demote the last OWNER.
+&nbsp; * Session-scoped pointers persisted in DataStore. See sync.md §2.11 for the demo-flag semantics.
+&nbsp; *
+&nbsp; * Read-only on purpose: the pointers are written from exactly the session-lifecycle use cases
+&nbsp; * (see [SessionMutator]), while every other injection site — `Get*UseCase`, the invite use cases,
+&nbsp; * the pull path — only reads. Handing all of them a setter they must not call is how a stray write
+&nbsp; * ends up somewhere nobody thought to review.
+&nbsp; *
+&nbsp; * These are session state, not configuration, so they stay off the configuration engine: `null`
+&nbsp; * here means &quot;nobody is signed in&quot;, while the engine reads `null` from a layer as &quot;key absent&quot;,
+&nbsp; * which would turn clearing a pointer into falling through to the layer below.
+&nbsp; *
+&nbsp; * - [currentUserId] — local user id; set for every flow including demo. Drives &quot;is anyone
+&nbsp; *   signed in&quot; logic.
+&nbsp; * - [currentWorkspaceId] — active workspace; drives per-workspace queries (`Get*UseCase`).
+&nbsp; * - [currentFirebaseUid] — Firebase auth uid; non-null only for Firebase-backed sessions.
+&nbsp; *   Used by `CreateWorkspaceUseCase` to decide whether to push to Firestore.
+&nbsp; * - [hasUsedDemo] — sticky flag set by `DemoLoginUseCase`, consumed by `WipeDemoDataUseCase`
+&nbsp; *   on real login/signup so demo rows never leak into the real account&#39;s outbox.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class ChangeMemberRoleUseCase(
-<b class="fc">&nbsp;    private val memberRepository: WorkspaceMemberRepository,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-&nbsp;) {
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;interface SessionPointers {
+&nbsp;    val currentUserId: Flow&lt;UserId?&gt;
+&nbsp;    val currentWorkspaceId: Flow&lt;WorkspaceId?&gt;
+&nbsp;    val currentFirebaseUid: Flow&lt;String?&gt;
+&nbsp;    val hasUsedDemo: Flow&lt;Boolean&gt;
+&nbsp;}
 &nbsp;
-<b class="fc">&nbsp;    data class Params(</b>
-<b class="fc">&nbsp;        val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;        val targetUserId: UserId,</b>
-<b class="fc">&nbsp;        val newRole: WorkspaceRole,</b>
-&nbsp;    )
+&nbsp;/**
+&nbsp; * Write side of [SessionPointers] — injected only by session-lifecycle use cases (`Login`,
+&nbsp; * `Signup`, `AnonymousLogin`, `DemoLogin`, `Logout`, `DeleteUserAccount`, `SelectWorkspace`,
+&nbsp; * `CreateWorkspace`, `PostAuthBootstrap`, `AbandonAuthSession`, `AuthLocalRepository`,
+&nbsp; * `SyncCoordinatorWorkspaceSyncer`).
+&nbsp; */
+&nbsp;interface SessionMutator {
 &nbsp;
-<b class="fc">&nbsp;    suspend operator fun invoke(params: Params): Either&lt;InviteError, Unit&gt; = either {</b>
-<b class="pc">&nbsp;        val callerId = session.currentUserId.flow.first()</b>
-<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
+&nbsp;    suspend fun setCurrentUser(id: UserId?)
 &nbsp;
-<b class="fc">&nbsp;        val members = memberRepository.getByWorkspaceId(params.workspaceId).first()</b>
-<b class="fc">&nbsp;        val callerMember = members.firstOrNull { it.userId == callerId }</b>
-<b class="pc">&nbsp;        ensure(callerMember?.role == WorkspaceRole.OWNER) { InviteError.NotOwner }</b>
+&nbsp;    suspend fun setCurrentWorkspace(id: WorkspaceId?)
 &nbsp;
-<b class="pc">&nbsp;        val target = members.firstOrNull { it.userId == params.targetUserId }</b>
-<b class="nc">&nbsp;            ?: raise(InviteError.InviteNotFound)</b>
-<b class="pc">&nbsp;        ensure(target.status == WorkspaceMemberStatus.ACTIVE) { InviteError.InviteNotPending }</b>
+&nbsp;    suspend fun setFirebaseUid(uid: String?)
 &nbsp;
-<b class="pc">&nbsp;        if (target.role == WorkspaceRole.OWNER &amp;&amp; params.newRole != WorkspaceRole.OWNER) {</b>
-<b class="fc">&nbsp;            val remainingOwners = members.count {</b>
-<b class="fc">&nbsp;                it.role == WorkspaceRole.OWNER &amp;&amp;</b>
-<b class="pc">&nbsp;                    it.status == WorkspaceMemberStatus.ACTIVE &amp;&amp;</b>
-<b class="fc">&nbsp;                    it.userId != params.targetUserId</b>
-&nbsp;            }
-<b class="pc">&nbsp;            ensure(remainingOwners &gt;= 1) { InviteError.CannotDemoteLastOwner }</b>
-&nbsp;        }
+&nbsp;    suspend fun setHasUsedDemo(value: Boolean)
 &nbsp;
-&nbsp;        // No-op fast path: avoid writing if nothing actually changes.
-<b class="fc">&nbsp;        if (target.role == params.newRole) return@either</b>
-&nbsp;
-<b class="fc">&nbsp;        Either.catch { memberRepository.update(target.copy(role = params.newRole)) }</b>
-<b class="fc">&nbsp;            .onLeft { log.e(it) { &quot;[local] update failed uid=${params.targetUserId.value}&quot; } }</b>
-<b class="fc">&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }</b>
-<b class="fc">&nbsp;            .bind()</b>
-&nbsp;
-<b class="fc">&nbsp;        log.i {</b>
-<b class="fc">&nbsp;            &quot;[done] uid=${params.targetUserId.value} ${target.role} -&gt; ${params.newRole} by=${callerId.value}&quot;</b>
-&nbsp;        }
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;ChangeMemberRole&quot;
-&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Clears user, workspace and Firebase uid in **one** store edit.
+&nbsp;     *
+&nbsp;     * Logout and account deletion used to write the three pointers as three separate DataStore
+&nbsp;     * edits, so a crash in between left a half-cleared session (user id null, workspace id still
+&nbsp;     * set). Must not touch [SessionPointers.hasUsedDemo] — that flag is device-scoped and clearing
+&nbsp;     * it would let orphan demo data reach Firestore (sync.md §2.11).
+&nbsp;     */
+&nbsp;    suspend fun clearSession()
 &nbsp;}
 </code>
 </pre>
@@ -250,7 +126,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

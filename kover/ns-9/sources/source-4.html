@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ZipStoredReaderKt</title>
+  <title>MoneySurfer Coverage Report > DashboardLayoutConfigCodec</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.backup.zip</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: ZipStoredReaderKt (com.georgeci.moneysurfer.data.backup.zip)</h1>
+<h1>Coverage Summary for Class: DashboardLayoutConfigCodec (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">ZipStoredReaderKt</td>
+  <td class="name">DashboardLayoutConfigCodec</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (4/10)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,118 +92,99 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup.zip
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
-&nbsp;import okio.Buffer
-&nbsp;import okio.BufferedSink
-&nbsp;import okio.BufferedSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigCodec
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigValueKind
+&nbsp;import com.georgeci.moneysurfer.data.preferences.DashboardLayoutCodec
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AccentSeed
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.PaletteSource
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;
 &nbsp;/**
-&nbsp; * Streaming reader for ZIPs produced by [ZipStoredWriter].
+&nbsp; * Wire format, unchanged from the previous hand-rolled adapters:
+&nbsp; *  - `BRAND`
+&nbsp; *  - `PRESET:&lt;seedName&gt;`, e.g. `PRESET:Plum`
+&nbsp; *  - `DYNAMIC`
 &nbsp; *
-&nbsp; * Reads local-file-headers in order and ignores the trailing central directory.
-&nbsp; * Only the STORED method is supported — a non-zero compression method is a
-&nbsp; * hard error.
+&nbsp; * Anything else — including a `PRESET:` with an unknown seed — is undecodable rather than silently
+&nbsp; * `Brand`, so a value written by a newer build falls through to the layer below instead of
+&nbsp; * overwriting the user&#39;s choice with a default.
 &nbsp; */
-&nbsp;internal class ZipStoredReader(private val source: BufferedSource) {
+&nbsp;internal object PaletteSourceCodec : ConfigCodec&lt;PaletteSource&gt; {
 &nbsp;
-&nbsp;    /** Reads the next entry&#39;s name. Returns `null` once the central directory is reached. */
-&nbsp;    fun nextEntryName(): String? {
-&nbsp;        if (source.exhausted()) return null
-&nbsp;        val signature = source.readIntLe()
-&nbsp;        if (signature != LOCAL_FILE_HEADER_SIGNATURE) {
-&nbsp;            // Treat anything else (central directory, EOCD) as end of stream.
-&nbsp;            return null
-&nbsp;        }
-&nbsp;        currentHeader = readLocalFileHeader()
-&nbsp;        return currentHeader?.name
+&nbsp;    private const val BRAND = &quot;BRAND&quot;
+&nbsp;    private const val DYNAMIC = &quot;DYNAMIC&quot;
+&nbsp;    private const val PRESET_PREFIX = &quot;PRESET:&quot;
+&nbsp;
+&nbsp;    override fun encode(value: PaletteSource): String = when (value) {
+&nbsp;        PaletteSource.Brand -&gt; BRAND
+&nbsp;        PaletteSource.Dynamic -&gt; DYNAMIC
+&nbsp;        is PaletteSource.Preset -&gt; PRESET_PREFIX + value.seed.name
 &nbsp;    }
 &nbsp;
-&nbsp;    /** Declared size of the most-recent entry, or `null` outside an entry. */
-&nbsp;    val currentEntrySize: Long?
-&nbsp;        get() = currentHeader?.size?.toLong()
+&nbsp;    override fun decode(raw: String): PaletteSource? = when {
+&nbsp;        raw == BRAND -&gt; PaletteSource.Brand
+&nbsp;        raw == DYNAMIC -&gt; PaletteSource.Dynamic
+&nbsp;        raw.startsWith(PRESET_PREFIX) -&gt; decodePreset(raw.removePrefix(PRESET_PREFIX))
+&nbsp;        else -&gt; null
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun decodePreset(seedName: String): PaletteSource? =
+&nbsp;        AccentSeed.entries.firstOrNull { it.name == seedName }?.let(PaletteSource::Preset)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Streams the body of the most-recent entry into [out] and verifies the CRC32.
-&nbsp;     * Throws [BackupError.CrcMismatch] on mismatch.
+&nbsp;     * Enumerated rather than free text: `PRESET:&lt;seed&gt;` is exactly the format that makes typing a
+&nbsp;     * raw override a routine way to fail, so the debug panel gets a picker instead of a text field.
 &nbsp;     */
-&nbsp;    fun readCurrentEntryTo(out: BufferedSink) {
-&nbsp;        val header = currentHeader ?: error(&quot;nextEntryName() returned null or was not called&quot;)
-&nbsp;        val crc = Crc32()
-&nbsp;        var remaining = header.size
-&nbsp;        val readBuffer = ByteArray(COPY_BUFFER_SIZE)
-&nbsp;        while (remaining &gt; 0) {
-&nbsp;            val toRead = minOf(remaining.toLong(), readBuffer.size.toLong()).toInt()
-&nbsp;            val n = source.read(readBuffer, 0, toRead)
-&nbsp;            if (n == -1) {
-&nbsp;                throw BackupError.InvalidArchive(&quot;Truncated entry: ${header.name}&quot;)
-&nbsp;            }
-&nbsp;            crc.update(readBuffer, length = n)
-&nbsp;            out.write(readBuffer, 0, n)
-&nbsp;            remaining -= n
-&nbsp;        }
-&nbsp;        if (crc.getValue() != header.crc) {
-&nbsp;            throw BackupError.CrcMismatch(header.name)
-&nbsp;        }
-&nbsp;        currentHeader = null
-&nbsp;    }
-&nbsp;
-&nbsp;    /** Reads the current entry into a fresh [Buffer]. */
-&nbsp;    fun readCurrentEntryToBuffer(): Buffer {
-&nbsp;        val buffer = Buffer()
-&nbsp;        readCurrentEntryTo(buffer)
-&nbsp;        return buffer
-&nbsp;    }
-&nbsp;
-&nbsp;    private var currentHeader: LocalEntry? = null
-&nbsp;
-&nbsp;    private fun readLocalFileHeader(): LocalEntry {
-&nbsp;        val versionNeeded = source.readShortLe().toInt() and MASK_U16
-&nbsp;        val flags = source.readShortLe().toInt() and MASK_U16
-&nbsp;        val method = source.readShortLe().toInt() and MASK_U16
-&nbsp;        source.readShortLe()
-&nbsp;        source.readShortLe()
-&nbsp;        val crc = source.readIntLe().toLong() and MASK_U32
-&nbsp;        val compressedSize = source.readIntLe().toLong() and MASK_U32
-&nbsp;        val uncompressedSize = source.readIntLe().toLong() and MASK_U32
-&nbsp;        val nameLength = source.readShortLe().toInt() and MASK_U16
-&nbsp;        val extraLength = source.readShortLe().toInt() and MASK_U16
-&nbsp;
-&nbsp;        val problem = when {
-&nbsp;            method != COMPRESSION_METHOD_STORED -&gt;
-&nbsp;                &quot;Unsupported compression method: $method&quot;
-&nbsp;            flags and GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG != 0 -&gt;
-&nbsp;                &quot;Data-descriptor entries are not supported&quot;
-&nbsp;            versionNeeded &gt; VERSION_NEEDED_TO_EXTRACT -&gt;
-&nbsp;                &quot;ZIP requires version $versionNeeded&quot;
-&nbsp;            compressedSize != uncompressedSize -&gt;
-&nbsp;                &quot;STORED entry has mismatched sizes&quot;
-&nbsp;            // The codec keeps each entry buffered as a single okio Segment chain,
-&nbsp;            // so anything above Int.MAX_VALUE bytes can&#39;t be addressed in the
-&nbsp;            // ByteArray copy loop and would silently overflow on the cast below.
-&nbsp;            // We don&#39;t ship multi-GB DBs, so reject up front.
-&nbsp;            uncompressedSize &gt; Int.MAX_VALUE.toLong() -&gt;
-&nbsp;                &quot;Entry too large: $uncompressedSize bytes&quot;
-&nbsp;            else -&gt; null
-&nbsp;        }
-&nbsp;        if (problem != null) {
-&nbsp;            throw BackupError.InvalidArchive(problem)
-&nbsp;        }
-&nbsp;
-&nbsp;        val nameBytes = source.readByteArray(nameLength.toLong())
-&nbsp;        val name = nameBytes.decodeToString()
-&nbsp;        if (extraLength &gt; 0) source.skip(extraLength.toLong())
-&nbsp;        return LocalEntry(name = name, size = uncompressedSize.toInt(), crc = crc)
-&nbsp;    }
-&nbsp;
-&nbsp;    private data class LocalEntry(val name: String, val size: Int, val crc: Long)
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.Choice(
+&nbsp;        listOf(BRAND, DYNAMIC) + AccentSeed.entries.map { PRESET_PREFIX + it.name },
+&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;private const val GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG: Int = 1 shl 3
-&nbsp;private const val COPY_BUFFER_SIZE: Int = 64 * 1024
-&nbsp;private const val MASK_U16: Int = 0xFFFF
-&nbsp;private const val MASK_U32: Long = 0xFFFFFFFFL
+&nbsp;/**
+&nbsp; * Delegates to the existing flat layout encoding, through the nullable entry point.
+&nbsp; *
+&nbsp; * `DashboardLayoutCodec.decode` substitutes the default layout for anything it cannot parse, which
+&nbsp; * is the right behaviour for a direct read but wrong here: a value the engine cannot decode has to
+&nbsp; * be reported as undecodable so the layer loses and the panel can show the raw string. A decoded
+&nbsp; * default would win and look deliberate.
+&nbsp; */
+&nbsp;internal object DashboardLayoutConfigCodec : ConfigCodec&lt;DashboardLayoutConfig&gt; {
+&nbsp;
+<b class="nc">&nbsp;    override fun encode(value: DashboardLayoutConfig): String = DashboardLayoutCodec.encode(value)</b>
+&nbsp;
+<b class="nc">&nbsp;    override fun decode(raw: String): DashboardLayoutConfig? = DashboardLayoutCodec.decodeOrNull(raw)</b>
+&nbsp;
+<b class="fc">&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Bare ISO-4217 alphabetic code, e.g. `EUR`.
+&nbsp; *
+&nbsp; * Free text rather than a choice: the currency catalogue is data, not a compile-time enum, so the
+&nbsp; * codec cannot list the accepted values. It still validates the *shape* — three A–Z letters —
+&nbsp; * because a `CurrencyCode` is used unchecked as a formatter key, and reporting garbage as
+&nbsp; * undecodable lets the layer below win instead of persisting a code nothing can render.
+&nbsp; *
+&nbsp; * The shape is checked *after* upcasing, and against A–Z rather than `Char.isLetter`. Both matter,
+&nbsp; * because the debug panel writes this key as free text: `Char.isLetter` is Unicode-wide and would
+&nbsp; * accept `руб`, and `&quot;aßc&quot;` is three letters that upcase to the four-character `ASSC` — a value
+&nbsp; * this codec would have produced and then refused to decode on the next read, losing the setting.
+&nbsp; */
+&nbsp;internal object CurrencyCodeCodec : ConfigCodec&lt;CurrencyCode&gt; {
+&nbsp;
+&nbsp;    private const val ISO_4217_LENGTH = 3
+&nbsp;
+&nbsp;    override fun encode(value: CurrencyCode): String = value.value
+&nbsp;
+&nbsp;    override fun decode(raw: String): CurrencyCode? = raw.trim().uppercase()
+&nbsp;        .takeIf { it.length == ISO_4217_LENGTH &amp;&amp; it.all { char -&gt; char in &#39;A&#39;..&#39;Z&#39; } }
+&nbsp;        ?.let(::CurrencyCode)
+&nbsp;
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -179,7 +208,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

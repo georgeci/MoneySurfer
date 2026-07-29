@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionAmountError</title>
+  <title>MoneySurfer Coverage Report > TransactionAmountInput</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionAmountError (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionAmountInput (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionAmountError</td>
+  <td class="name">TransactionAmountInput</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,16 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (60/60)
   </span>
 </td>
 </tr>
@@ -102,34 +109,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;object TransactionAmountInput {
 &nbsp;
 &nbsp;    /** Digits with at most one decimal separator; no sign, no exponent. */
-&nbsp;    private val AMOUNT_PATTERN = Regex(&quot;&quot;&quot;\d*\.?\d*&quot;&quot;&quot;)
+<b class="fc">&nbsp;    private val AMOUNT_PATTERN = Regex(&quot;&quot;&quot;\d*\.?\d*&quot;&quot;&quot;)</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Parses a raw amount (&#39;,&#39; normalised to &#39;.&#39;) to a [Double], or null when
 &nbsp;     * the text is not a plain unsigned decimal — e.g. &quot;1.2.3&quot;, &quot;12a&quot;, &quot;-5&quot;.
 &nbsp;     */
 &nbsp;    fun parse(amount: String): Double? {
-&nbsp;        val normalized = amount.replace(&#39;,&#39;, &#39;.&#39;)
-&nbsp;        if (!normalized.matches(AMOUNT_PATTERN)) return null
-&nbsp;        return normalized.toDoubleOrNull()
+<b class="fc">&nbsp;        val normalized = amount.replace(&#39;,&#39;, &#39;.&#39;)</b>
+<b class="fc">&nbsp;        if (!normalized.matches(AMOUNT_PATTERN)) return null</b>
+<b class="fc">&nbsp;        return normalized.toDoubleOrNull()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /** Submit gate: the amount parses and is strictly positive. */
-&nbsp;    fun isValid(amount: String): Boolean = (parse(amount) ?: return false) &gt; 0.0
+<b class="fc">&nbsp;    fun isValid(amount: String): Boolean = (parse(amount) ?: return false) &gt; 0.0</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * The inline error to surface for [amount], or null when the field is
 &nbsp;     * empty (nothing to complain about yet) or holds a positive amount.
 &nbsp;     */
 &nbsp;    fun errorFor(amount: String): TransactionAmountError? {
-&nbsp;        if (amount.isBlank()) return null
-&nbsp;        val parsed = parse(amount) ?: return TransactionAmountError.INVALID_FORMAT
-&nbsp;        return if (parsed &gt; 0.0) null else TransactionAmountError.NOT_POSITIVE
+<b class="fc">&nbsp;        if (amount.isBlank()) return null</b>
+<b class="fc">&nbsp;        val parsed = parse(amount) ?: return TransactionAmountError.INVALID_FORMAT</b>
+<b class="fc">&nbsp;        return if (parsed &gt; 0.0) null else TransactionAmountError.NOT_POSITIVE</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;/** Validation failures for a transaction amount field. */
-<b class="fc">&nbsp;enum class TransactionAmountError { INVALID_FORMAT, NOT_POSITIVE }</b>
+&nbsp;enum class TransactionAmountError { INVALID_FORMAT, NOT_POSITIVE }
 </code>
 </pre>
 </div>
@@ -153,7 +160,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

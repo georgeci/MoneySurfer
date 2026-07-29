@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionCreationScreenPreviewsKt</title>
+  <title>MoneySurfer Coverage Report > TransactionDetailsViewModel</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionCreationScreenPreviewsKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionDetailsViewModel (com.georgeci.moneysurfer.feature.transaction.details)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,154 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionCreationScreenPreviewsKt</td>
+  <td class="name">TransactionDetailsViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    80%
   </span>
   <span class="absValue">
-    (0/1)
+    (8/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    67.4%
   </span>
   <span class="absValue">
-    (0/4)
+    (29/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86%
+  </span>
+  <span class="absValue">
+    (49/57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (396/457)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TransactionDetailsViewModel$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionDetailsViewModel$handleDelete$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/200)
+    (27/27)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionDetailsViewModel$loadData$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (36/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.7%
+  </span>
+  <span class="absValue">
+    (311/325)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionDetailsViewModel$resolveSplit$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionDetailsViewModel$resolveTransferLeg$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionDetailsViewModel$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    74.7%
+  </span>
+  <span class="absValue">
+    (65/87)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.2%
+  </span>
+  <span class="absValue">
+    (83/91)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.7%
+  </span>
+  <span class="absValue">
+    (734/809)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,131 +201,299 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
 &nbsp;
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryAppearance
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.reference
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSplitLegsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransferCounterpartUseCase
+&nbsp;import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_deleted_snackbar
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionCreationFilledPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
-&nbsp;        TransactionCreationContent(
-&nbsp;            state = TransactionCreationState.Content(
-&nbsp;                amount = &quot;48.20&quot;,
-&nbsp;                note = PreviewNote,
-&nbsp;                type = TransactionTypeUi.Expense,
-&nbsp;                accounts = PreviewAccounts,
-&nbsp;                categories = PreviewCategories,
-&nbsp;                selectedAccount = PreviewAccounts.first(),
-&nbsp;                selectedCategory = PreviewCategories.first(),
-&nbsp;                isEditMode = false,
-&nbsp;                editingTransactionId = null,
-&nbsp;                timestamp = 0L,
-&nbsp;                categoryUsageCounts = emptyMap(),
-&nbsp;                displayCategories = PreviewCategories,
-&nbsp;            ),
-&nbsp;            onEvent = {},
+&nbsp;// ViewModel resolves the transaction plus everything the three screen variants need around it.
+<b class="fc">&nbsp;@KoinViewModel</b>
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
+&nbsp;class TransactionDetailsViewModel(
+&nbsp;    transactionId: TransactionId,
+<b class="fc">&nbsp;    private val getTransactionById: GetTransactionByIdUseCase,</b>
+<b class="fc">&nbsp;    private val getAccountById: GetAccountByIdUseCase,</b>
+<b class="fc">&nbsp;    private val getCategories: GetCategoriesUseCase,</b>
+<b class="fc">&nbsp;    private val getTransferCounterpart: GetTransferCounterpartUseCase,</b>
+<b class="fc">&nbsp;    private val getSplitLegs: GetSplitLegsUseCase,</b>
+<b class="fc">&nbsp;    private val deleteWithUndo: DeleteTransactionWithUndo,</b>
+&nbsp;) : MviViewModel&lt;TransactionDetailsState, TransactionDetailsEvent, TransactionDetailsEffect&gt;(
+<b class="fc">&nbsp;    initialState = TransactionDetailsState.Loading(transactionId),</b>
+&nbsp;) {
+&nbsp;
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        loadData()</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    override fun onEvent(event: TransactionDetailsEvent) {
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="pc">&nbsp;            TransactionDetailsEvent.OnBackClick -&gt;</b>
+<b class="nc">&nbsp;                postSideEffect(TransactionDetailsEffect.NavigateBack)</b>
+<b class="pc">&nbsp;            TransactionDetailsEvent.OnEditClick -&gt;</b>
+<b class="nc">&nbsp;                postSideEffect(TransactionDetailsEffect.NavigateToEdit(currentState.transactionId))</b>
+<b class="fc">&nbsp;            TransactionDetailsEvent.OnDuplicateClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(TransactionDetailsEffect.NavigateToDuplicate(currentState.transactionId))</b>
+<b class="pc">&nbsp;            TransactionDetailsEvent.OnDeleteClick -&gt;</b>
+<b class="nc">&nbsp;                updateState {</b>
+<b class="nc">&nbsp;                    TransactionDetailsState.content.showDeleteConfirmation.modify(this) { true }</b>
+&nbsp;                }
+<b class="pc">&nbsp;            TransactionDetailsEvent.OnDeleteConfirmed -&gt; handleDelete()</b>
+<b class="nc">&nbsp;            TransactionDetailsEvent.OnDeleteDismissed -&gt;</b>
+<b class="nc">&nbsp;                updateState {</b>
+<b class="nc">&nbsp;                    TransactionDetailsState.content.showDeleteConfirmation.modify(this) { false }</b>
+&nbsp;                }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadData() {
+<b class="fc">&nbsp;        launch {</b>
+<b class="fc">&nbsp;            val transactionId = currentState.transactionId</b>
+<b class="pc">&nbsp;            val transaction = getTransactionById(transactionId) ?: return@launch</b>
+<b class="fc">&nbsp;            val account = getAccountById(transaction.accountId)</b>
+<b class="fc">&nbsp;            val categories = getCategories().first()</b>
+<b class="pc">&nbsp;            val category = categories.find { it.id == transaction.categoryId }</b>
+<b class="pc">&nbsp;            val parentCategory = category?.parentId?.let { parentId -&gt; categories.find { it.id == parentId } }</b>
+<b class="fc">&nbsp;            val transfer = resolveTransferLeg(transaction, account)</b>
+<b class="fc">&nbsp;            val split = resolveSplit(transaction, categories)</b>
+&nbsp;
+<b class="fc">&nbsp;            updateState {</b>
+<b class="fc">&nbsp;                TransactionDetailsState.Content(</b>
+<b class="fc">&nbsp;                    transactionId = transactionId,</b>
+<b class="fc">&nbsp;                    formattedAmount = formatAmount(transaction, isTransfer = transfer != null),</b>
+<b class="fc">&nbsp;                    type = transaction.type,</b>
+<b class="fc">&nbsp;                    transfer = transfer,</b>
+<b class="fc">&nbsp;                    split = split,</b>
+<b class="fc">&nbsp;                    note = transaction.note,</b>
+<b class="fc">&nbsp;                    merchant = transaction.merchant,</b>
+<b class="pc">&nbsp;                    accountName = account?.name.orEmpty(),</b>
+<b class="fc">&nbsp;                    categoryName = category?.name.orEmpty(),</b>
+<b class="fc">&nbsp;                    parentCategoryName = parentCategory?.name,</b>
+<b class="pc">&nbsp;                    categorySystemKind = category?.systemKind?.name,</b>
+<b class="fc">&nbsp;                    categoryId = category?.id?.value.orEmpty(),</b>
+<b class="fc">&nbsp;                    categoryIconKey = category?.iconKey.orEmpty(),</b>
+<b class="fc">&nbsp;                    categoryHue = category?.hue ?: CategoryAppearance.UNSET_HUE,</b>
+<b class="fc">&nbsp;                    tags = transaction.tags,</b>
+<b class="fc">&nbsp;                    reference = transactionId.reference,</b>
+<b class="fc">&nbsp;                    formattedDate = formatDate(transaction.operationDate),</b>
+<b class="pc">&nbsp;                    isPlanned = transaction.status == TransactionStatus.PLANNED,</b>
+<b class="fc">&nbsp;                    showDeleteConfirmation = false,</b>
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Null unless [transaction] is one leg of a transfer. Neither leg stores the other account,
+&nbsp;     * so the sibling has to be resolved through the shared `transferId` — and the pair may be
+&nbsp;     * missing, in which case the screen still renders as a transfer with one side blank rather
+&nbsp;     * than silently degrading to an expense.
+&nbsp;     */
+&nbsp;    private suspend fun resolveTransferLeg(transaction: Transaction, account: Account?): TransferLeg? {
+<b class="fc">&nbsp;        if (transaction.transferId == null) return null</b>
+<b class="fc">&nbsp;        val counterpartName = getTransferCounterpart(transaction)</b>
+<b class="fc">&nbsp;            ?.let { getAccountById(it.accountId) }</b>
+<b class="pc">&nbsp;            ?.name</b>
+<b class="fc">&nbsp;            .orEmpty()</b>
+<b class="pc">&nbsp;        val ownName = account?.name.orEmpty()</b>
+<b class="fc">&nbsp;        return if (transaction.type == TransactionType.INCOME) {</b>
+<b class="fc">&nbsp;            TransferLeg(fromAccountName = counterpartName, toAccountName = ownName)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            TransferLeg(fromAccountName = ownName, toAccountName = counterpartName)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The receipt [transaction] is one leg of, or null when it is an ordinary single-category row.
+&nbsp;     *
+&nbsp;     * A group of one is treated as no split at all: a leg can reach this device from sync or a CSV
+&nbsp;     * import before (or without) its siblings, and there is nothing to break down until they land.
+&nbsp;     */
+&nbsp;    private suspend fun resolveSplit(
+&nbsp;        transaction: Transaction,
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;    ): SplitBreakdown? {
+<b class="fc">&nbsp;        val legs = getSplitLegs(transaction)</b>
+<b class="fc">&nbsp;        if (legs.size &lt; MIN_SPLIT_LEGS) return null</b>
+<b class="fc">&nbsp;        val total = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.money.abs() }</b>
+<b class="fc">&nbsp;        return SplitBreakdown(</b>
+<b class="fc">&nbsp;            formattedTotal = MoneyFormatter.format(total, transaction.currencyCode),</b>
+<b class="fc">&nbsp;            legs = legs.map { leg -&gt;</b>
+<b class="fc">&nbsp;                SplitLegUi(</b>
+<b class="fc">&nbsp;                    transactionId = leg.id,</b>
+<b class="pc">&nbsp;                    categoryName = categories.find { it.id == leg.categoryId }?.name.orEmpty(),</b>
+<b class="fc">&nbsp;                    formattedAmount = MoneyFormatter.format(leg.money.abs(), leg.currencyCode),</b>
+<b class="fc">&nbsp;                    isCurrent = leg.id == transaction.id,</b>
+<b class="fc">&nbsp;                )</b>
+&nbsp;            },
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/** Edit mode: identity band on top, delete action in the bar, no Transfer segment. */
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionCreationEditPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
-&nbsp;        val category = PreviewCategories.first()
-&nbsp;        TransactionCreationContent(
-&nbsp;            state = TransactionCreationState.Content(
-&nbsp;                amount = &quot;48.20&quot;,
-&nbsp;                note = PreviewNote,
-&nbsp;                type = TransactionTypeUi.Expense,
-&nbsp;                accounts = PreviewAccounts,
-&nbsp;                categories = PreviewCategories,
-&nbsp;                selectedAccount = PreviewAccounts.first(),
-&nbsp;                selectedCategory = category,
-&nbsp;                isEditMode = true,
-&nbsp;                editingTransactionId = TransactionId(&quot;preview-tx-8213&quot;),
-&nbsp;                editIdentity = TransactionEditIdentity(
-&nbsp;                    reference = &quot;TX-8213&quot;,
-&nbsp;                    type = TransactionTypeUi.Expense,
-&nbsp;                    note = PreviewNote,
-&nbsp;                    formattedAmount = &quot;−€48.20&quot;,
-&nbsp;                    categoryId = category.id.value,
-&nbsp;                    categoryIconKey = category.iconKey,
-&nbsp;                    categoryHue = category.hue,
-&nbsp;                    categorySystemKind = null,
-&nbsp;                ),
-&nbsp;                timestamp = 0L,
-&nbsp;                categoryUsageCounts = emptyMap(),
-&nbsp;                displayCategories = PreviewCategories,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
+&nbsp;    /**
+&nbsp;     * Transfers stay unsigned — money moved sideways, it neither arrived nor left. Only the
+&nbsp;     * income/expense variants carry a sign, matching the transaction list.
+&nbsp;     */
+&nbsp;    private fun formatAmount(transaction: Transaction, isTransfer: Boolean): String {
+<b class="fc">&nbsp;        val formatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode)</b>
+<b class="fc">&nbsp;        if (isTransfer) return formatted</b>
+<b class="pc">&nbsp;        return when (transaction.type) {</b>
+<b class="fc">&nbsp;            TransactionType.INCOME -&gt; &quot;+$formatted&quot;</b>
+<b class="fc">&nbsp;            TransactionType.EXPENSE -&gt; &quot;−$formatted&quot;</b>
+<b class="nc">&nbsp;            TransactionType.OPENING_BALANCE -&gt; formatted</b>
+&nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionCreationTransferPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
-&nbsp;        TransactionCreationContent(
-&nbsp;            state = TransactionCreationState.Content(
-&nbsp;                amount = &quot;48.20&quot;,
-&nbsp;                note = PreviewNote,
-&nbsp;                type = TransactionTypeUi.Transfer,
-&nbsp;                accounts = PreviewAccounts,
-&nbsp;                categories = PreviewCategories,
-&nbsp;                selectedAccount = PreviewAccounts.first(),
-&nbsp;                selectedCategory = PreviewCategories.first(),
-&nbsp;                isEditMode = false,
-&nbsp;                editingTransactionId = null,
-&nbsp;                timestamp = 0L,
-&nbsp;                categoryUsageCounts = emptyMap(),
-&nbsp;                displayCategories = PreviewCategories,
-&nbsp;                fromAccount = PreviewAccounts[0],
-&nbsp;                toAccount = PreviewAccounts[1],
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
+&nbsp;    private fun formatDate(date: kotlinx.datetime.LocalDate): String {
+<b class="pc">&nbsp;        val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)</b>
+<b class="fc">&nbsp;        val day = date.day.toString().padStart(2, &#39;0&#39;)</b>
+<b class="fc">&nbsp;        return &quot;$day $month ${date.year}&quot;</b>
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionCreationTransferCrossCurrencyPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
-&nbsp;        val from = PreviewAccounts[0]
-&nbsp;        val to = PreviewAccounts[1].copy(
-&nbsp;            name = &quot;Travel USD&quot;,
-&nbsp;            currencyCode = CurrencyCode(&quot;USD&quot;),
-&nbsp;        )
-&nbsp;        TransactionCreationContent(
-&nbsp;            state = TransactionCreationState.Content(
-&nbsp;                amount = &quot;250&quot;,
-&nbsp;                toAmount = &quot;271.83&quot;,
-&nbsp;                note = PreviewNote,
-&nbsp;                type = TransactionTypeUi.Transfer,
-&nbsp;                accounts = listOf(from, to),
-&nbsp;                categories = PreviewCategories,
-&nbsp;                selectedAccount = from,
-&nbsp;                selectedCategory = PreviewCategories.first(),
-&nbsp;                isEditMode = false,
-&nbsp;                editingTransactionId = null,
-&nbsp;                timestamp = 0L,
-&nbsp;                categoryUsageCounts = emptyMap(),
-&nbsp;                displayCategories = PreviewCategories,
-&nbsp;                fromAccount = from,
-&nbsp;                toAccount = to,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
+&nbsp;    private fun handleDelete() {
+<b class="fc">&nbsp;        launch {</b>
+<b class="fc">&nbsp;            deleteWithUndo(</b>
+<b class="fc">&nbsp;                transactionId = currentState.transactionId,</b>
+<b class="fc">&nbsp;                message = Res.string.transaction_details_deleted_snackbar,</b>
+<b class="fc">&nbsp;                undoLabel = Res.string.transaction_details_delete_undo,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            postSideEffect(TransactionDetailsEffect.NavigateBack)</b>
+&nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        /** Below this a group is not a split — see [resolveSplit]. */
+&nbsp;        const val MIN_SPLIT_LEGS = 2
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The legs one receipt was split across, as the details screen draws them under the amount.
+&nbsp; *
+&nbsp; * Present only when the group really has several legs; [SplitLegUi.isCurrent] marks the one the
+&nbsp; * screen was opened on, so the reader can see which slice of the receipt they navigated to.
+&nbsp; */
+&nbsp;data class SplitBreakdown(
+&nbsp;    val formattedTotal: String,
+&nbsp;    val legs: List&lt;SplitLegUi&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/** One leg of a split: where it was filed, how much of the receipt it took. */
+&nbsp;data class SplitLegUi(
+&nbsp;    val transactionId: TransactionId,
+&nbsp;    /** Blank when the leg is uncategorized — the screen substitutes its own label. */
+&nbsp;    val categoryName: String,
+&nbsp;    val formattedAmount: String,
+&nbsp;    val isCurrent: Boolean,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The two accounts a transfer moves money between, already oriented for display: [fromAccountName]
+&nbsp; * is always the source regardless of which leg is on screen. Either name is blank when the account
+&nbsp; * (or the paired leg) could not be resolved.
+&nbsp; */
+&nbsp;data class TransferLeg(
+&nbsp;    val fromAccountName: String,
+&nbsp;    val toAccountName: String,
+&nbsp;)
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface TransactionDetailsState {
+&nbsp;    val transactionId: TransactionId
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Loading(override val transactionId: TransactionId) : TransactionDetailsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Content(
+&nbsp;        override val transactionId: TransactionId,
+&nbsp;        val formattedAmount: String,
+&nbsp;        /**
+&nbsp;         * The stored type. A transfer is not a type of its own — both its legs are an ordinary
+&nbsp;         * `EXPENSE`/`INCOME` pair — so [transfer] is what tells the transfer variant apart.
+&nbsp;         */
+&nbsp;        val type: TransactionType,
+&nbsp;        /** Non-null when this transaction is one leg of a transfer. */
+&nbsp;        val transfer: TransferLeg? = null,
+&nbsp;        /** Non-null when this transaction is one leg of a receipt split across categories. */
+&nbsp;        val split: SplitBreakdown? = null,
+&nbsp;        val note: String,
+&nbsp;        val merchant: String = &quot;&quot;,
+&nbsp;        val accountName: String,
+&nbsp;        val categoryName: String,
+&nbsp;        /** Parent of [categoryName] when the category is nested, else null. */
+&nbsp;        val parentCategoryName: String? = null,
+&nbsp;        val categorySystemKind: String? = null,
+&nbsp;        /** Stored appearance of the transaction&#39;s category, fed to the shared bubble resolver. */
+&nbsp;        val categoryId: String = &quot;&quot;,
+&nbsp;        val categoryIconKey: String = &quot;&quot;,
+&nbsp;        val categoryHue: Int = CategoryAppearance.UNSET_HUE,
+&nbsp;        val tags: List&lt;String&gt; = emptyList(),
+&nbsp;        /** Derived short label (`TX-8A13`), see [com.georgeci.moneysurfer.domain.model.reference]. */
+&nbsp;        val reference: String = &quot;&quot;,
+&nbsp;        val formattedDate: String,
+&nbsp;        val isPlanned: Boolean,
+&nbsp;        val showDeleteConfirmation: Boolean,
+&nbsp;    ) : TransactionDetailsState {
+&nbsp;
+&nbsp;        val isTransfer: Boolean get() = transfer != null
+&nbsp;
+&nbsp;        val isIncome: Boolean get() = !isTransfer &amp;&amp; type == TransactionType.INCOME
+&nbsp;
+&nbsp;        val isSplit: Boolean get() = split != null
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Duplicating one leg of a transfer would produce a half-transfer, duplicating one leg of a
+&nbsp;         * split would produce a fragment of a receipt with no group to belong to, and an opening
+&nbsp;         * balance is an account artefact rather than something a user re-enters — none of the three
+&nbsp;         * offers the action.
+&nbsp;         */
+&nbsp;        val canDuplicate: Boolean
+&nbsp;            get() = !isTransfer &amp;&amp; !isSplit &amp;&amp; type != TransactionType.OPENING_BALANCE
+&nbsp;
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface TransactionDetailsEvent {
+&nbsp;    data object OnBackClick : TransactionDetailsEvent
+&nbsp;    data object OnEditClick : TransactionDetailsEvent
+&nbsp;    data object OnDuplicateClick : TransactionDetailsEvent
+&nbsp;    data object OnDeleteClick : TransactionDetailsEvent
+&nbsp;    data object OnDeleteConfirmed : TransactionDetailsEvent
+&nbsp;    data object OnDeleteDismissed : TransactionDetailsEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface TransactionDetailsEffect {
+&nbsp;    data object NavigateBack : TransactionDetailsEffect
+&nbsp;    data class NavigateToEdit(val transactionId: TransactionId) : TransactionDetailsEffect
+&nbsp;
+&nbsp;    /** Open the creation screen prefilled from [transactionId], as a brand-new transaction. */
+&nbsp;    data class NavigateToDuplicate(val transactionId: TransactionId) : TransactionDetailsEffect
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -240,7 +517,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

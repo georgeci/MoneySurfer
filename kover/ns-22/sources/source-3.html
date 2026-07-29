@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > LoggingConfigKt</title>
+  <title>MoneySurfer Coverage Report > AccountBalanceSeries</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.logging</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: LoggingConfigKt (com.georgeci.moneysurfer.domain.logging)</h1>
+<h1>Coverage Summary for Class: AccountBalanceSeries (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">LoggingConfigKt</td>
+  <td class="name">AccountBalanceSeries</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -58,22 +55,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -87,11 +69,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (12/12)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">AccountBalanceSeries$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,35 +112,83 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.logging
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import co.touchlab.kermit.Severity
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.minus
+&nbsp;
+&nbsp;/** Closing balance of one account at the end of [date]. */
+&nbsp;data class AccountBalancePoint(
+&nbsp;    val date: LocalDate,
+&nbsp;    val balance: Money,
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Global Kermit severity gate, called once from `initKoin` at every host&#39;s
-&nbsp; * startup.
+&nbsp; * The balance curve one account drew over a window, oldest point first, plus the net change
+&nbsp; * across that window.
 &nbsp; *
-&nbsp; * Release builds run at [Severity.Warn]: Verbose/Debug/Info calls — which
-&nbsp; * historically carried invitee emails and Firebase UIDs — are dropped before
-&nbsp; * their message lambda is even evaluated (Kermit checks min-severity first), so
-&nbsp; * the PII string is never constructed, let alone written to logcat / the iOS
-&nbsp; * unified log (issue #154). Debug builds keep [Severity.Verbose] for full
-&nbsp; * diagnostics.
-&nbsp; *
-&nbsp; * This is defence-in-depth with [redactEmail] / [redactUid], which run at the
-&nbsp; * call sites regardless of build type so the Warn/Error lines that do survive
-&nbsp; * here still never carry raw PII.
-&nbsp; *
-&nbsp; * Debug builds additionally install [DebugLogBuffer], so every host — not just
-&nbsp; * the one that happens to have a console attached — can show its last Warn/Error
-&nbsp; * lines in the Settings debug panel.
+&nbsp; * [delta] is not `last - first`: the first point already includes its own day&#39;s transactions,
+&nbsp; * so the difference between the ends would silently drop day one. It is the balance at the end
+&nbsp; * of the window minus the balance the account closed the day *before* it opened.
 &nbsp; */
-&nbsp;fun configureLogging(isDebug: Boolean) {
-<b class="fc">&nbsp;    Logger.setMinSeverity(if (isDebug) Severity.Verbose else Severity.Warn)</b>
-<b class="fc">&nbsp;    if (isDebug) {</b>
-<b class="fc">&nbsp;        DebugLogBuffer.install()</b>
+<b class="fc">&nbsp;data class AccountBalanceSeries(</b>
+<b class="fc">&nbsp;    val points: List&lt;AccountBalancePoint&gt;,</b>
+<b class="fc">&nbsp;    val delta: Money,</b>
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        /** Window the account details chart draws, matching its &quot;Balance · 30 days&quot; label. */
+&nbsp;        const val DEFAULT_DAYS: Int = 30
 &nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Rebuilds the daily balance curve by walking [transactions] backwards from [currentBalance].
+&nbsp; *
+&nbsp; * Anchored on the cached balance rather than summed from zero: the account&#39;s balance is the
+&nbsp; * authoritative figure the rest of the app shows, and a series summed independently would be
+&nbsp; * free to disagree with the number printed right above the chart. Working backwards makes the
+&nbsp; * last point equal that balance by construction.
+&nbsp; *
+&nbsp; * Pure. [transactions] may span any range and may contain rows for other accounts or non-ACTUAL
+&nbsp; * rows — [balanceImpact] filters those out. Rows dated after [today] are backed out of the
+&nbsp; * anchor, since the cached balance counts them but the curve must not.
+&nbsp; */
+&nbsp;fun buildAccountBalanceSeries(
+&nbsp;    accountId: AccountId,
+&nbsp;    currentBalance: Money,
+&nbsp;    transactions: List&lt;Transaction&gt;,
+&nbsp;    today: LocalDate,
+&nbsp;    days: Int = AccountBalanceSeries.DEFAULT_DAYS,
+&nbsp;): AccountBalanceSeries {
+&nbsp;    require(days &gt; 0) { &quot;days must be positive, was $days&quot; }
+&nbsp;
+&nbsp;    val byDate = mutableMapOf&lt;LocalDate, Money&gt;()
+&nbsp;    var future = Money.zero()
+&nbsp;    for (transaction in transactions) {
+&nbsp;        val impact = transaction.balanceImpact()[accountId] ?: continue
+&nbsp;        val date = transaction.operationDate
+&nbsp;        if (date &gt; today) {
+&nbsp;            future += impact
+&nbsp;        } else {
+&nbsp;            byDate[date] = (byDate[date] ?: Money.zero()) + impact
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    var running = currentBalance - future
+&nbsp;    val points = ArrayList&lt;AccountBalancePoint&gt;(days)
+&nbsp;    repeat(days) { index -&gt;
+&nbsp;        val date = today.minus(index, DateTimeUnit.DAY)
+&nbsp;        points += AccountBalancePoint(date = date, balance = running)
+&nbsp;        running -= byDate[date] ?: Money.zero()
+&nbsp;    }
+&nbsp;    points.reverse()
+&nbsp;
+&nbsp;    // `running` has now walked past the oldest point, so it holds the closing balance of the
+&nbsp;    // day before the window — the baseline the period delta is measured against.
+&nbsp;    return AccountBalanceSeries(points = points, delta = points.last().balance - running)
 &nbsp;}
 </code>
 </pre>
@@ -152,7 +213,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

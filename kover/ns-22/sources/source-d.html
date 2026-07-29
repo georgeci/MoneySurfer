@@ -63,24 +63,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (16/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    97.7%
   </span>
   <span class="absValue">
-    (72/72)
+    (84/86)
   </span>
 </td>
 </tr>
@@ -141,7 +148,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val hasMixedCurrency: Boolean,</b>
 &nbsp;    /** Workspace base currency, carried along so callers can format without a second lookup. */
 <b class="fc">&nbsp;    val currency: CurrencyCode?,</b>
-&nbsp;)
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Spend as a fraction of [effectiveLimit] — what a progress bar is drawn from. Can exceed 1,
+&nbsp;     * which is the overspend; a zero limit reads as 0, never as a NaN.
+&nbsp;     */
+&nbsp;    val spentFraction: Float
+<b class="pc">&nbsp;        get() = if (effectiveLimit.minor &lt;= 0L) 0f else spent.minor.toFloat() / effectiveLimit.minor.toFloat()</b>
+&nbsp;}
 &nbsp;
 &nbsp;private const val PERCENT = 100
 &nbsp;private const val WEEKLY_DAYS = 7
@@ -228,7 +243,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        rolloverCarry = carry,
 &nbsp;        remaining = remaining,
 &nbsp;        percent = percentOf(spent, effectiveLimit),
-&nbsp;        status = statusOf(spent, effectiveLimit, budget.alertPercent),
+&nbsp;        status = budgetStatusOf(spent, effectiveLimit, budget.alertPercent),
 &nbsp;        daysLeft = daysLeft,
 &nbsp;        dailyAverage = dailyAverage,
 &nbsp;        projectedTotal = dailyAverage * budget.period.forecastDays,
@@ -263,7 +278,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private fun percentOf(spent: Money, limit: Money): Int =
 &nbsp;    if (limit.minor &lt;= 0L) 0 else (spent.minor * PERCENT / limit.minor).toInt()
 &nbsp;
-&nbsp;private fun statusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
+&nbsp;/**
+&nbsp; * The traffic light for [spent] against [limit], with [alertPercent] as the near-limit threshold.
+&nbsp; *
+&nbsp; * Public because [calculateBudgetProgress] is not the only place spend meets a cap: the dashboard&#39;s
+&nbsp; * per-category breakdown ([buildSpentByCategory]) measures a category against its own budget
+&nbsp; * without folding the transaction list, and a second set of thresholds there would let the same
+&nbsp; * budget read WARN on one screen and OK on another.
+&nbsp; */
+&nbsp;fun budgetStatusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
 &nbsp;    val percent = percentOf(spent, limit)
 &nbsp;    return when {
 &nbsp;        spent &gt; limit -&gt; BudgetStatus.OVER
@@ -294,7 +317,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

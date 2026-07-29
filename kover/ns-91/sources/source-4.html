@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.feature.budget.generated.resources</a>
+    <a href="../index.html">moneysurfer.feature.dashboard.generated.resources</a>
 </div>
 
-<h1>Coverage Summary for Class: String0_commonMainKt (moneysurfer.feature.budget.generated.resources)</h1>
+<h1>Coverage Summary for Class: String0_commonMainKt (moneysurfer.feature.dashboard.generated.resources)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -60,27 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.1%
+    95.5%
   </span>
   <span class="absValue">
-    (75/117)
+    (192/201)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    37.6%
+    75.2%
   </span>
   <span class="absValue">
-    (109/290)
+    (376/500)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    37.4%
+    81.8%
   </span>
   <span class="absValue">
-    (1042/2784)
+    (3928/4800)
   </span>
 </td>
 </tr>
@@ -94,7 +94,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
 &nbsp;
-&nbsp;package moneysurfer.feature.budget.generated.resources
+&nbsp;package moneysurfer.feature.dashboard.generated.resources
 &nbsp;
 &nbsp;import kotlin.OptIn
 &nbsp;import kotlin.String
@@ -105,532 +105,910 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import org.jetbrains.compose.resources.ResourceItem
 &nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;
-&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.budget.generated.resources/&quot;
+&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.dashboard.generated.resources/&quot;
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(74_306_546)
-<b class="fc">&nbsp;internal val Res.string.budget_details_alert_over_format: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_details_alert_over_format&quot;, &quot;budget_details_alert_over_format&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10, 76),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10, 68),</b>
+&nbsp;@delegate:ResourceContentHash(736_028_905)
+<b class="fc">&nbsp;internal val Res.string.dashboard_accounts_manage: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_accounts_manage&quot;, &quot;dashboard_accounts_manage&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10, 61),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10, 41),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-989_142_252)
-<b class="fc">&nbsp;internal val Res.string.budget_details_alert_over_message: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_details_alert_over_message&quot;, &quot;budget_details_alert_over_message&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 87, 133),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 79, 105),</b>
+&nbsp;@delegate:ResourceContentHash(473_963_686)
+<b class="fc">&nbsp;internal val Res.string.dashboard_accounts_section_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_accounts_section_title&quot;, &quot;dashboard_accounts_section_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 72, 56),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 52, 52),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_960_480_362)
-<b class="fc">&nbsp;internal val Res.string.budget_details_alert_warn_format: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_alert_warn_format&quot;, &quot;budget_details_alert_warn_format&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 221, 92),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 185, 72),</b>
+&nbsp;@delegate:ResourceContentHash(20_061_117)
+<b class="fc">&nbsp;internal val Res.string.dashboard_add_account: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_add_account&quot;, &quot;dashboard_add_account&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 179, 65),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 143, 45),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_082_048_063)
-<b class="fc">&nbsp;internal val Res.string.budget_details_alert_warn_message_format: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_alert_warn_message_format&quot;, &quot;budget_details_alert_warn_message_format&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 314, 104),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 258, 84),</b>
+&nbsp;@delegate:ResourceContentHash(1_787_788_010)
+<b class="fc">&nbsp;internal val Res.string.dashboard_add_account_new: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_add_account_new&quot;, &quot;dashboard_add_account_new&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 129, 49),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 105, 37),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(58_828_203)
-<b class="fc">&nbsp;internal val Res.string.budget_details_edit: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_edit&quot;, &quot;budget_details_edit&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 419, 51),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 343, 35),</b>
+&nbsp;@delegate:ResourceContentHash(-569_514_008)
+<b class="fc">&nbsp;internal val Res.string.dashboard_add_transaction: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_add_transaction&quot;, &quot;dashboard_add_transaction&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 245, 85),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 189, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_777_610_259)
-<b class="fc">&nbsp;internal val Res.string.budget_details_not_found: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_details_not_found&quot;, &quot;budget_details_not_found&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 471, 96),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 379, 72),</b>
+&nbsp;@delegate:ResourceContentHash(501_679_894)
+<b class="fc">&nbsp;internal val Res.string.dashboard_balance_empty_text: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_balance_empty_text&quot;, &quot;dashboard_balance_empty_text&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 331, 124),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 243, 88),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-519_914_847)
-<b class="fc">&nbsp;internal val Res.string.budget_details_of_limit_format: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_of_limit_format&quot;, &quot;budget_details_of_limit_format&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 568, 50),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 452, 50),</b>
+&nbsp;@delegate:ResourceContentHash(1_150_912_975)
+<b class="fc">&nbsp;internal val Res.string.dashboard_balance_other_currencies: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_balance_other_currencies&quot;, &quot;dashboard_balance_other_currencies&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 456, 114),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 332, 86),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_446_129_144)
-<b class="fc">&nbsp;internal val Res.string.budget_details_rollover_carry_format: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_details_rollover_carry_format&quot;, &quot;budget_details_rollover_carry_format&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 619, 116),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 503, 80),</b>
+&nbsp;@delegate:ResourceContentHash(-1_459_467_286)
+<b class="fc">&nbsp;internal val Res.string.dashboard_balance_rates_as_of: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_balance_rates_as_of&quot;, &quot;dashboard_balance_rates_as_of&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 571, 105),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 419, 109),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-743_667_534)
-<b class="fc">&nbsp;internal val Res.string.budget_details_stat_daily_average: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_stat_daily_average&quot;, &quot;budget_details_stat_daily_average&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 736, 81),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 584, 61),</b>
+&nbsp;@delegate:ResourceContentHash(745_993_245)
+<b class="fc">&nbsp;internal val Res.string.dashboard_balance_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_balance_title&quot;, &quot;dashboard_balance_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 677, 63),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 529, 51),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_353_509_407)
-<b class="fc">&nbsp;internal val Res.string.budget_details_stat_per_day: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_stat_per_day&quot;, &quot;budget_details_stat_per_day&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 818, 67),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 646, 51),</b>
+&nbsp;@delegate:ResourceContentHash(464_717_632)
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_empty_subtitle: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_empty_subtitle&quot;, &quot;dashboard_budgets_empty_subtitle&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 741, 176),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 581, 96),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_880_115_458)
-<b class="fc">&nbsp;internal val Res.string.budget_details_stat_projected: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_stat_projected&quot;, &quot;budget_details_stat_projected&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 886, 57),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 698, 49),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_648_798_990)
-<b class="fc">&nbsp;internal val Res.string.budget_details_title: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_details_title&quot;, &quot;budget_details_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 944, 44),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 748, 36),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_065_759_512)
-<b class="fc">&nbsp;internal val Res.string.budget_details_transactions_empty: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_transactions_empty&quot;, &quot;budget_details_transactions_empty&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 989, 109),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 785, 85),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-771_508_169)
-<b class="fc">&nbsp;internal val Res.string.budget_details_transactions_header: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_details_transactions_header&quot;, &quot;budget_details_transactions_header&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1099, 90),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 871, 78),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-706_216_110)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_alert_decrease: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_alert_decrease&quot;, &quot;budget_edit_alert_decrease&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1190, 102),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 950, 70),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_952_084_045)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_alert_increase: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_alert_increase&quot;, &quot;budget_edit_alert_increase&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1293, 102),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1021, 70),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(954_370_280)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_alert_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_alert_label&quot;, &quot;budget_edit_alert_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1396, 67),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1092, 43),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_784_329_481)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_amount_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_amount_label&quot;, &quot;budget_edit_amount_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1464, 48),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1136, 40),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(644_373_406)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_amount_required: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_amount_required&quot;, &quot;budget_edit_amount_required&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1513, 107),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1177, 67),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_886_785_938)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_categories_hint: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_categories_hint&quot;, &quot;budget_edit_categories_hint&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1621, 143),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1245, 99),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_275_896_251)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_categories_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_categories_label&quot;, &quot;budget_edit_categories_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1765, 60),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1345, 52),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_949_369_692)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_created_snackbar: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_edit_created_snackbar&quot;, &quot;budget_edit_created_snackbar&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1826, 64),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1398, 56),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(2_092_382_761)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_name_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_name_label&quot;, &quot;budget_edit_name_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1891, 54),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1455, 38),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_909_269_298)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_name_required: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_name_required&quot;, &quot;budget_edit_name_required&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1946, 97),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1494, 65),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_871_361_111)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_period_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_period_label&quot;, &quot;budget_edit_period_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2044, 48),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1560, 40),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-538_335_271)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_rollover_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_rollover_label&quot;, &quot;budget_edit_rollover_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2093, 82),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1601, 66),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(2_077_686_083)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_rollover_supporting: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_rollover_supporting&quot;, &quot;budget_edit_rollover_supporting&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2176, 171),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1668, 107),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_109_230_399)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_save: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_save&quot;, &quot;budget_edit_save&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2348, 48),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1776, 32),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_657_143_624)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_start_date_label: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_start_date_label&quot;, &quot;budget_edit_start_date_label&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2397, 52),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1809, 48),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-798_123_371)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_title_create: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_title_create&quot;, &quot;budget_edit_title_create&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2450, 64),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1858, 48),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_364_127_871)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_title_edit: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_edit_title_edit&quot;, &quot;budget_edit_title_edit&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2515, 70),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1907, 46),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_675_411_511)
-<b class="fc">&nbsp;internal val Res.string.budget_edit_updated_snackbar: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_edit_updated_snackbar&quot;, &quot;budget_edit_updated_snackbar&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2586, 72),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1954, 56),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_731_324_128)
-<b class="fc">&nbsp;internal val Res.string.budget_footer_format: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_footer_format&quot;, &quot;budget_footer_format&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2659, 44),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2011, 44),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_326_393_343)
-<b class="fc">&nbsp;internal val Res.string.budget_mixed_currency: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_mixed_currency&quot;, &quot;budget_mixed_currency&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2704, 125),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2056, 89),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-115_867_360)
-<b class="fc">&nbsp;internal val Res.string.budget_over_format: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_over_format&quot;, &quot;budget_over_format&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2830, 62),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2146, 38),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_787_430_802)
-<b class="fc">&nbsp;internal val Res.string.budget_period_monthly: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_period_monthly&quot;, &quot;budget_period_monthly&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2893, 45),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2185, 41),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_017_298_679)
-<b class="fc">&nbsp;internal val Res.string.budget_period_weekly: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_period_weekly&quot;, &quot;budget_period_weekly&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2939, 44),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2227, 36),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-851_917_197)
-<b class="fc">&nbsp;internal val Res.string.budget_period_yearly: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_period_yearly&quot;, &quot;budget_period_yearly&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2984, 36),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2264, 36),</b>
+&nbsp;@delegate:ResourceContentHash(-852_768_624)
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_empty_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_empty_title&quot;, &quot;dashboard_budgets_empty_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 918, 81),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 678, 57),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-617_619_520)
-<b class="fc">&nbsp;internal val Res.string.budget_remaining_format: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_remaining_format&quot;, &quot;budget_remaining_format&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3021, 59),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2301, 43),</b>
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_left: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_left&quot;, &quot;dashboard_budgets_left&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1000, 58),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 736, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-115_867_360)
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_over: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_over&quot;, &quot;dashboard_budgets_over&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1059, 66),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 779, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(591_651_442)
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_see_all: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_see_all&quot;, &quot;dashboard_budgets_see_all&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1126, 41),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 822, 45),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-738_975_184)
-<b class="fc">&nbsp;internal val Res.string.budget_spent_of_format: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_spent_of_format&quot;, &quot;budget_spent_of_format&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3081, 50),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2345, 46),</b>
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_spent_of: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_spent_of&quot;, &quot;dashboard_budgets_spent_of&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1168, 54),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 868, 50),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-2_043_722_884)
-<b class="fc">&nbsp;internal val Res.string.budget_status_ok: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_status_ok&quot;, &quot;budget_status_ok&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3132, 44),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2392, 36),</b>
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_status_ok: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_status_ok&quot;, &quot;dashboard_budgets_status_ok&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1223, 55),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 919, 47),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_359_654_849)
-<b class="fc">&nbsp;internal val Res.string.budget_status_over: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budget_status_over&quot;, &quot;budget_status_over&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3177, 50),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2429, 34),</b>
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_status_over: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_status_over&quot;, &quot;dashboard_budgets_status_over&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1279, 61),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 967, 45),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_527_825_518)
-<b class="fc">&nbsp;internal val Res.string.budget_status_warn: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budget_status_warn&quot;, &quot;budget_status_warn&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3228, 66),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2464, 42),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(416_288_948)
-<b class="fc">&nbsp;internal val Res.string.budgets_active_header: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_active_header&quot;, &quot;budgets_active_header&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3295, 53),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2507, 37),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-798_123_371)
-<b class="fc">&nbsp;internal val Res.string.budgets_add: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_add&quot;, &quot;budgets_add&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3349, 51),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2545, 35),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(681_293_357)
-<b class="fc">&nbsp;internal val Res.string.budgets_all_categories: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_all_categories&quot;, &quot;budgets_all_categories&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3401, 66),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2581, 50),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_092_101_739)
-<b class="fc">&nbsp;internal val Res.string.budgets_archive: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_archive&quot;, &quot;budgets_archive&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3639, 43),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2767, 35),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-294_691_173)
-<b class="fc">&nbsp;internal val Res.string.budgets_archive_undo: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budgets_archive_undo&quot;, &quot;budgets_archive_undo&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3468, 52),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2632, 36),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_092_500_802)
-<b class="fc">&nbsp;internal val Res.string.budgets_archived_header: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_archived_header&quot;, &quot;budgets_archived_header&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3521, 51),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2669, 43),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(372_022_817)
-<b class="fc">&nbsp;internal val Res.string.budgets_archived_snackbar: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budgets_archived_snackbar&quot;, &quot;budgets_archived_snackbar&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3573, 65),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2713, 53),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(2_122_233_061)
-<b class="fc">&nbsp;internal val Res.string.budgets_delete: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_delete&quot;, &quot;budgets_delete&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4030, 42),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3074, 30),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-347_039_336)
-<b class="fc">&nbsp;internal val Res.string.budgets_delete_cancel: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_delete_cancel&quot;, &quot;budgets_delete_cancel&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3683, 45),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2803, 37),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_657_218_120)
-<b class="fc">&nbsp;internal val Res.string.budgets_delete_message: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_delete_message&quot;, &quot;budgets_delete_message&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3729, 170),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2841, 122),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(169_540_432)
-<b class="fc">&nbsp;internal val Res.string.budgets_delete_title: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_delete_title&quot;, &quot;budgets_delete_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3900, 68),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2964, 56),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_102_713_298)
-<b class="fc">&nbsp;internal val Res.string.budgets_deleted_snackbar: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:budgets_deleted_snackbar&quot;, &quot;budgets_deleted_snackbar&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3969, 60),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3021, 52),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-210_698_802)
-<b class="fc">&nbsp;internal val Res.string.budgets_empty: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_empty&quot;, &quot;budgets_empty&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4073, 197),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3105, 101),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_444_189_259)
-<b class="fc">&nbsp;internal val Res.string.budgets_restore: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_restore&quot;, &quot;budgets_restore&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4271, 43),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3207, 35),</b>
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_status_warn: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_status_warn&quot;, &quot;dashboard_budgets_status_warn&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1341, 77),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1013, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_391_467_181)
-<b class="fc">&nbsp;internal val Res.string.budgets_title: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:budgets_title&quot;, &quot;budgets_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4315, 41),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3243, 33),</b>
+<b class="fc">&nbsp;internal val Res.string.dashboard_budgets_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_budgets_title&quot;, &quot;dashboard_budgets_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1419, 51),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1067, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-128_167_204)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_average: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_average&quot;, &quot;dashboard_burn_rate_average&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1471, 59),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1111, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-975_436_834)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_caption: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_caption&quot;, &quot;dashboard_burn_rate_caption&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1531, 83),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1163, 63),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-822_517_229)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_chart_a11y: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_chart_a11y&quot;, &quot;dashboard_burn_rate_chart_a11y&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1615, 138),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1227, 106),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-747_087_077)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_empty_subtitle: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_empty_subtitle&quot;, &quot;dashboard_burn_rate_empty_subtitle&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1754, 162),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1334, 90),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_690_289_796)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_empty_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_empty_title&quot;, &quot;dashboard_burn_rate_empty_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 1917, 91),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1425, 67),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_739_577_656)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_off_pace: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_off_pace&quot;, &quot;dashboard_burn_rate_off_pace&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2009, 64),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1493, 48),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-26_473_873)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_on_track: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_on_track&quot;, &quot;dashboard_burn_rate_on_track&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2074, 60),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1542, 48),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_903_899_720)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_projection: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_projection&quot;, &quot;dashboard_burn_rate_projection&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2135, 102),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1591, 74),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(562_958_720)
+<b class="fc">&nbsp;internal val Res.string.dashboard_burn_rate_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_burn_rate_title&quot;, &quot;dashboard_burn_rate_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2238, 57),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1666, 45),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(366_447_551)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_add_content_description: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_add_content_description&quot;, &quot;dashboard_customize_add_content_description&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2296, 111),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1712, 87),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_278_235_894)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_available_empty: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_available_empty&quot;, &quot;dashboard_customize_available_empty&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2408, 111),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1800, 99),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-958_693_119)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_content_description: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_content_description&quot;, &quot;dashboard_customize_content_description&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2520, 91),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1900, 75),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(94_900_881)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_enabled_empty: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_customize_enabled_empty&quot;, &quot;dashboard_customize_enabled_empty&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2612, 129),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1976, 105),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_065_332_271)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_footnote: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_footnote&quot;, &quot;dashboard_customize_footnote&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2742, 164),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2082, 92),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_883_080_418)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_account_cash: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_account_cash&quot;, &quot;dashboard_customize_preview_account_cash&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2907, 72),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2175, 56),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(836_718_903)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_account_everyday: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_account_everyday&quot;, &quot;dashboard_customize_preview_account_everyday&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2980, 84),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2232, 64),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-53_473_801)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_account_savings: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_account_savings&quot;, &quot;dashboard_customize_preview_account_savings&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3065, 79),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2297, 63),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(229_737_169)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_goal_laptop: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_goal_laptop&quot;, &quot;dashboard_customize_preview_goal_laptop&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3145, 83),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2361, 63),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_386_549_018)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_goal_trip: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_goal_trip&quot;, &quot;dashboard_customize_preview_goal_trip&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3229, 81),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2425, 61),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(850_572_288)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_insight_down_body: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_insight_down_body&quot;, &quot;dashboard_customize_preview_insight_down_body&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3311, 177),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2487, 133),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_712_416_503)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_insight_down_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_insight_down_title&quot;, &quot;dashboard_customize_preview_insight_down_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3489, 110),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2621, 82),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_786_819_171)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_insight_subs_body: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_insight_subs_body&quot;, &quot;dashboard_customize_preview_insight_subs_body&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3600, 97),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2704, 81),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_978_132_131)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_insight_subs_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_insight_subs_title&quot;, &quot;dashboard_customize_preview_insight_subs_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3698, 102),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2786, 86),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(449_253_334)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_insight_up_body: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_insight_up_body&quot;, &quot;dashboard_customize_preview_insight_up_body&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3801, 179),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2873, 135),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_736_853_461)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_insight_up_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_insight_up_title&quot;, &quot;dashboard_customize_preview_insight_up_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 3981, 92),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3009, 76),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_281_784_155)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_transaction_coffee: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_transaction_coffee&quot;, &quot;dashboard_customize_preview_transaction_coffee&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4074, 66),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3086, 62),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_051_413_147)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_transaction_groceries: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_transaction_groceries&quot;, &quot;dashboard_customize_preview_transaction_groceries&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4141, 81),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3149, 69),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-275_859_985)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_transaction_rent: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_transaction_rent&quot;, &quot;dashboard_customize_preview_transaction_rent&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4223, 68),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3219, 60),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_128_231_864)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_preview_transaction_salary: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_preview_transaction_salary&quot;, &quot;dashboard_customize_preview_transaction_salary&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4292, 78),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3280, 62),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_812_374_335)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_remove_content_description: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_remove_content_description&quot;, &quot;dashboard_customize_remove_content_description&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4371, 110),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3343, 94),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(229_174_708)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_reorder_hint: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_reorder_hint&quot;, &quot;dashboard_customize_reorder_hint&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4482, 128),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3438, 60),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_171_487_827)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_section_available: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_section_available&quot;, &quot;dashboard_customize_section_available&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4611, 69),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3499, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_004_102_630)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_section_enabled: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_section_enabled&quot;, &quot;dashboard_customize_section_enabled&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4681, 71),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3557, 59),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(277_099_994)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_size_compact: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_size_compact&quot;, &quot;dashboard_customize_size_compact&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4753, 68),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3617, 52),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_347_060_667)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_size_expanded: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_size_expanded&quot;, &quot;dashboard_customize_size_expanded&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4822, 61),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3670, 49),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_562_554_514)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_style_size: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_style_size&quot;, &quot;dashboard_customize_style_size&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4884, 54),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3720, 46),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_973_983_355)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_style_subtitle: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_style_subtitle&quot;, &quot;dashboard_customize_style_subtitle&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4939, 162),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3767, 98),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_731_324_128)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_style_summary: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_style_summary&quot;, &quot;dashboard_customize_style_summary&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5102, 57),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3866, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(212_403_900)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_style_variant: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_style_variant&quot;, &quot;dashboard_customize_style_variant&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5160, 57),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3924, 49),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-958_693_119)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_title&quot;, &quot;dashboard_customize_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5218, 77),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3974, 61),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-215_955_382)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_balance_classic: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_balance_classic&quot;, &quot;dashboard_customize_variant_balance_classic&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5296, 83),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4036, 63),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_735_500_405)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_balance_inline: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_balance_inline&quot;, &quot;dashboard_customize_variant_balance_inline&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5380, 70),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4100, 58),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(397_249_879)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_balance_minimal: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_balance_minimal&quot;, &quot;dashboard_customize_variant_balance_minimal&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5451, 83),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4159, 63),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_270_171_969)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_balance_stacked: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_balance_stacked&quot;, &quot;dashboard_customize_variant_balance_stacked&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5535, 71),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4223, 63),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-98_547_228)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_insights_carousel: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_insights_carousel&quot;, &quot;dashboard_customize_variant_insights_carousel&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5607, 77),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4287, 65),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(469_173_515)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_insights_list: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_insights_list&quot;, &quot;dashboard_customize_variant_insights_list&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5685, 69),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4353, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_602_429_348)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_spent_bar: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_spent_bar&quot;, &quot;dashboard_customize_variant_spent_bar&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5755, 61),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4411, 53),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-312_938_222)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_spent_chips: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_spent_chips&quot;, &quot;dashboard_customize_variant_spent_chips&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5817, 63),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4465, 55),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_847_848_527)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_spent_gauge: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_spent_gauge&quot;, &quot;dashboard_customize_variant_spent_gauge&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5881, 63),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4521, 55),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_270_171_969)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_spent_multi: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_spent_multi&quot;, &quot;dashboard_customize_variant_spent_multi&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5945, 67),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4577, 59),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(600_843_998)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_variant_spent_ring: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_variant_spent_ring&quot;, &quot;dashboard_customize_variant_spent_ring&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6013, 62),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4637, 54),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(473_963_686)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_accounts: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_accounts&quot;, &quot;dashboard_customize_widget_accounts&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6076, 59),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4692, 55),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(745_993_245)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_balance: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_balance&quot;, &quot;dashboard_customize_widget_balance&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6136, 74),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4748, 62),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_391_467_181)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_budgets: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_budgets&quot;, &quot;dashboard_customize_widget_budgets&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6211, 62),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4811, 54),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(562_958_720)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_burn_rate: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_burn_rate&quot;, &quot;dashboard_customize_widget_burn_rate&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6274, 68),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4866, 56),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_116_053_509)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_goals: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_goals&quot;, &quot;dashboard_customize_widget_goals&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6343, 52),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4923, 48),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(879_877_179)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_insights: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_insights&quot;, &quot;dashboard_customize_widget_insights&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6396, 67),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4972, 55),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_763_358_006)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_quick_actions: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_quick_actions&quot;, &quot;dashboard_customize_widget_quick_actions&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6464, 92),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5028, 68),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_933_481_782)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_recent: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_recent&quot;, &quot;dashboard_customize_widget_recent&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6557, 93),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5097, 69),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-819_632_155)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_safe_to_spend: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_safe_to_spend&quot;, &quot;dashboard_customize_widget_safe_to_spend&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6651, 88),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5167, 68),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_090_207_997)
+<b class="fc">&nbsp;internal val Res.string.dashboard_customize_widget_spent_by_category: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_customize_widget_spent_by_category&quot;, &quot;dashboard_customize_widget_spent_by_category&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6740, 100),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5236, 76),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_895_163_179)
+<b class="fc">&nbsp;internal val Res.string.dashboard_goals_empty_subtitle: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_goals_empty_subtitle&quot;, &quot;dashboard_goals_empty_subtitle&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6841, 162),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5313, 98),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_485_659_345)
+<b class="fc">&nbsp;internal val Res.string.dashboard_goals_empty_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_goals_empty_title&quot;, &quot;dashboard_goals_empty_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7004, 71),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5412, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(591_651_442)
+<b class="fc">&nbsp;internal val Res.string.dashboard_goals_see_all: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_goals_see_all&quot;, &quot;dashboard_goals_see_all&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7076, 39),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5464, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_116_053_509)
+<b class="fc">&nbsp;internal val Res.string.dashboard_goals_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_goals_title&quot;, &quot;dashboard_goals_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7116, 41),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5508, 37),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-812_358_978)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_category_down_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_category_down_title&quot;, &quot;dashboard_insights_category_down_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7158, 94),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5546, 70),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_563_795_883)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_category_up_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_category_up_title&quot;, &quot;dashboard_insights_category_up_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7253, 84),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5617, 68),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(874_588_664)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_comparison_body: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_comparison_body&quot;, &quot;dashboard_insights_comparison_body&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7338, 162),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5686, 118),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(492_171_409)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_empty_text: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_empty_text&quot;, &quot;dashboard_insights_empty_text&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7501, 121),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5805, 77),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-12_187_394)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_period_down_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_period_down_title&quot;, &quot;dashboard_insights_period_down_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7623, 104),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5883, 76),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_004_370_395)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_period_flat_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_period_flat_title&quot;, &quot;dashboard_insights_period_flat_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7728, 88),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5960, 68),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-265_841_191)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_period_up_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_period_up_title&quot;, &quot;dashboard_insights_period_up_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7817, 98),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6029, 70),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-2_082_997_349)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_subscriptions_body: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_subscriptions_body&quot;, &quot;dashboard_insights_subscriptions_body&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7916, 85),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6100, 73),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(879_877_179)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_title&quot;, &quot;dashboard_insights_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8002, 56),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6174, 44),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-225_648_483)
+<b class="fc">&nbsp;internal val Res.string.dashboard_insights_uncategorized: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_insights_uncategorized&quot;, &quot;dashboard_insights_uncategorized&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8059, 76),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6219, 60),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_558_260_591)
+<b class="fc">&nbsp;internal val Res.string.dashboard_period_month: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_period_month&quot;, &quot;dashboard_period_month&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8136, 46),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6280, 38),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_017_234_191)
+<b class="fc">&nbsp;internal val Res.string.dashboard_period_week: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_period_week&quot;, &quot;dashboard_period_week&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8183, 45),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6319, 37),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-624_312_959)
+<b class="fc">&nbsp;internal val Res.string.dashboard_quick_action_transfer: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_quick_action_transfer&quot;, &quot;dashboard_quick_action_transfer&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8229, 59),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6357, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-2_063_316_780)
+<b class="fc">&nbsp;internal val Res.string.dashboard_recent_empty_subtitle: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_recent_empty_subtitle&quot;, &quot;dashboard_recent_empty_subtitle&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8289, 119),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6409, 91),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_192_913_502)
+<b class="fc">&nbsp;internal val Res.string.dashboard_recent_empty_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:dashboard_recent_empty_title&quot;, &quot;dashboard_recent_empty_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8409, 84),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6501, 56),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(591_651_442)
+<b class="fc">&nbsp;internal val Res.string.dashboard_recent_see_all: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:dashboard_recent_see_all&quot;, &quot;dashboard_recent_see_all&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8494, 40),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6558, 44),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@InternalResourceApi
 &nbsp;internal fun _collectCommonMainString0Resources(map: MutableMap&lt;String, StringResource&gt;) {
-<b class="nc">&nbsp;  map.put(&quot;budget_details_alert_over_format&quot;, Res.string.budget_details_alert_over_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_alert_over_message&quot;, Res.string.budget_details_alert_over_message)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_alert_warn_format&quot;, Res.string.budget_details_alert_warn_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_alert_warn_message_format&quot;, Res.string.budget_details_alert_warn_message_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_edit&quot;, Res.string.budget_details_edit)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_not_found&quot;, Res.string.budget_details_not_found)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_of_limit_format&quot;, Res.string.budget_details_of_limit_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_rollover_carry_format&quot;, Res.string.budget_details_rollover_carry_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_stat_daily_average&quot;, Res.string.budget_details_stat_daily_average)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_stat_per_day&quot;, Res.string.budget_details_stat_per_day)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_stat_projected&quot;, Res.string.budget_details_stat_projected)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_title&quot;, Res.string.budget_details_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_transactions_empty&quot;, Res.string.budget_details_transactions_empty)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_details_transactions_header&quot;, Res.string.budget_details_transactions_header)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_alert_decrease&quot;, Res.string.budget_edit_alert_decrease)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_alert_increase&quot;, Res.string.budget_edit_alert_increase)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_alert_label&quot;, Res.string.budget_edit_alert_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_amount_label&quot;, Res.string.budget_edit_amount_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_amount_required&quot;, Res.string.budget_edit_amount_required)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_categories_hint&quot;, Res.string.budget_edit_categories_hint)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_categories_label&quot;, Res.string.budget_edit_categories_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_created_snackbar&quot;, Res.string.budget_edit_created_snackbar)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_name_label&quot;, Res.string.budget_edit_name_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_name_required&quot;, Res.string.budget_edit_name_required)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_period_label&quot;, Res.string.budget_edit_period_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_rollover_label&quot;, Res.string.budget_edit_rollover_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_rollover_supporting&quot;, Res.string.budget_edit_rollover_supporting)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_save&quot;, Res.string.budget_edit_save)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_start_date_label&quot;, Res.string.budget_edit_start_date_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_title_create&quot;, Res.string.budget_edit_title_create)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_title_edit&quot;, Res.string.budget_edit_title_edit)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_edit_updated_snackbar&quot;, Res.string.budget_edit_updated_snackbar)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_footer_format&quot;, Res.string.budget_footer_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_mixed_currency&quot;, Res.string.budget_mixed_currency)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_over_format&quot;, Res.string.budget_over_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_period_monthly&quot;, Res.string.budget_period_monthly)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_period_weekly&quot;, Res.string.budget_period_weekly)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_period_yearly&quot;, Res.string.budget_period_yearly)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_remaining_format&quot;, Res.string.budget_remaining_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_spent_of_format&quot;, Res.string.budget_spent_of_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_status_ok&quot;, Res.string.budget_status_ok)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_status_over&quot;, Res.string.budget_status_over)</b>
-<b class="nc">&nbsp;  map.put(&quot;budget_status_warn&quot;, Res.string.budget_status_warn)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_active_header&quot;, Res.string.budgets_active_header)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_add&quot;, Res.string.budgets_add)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_all_categories&quot;, Res.string.budgets_all_categories)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_archive&quot;, Res.string.budgets_archive)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_archive_undo&quot;, Res.string.budgets_archive_undo)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_archived_header&quot;, Res.string.budgets_archived_header)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_archived_snackbar&quot;, Res.string.budgets_archived_snackbar)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_delete&quot;, Res.string.budgets_delete)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_delete_cancel&quot;, Res.string.budgets_delete_cancel)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_delete_message&quot;, Res.string.budgets_delete_message)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_delete_title&quot;, Res.string.budgets_delete_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_deleted_snackbar&quot;, Res.string.budgets_deleted_snackbar)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_empty&quot;, Res.string.budgets_empty)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_restore&quot;, Res.string.budgets_restore)</b>
-<b class="nc">&nbsp;  map.put(&quot;budgets_title&quot;, Res.string.budgets_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_accounts_manage&quot;, Res.string.dashboard_accounts_manage)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_accounts_section_title&quot;, Res.string.dashboard_accounts_section_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_add_account&quot;, Res.string.dashboard_add_account)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_add_account_new&quot;, Res.string.dashboard_add_account_new)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_add_transaction&quot;, Res.string.dashboard_add_transaction)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_balance_empty_text&quot;, Res.string.dashboard_balance_empty_text)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_balance_other_currencies&quot;, Res.string.dashboard_balance_other_currencies)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_balance_rates_as_of&quot;, Res.string.dashboard_balance_rates_as_of)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_balance_title&quot;, Res.string.dashboard_balance_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_empty_subtitle&quot;, Res.string.dashboard_budgets_empty_subtitle)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_empty_title&quot;, Res.string.dashboard_budgets_empty_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_left&quot;, Res.string.dashboard_budgets_left)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_over&quot;, Res.string.dashboard_budgets_over)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_see_all&quot;, Res.string.dashboard_budgets_see_all)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_spent_of&quot;, Res.string.dashboard_budgets_spent_of)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_status_ok&quot;, Res.string.dashboard_budgets_status_ok)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_status_over&quot;, Res.string.dashboard_budgets_status_over)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_status_warn&quot;, Res.string.dashboard_budgets_status_warn)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_budgets_title&quot;, Res.string.dashboard_budgets_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_average&quot;, Res.string.dashboard_burn_rate_average)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_caption&quot;, Res.string.dashboard_burn_rate_caption)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_chart_a11y&quot;, Res.string.dashboard_burn_rate_chart_a11y)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_empty_subtitle&quot;, Res.string.dashboard_burn_rate_empty_subtitle)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_empty_title&quot;, Res.string.dashboard_burn_rate_empty_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_off_pace&quot;, Res.string.dashboard_burn_rate_off_pace)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_on_track&quot;, Res.string.dashboard_burn_rate_on_track)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_projection&quot;, Res.string.dashboard_burn_rate_projection)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_burn_rate_title&quot;, Res.string.dashboard_burn_rate_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_add_content_description&quot;, Res.string.dashboard_customize_add_content_description)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_available_empty&quot;, Res.string.dashboard_customize_available_empty)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_content_description&quot;, Res.string.dashboard_customize_content_description)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_enabled_empty&quot;, Res.string.dashboard_customize_enabled_empty)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_footnote&quot;, Res.string.dashboard_customize_footnote)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_account_cash&quot;, Res.string.dashboard_customize_preview_account_cash)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_account_everyday&quot;, Res.string.dashboard_customize_preview_account_everyday)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_account_savings&quot;, Res.string.dashboard_customize_preview_account_savings)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_goal_laptop&quot;, Res.string.dashboard_customize_preview_goal_laptop)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_goal_trip&quot;, Res.string.dashboard_customize_preview_goal_trip)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_insight_down_body&quot;, Res.string.dashboard_customize_preview_insight_down_body)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_insight_down_title&quot;, Res.string.dashboard_customize_preview_insight_down_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_insight_subs_body&quot;, Res.string.dashboard_customize_preview_insight_subs_body)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_insight_subs_title&quot;, Res.string.dashboard_customize_preview_insight_subs_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_insight_up_body&quot;, Res.string.dashboard_customize_preview_insight_up_body)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_insight_up_title&quot;, Res.string.dashboard_customize_preview_insight_up_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_transaction_coffee&quot;, Res.string.dashboard_customize_preview_transaction_coffee)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_transaction_groceries&quot;, Res.string.dashboard_customize_preview_transaction_groceries)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_transaction_rent&quot;, Res.string.dashboard_customize_preview_transaction_rent)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_preview_transaction_salary&quot;, Res.string.dashboard_customize_preview_transaction_salary)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_remove_content_description&quot;, Res.string.dashboard_customize_remove_content_description)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_reorder_hint&quot;, Res.string.dashboard_customize_reorder_hint)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_section_available&quot;, Res.string.dashboard_customize_section_available)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_section_enabled&quot;, Res.string.dashboard_customize_section_enabled)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_size_compact&quot;, Res.string.dashboard_customize_size_compact)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_size_expanded&quot;, Res.string.dashboard_customize_size_expanded)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_style_size&quot;, Res.string.dashboard_customize_style_size)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_style_subtitle&quot;, Res.string.dashboard_customize_style_subtitle)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_style_summary&quot;, Res.string.dashboard_customize_style_summary)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_style_variant&quot;, Res.string.dashboard_customize_style_variant)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_title&quot;, Res.string.dashboard_customize_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_balance_classic&quot;, Res.string.dashboard_customize_variant_balance_classic)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_balance_inline&quot;, Res.string.dashboard_customize_variant_balance_inline)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_balance_minimal&quot;, Res.string.dashboard_customize_variant_balance_minimal)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_balance_stacked&quot;, Res.string.dashboard_customize_variant_balance_stacked)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_insights_carousel&quot;, Res.string.dashboard_customize_variant_insights_carousel)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_insights_list&quot;, Res.string.dashboard_customize_variant_insights_list)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_spent_bar&quot;, Res.string.dashboard_customize_variant_spent_bar)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_spent_chips&quot;, Res.string.dashboard_customize_variant_spent_chips)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_spent_gauge&quot;, Res.string.dashboard_customize_variant_spent_gauge)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_spent_multi&quot;, Res.string.dashboard_customize_variant_spent_multi)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_variant_spent_ring&quot;, Res.string.dashboard_customize_variant_spent_ring)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_accounts&quot;, Res.string.dashboard_customize_widget_accounts)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_balance&quot;, Res.string.dashboard_customize_widget_balance)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_budgets&quot;, Res.string.dashboard_customize_widget_budgets)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_burn_rate&quot;, Res.string.dashboard_customize_widget_burn_rate)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_goals&quot;, Res.string.dashboard_customize_widget_goals)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_insights&quot;, Res.string.dashboard_customize_widget_insights)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_quick_actions&quot;, Res.string.dashboard_customize_widget_quick_actions)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_recent&quot;, Res.string.dashboard_customize_widget_recent)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_safe_to_spend&quot;, Res.string.dashboard_customize_widget_safe_to_spend)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_customize_widget_spent_by_category&quot;, Res.string.dashboard_customize_widget_spent_by_category)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_goals_empty_subtitle&quot;, Res.string.dashboard_goals_empty_subtitle)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_goals_empty_title&quot;, Res.string.dashboard_goals_empty_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_goals_see_all&quot;, Res.string.dashboard_goals_see_all)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_goals_title&quot;, Res.string.dashboard_goals_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_category_down_title&quot;, Res.string.dashboard_insights_category_down_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_category_up_title&quot;, Res.string.dashboard_insights_category_up_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_comparison_body&quot;, Res.string.dashboard_insights_comparison_body)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_empty_text&quot;, Res.string.dashboard_insights_empty_text)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_period_down_title&quot;, Res.string.dashboard_insights_period_down_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_period_flat_title&quot;, Res.string.dashboard_insights_period_flat_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_period_up_title&quot;, Res.string.dashboard_insights_period_up_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_subscriptions_body&quot;, Res.string.dashboard_insights_subscriptions_body)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_title&quot;, Res.string.dashboard_insights_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_insights_uncategorized&quot;, Res.string.dashboard_insights_uncategorized)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_period_month&quot;, Res.string.dashboard_period_month)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_period_week&quot;, Res.string.dashboard_period_week)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_quick_action_transfer&quot;, Res.string.dashboard_quick_action_transfer)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_recent_empty_subtitle&quot;, Res.string.dashboard_recent_empty_subtitle)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_recent_empty_title&quot;, Res.string.dashboard_recent_empty_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;dashboard_recent_see_all&quot;, Res.string.dashboard_recent_see_all)</b>
 &nbsp;}
 </code>
 </pre>
@@ -655,7 +1033,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

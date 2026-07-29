@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionPeriodMode</title>
+  <title>MoneySurfer Coverage Report > MoneyKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionPeriodMode (com.georgeci.moneysurfer.domain.preferences)</h1>
+<h1>Coverage Summary for Class: MoneyKt (com.georgeci.moneysurfer.domain.primitives)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionPeriodMode</td>
+  <td class="name">MoneyKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,7 +58,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -69,66 +71,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (31/31)
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (117/117)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">TransactionPeriodMode$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (32/32)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,25 +99,117 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
 &nbsp;
-&nbsp;/**
-&nbsp; * Date window the transactions list is scoped to. Lives in the preferences package because the
-&nbsp; * choice is persisted alongside the other UI preferences; the window maths itself is in
-&nbsp; * `domain.util.TransactionPeriodWindow`.
-&nbsp; */
-&nbsp;enum class TransactionPeriodMode {
-<b class="fc">&nbsp;    Month,</b>
-<b class="fc">&nbsp;    Week,</b>
+&nbsp;import kotlin.jvm.JvmInline
+&nbsp;import kotlin.math.roundToLong
 &nbsp;
-&nbsp;    /** No date bounds — the list is bounded by paging instead. */
-<b class="fc">&nbsp;    AllTime,</b>
+&nbsp;@JvmInline
+&nbsp;value class Money(val minor: Long) : Comparable&lt;Money&gt; {
 &nbsp;
-&nbsp;    ;
+&nbsp;    // --- arithmetic ---
+&nbsp;    // Checked: a crafted amount (see CSV import, issue #159) must never silently
+&nbsp;    // wrap the cached account balance. Overflow throws rather than corrupting the
+&nbsp;    // total. In practice values are capped at [MAX_MINOR] on entry, so honest
+&nbsp;    // balances never come close to the Long limit and these never throw.
+&nbsp;    operator fun plus(other: Money): Money = Money(addExact(minor, other.minor))
+&nbsp;    operator fun minus(other: Money): Money = Money(subtractExact(minor, other.minor))
+&nbsp;    operator fun unaryMinus(): Money = Money(negateExact(minor))
+&nbsp;
+&nbsp;    operator fun times(multiplier: Int): Money = Money(multiplyExact(minor, multiplier.toLong()))
+&nbsp;    operator fun div(divisor: Int): Money = Money(minor / divisor)
+&nbsp;
+&nbsp;    // --- compare ---
+&nbsp;    override fun compareTo(other: Money): Int =
+&nbsp;        minor.compareTo(other.minor)
+&nbsp;
+&nbsp;    // --- utils ---
+&nbsp;    fun isZero(): Boolean = minor == 0L
+&nbsp;    fun isPositive(): Boolean = minor &gt; 0
+&nbsp;    fun isNegative(): Boolean = minor &lt; 0
+&nbsp;
+&nbsp;    // negateExact guards Long.MIN_VALUE, whose naive abs() wraps back to itself.
+&nbsp;    fun abs(): Money = if (minor &lt; 0) Money(negateExact(minor)) else this
+&nbsp;
+&nbsp;    override fun toString(): String = &quot;Money($minor)&quot;
 &nbsp;
 &nbsp;    companion object {
-<b class="fc">&nbsp;        val DEFAULT: TransactionPeriodMode = Month</b>
+&nbsp;        const val MINOR_PER_MAJOR = 100.0
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Domain cap on `|minor|`: 10^15 minor units (10 trillion major). Larger
+&nbsp;         * than any honest balance yet small enough that summing many rows stays
+&nbsp;         * well inside [Long]. Enforced at the CSV import boundary so a crafted
+&nbsp;         * `amount_minor` (e.g. [Long.MIN_VALUE]) can never enter the domain and
+&nbsp;         * wrap a cached balance. See issue #159.
+&nbsp;         */
+&nbsp;        const val MAX_MINOR: Long = 1_000_000_000_000_000L
+&nbsp;
+&nbsp;        private const val CENTS_RANGE_MAX = 99
+&nbsp;        private const val MINOR_FACTOR = 100
+&nbsp;
+&nbsp;        fun fromMinor(minor: Long): Money = Money(minor)
+&nbsp;
+&nbsp;        fun fromMajor(
+&nbsp;            units: Long,
+&nbsp;            cents: Int = 0,
+&nbsp;        ): Money {
+&nbsp;            require(cents in 0..CENTS_RANGE_MAX)
+&nbsp;            // Checked: fromMajor(Long.MAX_VALUE) must not silently wrap before the
+&nbsp;            // arithmetic operators ever run. See issue #159.
+&nbsp;            return Money(addExact(multiplyExact(units, MINOR_FACTOR.toLong()), cents.toLong()))
+&nbsp;        }
+&nbsp;
+&nbsp;        fun fromDouble(value: Double): Money {
+&nbsp;            return Money((value * MINOR_FACTOR).roundToLong())
+&nbsp;        }
+&nbsp;
+&nbsp;        fun zero(): Money = Money(0)
 &nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;// Overflow-checked Long arithmetic (Math.*Exact is JVM-only; Money is common
+&nbsp;// KMP code). Each mirrors the JDK algorithm and throws on overflow instead of
+&nbsp;// wrapping. Kept file-private to the Money value type.
+&nbsp;
+&nbsp;private const val LONG_HALF_BITS = 32
+&nbsp;
+&nbsp;private fun addExact(a: Long, b: Long): Long {
+<b class="fc">&nbsp;    val r = a + b</b>
+&nbsp;    // Overflow iff the operands share a sign that the result does not.
+<b class="fc">&nbsp;    if ((a xor r) and (b xor r) &lt; 0L) {</b>
+<b class="fc">&nbsp;        throw ArithmeticException(&quot;Money overflow: $a + $b&quot;)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return r</b>
+&nbsp;}
+&nbsp;
+&nbsp;private fun subtractExact(a: Long, b: Long): Long {
+<b class="fc">&nbsp;    val r = a - b</b>
+&nbsp;    // Overflow iff the operands differ in sign and the result takes b&#39;s sign.
+<b class="fc">&nbsp;    if ((a xor b) and (a xor r) &lt; 0L) {</b>
+<b class="fc">&nbsp;        throw ArithmeticException(&quot;Money overflow: $a - $b&quot;)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return r</b>
+&nbsp;}
+&nbsp;
+&nbsp;private fun negateExact(a: Long): Long {
+<b class="fc">&nbsp;    if (a == Long.MIN_VALUE) {</b>
+<b class="fc">&nbsp;        throw ArithmeticException(&quot;Money overflow: -($a)&quot;)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return -a</b>
+&nbsp;}
+&nbsp;
+&nbsp;private fun multiplyExact(a: Long, b: Long): Long {
+<b class="fc">&nbsp;    val r = a * b</b>
+<b class="fc">&nbsp;    val absHigh = (if (a &lt; 0) -a else a) or (if (b &lt; 0) -b else b)</b>
+&nbsp;    // Fast path: when both magnitudes fit in 31 bits the product cannot overflow.
+<b class="fc">&nbsp;    if (absHigh ushr (LONG_HALF_BITS - 1) == 0L) return r</b>
+<b class="fc">&nbsp;    val divisionMismatch = b != 0L &amp;&amp; r / b != a</b>
+<b class="fc">&nbsp;    val minTimesNegativeOne = a == Long.MIN_VALUE &amp;&amp; b == -1L</b>
+<b class="fc">&nbsp;    if (divisionMismatch || minTimesNegativeOne) {</b>
+<b class="fc">&nbsp;        throw ArithmeticException(&quot;Money overflow: $a * $b&quot;)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return r</b>
 &nbsp;}
 </code>
 </pre>
@@ -179,7 +234,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

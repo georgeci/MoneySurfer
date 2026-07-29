@@ -1,0 +1,481 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DebugConfigSource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
+</div>
+
+<h1>Coverage Summary for Class: DebugConfigSource (com.georgeci.moneysurfer.appconfig)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">DebugConfigSource</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DebugConfigSource$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DebugConfigSource$Companion$Empty$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (8/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DebugConfigSource$DefaultImpls</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    27.3%
+  </span>
+  <span class="absValue">
+    (3/11)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (4/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (15/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
+&nbsp;
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;
+&nbsp;/** Resolution order is `Debug &gt; Session &gt; Local &gt; RemoteGlobal &gt; Build &gt; key.default`. */
+&nbsp;enum class ConfigLayer {
+&nbsp;    Debug,
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Values held in memory across the logout boundary, so the UI does not snap to defaults while
+&nbsp;     * the user is still looking at it. Empty for the whole of a normal session — see
+&nbsp;     * [SessionConfigOverlay].
+&nbsp;     */
+&nbsp;    Session,
+&nbsp;    Local,
+&nbsp;    RemoteGlobal,
+&nbsp;    Build,
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * What one layer holds for one key. Absent and undecodable are deliberately distinct: both stop
+&nbsp; * the layer from winning, but only the debug panel needs to tell them apart.
+&nbsp; */
+&nbsp;sealed interface LayerValue&lt;out T : Any&gt; {
+&nbsp;
+&nbsp;    /** The layer does not hold this key. Never means `false`. */
+&nbsp;    data object Absent : LayerValue&lt;Nothing&gt;
+&nbsp;
+&nbsp;    /** Stored, but the codec rejected it. Logged, non-fatal, treated as absent for resolution. */
+&nbsp;    data class Undecodable(val raw: String) : LayerValue&lt;Nothing&gt;
+&nbsp;
+&nbsp;    data class Present&lt;out T : Any&gt;(val value: T) : LayerValue&lt;T&gt;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Turns a stored string into a layer value, for the sources whose backing store holds encoded
+&nbsp; * strings — every layer except the in-memory Build map.
+&nbsp; *
+&nbsp; * A codec rejection is [LayerValue.Undecodable], not [ConfigKey.default]: resolution then continues
+&nbsp; * to the layer below instead of stopping on a value nobody wrote, and the debug panel can still show
+&nbsp; * what was actually stored.
+&nbsp; */
+&nbsp;fun &lt;T : Any&gt; ConfigKey&lt;T&gt;.layerValueOf(raw: String?): LayerValue&lt;T&gt; = when (raw) {
+&nbsp;    null -&gt; LayerValue.Absent
+&nbsp;    else -&gt; codec.decode(raw)?.let { LayerValue.Present(it) } ?: LayerValue.Undecodable(raw)
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One layer of the chain.
+&nbsp; *
+&nbsp; * [peek] is synchronous, so every source keeps an in-memory mirror of its backing store. The
+&nbsp; * mirror is warmed by [hydrate] and kept current by [changes], which is what makes `Config.resolve`
+&nbsp; * correct while the debug panel is on screen. The store-backed sources do that with a single
+&nbsp; * collection of their store on the application scope, shared by every collector of [changes], and
+&nbsp; * a source that owns its writes also publishes on write — the two are ordered against each other so
+&nbsp; * the mirror cannot go backwards.
+&nbsp; */
+&nbsp;interface ConfigSource {
+&nbsp;
+&nbsp;    val layer: ConfigLayer
+&nbsp;
+&nbsp;    /** Reads the warmed mirror. A source that is not warm yet reports [LayerValue.Absent]. */
+&nbsp;    fun &lt;T : Any&gt; peek(key: ConfigKey&lt;T&gt;): LayerValue&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Emits once with the current state, then again after every change this source serves.
+&nbsp;     *
+&nbsp;     * Must not fail. A source whose backing store cannot be read reports [isDegraded] and emits as
+&nbsp;     * if it were empty: this flow is collected on the startup path, before a start route exists, so
+&nbsp;     * a throw here takes the whole app down rather than costing one layer.
+&nbsp;     */
+&nbsp;    val changes: Flow&lt;Unit&gt;
+&nbsp;
+&nbsp;    /** Warms the in-memory mirror. Idempotent. Must not fail — see [isDegraded]. */
+&nbsp;    suspend fun hydrate()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `true` while this source&#39;s backing store cannot be read. Its keys then resolve as absent, so
+&nbsp;     * values fall through to the layers below and finally to `key.default` — correct, but not
+&nbsp;     * necessarily current, which is why the debug panel surfaces it.
+&nbsp;     *
+&nbsp;     * Live rather than latched: a store that becomes readable again clears the flag on its next
+&nbsp;     * successful read or write.
+&nbsp;     */
+&nbsp;    val isDegraded: Boolean get() = false
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Host-declared, in-memory, read-only. The only layer that holds typed values directly — there is
+&nbsp; * no store to encode for.
+&nbsp; */
+&nbsp;interface BuildConfigSource : ConfigSource {
+&nbsp;    override val layer: ConfigLayer get() = ConfigLayer.Build
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Declares the Build layer for one host, replacing the per-host flag data classes.
+&nbsp; *
+&nbsp; * ```kotlin
+&nbsp; * BuildConfigSource {
+&nbsp; *     put(HostConfigKeys.isOffline, false)
+&nbsp; *     put(HostConfigKeys.transferEnabled, true)
+&nbsp; * }
+&nbsp; * ```
+&nbsp; *
+&nbsp; * [BuildConfigSourceBuilder.put] is a function, not an infix `to`: a type mismatch in `key to
+&nbsp; * value` resolves silently to `kotlin.to` and produces a `Pair` the builder never sees.
+&nbsp; */
+&nbsp;fun BuildConfigSource(declare: BuildConfigSourceBuilder.() -&gt; Unit): BuildConfigSource =
+&nbsp;    MapBuildConfigSource(BuildConfigSourceBuilder().apply(declare).values.toMap())
+&nbsp;
+&nbsp;class BuildConfigSourceBuilder internal constructor() {
+&nbsp;    internal val values: MutableMap&lt;String, Any&gt; = mutableMapOf()
+&nbsp;
+&nbsp;    fun &lt;T : Any&gt; put(key: ConfigKey&lt;T&gt;, value: T) {
+&nbsp;        values[key.name] = value
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private class MapBuildConfigSource(private val values: Map&lt;String, Any&gt;) : BuildConfigSource {
+&nbsp;    override fun &lt;T : Any&gt; peek(key: ConfigKey&lt;T&gt;): LayerValue&lt;T&gt; {
+&nbsp;        @Suppress(&quot;UNCHECKED_CAST&quot;) // BuildConfigSourceBuilder.put is the only writer and it is typed.
+&nbsp;        val value = values[key.name] as T? ?: return LayerValue.Absent
+&nbsp;        return LayerValue.Present(value)
+&nbsp;    }
+&nbsp;
+&nbsp;    override val changes: Flow&lt;Unit&gt; = flowOf(Unit)
+&nbsp;
+&nbsp;    override suspend fun hydrate() = Unit
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Server-owned flags. Serves only `remoteOverridable` keys — the engine enforces that centrally,
+&nbsp; * so a source that ignored the rule still cannot override a host fact or a user setting.
+&nbsp; *
+&nbsp; * `Empty` lives here rather than in a `no-op` module so the offline host can bind it without
+&nbsp; * depending on the Firestore-bound implementation.
+&nbsp; */
+&nbsp;interface RemoteGlobalConfigSource : ConfigSource {
+&nbsp;    override val layer: ConfigLayer get() = ConfigLayer.RemoteGlobal
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Re-reads the server document and replaces the persistent mirror with what it holds.
+&nbsp;     *
+&nbsp;     * Separate from [hydrate] because the two answer different questions: [hydrate] warms the mirror
+&nbsp;     * from local storage and is awaited on the startup path, while this reaches the network and must
+&nbsp;     * never be awaited there. Called on launch and on every foreground return — see
+&nbsp;     * `RemoteConfigRefresh`.
+&nbsp;     *
+&nbsp;     * Must not fail, for the same reason [hydrate] must not: a failed fetch leaves the previous
+&nbsp;     * mirror in place, which is what makes an offline launch resolve the last known values.
+&nbsp;     *
+&nbsp;     * The default no-op is what lets the offline host bind [Empty] and keep a layer that is simply
+&nbsp;     * never refreshed.
+&nbsp;     */
+&nbsp;    suspend fun refresh(): Unit = Unit
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        val Empty: RemoteGlobalConfigSource = object : RemoteGlobalConfigSource {
+&nbsp;            override fun &lt;T : Any&gt; peek(key: ConfigKey&lt;T&gt;): LayerValue&lt;T&gt; = LayerValue.Absent
+&nbsp;            override val changes: Flow&lt;Unit&gt; = flowOf(Unit)
+&nbsp;            override suspend fun hydrate() = Unit
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The values the account wipe just deleted, held in memory so the running UI keeps its theme and
+&nbsp; * accent instead of snapping to defaults the moment the user taps &quot;log out&quot;.
+&nbsp; *
+&nbsp; * Three properties make this safe, and all three are load-bearing:
+&nbsp; *
+&nbsp; * - **Nothing persists it.** A process restart lands on defaults, so a wipe is still a wipe from
+&nbsp; *   the next launch&#39;s point of view.
+&nbsp; * - **It is cleared when the next session starts.** Otherwise the previous user&#39;s values would
+&nbsp; *   shadow whatever the new user&#39;s pull writes into Local — reintroducing the leak the wipe exists
+&nbsp; *   to prevent.
+&nbsp; * - **A local write to a key releases it.** The overlay outranks Local, so a value the user picks
+&nbsp; *   while signed out would otherwise be written and then not shown. `Config.handle` calls
+&nbsp; *   [release] before writing for exactly that reason.
+&nbsp; */
+&nbsp;interface SessionConfigOverlay : ConfigSource {
+&nbsp;    override val layer: ConfigLayer get() = ConfigLayer.Session
+&nbsp;
+&nbsp;    /** Holds [values] — codec-encoded, keyed by key name — until the next session starts. */
+&nbsp;    fun hold(values: Map&lt;String, String&gt;)
+&nbsp;
+&nbsp;    /** Drops one key, because something below now owns it again. */
+&nbsp;    fun release(name: String)
+&nbsp;
+&nbsp;    /** Drops everything. Called at session start. */
+&nbsp;    fun clear()
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /**
+&nbsp;         * Never holds anything. The default for engines assembled outside the app (tests), so the
+&nbsp;         * overlay stays an opt-in participant rather than a mandatory constructor argument.
+&nbsp;         */
+&nbsp;        val Inactive: SessionConfigOverlay = object : SessionConfigOverlay {
+&nbsp;            override fun &lt;T : Any&gt; peek(key: ConfigKey&lt;T&gt;): LayerValue&lt;T&gt; = LayerValue.Absent
+&nbsp;            override val changes: Flow&lt;Unit&gt; = flowOf(Unit)
+&nbsp;            override suspend fun hydrate() = Unit
+&nbsp;            override fun hold(values: Map&lt;String, String&gt;) = Unit
+&nbsp;            override fun release(name: String) = Unit
+&nbsp;            override fun clear() = Unit
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Device-local user settings. The only writable layer on the production path. */
+&nbsp;interface LocalConfigSource : ConfigSource {
+&nbsp;    override val layer: ConfigLayer get() = ConfigLayer.Local
+&nbsp;
+&nbsp;    suspend fun &lt;T : Any&gt; write(key: SettingKey&lt;T&gt;, value: T)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Drops every account-scoped (`SettingKey.sync`) value, leaving the device-scoped ones alone.
+&nbsp;     * Part of the account wipe.
+&nbsp;     *
+&nbsp;     * It belongs here rather than in the reset repository&#39;s DAO fan-out because the layer keeps an
+&nbsp;     * in-memory snapshot behind the synchronous [peek]: a delete made straight through the store
+&nbsp;     * would leave that snapshot serving the wiped account&#39;s values until something else happened to
+&nbsp;     * republish it. Only the layer that owns the snapshot can retire it in the same call.
+&nbsp;     */
+&nbsp;    suspend fun clearSynced()
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * QA overrides, backed by their own store so resetting them never touches user settings.
+&nbsp; *
+&nbsp; * Release builds bind [Empty]: the layer stays in the chain and always resolves absent.
+&nbsp; * [isActive] is the one signal the rest of the app uses to decide whether the debug surface
+&nbsp; * exists at all.
+&nbsp; */
+<b class="nc">&nbsp;interface DebugConfigSource : ConfigSource {</b>
+<b class="pc">&nbsp;    override val layer: ConfigLayer get() = ConfigLayer.Debug</b>
+&nbsp;
+&nbsp;    /** `false` for [Empty] — no store, writes are rejected. */
+&nbsp;    val isActive: Boolean
+&nbsp;
+&nbsp;    /** Stores [raw] verbatim; the caller validates it through the key&#39;s codec first. */
+&nbsp;    suspend fun override(key: ConfigKey&lt;*&gt;, raw: String)
+&nbsp;
+&nbsp;    suspend fun clear(key: ConfigKey&lt;*&gt;)
+&nbsp;
+&nbsp;    suspend fun clearAll()
+&nbsp;
+&nbsp;    companion object {
+<b class="fc">&nbsp;        val Empty: DebugConfigSource = object : DebugConfigSource {</b>
+<b class="nc">&nbsp;            override val isActive: Boolean = false</b>
+<b class="nc">&nbsp;            override fun &lt;T : Any&gt; peek(key: ConfigKey&lt;T&gt;): LayerValue&lt;T&gt; = LayerValue.Absent</b>
+<b class="fc">&nbsp;            override val changes: Flow&lt;Unit&gt; = flowOf(Unit)</b>
+<b class="nc">&nbsp;            override suspend fun hydrate() = Unit</b>
+<b class="nc">&nbsp;            override suspend fun override(key: ConfigKey&lt;*&gt;, raw: String) = Unit</b>
+<b class="nc">&nbsp;            override suspend fun clear(key: ConfigKey&lt;*&gt;) = Unit</b>
+<b class="nc">&nbsp;            override suspend fun clearAll() = Unit</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
+</div>
+</body>
+</html>

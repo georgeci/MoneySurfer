@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInviteDao</title>
+  <title>MoneySurfer Coverage Report > RemoteConfigMirrorImplKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInviteDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: RemoteConfigMirrorImplKt (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInviteDao</td>
+  <td class="name">RemoteConfigMirrorImplKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,73 +44,57 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
-&nbsp;import androidx.room.Dao
-&nbsp;import androidx.room.Insert
-&nbsp;import androidx.room.Query
-&nbsp;import androidx.room.Update
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
+&nbsp;import androidx.datastore.core.DataStore
+&nbsp;import androidx.datastore.preferences.core.Preferences
+&nbsp;import androidx.datastore.preferences.core.stringPreferencesKey
+&nbsp;import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
+&nbsp;import kotlinx.coroutines.CoroutineScope
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;@Dao
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface WorkspaceInviteDao {
+&nbsp;/** File name of the server-flag mirror. Deliberately not the app&#39;s settings file. */
+&nbsp;internal const val REMOTE_FLAGS_FILE_NAME = &quot;moneysurfer_remote_flags.preferences_pb&quot;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_invites&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;/**
+&nbsp; * [RemoteConfigMirror] on its own DataStore file, alongside the other DataStore-backed layers.
+&nbsp; *
+&nbsp; * Its own file for two reasons. The contents are server-owned and disposable, so they must not ride
+&nbsp; * along in the user&#39;s settings file through backup and export; and being disposable is what lets the
+&nbsp; * store replace itself on corruption, which the settings file deliberately does not do because it
+&nbsp; * also holds the session pointers.
+&nbsp; *
+&nbsp; * The store is **not** a Koin binding: a second unqualified `DataStore&lt;Preferences&gt;` would collide
+&nbsp; * with the app&#39;s own one in `sharedPlatformModule` and both would end up reading the same file. Each
+&nbsp; * platform&#39;s `createRemoteConfigMirror(...)` builds it and hands it straight to this constructor —
+&nbsp; * the same shape `DebugConfigSourceImpl` already uses.
+&nbsp; *
+&nbsp; * Values are stored under the bare key name; the file is dedicated, so there is nothing to namespace
+&nbsp; * against.
+&nbsp; */
+&nbsp;class RemoteConfigMirrorImpl(
+&nbsp;    dataStore: DataStore&lt;Preferences&gt;,
+&nbsp;    scope: CoroutineScope,
+&nbsp;) : RemoteConfigMirror {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;    private val mirror = PreferencesMirror(dataStore, scope)
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE email = :email&quot;)
-&nbsp;    fun getByEmail(email: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;    override fun raw(name: String): String? = mirror.raw(name)
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE targetUserId = :userId&quot;)
-&nbsp;    fun getByTargetUserId(userId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;    override val changes: Flow&lt;Unit&gt; = mirror.changes
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): WorkspaceInviteEntity?
+&nbsp;    override suspend fun hydrate() = mirror.hydrate()
 &nbsp;
-&nbsp;    // Id of a still-joinable invite in [workspaceId] that admits the given member —
-&nbsp;    // matched by targetUserId or, for email-only invites, a case-insensitive email
-&nbsp;    // match. Stamped onto the pushed member doc so Firestore rules can verify the
-&nbsp;    // accept-invite self-create (issue #152). PENDING is preferred over ACCEPTED so a
-&nbsp;    // fresh invite wins over a stale terminal one; nulls when nothing admits the member.
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT id FROM workspace_invites
-&nbsp;        WHERE workspaceId = :workspaceId
-&nbsp;          AND status IN (&#39;PENDING&#39;, &#39;ACCEPTED&#39;)
-&nbsp;          AND (targetUserId = :userId OR (:email IS NOT NULL AND lower(email) = lower(:email)))
-&nbsp;        ORDER BY CASE status WHEN &#39;PENDING&#39; THEN 0 ELSE 1 END, updatedAt DESC
-&nbsp;        LIMIT 1
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun findJoinableInviteId(
-&nbsp;        workspaceId: String,
-&nbsp;        userId: String,
-&nbsp;        email: String?,
-&nbsp;    ): String?
+&nbsp;    override val isDegraded: Boolean get() = mirror.isDegraded
 &nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: WorkspaceInviteEntity)
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceInviteEntity&gt;)
-&nbsp;
-&nbsp;    @Update
-&nbsp;    suspend fun update(entity: WorkspaceInviteEntity)
-&nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: WorkspaceInviteEntity)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM workspace_invites WHERE id = :id&quot;)
-&nbsp;    suspend fun delete(id: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM workspace_invites&quot;)
-&nbsp;    suspend fun deleteAll()
+&nbsp;    override suspend fun replaceAll(values: Map&lt;String, String&gt;) {
+&nbsp;        mirror.edit { preferences -&gt;
+&nbsp;            // Clear first: this is a replace, not a merge, so a flag the owner removed from the
+&nbsp;            // document stops being served instead of being pinned at its last value forever.
+&nbsp;            preferences.clear()
+&nbsp;            values.forEach { (name, raw) -&gt; preferences[stringPreferencesKey(name)] = raw }
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -135,7 +119,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

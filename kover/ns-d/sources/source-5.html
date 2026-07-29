@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MoneySurferDatabase</title>
+  <title>MoneySurfer Coverage Report > ConfigEntryDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: MoneySurferDatabase (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: ConfigEntryDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">MoneySurferDatabase</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">ConfigEntryDao</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,85 +44,89 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
 &nbsp;
-&nbsp;import androidx.room.ConstructedBy
-&nbsp;import androidx.room.Database
-&nbsp;import androidx.room.RoomDatabase
-&nbsp;import androidx.room.RoomDatabaseConstructor
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.ConfigEntryDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.ExchangeRateDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import androidx.room.Dao
+&nbsp;import androidx.room.Query
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.ConfigEntryEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.ExchangeRateEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;/**
-&nbsp; * Schema version of [MoneySurferDatabase]. Single source of truth so the
-&nbsp; * Room annotation, the backup manifest, and tests can never drift.
+&nbsp; * Access to the synced-settings table.
+&nbsp; *
+&nbsp; * Reads are whole-table: the synced set is a handful of rows, both consumers (the in-memory mirror
+&nbsp; * behind `ConfigSource.peek`, and the reconciliation) want all of them, and a per-key query would
+&nbsp; * buy nothing. The writes, by contrast, are deliberately three narrow statements rather than one
+&nbsp; * `@Upsert`, because each has to leave a *different* column alone — see each one.
 &nbsp; */
-&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 36
+&nbsp;@Dao
+&nbsp;interface ConfigEntryDao {
 &nbsp;
-<b class="fc">&nbsp;@Database(</b>
-&nbsp;    entities = [
-&nbsp;        UserEntity::class,
-&nbsp;        WorkspaceEntity::class,
-&nbsp;        WorkspaceMemberEntity::class,
-&nbsp;        WorkspaceInviteEntity::class,
-&nbsp;        AccountEntity::class,
-&nbsp;        CategoryEntity::class,
-&nbsp;        TransactionEntity::class,
-&nbsp;        TransactionFtsEntity::class,
-&nbsp;        BudgetEntity::class,
-&nbsp;        RecurringRuleEntity::class,
-&nbsp;        GoalEntity::class,
-&nbsp;        GoalContributionEntity::class,
-&nbsp;        ExchangeRateEntity::class,
-&nbsp;        ConfigEntryEntity::class,
-&nbsp;    ],
-&nbsp;    version = MONEY_SURFER_DB_VERSION,
-&nbsp;)
-&nbsp;@ConstructedBy(MoneySurferDatabaseConstructor::class)
-&nbsp;abstract class MoneySurferDatabase : RoomDatabase() {
-&nbsp;    abstract fun userDao(): UserDao
-&nbsp;    abstract fun workspaceDao(): WorkspaceDao
-&nbsp;    abstract fun workspaceMemberDao(): WorkspaceMemberDao
-&nbsp;    abstract fun workspaceInviteDao(): WorkspaceInviteDao
-&nbsp;    abstract fun accountDao(): AccountDao
-&nbsp;    abstract fun categoryDao(): CategoryDao
-&nbsp;    abstract fun transactionDao(): TransactionDao
-&nbsp;    abstract fun budgetDao(): BudgetDao
-&nbsp;    abstract fun recurringRuleDao(): RecurringRuleDao
-&nbsp;    abstract fun goalDao(): GoalDao
-&nbsp;    abstract fun goalContributionDao(): GoalContributionDao
-&nbsp;    abstract fun exchangeRateDao(): ExchangeRateDao
-&nbsp;    abstract fun configEntryDao(): ConfigEntryDao
-&nbsp;}
+&nbsp;    /**
+&nbsp;     * Every row, re-emitted on any write to the table — including one made by the pull, which is
+&nbsp;     * what lets a setting changed on another device retheme this one&#39;s UI without any extra wiring.
+&nbsp;     */
+&nbsp;    @Query(&quot;SELECT * FROM config_entry&quot;)
+&nbsp;    fun observeAll(): Flow&lt;List&lt;ConfigEntryEntity&gt;&gt;
 &nbsp;
-&nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
-&nbsp;expect object MoneySurferDatabaseConstructor : RoomDatabaseConstructor&lt;MoneySurferDatabase&gt; {
-&nbsp;    override fun initialize(): MoneySurferDatabase
+&nbsp;    @Query(&quot;SELECT * FROM config_entry&quot;)
+&nbsp;    suspend fun getAll(): List&lt;ConfigEntryEntity&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM config_entry WHERE `key` = :key&quot;)
+&nbsp;    suspend fun getByKey(key: String): ConfigEntryEntity?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A local write. `lastPushedAt` is *not* in the update list, so an existing row keeps whatever
+&nbsp;     * it was: the row now reads newer than its last push, which is exactly what makes the
+&nbsp;     * reconciliation pick it up if the outbox refused the enqueue.
+&nbsp;     */
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        INSERT INTO config_entry (`key`, `value`, `updatedAt`, `lastPushedAt`)
+&nbsp;        VALUES (:key, :value, :updatedAt, NULL)
+&nbsp;        ON CONFLICT(`key`) DO UPDATE SET
+&nbsp;            `value` = :value,
+&nbsp;            `updatedAt` = :updatedAt
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun write(key: String, value: String, updatedAt: Long)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A pulled value. Stamps `lastPushedAt = updatedAt` because the server is where this value came
+&nbsp;     * from — leaving it null would make the next reconciliation push the value straight back.
+&nbsp;     */
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        INSERT INTO config_entry (`key`, `value`, `updatedAt`, `lastPushedAt`)
+&nbsp;        VALUES (:key, :value, :updatedAt, :updatedAt)
+&nbsp;        ON CONFLICT(`key`) DO UPDATE SET
+&nbsp;            `value` = :value,
+&nbsp;            `updatedAt` = :updatedAt,
+&nbsp;            `lastPushedAt` = :updatedAt
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun applyRemote(key: String, value: String, updatedAt: Long)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Records a successful push. Scoped to `updatedAt = :pushedUpdatedAt` so a local write that
+&nbsp;     * landed *after* the push read the row is not marked as pushed — that write must still be
+&nbsp;     * reconciled, and the value the server holds is the older one.
+&nbsp;     */
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        UPDATE config_entry
+&nbsp;        SET `lastPushedAt` = :pushedUpdatedAt
+&nbsp;        WHERE `key` = :key AND `updatedAt` = :pushedUpdatedAt
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun markPushed(key: String, pushedUpdatedAt: Long)
+&nbsp;
+&nbsp;    /** Keys whose current value has never reached the server. */
+&nbsp;    @Query(&quot;SELECT `key` FROM config_entry WHERE `lastPushedAt` IS NULL OR `updatedAt` &gt; `lastPushedAt`&quot;)
+&nbsp;    suspend fun keysPendingPush(): List&lt;String&gt;
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM config_entry&quot;)
+&nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
 </pre>
@@ -195,7 +151,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

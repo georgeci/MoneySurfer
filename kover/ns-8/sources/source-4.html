@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FtsQuery</title>
+  <title>MoneySurfer Coverage Report > Crc32Kt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,77 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.backup.zip</a>
 </div>
 
-<h1>Coverage Summary for Class: FtsQuery (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: Crc32Kt (com.georgeci.moneysurfer.data.backup.zip)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">FtsQuery</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (73/73)
-  </span>
-</td>
+  <td class="name">Crc32Kt</td>
+    <td class="coverageStat"/>
 </tr>
 
 </table>
@@ -99,32 +44,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup.zip
 &nbsp;
 &nbsp;/**
-&nbsp; * Turns free-form user input into an FTS4 MATCH expression.
+&nbsp; * IEEE 802.3 CRC-32 — same polynomial as ZIP / PNG / `java.util.zip.CRC32`.
 &nbsp; *
-&nbsp; * Raw input must never reach `MATCH`: unbalanced quotes are a syntax error (SQLite
-&nbsp; * throws, the Flow dies), and bare `OR` / `NOT` / `NEAR` are operators, not words.
-&nbsp; * Everything that is not a letter or a digit is therefore treated as a separator, and
-&nbsp; * each surviving token gets a `*` so typing progressively narrows results instead of
-&nbsp; * matching nothing until the word is complete — the trailing `*` also demotes operator
-&nbsp; * keywords back to ordinary terms.
-&nbsp; *
-&nbsp; * Tokens are space-joined, i.e. implicitly AND-ed by FTS4.
+&nbsp; * Table-based, KMP-native (no `java.util.zip` on iOS).
 &nbsp; */
-&nbsp;object FtsQuery {
+&nbsp;internal class Crc32 {
+&nbsp;    private var value: Int = 0.inv()
 &nbsp;
-&nbsp;    /** Returns null when [raw] carries no searchable token — callers should skip the query. */
-&nbsp;    fun fromUserInput(raw: String): String? {
-<b class="fc">&nbsp;        val tokens = raw</b>
-<b class="fc">&nbsp;            .map { if (it.isLetterOrDigit()) it else &#39; &#39; }</b>
-<b class="fc">&nbsp;            .joinToString(separator = &quot;&quot;)</b>
-<b class="fc">&nbsp;            .split(&#39; &#39;)</b>
-<b class="fc">&nbsp;            .filter { it.isNotEmpty() }</b>
-<b class="fc">&nbsp;        return if (tokens.isEmpty()) null else tokens.joinToString(separator = &quot; &quot;) { &quot;$it*&quot; }</b>
+&nbsp;    fun update(buffer: ByteArray, offset: Int = 0, length: Int = buffer.size - offset) {
+&nbsp;        var crc = value
+&nbsp;        val end = offset + length
+&nbsp;        var i = offset
+&nbsp;        while (i &lt; end) {
+&nbsp;            crc = (crc ushr BITS_PER_BYTE) xor TABLE[(crc xor buffer[i].toInt()) and BYTE_MASK]
+&nbsp;            i++
+&nbsp;        }
+&nbsp;        value = crc
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getValue(): Long = (value.inv().toLong() and MASK_U32)
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        private val TABLE: IntArray = IntArray(TABLE_SIZE).also { table -&gt;
+&nbsp;            for (n in 0 until TABLE_SIZE) {
+&nbsp;                var c = n
+&nbsp;                repeat(BITS_PER_BYTE) {
+&nbsp;                    c = if (c and 1 != 0) (c ushr 1) xor POLY else c ushr 1
+&nbsp;                }
+&nbsp;                table[n] = c
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;private const val TABLE_SIZE = 256
+&nbsp;private const val BITS_PER_BYTE = 8
+&nbsp;private const val BYTE_MASK = 0xFF
+&nbsp;private const val MASK_U32 = 0xFFFFFFFFL
+&nbsp;
+&nbsp;@Suppress(&quot;MagicNumber&quot;)
+&nbsp;private const val POLY: Int = 0xEDB88320.toInt()
 </code>
 </pre>
 </div>
@@ -148,7 +110,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

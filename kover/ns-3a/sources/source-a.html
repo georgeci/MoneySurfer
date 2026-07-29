@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > DeleteCategoryDialogKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.category.manage</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.category.manage)</h1>
+<h1>Coverage Summary for Class: DeleteCategoryDialogKt (com.georgeci.moneysurfer.feature.category.manage)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,77 +48,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">ComposableSingletons$CategoriesManageScreenKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/25)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/177)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">ComposableSingletons$DeleteCategoryDialogKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/56)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">DeleteCategoryDialogKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/31)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,16 +79,84 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/233)
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/214)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.manage
+&nbsp;
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferConfirmDialog
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.category.generated.resources.Res
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_delete_cancel
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_delete_children
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_delete_confirm
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_delete_message
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_delete_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * [childCount] &gt; 0 adds a line saying the children survive and move up to the root — deleting a
+&nbsp; * parent silently rearranging part of the tree is exactly the sort of thing a confirmation
+&nbsp; * dialog exists to say out loud.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun DeleteCategoryDialog(
+&nbsp;    categoryName: String,
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;    childCount: Int = 0,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    SurferConfirmDialog(</b>
+<b class="nc">&nbsp;        title = stringResource(Res.string.categories_manage_delete_title),</b>
+<b class="nc">&nbsp;        message = stringResource(Res.string.categories_manage_delete_message, categoryName),</b>
+<b class="nc">&nbsp;        detail = if (childCount &gt; 0) {</b>
+<b class="nc">&nbsp;            stringResource(Res.string.categories_manage_delete_children, childCount)</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            null</b>
+<b class="nc">&nbsp;        },</b>
+<b class="nc">&nbsp;        confirmLabel = stringResource(Res.string.categories_manage_delete_confirm),</b>
+<b class="nc">&nbsp;        cancelLabel = stringResource(Res.string.categories_manage_delete_cancel),</b>
+<b class="nc">&nbsp;        icon = SurferIcons.Delete,</b>
+<b class="nc">&nbsp;        destructive = true,</b>
+<b class="nc">&nbsp;        onConfirm = onConfirm,</b>
+<b class="nc">&nbsp;        onDismiss = onDismiss,</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun DeleteCategoryDialogPreview() {
+&nbsp;    AppTheme {
+&nbsp;        DeleteCategoryDialog(
+&nbsp;            categoryName = &quot;Food&quot;,
+&nbsp;            onConfirm = {},
+&nbsp;            onDismiss = {},
+&nbsp;            childCount = 2,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -170,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

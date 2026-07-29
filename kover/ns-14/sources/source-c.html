@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ExchangeRateRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > SyncDtoMappersKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: ExchangeRateRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: SyncDtoMappersKt (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,21 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ExchangeRateRepositoryImpl</td>
+  <td class="name">SyncDtoMappersKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (7/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    87.5%
-  </span>
-  <span class="absValue">
-    (14/16)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,121 +63,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (29/29)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    97.3%
+    93.8%
   </span>
   <span class="absValue">
-    (248/255)
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (220/220)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.7%
+  </span>
+  <span class="absValue">
+    (953/956)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$isStale$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$observe-MpYtP3o$$inlined$map$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$observe-MpYtP3o$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$observe-MpYtP3o$$inlined$map$1$2</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$observe-MpYtP3o$$inlined$map$1$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ExchangeRateRepositoryImpl$refreshIfStale$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    63.6%
-  </span>
-  <span class="absValue">
-    (7/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    87.5%
-  </span>
-  <span class="absValue">
-    (14/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    96.7%
-  </span>
-  <span class="absValue">
-    (29/30)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    96.9%
-  </span>
-  <span class="absValue">
-    (248/256)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -190,92 +99,333 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.ExchangeRateDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.ExchangeRateEntity
-&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.ExchangeRateRemoteSource
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.ExchangeRateRepository
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.map
-&nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Duration
-&nbsp;import kotlin.time.Duration.Companion.hours
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountExtraDetailsColumn
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountExtraDetailDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.BudgetDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.CategoryDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.GoalContributionDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.GoalDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.TransactionDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTags
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Room-backed FX cache in front of [ExchangeRateRemoteSource].
+&nbsp; * Shared Room ↔ Firestore-DTO mappers. Used by both the v1
+&nbsp; * [com.georgeci.moneysurfer.data.repository.WorkspaceSyncRepositoryImpl] and the
+&nbsp; * Phase-1 outbox path (repo dual-writes serialize the DTO into the queue payload).
 &nbsp; *
-&nbsp; * Refresh policy: at most one fetch per [REFRESH_INTERVAL] per base currency, triggered by whoever
-&nbsp; * observes the rates (in practice the dashboard, on open). Daily is the natural cadence — the
-&nbsp; * reference feeds this reads publish once a business day — and it keeps a backgrounded app that
-&nbsp; * gets resumed twenty times from making twenty requests.
-&nbsp; *
-&nbsp; * Everything else about failure is deliberately quiet: an unreachable provider leaves the previous
-&nbsp; * table in place, and the dashboard keeps showing it with its own &quot;as of&quot; date.
+&nbsp; * `clientVersionCode` is set via the DTO defaults (currently `1`) — the static
+&nbsp; * Firestore rule `hasValidClientVersion()` requires `&gt;= 1`. When real version
+&nbsp; * threading is wired (AppInfo.versionCode), bump the static default or move
+&nbsp; * to a per-call parameter.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [ExchangeRateRepository::class])</b>
-&nbsp;class ExchangeRateRepositoryImpl(
-<b class="fc">&nbsp;    private val dao: ExchangeRateDao,</b>
-<b class="fc">&nbsp;    private val remoteSource: ExchangeRateRemoteSource,</b>
-<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
-&nbsp;) : ExchangeRateRepository {
 &nbsp;
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+<b class="fc">&nbsp;fun WorkspaceEntity.toDoc(): WorkspaceDoc = WorkspaceDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    description = description,</b>
+<b class="fc">&nbsp;    baseCurrency = baseCurrency,</b>
+<b class="fc">&nbsp;    ownerId = ownerId,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    override fun observe(base: CurrencyCode): Flow&lt;ExchangeRateTable?&gt; =
-<b class="fc">&nbsp;        dao.observeByBase(base.value).map { rows -&gt; rows.toTable(base) }</b>
+<b class="fc">&nbsp;fun WorkspaceDoc.toEntity(id: String): WorkspaceEntity = WorkspaceEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    description = description,</b>
+<b class="fc">&nbsp;    baseCurrency = baseCurrency,</b>
+<b class="fc">&nbsp;    ownerId = ownerId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    override suspend fun refreshIfStale(base: CurrencyCode) {
-<b class="fc">&nbsp;        if (!isStale(base)) return</b>
-<b class="fc">&nbsp;        val fetched = remoteSource.fetchLatest(base)</b>
-<b class="fc">&nbsp;        if (fetched == null) {</b>
-<b class="fc">&nbsp;            log.i { &quot;[refresh] provider gave nothing for ${base.value} — keeping cache&quot; }</b>
-&nbsp;            return
-&nbsp;        }
-<b class="fc">&nbsp;        val fetchedAt = clock.now().toEpochMilliseconds()</b>
-<b class="fc">&nbsp;        dao.replaceForBase(base.value, fetched.toEntities(fetchedAt))</b>
-<b class="fc">&nbsp;        log.i { &quot;[refresh] cached ${fetched.rates.size} rates for ${base.value} asOf=${fetched.asOf}&quot; }</b>
+<b class="fc">&nbsp;fun AccountEntity.toDoc(): AccountDoc = AccountDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    currency = currency,</b>
+<b class="fc">&nbsp;    balance = balance,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    archivedAt = archivedAt,</b>
+&nbsp;    // Same stored-column↔wire-list conversion as TransactionEntity.tags below: the wire keeps
+&nbsp;    // structured entries, Room keeps one JSON column.
+<b class="fc">&nbsp;    extraDetails = AccountExtraDetailsColumn.decode(extraDetails)</b>
+<b class="fc">&nbsp;        .map { AccountExtraDetailDoc(key = it.key, value = it.value) },</b>
+<b class="fc">&nbsp;    sortOrder = sortOrder,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = AccountEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    currency = currency,</b>
+<b class="fc">&nbsp;    balance = balance,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    archivedAt = archivedAt,</b>
+&nbsp;    // `encode` normalizes, so a doc from a client we do not control cannot seed the column with
+&nbsp;    // blank keys, duplicates or an unbounded list.
+<b class="fc">&nbsp;    extraDetails = AccountExtraDetailsColumn.encode(</b>
+<b class="fc">&nbsp;        extraDetails.map { AccountExtraDetail(key = it.key, value = it.value) },</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    sortOrder = sortOrder,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    parentId = parentId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    systemKind = systemKind,</b>
+<b class="fc">&nbsp;    iconKey = iconKey,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = CategoryEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    parentId = parentId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    systemKind = systemKind,</b>
+<b class="fc">&nbsp;    iconKey = iconKey,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Room stores `categoryIds` as a CSV column while the wire DTO carries a real list, so these
+&nbsp; * mappers convert on the entity↔wire boundary. (`BudgetRepositoryImpl` does the same conversion
+&nbsp; * on the entity↔domain boundary — two boundaries, same CSV encoding.) Blank segments are dropped
+&nbsp; * so a legacy `&quot;&quot;` or a trailing comma decodes to an empty list rather than a blank id.
+&nbsp; */
+<b class="fc">&nbsp;fun BudgetEntity.toDoc(): BudgetDoc = BudgetDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    categoryIds = categoryIds.split(&#39;,&#39;).filter { it.isNotBlank() },</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    period = period,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    alertPercent = alertPercent,</b>
+<b class="fc">&nbsp;    isActive = isActive,</b>
+<b class="fc">&nbsp;    rollover = rollover,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun BudgetDoc.toEntity(id: String, workspaceId: String): BudgetEntity = BudgetEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    categoryIds = categoryIds.filter { it.isNotBlank() }.joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    period = period,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    alertPercent = alertPercent,</b>
+<b class="fc">&nbsp;    isActive = isActive,</b>
+<b class="fc">&nbsp;    rollover = rollover,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(</b>
+<b class="fc">&nbsp;    accountId = accountId,</b>
+<b class="fc">&nbsp;    categoryId = categoryId,</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    note = note,</b>
+<b class="fc">&nbsp;    merchant = merchant,</b>
+&nbsp;    // Same CSV-column↔wire-list conversion as BudgetEntity.categoryIds above.
+<b class="fc">&nbsp;    tags = tags.split(&#39;,&#39;).filter { it.isNotBlank() },</b>
+<b class="fc">&nbsp;    operationAt = operationAt,</b>
+<b class="fc">&nbsp;    operationDate = operationDate,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;    // The Room column and the wire field are the same tombstone (issue #346), so an upsert push
+&nbsp;    // carries it either way: a restore writes `null` and lifts the remote tombstone, and a row
+&nbsp;    // pushed while deleted stays deleted for peers.
+<b class="fc">&nbsp;    deletedAt = deletedAt,</b>
+<b class="fc">&nbsp;    transferId = transferId,</b>
+<b class="fc">&nbsp;    splitId = splitId,</b>
+<b class="fc">&nbsp;    recurringRuleId = recurringRuleId,</b>
+&nbsp;)
+&nbsp;
+&nbsp;fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
+&nbsp;    // Tolerate legacy/partial Firestore docs:
+&nbsp;    //  - operationDate may be &quot;&quot; (older schema): derive ISO date from operationAt.
+&nbsp;    //    Use UTC, not the device default, so the same Firestore doc resolves to the
+&nbsp;    //    same operationDate on every client (avoids cross-device divergence).
+&nbsp;    //  - createdAt may be 0L (older schema): fall back to operationAt or updatedAt
+&nbsp;    //    so audit ordering doesn&#39;t collapse to epoch zero.
+<b class="fc">&nbsp;    val resolvedOperationDate = operationDate.ifBlank {</b>
+<b class="fc">&nbsp;        Instant.fromEpochMilliseconds(operationAt)</b>
+<b class="fc">&nbsp;            .toLocalDateTime(TimeZone.UTC)</b>
+<b class="fc">&nbsp;            .date</b>
+<b class="fc">&nbsp;            .toString()</b>
 &nbsp;    }
-&nbsp;
-&nbsp;    private suspend fun isStale(base: CurrencyCode): Boolean {
-<b class="fc">&nbsp;        val lastFetchedAt = dao.lastFetchedAt(base.value) ?: return true</b>
-<b class="fc">&nbsp;        return clock.now() - Instant.fromEpochMilliseconds(lastFetchedAt) &gt;= REFRESH_INTERVAL</b>
+<b class="fc">&nbsp;    val resolvedCreatedAt = if (createdAt == 0L) {</b>
+<b class="pc">&nbsp;        if (operationAt != 0L) operationAt else updatedAt</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;        createdAt</b>
 &nbsp;    }
-&nbsp;
-&nbsp;    private fun List&lt;ExchangeRateEntity&gt;.toTable(base: CurrencyCode): ExchangeRateTable? {
-<b class="fc">&nbsp;        if (isEmpty()) return null</b>
-<b class="fc">&nbsp;        return ExchangeRateTable(</b>
-<b class="fc">&nbsp;            baseCurrency = base,</b>
-<b class="fc">&nbsp;            rates = associate { CurrencyCode(it.currency) to it.rate },</b>
-&nbsp;            // Every row of one fetch carries the same publication moment; the newest wins so a
-&nbsp;            // half-written table (an interrupted replace) still reports the date it can back up.
-<b class="pc">&nbsp;            asOf = Instant.fromEpochMilliseconds(maxOf { it.asOf }),</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun ExchangeRateTable.toEntities(fetchedAt: Long): List&lt;ExchangeRateEntity&gt; =
-<b class="fc">&nbsp;        rates.map { (currency, rate) -&gt;</b>
-<b class="fc">&nbsp;            ExchangeRateEntity(</b>
-<b class="fc">&nbsp;                baseCurrency = baseCurrency.value,</b>
-<b class="fc">&nbsp;                currency = currency.value,</b>
-<b class="fc">&nbsp;                rate = rate,</b>
-<b class="fc">&nbsp;                asOf = asOf.toEpochMilliseconds(),</b>
-<b class="fc">&nbsp;                fetchedAt = fetchedAt,</b>
-<b class="fc">&nbsp;            )</b>
-&nbsp;        }
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;ExchangeRateRepository&quot;
-&nbsp;
-&nbsp;        /** Staleness threshold: the reference feeds publish daily, so anything younger is current. */
-<b class="pc">&nbsp;        val REFRESH_INTERVAL: Duration = 24.hours</b>
-&nbsp;    }
+<b class="fc">&nbsp;    return TransactionEntity(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        accountId = accountId,</b>
+<b class="fc">&nbsp;        amount = amount,</b>
+<b class="fc">&nbsp;        currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;        categoryId = categoryId,</b>
+<b class="fc">&nbsp;        note = note,</b>
+<b class="fc">&nbsp;        merchant = merchant,</b>
+&nbsp;        // Normalized, not just joined: a remote tag carrying the CSV separator would come
+&nbsp;        // back from Room as two tags, and this doc may come from a client we do not control.
+<b class="fc">&nbsp;        tags = TransactionTags.normalize(tags).joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;        operationAt = operationAt,</b>
+<b class="fc">&nbsp;        operationDate = resolvedOperationDate,</b>
+<b class="fc">&nbsp;        type = type,</b>
+<b class="fc">&nbsp;        status = status,</b>
+<b class="fc">&nbsp;        createdAt = resolvedCreatedAt,</b>
+<b class="fc">&nbsp;        updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;        deletedAt = deletedAt,</b>
+<b class="fc">&nbsp;        transferId = transferId,</b>
+<b class="fc">&nbsp;        splitId = splitId,</b>
+<b class="fc">&nbsp;        recurringRuleId = recurringRuleId,</b>
+&nbsp;    )
 &nbsp;}
+&nbsp;
+<b class="fc">&nbsp;fun GoalEntity.toDoc(): GoalDoc = GoalDoc(</b>
+<b class="fc">&nbsp;    title = title,</b>
+<b class="fc">&nbsp;    emoji = emoji,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+<b class="fc">&nbsp;    target = target,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    targetDate = targetDate,</b>
+<b class="fc">&nbsp;    accountId = accountId,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun GoalDoc.toEntity(id: String, workspaceId: String): GoalEntity = GoalEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    title = title,</b>
+<b class="fc">&nbsp;    emoji = emoji,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+<b class="fc">&nbsp;    target = target,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    targetDate = targetDate,</b>
+&nbsp;    // A blank accountId passes the rules&#39; nullable-string guard but is no account,
+&nbsp;    // and storing it would violate the Room FK. Absent means null.
+<b class="fc">&nbsp;    accountId = accountId?.takeIf { it.isNotBlank() },</b>
+&nbsp;    // Legacy/partial docs may omit `status`; the DTO default already lands on ACTIVE,
+&nbsp;    // but an explicitly-empty string would store an unparseable enum name.
+<b class="fc">&nbsp;    status = status.ifBlank { &quot;ACTIVE&quot; },</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun GoalContributionEntity.toDoc(): GoalContributionDoc = GoalContributionDoc(</b>
+<b class="fc">&nbsp;    goalId = goalId,</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    occurredOn = occurredOn,</b>
+<b class="fc">&nbsp;    note = note,</b>
+<b class="fc">&nbsp;    transferId = transferId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+&nbsp;fun GoalContributionDoc.toEntity(id: String, workspaceId: String): GoalContributionEntity =
+<b class="fc">&nbsp;    GoalContributionEntity(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        goalId = goalId,</b>
+<b class="fc">&nbsp;        amount = amount,</b>
+<b class="fc">&nbsp;        occurredOn = occurredOn,</b>
+<b class="fc">&nbsp;        note = note,</b>
+<b class="fc">&nbsp;        transferId = transferId,</b>
+<b class="fc">&nbsp;        createdAt = createdAt,</b>
+<b class="fc">&nbsp;        updatedAt = updatedAt,</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceMemberEntity.toDoc(): WorkspaceMemberDoc = WorkspaceMemberDoc(</b>
+<b class="fc">&nbsp;    userId = userId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    displayName = displayName,</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    addedByUserId = addedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    leftAt = leftAt,</b>
+<b class="fc">&nbsp;    removedAt = removedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceMemberDoc.toEntity(workspaceId: String): WorkspaceMemberEntity = WorkspaceMemberEntity(</b>
+<b class="fc">&nbsp;    userId = userId,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status.ifEmpty { &quot;ACTIVE&quot; },</b>
+<b class="fc">&nbsp;    displayName = displayName,</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    addedByUserId = addedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    leftAt = leftAt,</b>
+<b class="fc">&nbsp;    removedAt = removedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceInviteEntity.toDoc(): WorkspaceInviteDoc = WorkspaceInviteDoc(</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    targetUserId = targetUserId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    invitedByUserId = invitedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    expiresAt = expiresAt,</b>
+<b class="fc">&nbsp;    respondedAt = respondedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceInviteDoc.toEntity(id: String, workspaceId: String): WorkspaceInviteEntity = WorkspaceInviteEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    targetUserId = targetUserId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status.ifEmpty { &quot;PENDING&quot; },</b>
+<b class="fc">&nbsp;    invitedByUserId = invitedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    expiresAt = expiresAt,</b>
+<b class="fc">&nbsp;    respondedAt = respondedAt,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -299,7 +449,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

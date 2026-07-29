@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > DashboardNavigationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.category.picker)</h1>
+<h1>Coverage Summary for Class: DashboardNavigationKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,68 +48,129 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">ComposableSingletons$CategoryChooserContentKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/10)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/179)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">DashboardNavigationKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/10)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/14)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/179)
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.4%
+  </span>
+  <span class="absValue">
+    (28/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (15/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.4%
+  </span>
+  <span class="absValue">
+    (143/263)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+&nbsp;
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;
+&nbsp;/**
+&nbsp; * Where the dashboard can send the user. Grouped rather than declared one lambda per destination:
+&nbsp; * the screen reaches a dozen places, and `kotlin:S107` allows seven parameters. Same remedy and
+&nbsp; * same shape as `WorkspaceSelectorNavigation` — see AGENTS.md → UI Rules.
+&nbsp; */
+&nbsp;data class DashboardNavigation(
+&nbsp;    val onNavigateToAccountCreation: () -&gt; Unit,
+&nbsp;    val onNavigateToAccountsManage: () -&gt; Unit,
+&nbsp;    val onNavigateToTransactionCreation: (accountId: AccountId?) -&gt; Unit,
+&nbsp;    val onNavigateToTransferCreation: () -&gt; Unit,
+&nbsp;    val onNavigateToAccountDetails: (AccountId) -&gt; Unit,
+&nbsp;    val onNavigateToTransactionDetails: (TransactionId) -&gt; Unit,
+&nbsp;    val onNavigateToSettings: () -&gt; Unit,
+&nbsp;    val onNavigateToCustomize: () -&gt; Unit,
+&nbsp;    val onNavigateToTransactionsList: () -&gt; Unit,
+&nbsp;    val onNavigateToGoals: () -&gt; Unit,
+&nbsp;    val onNavigateToGoalDetails: (GoalId) -&gt; Unit,
+&nbsp;    val onNavigateToBudgetCreation: () -&gt; Unit,
+&nbsp;    val onNavigateToBudgets: () -&gt; Unit,
+&nbsp;    val onNavigateToBudgetDetails: (BudgetId) -&gt; Unit,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The screen&#39;s whole side-effect half: one branch per [DashboardEffect], nothing else.
+&nbsp; *
+&nbsp; * A plain function rather than a lambda inside the composable, for two reasons. A flat dispatch
+&nbsp; * table that grows with the destination list is what pushed `DashboardScreen` over the complexity
+&nbsp; * limit; and a mis-wired branch here sends the user to the wrong screen, which is worth a test —
+&nbsp; * one that needs no composition, no lifecycle and no view model to run.
+&nbsp; */
+&nbsp;// One straight-line branch per destination — flat, exhaustive, and checked by the compiler. Its
+&nbsp;// &quot;complexity&quot; is the number of places the dashboard can reach, not tangled logic; grouping the
+&nbsp;// branches behind nested types to please the metric would cost exactly the readability the flat
+&nbsp;// table buys. Same call as `SettingsScreen`.
+&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
+&nbsp;internal fun DashboardNavigation.navigate(effect: DashboardEffect) {
+<b class="fc">&nbsp;    when (effect) {</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToAccountDetails -&gt; onNavigateToAccountDetails(effect.accountId)</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToTransactionDetails -&gt; onNavigateToTransactionDetails(effect.transactionId)</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToAccountsManage -&gt; onNavigateToAccountsManage()</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToTransactionCreation -&gt; onNavigateToTransactionCreation(effect.accountId)</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToTransferCreation -&gt; onNavigateToTransferCreation()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToSettings -&gt; onNavigateToSettings()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToCustomize -&gt; onNavigateToCustomize()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToTransactionsList -&gt; onNavigateToTransactionsList()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToGoals -&gt; onNavigateToGoals()</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToGoalDetails -&gt; onNavigateToGoalDetails(effect.goalId)</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToBudgetCreation -&gt; onNavigateToBudgetCreation()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToBudgets -&gt; onNavigateToBudgets()</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToBudgetDetails -&gt; onNavigateToBudgetDetails(effect.budgetId)</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun HandleDashboardEffects(
+&nbsp;    viewModel: DashboardViewModel,
+&nbsp;    navigation: DashboardNavigation,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    viewModel.HandleSideEffect(navigation::navigate)</b>
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -128,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

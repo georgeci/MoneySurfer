@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionRepository</title>
+  <title>MoneySurfer Coverage Report > PendingMutationDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: PendingMutationDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionRepository</td>
+  <td class="name">PendingMutationDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,88 +44,102 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.dao
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import androidx.room.Dao
+&nbsp;import androidx.room.Query
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;// Transactions are the app&#39;s central entity and every screen queries them along a different axis
-&nbsp;// (account, workspace, window, transfer pair). Splitting the interface to satisfy the threshold
-&nbsp;// would scatter one storage contract across several types without removing a single query.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface TransactionRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
-&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;@Dao
+&nbsp;interface PendingMutationDao {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Newest-first page of categorized transactions inside [window], for one account or — when
-&nbsp;     * [accountId] is `null` — every account.
+&nbsp;     * Insert-if-absent: queues the mutation unless an identical one is already waiting.
 &nbsp;     *
-&nbsp;     * At most [limit] rows are returned: the caller grows the limit to page further rather than
-&nbsp;     * offsetting, so a row inserted while the user scrolls cannot shift the already-visible
-&nbsp;     * prefix. An unbounded [window] is still bounded by [limit].
-&nbsp;     */
-&nbsp;    fun getCategorizedWindow(
-&nbsp;        accountId: AccountId?,
-&nbsp;        window: TransactionPeriodWindow,
-&nbsp;        limit: Int,
-&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Per-type, per-currency sums over the *whole* [window] — unaffected by the paging applied to
-&nbsp;     * [getCategorizedWindow], so a summary built from these stays correct as pages load.
-&nbsp;     */
-&nbsp;    fun getTotals(
-&nbsp;        accountId: AccountId?,
-&nbsp;        window: TransactionPeriodWindow,
-&nbsp;    ): Flow&lt;List&lt;TransactionTotal&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
-&nbsp;
-&nbsp;    /** The live transaction behind [id], or `null` when it does not exist or has been deleted. */
-&nbsp;    suspend fun getById(id: TransactionId): Transaction?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg sharing [transferId] — two for a healthy transfer, one for a leg whose pair was
-&nbsp;     * deleted or never imported. Callers must not assume a pair exists.
-&nbsp;     */
-&nbsp;    suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg sharing [splitId], oldest first — the receipt the row belongs to.
+&nbsp;     * Renaming an account five times used to queue five identical pushes, because outbox rows carry
+&nbsp;     * no payload — each one re-reads the entity at push time, so they all push the same current
+&nbsp;     * value. That is redundant, not incorrect, but it is redundant for *every* entity type, and a
+&nbsp;     * settings screen bound to a toggle produces such runs routinely.
 &nbsp;     *
-&nbsp;     * A one-element result is a legitimate state, not a broken group: a leg can arrive from sync or
-&nbsp;     * a CSV import before (or without) its siblings, and it is a complete transaction on its own.
-&nbsp;     */
-&nbsp;    suspend fun getBySplitId(splitId: SplitId): List&lt;Transaction&gt;
-&nbsp;    suspend fun insert(transaction: Transaction)
-&nbsp;    suspend fun update(transaction: Transaction)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Marks [id] deleted. The row survives as a tombstone — invisible to every query on this
-&nbsp;     * interface, but still there for [restore] to bring back (issue #346).
-&nbsp;     */
-&nbsp;    suspend fun delete(id: TransactionId)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Lifts the tombstone from [id] and returns the transaction as it now stands, or `null` when
-&nbsp;     * there was nothing deleted to bring back.
+&nbsp;     * **Scoping to `PENDING` is the correctness part.** A write landing while a row is `IN_FLIGHT`
+&nbsp;     * must produce a *new* row: the in-flight push already read the entity, so without a second row
+&nbsp;     * the change made after that read would never be sent. A plain unique index cannot express
+&nbsp;     * &quot;unique among pending rows only&quot; — Room&#39;s `@Index` has no `WHERE` clause — so the condition
+&nbsp;     * lives in the statement.
 &nbsp;     *
-&nbsp;     * The Undo half of [delete], and deliberately keyed on the id alone: the row was never
-&nbsp;     * removed, so restoring it needs no copy of its fields to have survived alongside the
-&nbsp;     * request — which is what makes an Undo outlive the Snackbar that offered it.
-&nbsp;     *
-&nbsp;     * Returning `null` for an id that is missing or already live is what keeps a repeated Undo
-&nbsp;     * from refunding the same balance twice.
+&nbsp;     * **`workspaceId` is part of the identity, not decoration.** Most entity ids are UUIDs, so
+&nbsp;     * `entityType` + `entityId` would be enough for them — but `WORKSPACE_MEMBER` rows carry
+&nbsp;     * `entityId = userId` and `scopeKey = workspaceId`, and one user is a member of many
+&nbsp;     * workspaces. Matching without the scope would let leaving W1 swallow the enqueue for leaving
+&nbsp;     * W2, and the surviving row pushes only its own workspace: W2 would keep the user ACTIVE on
+&nbsp;     * Firestore forever. `IS` rather than `=` because the column is nullable — settings rows carry
+&nbsp;     * no workspace, and SQL `=` never matches NULL to NULL.
 &nbsp;     */
-&nbsp;    suspend fun restore(id: TransactionId): Transaction?
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        INSERT INTO pending_mutations (id, entityType, entityId, operation, workspaceId, createdAt, attempts, status, lastError)
+&nbsp;        SELECT :id, :entityType, :entityId, :operation, :workspaceId, :createdAt, :attempts, :status, :lastError
+&nbsp;        WHERE NOT EXISTS (
+&nbsp;            SELECT 1 FROM pending_mutations
+&nbsp;            WHERE entityType = :entityType
+&nbsp;              AND entityId = :entityId
+&nbsp;              AND operation = :operation
+&nbsp;              AND workspaceId IS :workspaceId
+&nbsp;              AND status = &#39;PENDING&#39;
+&nbsp;        )
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    @Suppress(&quot;LongParameterList&quot;) // Mirrors the entity: an @Insert cannot express the guard.
+&nbsp;    suspend fun insertIfAbsent(
+&nbsp;        id: String,
+&nbsp;        entityType: String,
+&nbsp;        entityId: String,
+&nbsp;        operation: String,
+&nbsp;        workspaceId: String?,
+&nbsp;        createdAt: Long,
+&nbsp;        attempts: Int,
+&nbsp;        status: String,
+&nbsp;        lastError: String?,
+&nbsp;    )
+&nbsp;
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        SELECT * FROM pending_mutations
+&nbsp;        WHERE status = &#39;PENDING&#39;
+&nbsp;          AND (:workspaceId IS NULL OR workspaceId = :workspaceId OR workspaceId IS NULL)
+&nbsp;        ORDER BY createdAt ASC
+&nbsp;        LIMIT :limit
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun pending(workspaceId: String?, limit: Int): List&lt;PendingMutationEntity&gt;
+&nbsp;
+&nbsp;    @Query(&quot;UPDATE pending_mutations SET status = &#39;IN_FLIGHT&#39; WHERE id IN (:ids)&quot;)
+&nbsp;    suspend fun markInFlight(ids: List&lt;String&gt;)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM pending_mutations WHERE id IN (:ids)&quot;)
+&nbsp;    suspend fun deleteByIds(ids: List&lt;String&gt;)
+&nbsp;
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        UPDATE pending_mutations
+&nbsp;        SET status = &#39;PENDING&#39;,
+&nbsp;            attempts = attempts + 1,
+&nbsp;            lastError = :error
+&nbsp;        WHERE id = :id
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun markFailed(id: String, error: String)
+&nbsp;
+&nbsp;    @Query(&quot;SELECT COUNT(*) FROM pending_mutations WHERE status != &#39;IN_FLIGHT&#39;&quot;)
+&nbsp;    fun pendingCount(): Flow&lt;Int&gt;
+&nbsp;
+&nbsp;    /** Every row regardless of status, oldest first — the Sync screen&#39;s outbox section. */
+&nbsp;    @Query(&quot;SELECT * FROM pending_mutations ORDER BY createdAt ASC LIMIT :limit&quot;)
+&nbsp;    fun observeAll(limit: Int): Flow&lt;List&lt;PendingMutationEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM pending_mutations&quot;)
+&nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
 </pre>
@@ -150,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

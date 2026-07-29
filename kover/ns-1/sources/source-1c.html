@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > ConfigKeyGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigKeyGroup (com.georgeci.moneysurfer.appconfig)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigKeyGroup</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
+&nbsp;
+&nbsp;/**
+&nbsp; * One configuration value: a compile-time constant, never a DI participant. The number of Koin
+&nbsp; * bindings therefore does not grow with the number of flags.
+&nbsp; *
+&nbsp; * [T] is `Any`-bounded because the engine already spends `null` on &quot;absent in this layer&quot; — an
+&nbsp; * &quot;empty&quot; value has to be a sentinel inside the codec instead.
+&nbsp; *
+&nbsp; * Plain `ConfigKey` is **read-only**: host-owned facts and server-owned flags. Only [SettingKey]
+&nbsp; * can be written, so `Config.handle` on a server flag fails to compile.
+&nbsp; */
+&nbsp;open class ConfigKey&lt;T : Any&gt;(
+&nbsp;    val name: String,
+&nbsp;    val default: T,
+&nbsp;    val codec: ConfigCodec&lt;T&gt;,
+&nbsp;    /**
+&nbsp;     * Opt-in: only these keys are served (or mirrored) by the RemoteGlobal layer. Without the
+&nbsp;     * opt-in a free-form remote map could override anything it names — `host.is_offline` would
+&nbsp;     * flip the online build onto the offline start route while its DI graph stays online, and any
+&nbsp;     * `SettingKey` the user never wrote has an absent Local layer, so a remote
+&nbsp;     * `ui.onboarding_completed` would skip onboarding on every fresh install.
+&nbsp;     */
+&nbsp;    val remoteOverridable: Boolean = false,
+&nbsp;) {
+&nbsp;    override fun toString(): String = &quot;ConfigKey($name)&quot;
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        fun bool(
+&nbsp;            name: String,
+&nbsp;            default: Boolean,
+&nbsp;            remoteOverridable: Boolean = false,
+&nbsp;        ): ConfigKey&lt;Boolean&gt; = ConfigKey(name, default, BooleanConfigCodec, remoteOverridable)
+&nbsp;
+&nbsp;        fun string(
+&nbsp;            name: String,
+&nbsp;            default: String,
+&nbsp;            remoteOverridable: Boolean = false,
+&nbsp;        ): ConfigKey&lt;String&gt; = ConfigKey(name, default, StringConfigCodec, remoteOverridable)
+&nbsp;
+&nbsp;        inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(
+&nbsp;            name: String,
+&nbsp;            default: E,
+&nbsp;            remoteOverridable: Boolean = false,
+&nbsp;        ): ConfigKey&lt;E&gt; = ConfigKey(name, default, EnumConfigCodec(enumValues&lt;E&gt;().toList()), remoteOverridable)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Writable key — a user setting. Only settings get a setter, so a server- or host-owned flag
+&nbsp; * cannot be written by mistake.
+&nbsp; *
+&nbsp; * [sync] `true` marks the value for per-user replication; `false` keeps it device-scoped.
+&nbsp; * Device-scoped is mandatory for onboarding and demo state — replicating those would replay
+&nbsp; * onboarding across devices and let demo data leak into a real account.
+&nbsp; *
+&nbsp; * [sync] also decides where the value is *stored*: `true` routes it into the account-scoped Room
+&nbsp; * `config_entry` table, which is wiped on account change and pushed through the outbox, while
+&nbsp; * `false` keeps it in DataStore, where nothing wipes it. `LocalConfigSource` owns that routing, so
+&nbsp; * no caller sees the split.
+&nbsp; *
+&nbsp; * `remoteOverridable` is hard-coded `false` and not exposed as a parameter, so a user setting
+&nbsp; * cannot become server-controlled by oversight.
+&nbsp; */
+&nbsp;class SettingKey&lt;T : Any&gt;(
+&nbsp;    name: String,
+&nbsp;    default: T,
+&nbsp;    codec: ConfigCodec&lt;T&gt;,
+&nbsp;    val sync: Boolean,
+&nbsp;) : ConfigKey&lt;T&gt;(name, default, codec, remoteOverridable = false) {
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        fun bool(name: String, default: Boolean, sync: Boolean): SettingKey&lt;Boolean&gt; =
+&nbsp;            SettingKey(name, default, BooleanConfigCodec, sync)
+&nbsp;
+&nbsp;        fun string(name: String, default: String, sync: Boolean): SettingKey&lt;String&gt; =
+&nbsp;            SettingKey(name, default, StringConfigCodec, sync)
+&nbsp;
+&nbsp;        inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(name: String, default: E, sync: Boolean): SettingKey&lt;E&gt; =
+&nbsp;            SettingKey(name, default, EnumConfigCodec(enumValues&lt;E&gt;().toList()), sync)
+&nbsp;
+&nbsp;        fun &lt;T : Any&gt; custom(
+&nbsp;            name: String,
+&nbsp;            default: T,
+&nbsp;            codec: ConfigCodec&lt;T&gt;,
+&nbsp;            sync: Boolean,
+&nbsp;        ): SettingKey&lt;T&gt; = SettingKey(name, default, codec, sync)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Every key a module owns, contributed to a runtime registry. The debug panel and the
+&nbsp; * remote-config pull both need *all* keys, and keys are `internal` to their owning module, so
+&nbsp; * they cannot see the symbols — they read the registry instead.
+&nbsp; *
+&nbsp; * Bind one class per group to this shared interface (the `SyncEntityPlugin` precedent). Several
+&nbsp; * modules binding a bare `ConfigKeyGroup` would overwrite one another in Koin&#39;s definition index
+&nbsp; * and `getAll()` would return a single surviving group.
+&nbsp; */
+&nbsp;interface ConfigKeyGroup {
+&nbsp;    val keys: List&lt;ConfigKey&lt;*&gt;&gt;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
+</div>
+</body>
+</html>

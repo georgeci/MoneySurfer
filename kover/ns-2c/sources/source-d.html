@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InitialBalanceInputKt</title>
+  <title>MoneySurfer Coverage Report > AccountDetailsTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,77 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.account.creation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.details</a>
 </div>
 
-<h1>Coverage Summary for Class: InitialBalanceInputKt (com.georgeci.moneysurfer.feature.account.creation)</h1>
+<h1>Coverage Summary for Class: AccountDetailsTestTags (com.georgeci.moneysurfer.feature.account.details)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">InitialBalanceInputKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
+  <td class="name">AccountDetailsTestTags</td>
+    <td class="coverageStat"/>
 </tr>
 
 </table>
@@ -99,66 +44,437 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.creation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.details
 &nbsp;
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.font.FontFamily
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.feature.account.extraDetailLabel
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_add_transaction
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_chart_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_edit_content_description
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_extra_details_section
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_all
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_expenses
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_income
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_in_this_month
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_out_this_month
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_empty
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_section
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_see_all
+&nbsp;import com.georgeci.moneysurfer.feature.account.icon
+&nbsp;import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
+&nbsp;import com.georgeci.moneysurfer.feature.account.labelRes
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
-&nbsp;/**
-&nbsp; * Input filtering + validation for the account creation &quot;Opening balance&quot; field.
-&nbsp; * Lives outside the ViewModel so the parsing rules can be unit-tested directly.
-&nbsp; */
-&nbsp;object InitialBalanceInput {
+&nbsp;/** Stable selectors for the account details screen — see docs/testing/testing-strategy.md. */
+&nbsp;object AccountDetailsTestTags {
+&nbsp;    const val Root = &quot;accountDetails:root&quot;
+&nbsp;    const val SeeAll = &quot;accountDetails:seeAll&quot;
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Reduces a raw text-field value to a parseable money string: digits, an
-&nbsp;     * optional leading minus, and at most one decimal separator (&#39;,&#39; normalised
-&nbsp;     * to &#39;.&#39;). Letters and any extra separators are dropped, so the field can
-&nbsp;     * never hold an unparseable amount.
-&nbsp;     */
-&nbsp;    fun sanitize(raw: String): String {
-&nbsp;        val negative = raw.startsWith(&#39;-&#39;)
-&nbsp;        val digits = StringBuilder()
-&nbsp;        var separatorUsed = false
-&nbsp;        for (ch in raw) {
-&nbsp;            when {
-&nbsp;                ch.isDigit() -&gt; digits.append(ch)
-&nbsp;                (ch == &#39;.&#39; || ch == &#39;,&#39;) &amp;&amp; !separatorUsed -&gt; {
-&nbsp;                    separatorUsed = true
-&nbsp;                    digits.append(&#39;.&#39;)
-&nbsp;                }
-&nbsp;            }
+&nbsp;    /** Transaction-type filter chip, suffixed with the lowercased [TransactionFilter]. */
+&nbsp;    const val FilterPrefix = &quot;accountDetails:filter:&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun AccountDetailsScreen(
+&nbsp;    accountId: AccountId,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToTransactionCreation: (accountId: AccountId) -&gt; Unit = {},
+&nbsp;    onNavigateToTransactionDetails: (transactionId: TransactionId) -&gt; Unit = {},
+&nbsp;    onNavigateToAccountEdit: (accountId: AccountId) -&gt; Unit = {},
+&nbsp;    onNavigateToTransactionsList: (accountId: AccountId) -&gt; Unit = {},
+&nbsp;    viewModel: AccountDetailsViewModel = koinViewModel(key = accountId.value) { parametersOf(accountId) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            AccountDetailsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is AccountDetailsEffect.NavigateToTransactionDetails -&gt; onNavigateToTransactionDetails(effect.transactionId)
+&nbsp;            AccountDetailsEffect.NavigateToTransactionCreation -&gt; onNavigateToTransactionCreation(accountId)
+&nbsp;            is AccountDetailsEffect.NavigateToAccountEdit -&gt; onNavigateToAccountEdit(effect.accountId)
+&nbsp;            is AccountDetailsEffect.NavigateToTransactionsList -&gt; onNavigateToTransactionsList(effect.accountId)
 &nbsp;        }
-&nbsp;        return if (negative) &quot;-$digits&quot; else digits.toString()
 &nbsp;    }
 &nbsp;
-&nbsp;    /** Parses a [sanitize]d value to a [Double], or null while it is still incomplete (e.g. &quot;&quot; or &quot;-&quot;). */
-&nbsp;    fun parse(value: String): Double? = value.toDoubleOrNull()
+&nbsp;    when (val current = state) {
+&nbsp;        is AccountDetailsState.Loading -&gt; AccountDetailsLoading(onEvent = viewModel::onEvent)
+&nbsp;        is AccountDetailsState.Content -&gt; AccountDetailsContent(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    /**
-&nbsp;     * The inline error to surface for [balance] given the selected [type], or
-&nbsp;     * null when the amount is acceptable. A negative opening balance is only
-&nbsp;     * valid for account types that can carry debt (see [allowsNegativeBalance]).
-&nbsp;     */
-&nbsp;    fun errorFor(balance: String, type: AccountType): InitialBalanceError? {
-&nbsp;        val parsed = parse(balance) ?: return null
-&nbsp;        return if (parsed &lt; 0 &amp;&amp; !type.allowsNegativeBalance) {
-&nbsp;            InitialBalanceError.NEGATIVE_NOT_ALLOWED
-&nbsp;        } else {
-&nbsp;            null
+&nbsp;@Composable
+&nbsp;private fun AccountDetailsLoading(onEvent: (AccountDetailsEvent) -&gt; Unit) {
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = stringResource(Res.string.account_details_title),
+&nbsp;        onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(padding)
+&nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;        ) {
+&nbsp;            repeat(SKELETON_ROWS) {
+&nbsp;                SurferSkeletonRow()
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Validation failures for the opening balance field. */
-&nbsp;enum class InitialBalanceError { NEGATIVE_NOT_ALLOWED, }
+&nbsp;private const val SKELETON_ROWS = 5
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun AccountDetailsContent(
+&nbsp;    state: AccountDetailsState.Content,
+&nbsp;    onEvent: (AccountDetailsEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = stringResource(Res.string.account_details_title),
+&nbsp;        modifier = Modifier
+&nbsp;            .testTag(AccountDetailsTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
+&nbsp;        actions = {
+&nbsp;            SurferToolbarAction(
+&nbsp;                icon = SurferIcons.Edit,
+&nbsp;                contentDescription = stringResource(Res.string.account_details_edit_content_description),
+&nbsp;                onClick = { onEvent(AccountDetailsEvent.OnEditClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        primaryAction = SurferPaneAction(
+&nbsp;            label = stringResource(Res.string.account_details_add_transaction),
+&nbsp;            onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
+&nbsp;        ),
+&nbsp;    ) { padding -&gt;
+&nbsp;        val filtered = remember(state.filter, state.transactions) {
+&nbsp;            when (state.filter) {
+&nbsp;                TransactionFilter.All -&gt; state.transactions
+&nbsp;                TransactionFilter.Expenses -&gt; state.transactions.filter { it.isExpense }
+&nbsp;                TransactionFilter.Income -&gt; state.transactions.filterNot { it.isExpense }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        LazyColumn(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding()),
+&nbsp;            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
+&nbsp;        ) {
+&nbsp;            item {
+&nbsp;                SurferAccountDetailsHeroCard(
+&nbsp;                    // Falls back to the generic wallet only while the type is still loading.
+&nbsp;                    icon = state.type?.icon() ?: SurferIcons.Wallet,
+&nbsp;                    name = state.name,
+&nbsp;                    // The mockup&#39;s meta line is the account kind (&quot;CURRENT · •• 4021&quot;); the
+&nbsp;                    // last-4 half needs a field the model does not have yet, so only the kind
+&nbsp;                    // shows — still closer than the currency code that used to sit here.
+&nbsp;                    subtitle = state.type?.let { stringResource(it.labelRes()).uppercase() }.orEmpty(),
+&nbsp;                    formattedBalance = state.formattedBalance.ifBlank { &quot;€0.00&quot; },
+&nbsp;                    modifier = Modifier
+&nbsp;                        .padding(horizontal = AppTheme.spacing.default)
+&nbsp;                        .padding(bottom = AppTheme.spacing.large),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            item { QuickStats(state) }
+&nbsp;            item {
+&nbsp;                SurferBalanceChartCard(
+&nbsp;                    title = stringResource(Res.string.account_details_chart_title),
+&nbsp;                    delta = state.chart.formattedDelta,
+&nbsp;                    deltaColor = if (state.chart.isDeltaNegative) {
+&nbsp;                        AppTheme.materialColors.error
+&nbsp;                    } else {
+&nbsp;                        AppTheme.semanticColors.income
+&nbsp;                    },
+&nbsp;                    points = state.chart.points,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .padding(horizontal = AppTheme.spacing.default)
+&nbsp;                        .padding(bottom = AppTheme.spacing.medium),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            if (state.extraDetails.isNotEmpty()) {
+&nbsp;                item { ExtraDetailsSection(details = state.extraDetails) }
+&nbsp;            }
+&nbsp;            item {
+&nbsp;                FilterChips(
+&nbsp;                    selected = state.filter,
+&nbsp;                    onSelect = { onEvent(AccountDetailsEvent.OnFilterChanged(it)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;            item {
+&nbsp;                Row(
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .padding(
+&nbsp;                            start = AppTheme.spacing.large,
+&nbsp;                            end = AppTheme.spacing.large,
+&nbsp;                            top = AppTheme.spacing.medium,
+&nbsp;                            bottom = AppTheme.spacing.xSmall,
+&nbsp;                        ),
+&nbsp;                    verticalAlignment = Alignment.CenterVertically,
+&nbsp;                ) {
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(Res.string.account_details_transactions_section),
+&nbsp;                        style = AppTheme.typography.labelLarge,
+&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                        modifier = Modifier.weight(1f),
+&nbsp;                    )
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(Res.string.account_details_transactions_see_all),
+&nbsp;                        style = AppTheme.typography.labelLarge,
+&nbsp;                        color = AppTheme.materialColors.primary,
+&nbsp;                        modifier = Modifier
+&nbsp;                            .testTag(AccountDetailsTestTags.SeeAll)
+&nbsp;                            .clickable {
+&nbsp;                                onEvent(AccountDetailsEvent.OnSeeAllTransactionsClick)
+&nbsp;                            },
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;            if (filtered.isEmpty()) {
+&nbsp;                item {
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(Res.string.account_details_transactions_empty),
+&nbsp;                        style = AppTheme.typography.bodyMedium,
+&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                        modifier = Modifier.padding(AppTheme.spacing.large),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                items(filtered, key = { it.id.value }) { transaction -&gt;
+&nbsp;                    val incomeColor = AppTheme.semanticColors.income
+&nbsp;                    // The gap below the row belongs to the swipe wrapper and the inset to the line
+&nbsp;                    // — see TransactionRow in the transaction feature for why they cannot swap.
+&nbsp;                    SurferSwipeToDeleteTransaction(
+&nbsp;                        transactionTitle = transaction.title,
+&nbsp;                        onDelete = {
+&nbsp;                            onEvent(AccountDetailsEvent.OnDeleteTransaction(transaction.id))
+&nbsp;                        },
+&nbsp;                        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+&nbsp;                        isTransfer = transaction.isTransfer,
+&nbsp;                        isSplit = transaction.isSplitLeg,
+&nbsp;                    ) {
+&nbsp;                        SurferTransactionLine(
+&nbsp;                            icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
+&nbsp;                            title = transaction.title,
+&nbsp;                            formattedAmount = transaction.formattedAmount,
+&nbsp;                            categoryHueSeed = transaction.categoryHueSeed,
+&nbsp;                            amountColor = if (transaction.isExpense) {
+&nbsp;                                AppTheme.materialColors.onSurface
+&nbsp;                            } else {
+&nbsp;                                incomeColor
+&nbsp;                            },
+&nbsp;                            amountPillBackground = if (transaction.isExpense) {
+&nbsp;                                null
+&nbsp;                            } else {
+&nbsp;                                incomeColor.copy(alpha = 0.18f)
+&nbsp;                            },
+&nbsp;                            modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
+&nbsp;                            onClick = { onEvent(AccountDetailsEvent.OnTransactionClick(transaction.id)) },
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun QuickStats(state: AccountDetailsState.Content) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.default)
+&nbsp;            .padding(bottom = AppTheme.spacing.default),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;    ) {
+&nbsp;        SurferAccountStatCard(
+&nbsp;            label = stringResource(Res.string.account_details_in_this_month),
+&nbsp;            value = state.formattedIncome,
+&nbsp;            icon = SurferIcons.ArrowDown,
+&nbsp;            iconTint = AppTheme.semanticColors.income,
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;        SurferAccountStatCard(
+&nbsp;            label = stringResource(Res.string.account_details_out_this_month),
+&nbsp;            value = state.formattedExpenses,
+&nbsp;            icon = SurferIcons.ArrowUp,
+&nbsp;            iconTint = AppTheme.materialColors.error,
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Whether an account of this type can be created with a negative opening
-&nbsp; * balance. Only credit-style accounts (Card) carry debt; cash/bank/savings
-&nbsp; * balances start at zero or above.
+&nbsp; * The &quot;Extra details&quot; the creation screen collected. Read-only here — editing them means opening
+&nbsp; * the edit form, which is the same screen that defined them.
 &nbsp; */
-&nbsp;internal val AccountType.allowsNegativeBalance: Boolean
-<b class="fc">&nbsp;    get() = this == AccountType.CARD</b>
+&nbsp;@Composable
+&nbsp;private fun ExtraDetailsSection(details: List&lt;AccountExtraDetail&gt;) {
+&nbsp;    Column(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.large)
+&nbsp;            .padding(bottom = AppTheme.spacing.medium),
+&nbsp;        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.account_details_extra_details_section),
+&nbsp;            style = AppTheme.typography.labelLarge,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        details.forEach { detail -&gt;
+&nbsp;            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.xSmall)) {
+&nbsp;                Text(
+&nbsp;                    text = extraDetailLabel(detail.key),
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;                Text(
+&nbsp;                    text = detail.value,
+&nbsp;                    style = if (isMonospaceExtraDetail(detail.key)) {
+&nbsp;                        AppTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+&nbsp;                    } else {
+&nbsp;                        AppTheme.typography.bodyMedium
+&nbsp;                    },
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun FilterChips(
+&nbsp;    selected: TransactionFilter,
+&nbsp;    onSelect: (TransactionFilter) -&gt; Unit,
+&nbsp;) {
+&nbsp;    SurferFilterChipRow(
+&nbsp;        modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
+&nbsp;        options = listOf(TransactionFilter.All, TransactionFilter.Expenses, TransactionFilter.Income),
+&nbsp;        selected = selected,
+&nbsp;        label = { filter -&gt;
+&nbsp;            stringResource(
+&nbsp;                when (filter) {
+&nbsp;                    TransactionFilter.All -&gt; Res.string.account_details_filter_all
+&nbsp;                    TransactionFilter.Expenses -&gt; Res.string.account_details_filter_expenses
+&nbsp;                    TransactionFilter.Income -&gt; Res.string.account_details_filter_income
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        onSelect = onSelect,
+&nbsp;        optionTestTag = { filter -&gt; AccountDetailsTestTags.FilterPrefix + filter.name.lowercase() },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** A month of plausible balances so the preview draws the same shape the real series does. */
+&nbsp;private val PreviewChartPoints: List&lt;Pair&lt;Float, Float&gt;&gt; = listOf(
+&nbsp;    2068f, 2042f, 2110f, 2095f, 2180f, 2164f, 2140f, 2210f, 2196f, 2255f,
+&nbsp;    2231f, 2288f, 2262f, 2240f, 2310f, 2295f, 2352f, 2330f, 2308f, 2374f,
+&nbsp;    2360f, 2412f, 2390f, 2368f, 2430f, 2415f, 2462f, 2441f, 2470f, 2480f,
+&nbsp;).mapIndexed { index, balance -&gt; index.toFloat() to balance }
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun AccountDetailsScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        AccountDetailsContent(
+&nbsp;            state = AccountDetailsState.Content(
+&nbsp;                accountId = AccountId(&quot;preview-acc-1&quot;),
+&nbsp;                name = &quot;Everyday&quot;,
+&nbsp;                formattedBalance = &quot;€2,480.32&quot;,
+&nbsp;                type = AccountType.BANK,
+&nbsp;                formattedIncome = &quot;€3,200.00&quot;,
+&nbsp;                formattedExpenses = &quot;€1,148.49&quot;,
+&nbsp;                chart = AccountBalanceChartUi(
+&nbsp;                    points = PreviewChartPoints,
+&nbsp;                    formattedDelta = &quot;+€412.00&quot;,
+&nbsp;                    isDeltaNegative = false,
+&nbsp;                ),
+&nbsp;                transactions = listOf(
+&nbsp;                    AccountTransactionUi(
+&nbsp;                        id = TransactionId(&quot;preview-tx-1&quot;),
+&nbsp;                        title = &quot;Lidl — weekly shop&quot;,
+&nbsp;                        formattedAmount = &quot;−€48.20&quot;,
+&nbsp;                        isExpense = true,
+&nbsp;                        categoryHueSeed = &quot;preview-cat-1&quot;,
+&nbsp;                    ),
+&nbsp;                    AccountTransactionUi(
+&nbsp;                        id = TransactionId(&quot;preview-tx-2&quot;),
+&nbsp;                        title = &quot;Salary&quot;,
+&nbsp;                        formattedAmount = &quot;€3,200.00&quot;,
+&nbsp;                        isExpense = false,
+&nbsp;                        categoryHueSeed = &quot;preview-cat-2&quot;,
+&nbsp;                    ),
+&nbsp;                    AccountTransactionUi(
+&nbsp;                        id = TransactionId(&quot;preview-tx-3&quot;),
+&nbsp;                        title = &quot;Coffee&quot;,
+&nbsp;                        formattedAmount = &quot;−€3.80&quot;,
+&nbsp;                        isExpense = true,
+&nbsp;                        categoryHueSeed = &quot;preview-cat-3&quot;,
+&nbsp;                    ),
+&nbsp;                ),
+&nbsp;                filter = TransactionFilter.All,
+&nbsp;                extraDetails = listOf(
+&nbsp;                    AccountExtraDetail(
+&nbsp;                        key = AccountExtraDetailKey.IBAN.name,
+&nbsp;                        value = &quot;PL61 1090 1014 0000 0712 1981 2874&quot;,
+&nbsp;                    ),
+&nbsp;                    AccountExtraDetail(key = &quot;Broker code&quot;, value = &quot;MS-4417&quot;),
+&nbsp;                ),
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -182,7 +498,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

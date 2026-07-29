@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferWidgetSize</title>
+  <title>MoneySurfer Coverage Report > DashboardSpentByCategoryWidgetKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferWidgetSize (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: DashboardSpentByCategoryWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferWidgetSize</td>
+  <td class="name">DashboardSpentByCategoryWidgetKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    78.3%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (18/23)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    95.1%
   </span>
   <span class="absValue">
-    (0/18)
+    (39/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.4%
+  </span>
+  <span class="absValue">
+    (487/505)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">DashboardSpentByCategoryWidgetKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.3%
+  </span>
+  <span class="absValue">
+    (18/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.1%
+  </span>
+  <span class="absValue">
+    (39/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.4%
+  </span>
+  <span class="absValue">
+    (487/505)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,15 +126,122 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
 &nbsp;
-&nbsp;import androidx.compose.runtime.ProvidableCompositionLocal
-&nbsp;import androidx.compose.runtime.staticCompositionLocalOf
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryEmpty
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_empty_subtitle
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_empty_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_of_cap
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_over_cap
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_over
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-<b class="nc">&nbsp;enum class SurferWidgetSize { Hero, Compact }</b>
+&nbsp;/**
+&nbsp; * Where the selected period&#39;s money went, category by category, in whichever of the five
+&nbsp; * treatments the card style names.
+&nbsp; *
+&nbsp; * Like safe-to-spend this one keeps drawing with nothing behind it: a period with no expenses yet
+&nbsp; * is a state the widget is *for*, not a reason to leave a gap in the column.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;internal fun SpentByCategoryWidget(state: DashboardState.Content, variant: String?) {</b>
+<b class="fc">&nbsp;    SurferSpentByCategoryWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_spent_by_category_title),</b>
+<b class="fc">&nbsp;        items = state.spentByCategory.map { it.toWidgetItem() },</b>
+<b class="fc">&nbsp;        variant = SurferSpentByCategoryVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        empty = SurferSpentByCategoryEmpty(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_spent_by_category_empty_title),</b>
+<b class="fc">&nbsp;            subtitle = stringResource(Res.string.dashboard_spent_by_category_empty_subtitle),</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.SpentByCategory),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;val LocalSurferWidgetSize: ProvidableCompositionLocal&lt;SurferWidgetSize&gt; =
-&nbsp;    staticCompositionLocalOf { SurferWidgetSize.Hero }
+&nbsp;/**
+&nbsp; * The row as the card draws it. The tint comes from the category&#39;s stored hue through the one
+&nbsp; * resolver every category bubble goes through, so a category keeps the same colour here as on the
+&nbsp; * screens that own it.
+&nbsp; *
+&nbsp; * The uncategorized bucket has no stored appearance, so its tint is hashed from the fixed
+&nbsp; * [UNCATEGORIZED_ID] rather than from the label beside it — the label is translated, and a bucket
+&nbsp; * that changed colour when the user switched language would look like a different category.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun CategorySpendUi.toWidgetItem(): SurferCategorySpendItem {</b>
+<b class="fc">&nbsp;    val fallbackName = stringResource(Res.string.dashboard_spent_by_category_uncategorized)</b>
+<b class="fc">&nbsp;    val id = categoryId ?: UNCATEGORIZED_ID</b>
+<b class="fc">&nbsp;    return SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        name = name ?: fallbackName,</b>
+<b class="fc">&nbsp;        amount = spentFormatted,</b>
+<b class="fc">&nbsp;        share = share,</b>
+<b class="fc">&nbsp;        caption = caption(),</b>
+&nbsp;        // The same resolver every category bubble goes through: the stored hue snapped to the
+&nbsp;        // palette, falling back to hashing the id for a row that stored none.
+<b class="fc">&nbsp;        tint = SurferCategoryPalette.tintForHue(hue ?: NO_STORED_HUE) ?: SurferCategoryPalette.tintFor(id),</b>
+<b class="fc">&nbsp;        cap = cap?.toWidgetCap(),</b>
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The line that names what the row&#39;s meter measures. A capped category is measured against its cap,
+&nbsp; * so the caption states the cap; an uncapped one is measured against the period&#39;s spend, so it
+&nbsp; * states the share. The two must never be told apart by the shape alone.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun CategorySpendUi.caption(): String {</b>
+<b class="fc">&nbsp;    val limit = cap ?: return stringResource(Res.string.dashboard_spent_by_category_share, sharePercent)</b>
+<b class="fc">&nbsp;    return if (limit.status == BudgetStatus.OVER) {</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_spent_by_category_over_cap, limit.limitFormatted)</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_spent_by_category_of_cap, spentFormatted, limit.limitFormatted)</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun CategoryCapUi.toWidgetCap(): SurferCategorySpendCap = SurferCategorySpendCap(</b>
+<b class="fc">&nbsp;    progress = progress,</b>
+<b class="fc">&nbsp;    status = status.toWidgetStatus(),</b>
+<b class="fc">&nbsp;    statusLabel = status.statusLabel(),</b>
+&nbsp;)
+&nbsp;
+&nbsp;/** Only the two states worth interrupting a row for carry a word; OK is the quiet default. */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BudgetStatus.statusLabel(): String? = when (this) {</b>
+<b class="nc">&nbsp;    BudgetStatus.OK -&gt; null</b>
+<b class="fc">&nbsp;    BudgetStatus.WARN -&gt; stringResource(Res.string.dashboard_spent_by_category_status_warn)</b>
+<b class="fc">&nbsp;    BudgetStatus.OVER -&gt; stringResource(Res.string.dashboard_spent_by_category_status_over)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** List key for the uncategorized bucket, which has no category id to be keyed by. */
+&nbsp;private const val UNCATEGORIZED_ID = &quot;uncategorized&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The &quot;never stored&quot; hue sentinel — `SurferCategoryPalette.tintForHue` reads anything off the
+&nbsp; * colour wheel as absent and falls back to hashing the id.
+&nbsp; */
+&nbsp;private const val NO_STORED_HUE = -1
 </code>
 </pre>
 </div>
@@ -124,7 +265,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

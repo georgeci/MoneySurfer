@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > BudgetDetailsTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,91 +22,376 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.budget.details)</h1>
+<h1>Coverage Summary for Class: BudgetDetailsTestTags (com.georgeci.moneysurfer.feature.budget.details)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
-  <tr>
-    <td class="name">ComposableSingletons$BudgetDetailsScreenKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/23)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/171)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
+  <td class="name">BudgetDetailsTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/23)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/171)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
+&nbsp;
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetUi
+&nbsp;import com.georgeci.moneysurfer.feature.budget.budgetPeriodLabel
+&nbsp;import com.georgeci.moneysurfer.feature.budget.budgetStatusLabel
+&nbsp;import com.georgeci.moneysurfer.feature.budget.previewBudget
+&nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferAlertBanner
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetRing
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatusPill
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferStatTile
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.budget.generated.resources.Res
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_days_elapsed
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_days_left
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_alert_over_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_alert_over_message
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_alert_warn_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_alert_warn_message_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_edit
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_not_found
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_of_limit_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_rollover_carry_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_stat_daily_average
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_stat_per_day
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_stat_projected
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_title
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_transactions_empty
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_details_transactions_header
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_footer_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_mixed_currency
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
+&nbsp;
+&nbsp;/** Stable selectors for the Budget details screen — see docs/testing/testing-strategy.md. */
+&nbsp;object BudgetDetailsTestTags {
+&nbsp;    const val Root = &quot;budgetDetails:root&quot;
+&nbsp;    const val Ring = &quot;budgetDetails:ring&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun BudgetDetailsScreen(
+&nbsp;    budgetId: BudgetId,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToBudgetEdit: (BudgetId) -&gt; Unit,
+&nbsp;    onNavigateToTransactionDetails: (TransactionId) -&gt; Unit,
+&nbsp;    viewModel: BudgetDetailsViewModel = koinViewModel(key = budgetId.value) { parametersOf(budgetId) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            BudgetDetailsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is BudgetDetailsEffect.NavigateToBudgetEdit -&gt; onNavigateToBudgetEdit(effect.budgetId)
+&nbsp;            is BudgetDetailsEffect.NavigateToTransactionDetails -&gt;
+&nbsp;                onNavigateToTransactionDetails(effect.transactionId)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    BudgetDetailsContent(state = state, onEvent = viewModel::onEvent)
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+&nbsp; * injected state, the way `DashboardContent` is used.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun BudgetDetailsContent(
+&nbsp;    state: BudgetDetailsState,
+&nbsp;    onEvent: (BudgetDetailsEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val content = state as? BudgetDetailsState.Content
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = content?.budget?.name ?: stringResource(Res.string.budget_details_title),
+&nbsp;        modifier = Modifier
+&nbsp;            .testTag(BudgetDetailsTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        onBack = { onEvent(BudgetDetailsEvent.OnBackClick) },
+&nbsp;        actions = {
+&nbsp;            if (content != null) {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Edit,
+&nbsp;                    text = stringResource(Res.string.budget_details_edit),
+&nbsp;                    onClick = { onEvent(BudgetDetailsEvent.OnEditClick) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        if (state is BudgetDetailsState.Missing) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .surferContentContainer()
+&nbsp;                    .padding(padding)
+&nbsp;                    .padding(AppTheme.spacing.large),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budget_details_not_found),
+&nbsp;                    style = AppTheme.typography.bodyLarge,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    textAlign = TextAlign.Center,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            return@SurferPaneScaffold
+&nbsp;        }
+&nbsp;        if (content == null) {
+&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;            return@SurferPaneScaffold
+&nbsp;        }
+&nbsp;
+&nbsp;        LazyColumn(
+&nbsp;            modifier = Modifier.fillMaxSize().surferContentContainer().padding(top = padding.calculateTopPadding()),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                start = AppTheme.spacing.default,
+&nbsp;                end = AppTheme.spacing.default,
+&nbsp;                top = AppTheme.spacing.medium,
+&nbsp;                bottom = padding.calculateBottomPadding() + AppTheme.spacing.xLarge,
+&nbsp;            ),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;        ) {
+&nbsp;            item(key = &quot;hero&quot;) { BudgetHero(content.budget) }
+&nbsp;            item(key = &quot;alert&quot;) { BudgetAlert(content.budget) }
+&nbsp;            item(key = &quot;stats&quot;) { BudgetStats(content.budget) }
+&nbsp;            item(key = &quot;transactionsHeader&quot;) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budget_details_transactions_header),
+&nbsp;                    style = AppTheme.typography.titleSmall,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                    modifier = Modifier.padding(top = AppTheme.spacing.small),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            if (content.transactions.isEmpty()) {
+&nbsp;                item(key = &quot;transactionsEmpty&quot;) {
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(Res.string.budget_details_transactions_empty),
+&nbsp;                        style = AppTheme.typography.bodyMedium,
+&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;            items(content.transactions, key = { it.id.value }) { transaction -&gt;
+&nbsp;                BudgetTransactionRow(
+&nbsp;                    transaction = transaction,
+&nbsp;                    onClick = { onEvent(BudgetDetailsEvent.OnTransactionClick(transaction.id)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BudgetHero(budget: BudgetUi) {
+&nbsp;    Column(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
+&nbsp;        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;    ) {
+&nbsp;        SurferBudgetRing(
+&nbsp;            progress = budget.progress,
+&nbsp;            status = budget.status.toUi(),
+&nbsp;            modifier = Modifier.testTag(BudgetDetailsTestTags.Ring),
+&nbsp;        ) {
+&nbsp;            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+&nbsp;                Text(
+&nbsp;                    text = &quot;${budget.percent}%&quot;,
+&nbsp;                    style = AppTheme.typography.headlineMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                )
+&nbsp;                Text(
+&nbsp;                    text = budget.spentFormatted,
+&nbsp;                    style = AppTheme.typography.titleSmall,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                )
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budget_details_of_limit_format, budget.limitFormatted),
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;        SurferBudgetStatusPill(label = budgetStatusLabel(budget.status), status = budget.status.toUi())
+&nbsp;        Text(
+&nbsp;            text = stringResource(
+&nbsp;                Res.string.budget_footer_format,
+&nbsp;                &quot;${budgetPeriodLabel(budget.period)} · ${budget.windowLabel}&quot;,
+&nbsp;                pluralStringResource(Res.plurals.budget_days_left, budget.daysLeft, budget.daysLeft),
+&nbsp;            ),
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        budget.rolloverCarryFormatted?.let { carry -&gt;
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.budget_details_rollover_carry_format, carry),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        if (budget.hasMixedCurrency) {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.budget_mixed_currency),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BudgetAlert(budget: BudgetUi) {
+&nbsp;    when (budget.status) {
+&nbsp;        BudgetStatus.OK -&gt; Unit
+&nbsp;        BudgetStatus.WARN -&gt; SurferAlertBanner(
+&nbsp;            title = stringResource(Res.string.budget_details_alert_warn_format, budget.percent),
+&nbsp;            status = budget.status.toUi(),
+&nbsp;            message = stringResource(
+&nbsp;                Res.string.budget_details_alert_warn_message_format,
+&nbsp;                budget.alertPercent,
+&nbsp;            ),
+&nbsp;        )
+&nbsp;        BudgetStatus.OVER -&gt; SurferAlertBanner(
+&nbsp;            title = stringResource(Res.string.budget_details_alert_over_format, budget.remainderFormatted),
+&nbsp;            status = budget.status.toUi(),
+&nbsp;            message = stringResource(Res.string.budget_details_alert_over_message),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BudgetStats(budget: BudgetUi) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;    ) {
+&nbsp;        SurferStatTile(
+&nbsp;            label = stringResource(Res.string.budget_details_stat_daily_average),
+&nbsp;            value = budget.dailyAverageFormatted,
+&nbsp;            caption = pluralStringResource(
+&nbsp;                Res.plurals.budget_days_elapsed,
+&nbsp;                budget.elapsedDays,
+&nbsp;                budget.elapsedDays,
+&nbsp;            ),
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;        SurferStatTile(
+&nbsp;            label = stringResource(Res.string.budget_details_stat_projected),
+&nbsp;            value = budget.projectedTotalFormatted,
+&nbsp;            valueColor = if (budget.status == BudgetStatus.OVER) AppTheme.materialColors.error else null,
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;        SurferStatTile(
+&nbsp;            label = stringResource(Res.string.budget_details_stat_per_day),
+&nbsp;            value = budget.perDayRemainingFormatted,
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BudgetTransactionRow(
+&nbsp;    transaction: BudgetTransactionUi,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .clickable(onClick = onClick)
+&nbsp;            .padding(vertical = AppTheme.spacing.small),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;    ) {
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = transaction.title,
+&nbsp;                style = AppTheme.typography.bodyLarge,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                maxLines = 1,
+&nbsp;                overflow = TextOverflow.Ellipsis,
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = listOfNotNull(transaction.dateLabel, transaction.categoryName).joinToString(&quot; · &quot;),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Text(
+&nbsp;            text = transaction.amountFormatted,
+&nbsp;            style = AppTheme.typography.titleSmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun BudgetDetailsContentPreview() {
+&nbsp;    AppTheme {
+&nbsp;        BudgetDetailsContent(
+&nbsp;            state = BudgetDetailsState.Content(
+&nbsp;                budget = previewBudget(),
+&nbsp;                transactions = listOf(
+&nbsp;                    BudgetTransactionUi(
+&nbsp;                        id = TransactionId(&quot;t-1&quot;),
+&nbsp;                        title = &quot;Lidl&quot;,
+&nbsp;                        categoryName = &quot;Groceries&quot;,
+&nbsp;                        amountFormatted = &quot;€42.10&quot;,
+&nbsp;                        dateLabel = &quot;18 Apr&quot;,
+&nbsp;                    ),
+&nbsp;                ),
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -128,7 +413,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

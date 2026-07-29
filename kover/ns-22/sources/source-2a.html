@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MonthlyNet</title>
+  <title>MoneySurfer Coverage Report > GoalContribution</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: MonthlyNet (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MonthlyNet</td>
+  <td class="name">GoalContribution</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (22/22)
+    (84/84)
   </span>
 </td>
 </tr>
@@ -94,71 +94,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.YearMonth
-&nbsp;
-&nbsp;/*
-&nbsp; * Return shapes of SpendAnalyticsRepository.
-&nbsp; *
-&nbsp; * All of them are magnitudes in the workspace base currency: the queries behind them sum
-&nbsp; * `ABS(amount)`, so an expense reads as a positive number rather than a negative one. Nothing
-&nbsp; * here is persisted or pushed — a change to the maths never needs a migration.
-&nbsp; */
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * What one category booked inside a spend window.
+&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
+&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
 &nbsp; *
-&nbsp; * [categoryId] is `null` for the uncategorized bucket. That is a real slice, not a missing one:
-&nbsp; * `Transaction.categoryId` is nullable, and a workspace with half its rows uncategorized would
-&nbsp; * otherwise show a donut that does not add up to what was spent.
+&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
+&nbsp; * touched. It exists so the money-backed model can later store the id of a real
+&nbsp; * transfer here without a schema change on either side of the wire.
 &nbsp; */
-&nbsp;data class CategorySpendSlice(
-&nbsp;    val categoryId: CategoryId?,
-&nbsp;    val total: Money,
-&nbsp;    val transactionCount: Int,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * One month of the income-vs-expense trend. Both figures are magnitudes, so [net] is the
-&nbsp; * subtraction rather than a sum of signed rows.
-&nbsp; *
-&nbsp; * A month with income but no spend still produces a row — the query groups by month and type,
-&nbsp; * and the missing side folds to zero here rather than dropping the column from the chart.
-&nbsp; *
-&nbsp; * [month] names the calendar month the rows fell in; it does *not* promise the whole month was
-&nbsp; * counted. A query window that starts or ends mid-month yields a part-month row indistinguishable
-&nbsp; * from a full one — see
-&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.netByMonth].
-&nbsp; */
-<b class="fc">&nbsp;data class MonthlyNet(</b>
-<b class="fc">&nbsp;    val month: YearMonth,</b>
-<b class="fc">&nbsp;    val income: Money,</b>
-<b class="fc">&nbsp;    val expense: Money,</b>
-&nbsp;) {
-&nbsp;    /** Negative once the month spent more than it earned. */
-<b class="fc">&nbsp;    val net: Money get() = income - expense</b>
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * One day of the spend series. Days with nothing booked are absent — the heatmap and the burn
-&nbsp; * rate both need to tell &quot;no spend&quot; from &quot;no data&quot;, and only the caller knows which window it
-&nbsp; * asked for.
-&nbsp; */
-&nbsp;data class DailySpendPoint(
-&nbsp;    val date: LocalDate,
-&nbsp;    val total: Money,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * What one merchant took inside a spend window. [merchant] is never blank — see
-&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.topMerchants].
-&nbsp; */
-&nbsp;data class MerchantSpend(
-&nbsp;    val merchant: String,
-&nbsp;    val total: Money,
-&nbsp;    val transactionCount: Int,
+<b class="fc">&nbsp;data class GoalContribution(</b>
+<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val goalId: GoalId,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
+<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
+<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
+<b class="fc">&nbsp;    val createdAt: Instant,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
 &nbsp;)
 </code>
 </pre>
@@ -183,7 +144,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

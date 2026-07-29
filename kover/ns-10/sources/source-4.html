@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryAppearanceMigrationKt</title>
+  <title>MoneySurfer Coverage Report > LocalDataModule</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.di</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryAppearanceMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
+<h1>Coverage Summary for Class: LocalDataModule (com.georgeci.moneysurfer.data.di)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,103 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryAppearanceMigrationKt</td>
+  <td class="name">LocalDataModule</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    7.1%
   </span>
   <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    5.3%
-  </span>
-  <span class="absValue">
-    (1/19)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    4%
-  </span>
-  <span class="absValue">
-    (6/150)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">CategoryAppearanceMigrationKt$MIGRATION_25_26$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
+    (1/14)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    7.1%
   </span>
   <span class="absValue">
-    (1/4)
+    (1/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    7.1%
   </span>
   <span class="absValue">
-    (4/12)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (2/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    8.7%
-  </span>
-  <span class="absValue">
-    (2/23)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    6.2%
-  </span>
-  <span class="absValue">
-    (10/162)
+    (2/28)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,69 +92,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.di
 &nbsp;
-&nbsp;import androidx.room.migration.Migration
-&nbsp;import androidx.sqlite.SQLiteConnection
-&nbsp;import androidx.sqlite.execSQL
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryAppearance
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
+&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.ConfigEntryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.ExchangeRateDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
+&nbsp;import org.koin.core.annotation.ComponentScan
+&nbsp;import org.koin.core.annotation.Module
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;/**
-&nbsp; * v25 → v26: give `categories` the `iconKey` and `hue` columns the creation screen has been
-&nbsp; * collecting and throwing away.
-&nbsp; *
-&nbsp; * Additive — two `ALTER TABLE ... ADD COLUMN`s, no table rebuild — followed by a deterministic
-&nbsp; * backfill. The backfill is the point: leaving existing rows on the column defaults would paint
-&nbsp; * every category the user already has in one identical colour, which reads as a broken screen
-&nbsp; * rather than as &quot;no colour chosen&quot;. Deriving both values from a stable hash of the category id
-&nbsp; * (see [CategoryAppearance]) instead reproduces exactly what the pre-column UI drew, so the
-&nbsp; * upgrade is visually a no-op.
-&nbsp; *
-&nbsp; * The hash runs in Kotlin rather than SQL because SQLite has no portable string-hash function,
-&nbsp; * and it has to agree bit-for-bit with the one the domain uses on every platform.
-&nbsp; */
-<b class="fc">&nbsp;val MIGRATION_25_26: Migration = object : Migration(25, 26) {</b>
-&nbsp;    override fun migrate(connection: SQLiteConnection) {
-<b class="nc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `categories` ADD COLUMN `iconKey` TEXT NOT NULL DEFAULT &#39;&#39;&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `categories` ADD COLUMN `hue` INTEGER NOT NULL DEFAULT -1&quot;)</b>
-<b class="nc">&nbsp;        backfillCategoryAppearance(connection)</b>
-&nbsp;    }
+<b class="fc">&nbsp;@Module</b>
+&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.data&quot;)
+&nbsp;class LocalDataModule {
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun userDao(database: MoneySurferDatabase): UserDao = database.userDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceDao(database: MoneySurferDatabase): WorkspaceDao = database.workspaceDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceMemberDao(database: MoneySurferDatabase): WorkspaceMemberDao = database.workspaceMemberDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceInviteDao(database: MoneySurferDatabase): WorkspaceInviteDao = database.workspaceInviteDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun accountDao(database: MoneySurferDatabase): AccountDao = database.accountDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun categoryDao(database: MoneySurferDatabase): CategoryDao = database.categoryDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun transactionDao(database: MoneySurferDatabase): TransactionDao = database.transactionDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun budgetDao(database: MoneySurferDatabase): BudgetDao = database.budgetDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun recurringRuleDao(database: MoneySurferDatabase): RecurringRuleDao = database.recurringRuleDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun goalDao(database: MoneySurferDatabase): GoalDao = database.goalDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun goalContributionDao(database: MoneySurferDatabase): GoalContributionDao = database.goalContributionDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun exchangeRateDao(database: MoneySurferDatabase): ExchangeRateDao = database.exchangeRateDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun configEntryDao(database: MoneySurferDatabase): ConfigEntryDao = database.configEntryDao()</b>
 &nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Reads every category id (with its system kind, so the seeded Transfer row keeps its fixed
-&nbsp; * appearance) and writes the derived icon key and hue back.
-&nbsp; */
-&nbsp;internal fun backfillCategoryAppearance(connection: SQLiteConnection) {
-<b class="nc">&nbsp;    val rows = mutableListOf&lt;Pair&lt;String, CategorySystemKind?&gt;&gt;()</b>
-<b class="nc">&nbsp;    connection.prepare(&quot;SELECT `id`, `systemKind` FROM `categories`&quot;).use { statement -&gt;</b>
-<b class="nc">&nbsp;        while (statement.step()) {</b>
-<b class="nc">&nbsp;            val id = statement.getText(0)</b>
-<b class="nc">&nbsp;            val systemKind = if (statement.isNull(1)) {</b>
-<b class="nc">&nbsp;                null</b>
-&nbsp;            } else {
-<b class="nc">&nbsp;                runCatching { CategorySystemKind.valueOf(statement.getText(1)) }.getOrNull()</b>
-&nbsp;            }
-<b class="nc">&nbsp;            rows += id to systemKind</b>
-&nbsp;        }
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="nc">&nbsp;    connection.prepare(&quot;UPDATE `categories` SET `iconKey` = ?, `hue` = ? WHERE `id` = ?&quot;).use { statement -&gt;</b>
-<b class="nc">&nbsp;        rows.forEach { (id, systemKind) -&gt;</b>
-<b class="nc">&nbsp;            statement.reset()</b>
-<b class="nc">&nbsp;            statement.bindText(BIND_ICON_KEY, CategoryAppearance.defaultIconKey(id, systemKind))</b>
-<b class="nc">&nbsp;            statement.bindInt(BIND_HUE, CategoryAppearance.defaultHue(id, systemKind))</b>
-<b class="nc">&nbsp;            statement.bindText(BIND_ID, id)</b>
-<b class="nc">&nbsp;            statement.step()</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
-&nbsp;}
-&nbsp;
-&nbsp;// Bind indices of the UPDATE above — SQLite parameters are 1-based.
-&nbsp;private const val BIND_ICON_KEY = 1
-&nbsp;private const val BIND_HUE = 2
-&nbsp;private const val BIND_ID = 3
 </code>
 </pre>
 </div>
@@ -236,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceMembersViewModelKt</title>
+  <title>MoneySurfer Coverage Report > WorkspaceMembersTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,74 +22,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.members</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceMembersViewModelKt (com.georgeci.moneysurfer.feature.workspace.members)</h1>
+<h1>Coverage Summary for Class: WorkspaceMembersTestTags (com.georgeci.moneysurfer.feature.workspace.members)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceMembersViewModelKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/115)
-  </span>
-</td>
+  <td class="name">WorkspaceMembersTestTags</td>
+    <td class="coverageStat"/>
 </tr>
 
 </table>
@@ -101,235 +46,502 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.members
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMember
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.drawBehind
+&nbsp;import androidx.compose.ui.geometry.CornerRadius
+&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.CancelInviteUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetWorkspacesForUserUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.InviteError
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.LeaveWorkspaceUseCase
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.flow.combine
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferInvitePendingRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.workspace.generated.resources.Res
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_close_content_description
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_cancel_content_description
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_status_expired
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_status_pending
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_subtitle
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_title
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invites_empty
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_cancel
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_confirm
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_message_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_title_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_role_editor
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_role_owner
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_role_viewer
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_editor_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_owner_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_unknown_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_viewer_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_tab_active_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_tab_invited_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_title_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_view_only_hint
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;@KoinViewModel
-&nbsp;class WorkspaceMembersViewModel(
-&nbsp;    workspaceId: WorkspaceId,
-&nbsp;    private val session: SessionPointers,
-&nbsp;    private val getWorkspacesForUserUseCase: GetWorkspacesForUserUseCase,
-&nbsp;    private val memberRepository: WorkspaceMemberRepository,
-&nbsp;    private val inviteRepository: WorkspaceInviteRepository,
-&nbsp;    private val leaveWorkspace: LeaveWorkspaceUseCase,
-&nbsp;    private val cancelInvite: CancelInviteUseCase,
-&nbsp;    private val clock: ClockUseCase,
-&nbsp;) : MviViewModel&lt;WorkspaceMembersState, WorkspaceMembersEvent, WorkspaceMembersEffect&gt;(
-&nbsp;    initialState = WorkspaceMembersState.Loading(workspaceId),
+&nbsp;/** Stable selectors for the workspace members view — see docs/testing/testing-strategy.md. */
+&nbsp;object WorkspaceMembersTestTags {
+&nbsp;    const val Root = &quot;workspaceMembers:root&quot;
+&nbsp;    const val Invite = &quot;workspaceMembers:invite&quot;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Pure content composable for the Members view. Renders header + Active/Invited tabs +
+&nbsp; * member list / pending-invite list against the provided [state]/[onEvent]. Callers are
+&nbsp; * responsible for the surrounding container (bottom sheet, dialog, full screen, etc.).
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun WorkspaceMembersScreen(
+&nbsp;    state: WorkspaceMembersState,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    headerNavigationIcon: ImageVector = SurferIcons.Close,
+&nbsp;    showHeader: Boolean = true,
 &nbsp;) {
-&nbsp;
-&nbsp;    init { observeWorkspace() }
-&nbsp;
-&nbsp;    override fun onEvent(event: WorkspaceMembersEvent) {
-&nbsp;        when (event) {
-&nbsp;            WorkspaceMembersEvent.OnDismiss -&gt; postSideEffect(WorkspaceMembersEffect.Dismiss)
-&nbsp;            WorkspaceMembersEvent.OnInviteClick -&gt; postSideEffect(WorkspaceMembersEffect.OpenInvite)
-&nbsp;            is WorkspaceMembersEvent.OnTabSelected -&gt; selectTab(event.tab)
-&nbsp;            is WorkspaceMembersEvent.OnMemberClick -&gt; openMemberActions(event.userId)
-&nbsp;            WorkspaceMembersEvent.OnLeaveClick -&gt; updateContent { copy(showLeaveDialog = true) }
-&nbsp;            WorkspaceMembersEvent.OnLeaveCancel -&gt; updateContent { copy(showLeaveDialog = false) }
-&nbsp;            WorkspaceMembersEvent.OnLeaveConfirm -&gt; performLeave()
-&nbsp;            is WorkspaceMembersEvent.OnInviteCancel -&gt; performCancelInvite(event.id)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun openMemberActions(userId: UserId) {
-&nbsp;        val state = WorkspaceMembersState.content.getOrNull(currentState) ?: return
-&nbsp;        val target = state.members.firstOrNull { it.userId == userId } ?: return
-&nbsp;
-&nbsp;        if (state.canManage &amp;&amp; !target.isYou &amp;&amp; target.role != WorkspaceRole.OWNER) {
-&nbsp;            postSideEffect(
-&nbsp;                WorkspaceMembersEffect.OpenMemberActions(state.workspaceId, userId),
+&nbsp;    when (state) {
+&nbsp;        is WorkspaceMembersState.Loading -&gt;
+&nbsp;            Box(modifier = modifier.fillMaxWidth().height(200.dp))
+&nbsp;        is WorkspaceMembersState.Content -&gt;
+&nbsp;            WorkspaceMembersContent(
+&nbsp;                state = state,
+&nbsp;                onEvent = onEvent,
+&nbsp;                modifier = modifier,
+&nbsp;                headerNavigationIcon = headerNavigationIcon,
+&nbsp;                showHeader = showHeader,
 &nbsp;            )
-&nbsp;        }
 &nbsp;    }
-&nbsp;
-&nbsp;    private fun performLeave() {
-&nbsp;        val state = currentState as? WorkspaceMembersState.Content ?: return
-&nbsp;        if (state.busy) return
-&nbsp;        updateContent { copy(busy = true) }
-&nbsp;        launch(onError = { reportFailure(InviteError.LocalWriteFailed(it)) }) {
-&nbsp;            leaveWorkspace(state.workspaceId).fold(
-&nbsp;                ifLeft = { reportFailure(it) },
-&nbsp;                ifRight = {
-&nbsp;                    updateContent { copy(busy = false, showLeaveDialog = false) }
-&nbsp;                    postSideEffect(WorkspaceMembersEffect.LeftWorkspace)
-&nbsp;                },
-&nbsp;            )
-&nbsp;        }
+&nbsp;    if (state is WorkspaceMembersState.Content &amp;&amp; state.showLeaveDialog) {
+&nbsp;        LeaveDialog(
+&nbsp;            workspaceName = state.workspaceName,
+&nbsp;            busy = state.busy,
+&nbsp;            onCancel = { onEvent(WorkspaceMembersEvent.OnLeaveCancel) },
+&nbsp;            onConfirm = { onEvent(WorkspaceMembersEvent.OnLeaveConfirm) },
+&nbsp;        )
 &nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    private fun performCancelInvite(id: WorkspaceInviteId) {
-&nbsp;        val state = currentState as? WorkspaceMembersState.Content ?: return
-&nbsp;        if (state.busy) return
-&nbsp;        updateContent { copy(busy = true) }
-&nbsp;        launch(onError = { reportFailure(InviteError.LocalWriteFailed(it)) }) {
-&nbsp;            cancelInvite(id).fold(
-&nbsp;                ifLeft = { reportFailure(it) },
-&nbsp;                ifRight = { updateContent { copy(busy = false) } },
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun reportFailure(error: InviteError) {
-&nbsp;        updateContent { copy(busy = false, showLeaveDialog = false) }
-&nbsp;        postSideEffect(WorkspaceMembersEffect.ShowError(error))
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun selectTab(tab: MembersTab) {
-&nbsp;        updateContent { if (this.tab == tab) this else copy(tab = tab) }
-&nbsp;    }
-&nbsp;
-&nbsp;    private inline fun updateContent(
-&nbsp;        crossinline block: WorkspaceMembersState.Content.() -&gt; WorkspaceMembersState.Content,
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersContent(
+&nbsp;    state: WorkspaceMembersState.Content,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    headerNavigationIcon: ImageVector = SurferIcons.Close,
+&nbsp;    showHeader: Boolean = true,
+&nbsp;) {
+&nbsp;    Column(
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .testTag(WorkspaceMembersTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
 &nbsp;    ) {
-&nbsp;        updateState { if (this is WorkspaceMembersState.Content) block() else this }
-&nbsp;    }
+&nbsp;        if (showHeader) {
+&nbsp;            Header(
+&nbsp;                workspaceName = state.workspaceName,
+&nbsp;                memberCount = state.activeCount,
+&nbsp;                viewerRole = state.viewerRole,
+&nbsp;                navigationIcon = headerNavigationIcon,
+&nbsp;                onClose = { onEvent(WorkspaceMembersEvent.OnDismiss) },
+&nbsp;            )
+&nbsp;        }
 &nbsp;
-&nbsp;    private fun observeWorkspace() {
-&nbsp;        launch {
-&nbsp;            val workspaceId = currentState.workspaceId
-&nbsp;            val userId = session.currentUserId.first()
-&nbsp;            val workspace = userId
-&nbsp;                ?.let { getWorkspacesForUserUseCase(it).first().firstOrNull { ws -&gt; ws.id == workspaceId } }
+&nbsp;        if (state.canManage) {
+&nbsp;            Box(modifier = Modifier.padding(horizontal = AppTheme.spacing.default)) {
+&nbsp;                SurferInviteRow(
+&nbsp;                    title = stringResource(Res.string.workspace_members_invite_title),
+&nbsp;                    subtitle = stringResource(Res.string.workspace_members_invite_subtitle),
+&nbsp;                    onClick = { onEvent(WorkspaceMembersEvent.OnInviteClick) },
+&nbsp;                    modifier = Modifier.testTag(WorkspaceMembersTestTags.Invite),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.medium))
+&nbsp;        }
 &nbsp;
-&nbsp;            val membersFlow = memberRepository.getByWorkspaceId(workspaceId)
-&nbsp;            val invitesFlow = inviteRepository.getByWorkspaceId(workspaceId)
-&nbsp;
-&nbsp;            combine(membersFlow, invitesFlow) { members, invites -&gt; members to invites }
-&nbsp;                .collect { (members, invites) -&gt;
-&nbsp;                    val activeMembers = members.filter { it.status == WorkspaceMemberStatus.ACTIVE }
-&nbsp;                    val pendingInvites = invites
-&nbsp;                        .filter { it.status == InviteStatus.PENDING }
-&nbsp;                        .sortedByDescending { it.createdAt }
-&nbsp;                    val now = clock.now()
-&nbsp;                    val viewerRole = activeMembers.firstOrNull { it.userId == userId }?.role
-&nbsp;
-&nbsp;                    updateState {
-&nbsp;                        val previous = this as? WorkspaceMembersState.Content
-&nbsp;                        WorkspaceMembersState.Content(
-&nbsp;                            workspaceId = workspaceId,
-&nbsp;                            workspaceName = workspace?.name.orEmpty(),
-&nbsp;                            currentUserId = userId,
-&nbsp;                            viewerRole = viewerRole,
-&nbsp;                            members = activeMembers.map { it.toUi(userId) },
-&nbsp;                            pendingInvites = pendingInvites.map { it.toUi(now) },
-&nbsp;                            tab = previous?.tab ?: MembersTab.Active,
-&nbsp;                            busy = previous?.busy ?: false,
-&nbsp;                            showLeaveDialog = previous?.showLeaveDialog ?: false,
-&nbsp;                        )
-&nbsp;                    }
+&nbsp;        SurferSegmentedControl(
+&nbsp;            options = listOf(MembersTab.Active, MembersTab.Invited),
+&nbsp;            selected = state.tab,
+&nbsp;            label = { tab -&gt;
+&nbsp;                when (tab) {
+&nbsp;                    MembersTab.Active -&gt; stringResource(
+&nbsp;                        Res.string.workspace_members_tab_active_format,
+&nbsp;                        state.activeCount,
+&nbsp;                    )
+&nbsp;                    MembersTab.Invited -&gt; stringResource(
+&nbsp;                        Res.string.workspace_members_tab_invited_format,
+&nbsp;                        state.invitedCount,
+&nbsp;                    )
 &nbsp;                }
+&nbsp;            },
+&nbsp;            onSelect = { onEvent(WorkspaceMembersEvent.OnTabSelected(it)) },
+&nbsp;            modifier = Modifier.padding(horizontal = AppTheme.spacing.large),
+&nbsp;        )
+&nbsp;        Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;
+&nbsp;        when (state.tab) {
+&nbsp;            MembersTab.Active -&gt; ActiveList(state = state, onEvent = onEvent)
+&nbsp;            MembersTab.Invited -&gt; InvitedList(state = state, onEvent = onEvent)
+&nbsp;        }
+&nbsp;
+&nbsp;        if (state.canLeave) {
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.medium))
+&nbsp;            Box(
+&nbsp;                modifier = Modifier.padding(horizontal = AppTheme.spacing.large).fillMaxWidth(),
+&nbsp;            ) {
+&nbsp;                SurferButton(
+&nbsp;                    text = stringResource(Res.string.workspace_members_leave),
+&nbsp;                    style = SurferButtonStyle.Outlined,
+&nbsp;                    enabled = !state.busy,
+&nbsp;                    startIcon = SurferIcons.Logout,
+&nbsp;                    onClick = { onEvent(WorkspaceMembersEvent.OnLeaveClick) },
+&nbsp;                    modifier = Modifier.fillMaxWidth(),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        Spacer(Modifier.height(AppTheme.spacing.large))
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun Header(
+&nbsp;    workspaceName: String,
+&nbsp;    memberCount: Int,
+&nbsp;    viewerRole: WorkspaceRole?,
+&nbsp;    navigationIcon: ImageVector,
+&nbsp;    onClose: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(start = AppTheme.spacing.large, end = AppTheme.spacing.small, bottom = 14.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(40.dp)
+&nbsp;                .clip(RoundedCornerShape(12.dp))
+&nbsp;                .background(AppTheme.materialColors.surfaceContainerHighest),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Text(
+&nbsp;                text = workspaceName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),
+&nbsp;                style = AppTheme.typography.titleMedium,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Column(Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.workspace_members_title_format, workspaceName),
+&nbsp;                style = AppTheme.typography.titleLarge,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = subtitleFor(viewerRole, memberCount),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier.padding(top = 2.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        IconButton(onClick = onClose) {
+&nbsp;            Icon(
+&nbsp;                imageVector = navigationIcon,
+&nbsp;                contentDescription = stringResource(Res.string.workspace_members_close_content_description),
+&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-<b class="nc">&nbsp;private fun WorkspaceMember.toUi(currentUserId: UserId?): MemberUi = MemberUi(</b>
-<b class="nc">&nbsp;    userId = userId,</b>
-<b class="nc">&nbsp;    name = displayName.ifBlank { email.orEmpty() }.ifBlank { &quot;Member&quot; },</b>
-<b class="nc">&nbsp;    email = email.orEmpty(),</b>
-<b class="nc">&nbsp;    role = role,</b>
-<b class="nc">&nbsp;    initial = (displayName.firstOrNull() ?: email?.firstOrNull() ?: &#39;?&#39;).uppercaseChar().toString(),</b>
-<b class="nc">&nbsp;    isYou = userId == currentUserId,</b>
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;private fun WorkspaceInvite.toUi(now: kotlin.time.Instant): InviteUi = InviteUi(</b>
-<b class="nc">&nbsp;    id = id,</b>
-<b class="nc">&nbsp;    email = email,</b>
-<b class="nc">&nbsp;    role = role,</b>
-<b class="nc">&nbsp;    isExpired = expiresAt &lt;= now,</b>
-<b class="nc">&nbsp;    expiresAt = expiresAt,</b>
-&nbsp;)
-&nbsp;
-&nbsp;@optics
-&nbsp;sealed interface WorkspaceMembersState {
-&nbsp;    val workspaceId: WorkspaceId
-&nbsp;
-&nbsp;    @optics
-&nbsp;    data class Loading(override val workspaceId: WorkspaceId) : WorkspaceMembersState {
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        override val workspaceId: WorkspaceId,
-&nbsp;        val workspaceName: String,
-&nbsp;        val currentUserId: UserId?,
-&nbsp;        val viewerRole: WorkspaceRole?,
-&nbsp;        val members: List&lt;MemberUi&gt;,
-&nbsp;        val pendingInvites: List&lt;InviteUi&gt;,
-&nbsp;        val tab: MembersTab,
-&nbsp;        val busy: Boolean,
-&nbsp;        val showLeaveDialog: Boolean,
-&nbsp;    ) : WorkspaceMembersState {
-&nbsp;        val canManage: Boolean get() = viewerRole == WorkspaceRole.OWNER
-&nbsp;        val canLeave: Boolean get() = viewerRole != null &amp;&amp; viewerRole != WorkspaceRole.OWNER
-&nbsp;        val activeCount: Int get() = members.size
-&nbsp;        val invitedCount: Int get() = pendingInvites.count { !it.isExpired }
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object
+&nbsp;@Composable
+&nbsp;private fun subtitleFor(role: WorkspaceRole?, memberCount: Int): String = when (role) {
+&nbsp;    WorkspaceRole.OWNER -&gt;
+&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_owner_format, memberCount, memberCount)
+&nbsp;    WorkspaceRole.EDITOR -&gt;
+&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_editor_format, memberCount, memberCount)
+&nbsp;    WorkspaceRole.VIEWER -&gt;
+&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_viewer_format, memberCount, memberCount)
+&nbsp;    null -&gt;
+&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_unknown_format, memberCount, memberCount)
 &nbsp;}
 &nbsp;
-&nbsp;data class MemberUi(
-&nbsp;    val userId: UserId,
-&nbsp;    val name: String,
-&nbsp;    val email: String,
-&nbsp;    val role: WorkspaceRole,
-&nbsp;    val initial: String,
-&nbsp;    val isYou: Boolean,
-&nbsp;)
-&nbsp;
-&nbsp;data class InviteUi(
-&nbsp;    val id: WorkspaceInviteId,
-&nbsp;    val email: String,
-&nbsp;    val role: WorkspaceRole,
-&nbsp;    val isExpired: Boolean,
-&nbsp;    val expiresAt: kotlin.time.Instant,
-&nbsp;)
-&nbsp;
-&nbsp;enum class MembersTab { Active, Invited }
-&nbsp;
-&nbsp;sealed interface WorkspaceMembersEvent {
-&nbsp;    data object OnDismiss : WorkspaceMembersEvent
-&nbsp;    data object OnInviteClick : WorkspaceMembersEvent
-&nbsp;    data class OnTabSelected(val tab: MembersTab) : WorkspaceMembersEvent
-&nbsp;    data class OnMemberClick(val userId: UserId) : WorkspaceMembersEvent
-&nbsp;    data object OnLeaveClick : WorkspaceMembersEvent
-&nbsp;    data object OnLeaveCancel : WorkspaceMembersEvent
-&nbsp;    data object OnLeaveConfirm : WorkspaceMembersEvent
-&nbsp;    data class OnInviteCancel(val id: WorkspaceInviteId) : WorkspaceMembersEvent
+&nbsp;@Composable
+&nbsp;private fun ActiveList(
+&nbsp;    state: WorkspaceMembersState.Content,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    state.members.forEachIndexed { index, member -&gt;
+&nbsp;        if (index &gt; 0) Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;        val clickable = state.canManage &amp;&amp; !member.isYou &amp;&amp; member.role != WorkspaceRole.OWNER
+&nbsp;        val rowModifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.large)
+&nbsp;            .let { if (clickable) it.clickable { onEvent(WorkspaceMembersEvent.OnMemberClick(member.userId)) } else it }
+&nbsp;        Box(modifier = rowModifier) {
+&nbsp;            SurferMemberRow(
+&nbsp;                name = member.name,
+&nbsp;                initial = member.initial,
+&nbsp;                roleLabel = roleLabel(member.role),
+&nbsp;                isYou = member.isYou,
+&nbsp;                secondaryLine = member.email.takeIf { it.isNotBlank() },
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;    if (!state.canManage &amp;&amp; state.viewerRole != null) {
+&nbsp;        ViewOnlyHint()
+&nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface WorkspaceMembersEffect {
-&nbsp;    data object Dismiss : WorkspaceMembersEffect
-&nbsp;    data object OpenInvite : WorkspaceMembersEffect
-&nbsp;    data class OpenMemberActions(
-&nbsp;        val workspaceId: WorkspaceId,
-&nbsp;        val targetUserId: UserId,
-&nbsp;    ) : WorkspaceMembersEffect
-&nbsp;    data object LeftWorkspace : WorkspaceMembersEffect
-&nbsp;    data class ShowError(val error: InviteError) : WorkspaceMembersEffect
+&nbsp;@Composable
+&nbsp;private fun InvitedList(
+&nbsp;    state: WorkspaceMembersState.Content,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val pending = state.pendingInvites.filter { !it.isExpired }
+&nbsp;    val expired = state.pendingInvites.filter { it.isExpired }
+&nbsp;    if (pending.isEmpty() &amp;&amp; expired.isEmpty()) {
+&nbsp;        EmptyHint(stringResource(Res.string.workspace_members_invites_empty))
+&nbsp;        return
+&nbsp;    }
+&nbsp;    val pendingLabel = stringResource(Res.string.workspace_members_invite_status_pending)
+&nbsp;    val expiredLabel = stringResource(Res.string.workspace_members_invite_status_expired)
+&nbsp;    val all = pending + expired
+&nbsp;    all.forEachIndexed { index, invite -&gt;
+&nbsp;        if (index &gt; 0) Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;        InviteRow(
+&nbsp;            invite = invite,
+&nbsp;            statusLabel = if (invite.isExpired) expiredLabel else pendingLabel,
+&nbsp;            canCancel = state.canManage &amp;&amp; !state.busy,
+&nbsp;            onCancel = { onEvent(WorkspaceMembersEvent.OnInviteCancel(invite.id)) },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun InviteRow(
+&nbsp;    invite: InviteUi,
+&nbsp;    statusLabel: String,
+&nbsp;    canCancel: Boolean,
+&nbsp;    onCancel: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.large),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;    ) {
+&nbsp;        Box(modifier = Modifier.weight(1f)) {
+&nbsp;            SurferInvitePendingRow(
+&nbsp;                email = invite.email,
+&nbsp;                statusLabel = statusLabel,
+&nbsp;                isExpired = invite.isExpired,
+&nbsp;                roleLabel = roleLabel(invite.role),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        if (canCancel) {
+&nbsp;            IconButton(onClick = onCancel) {
+&nbsp;                Icon(
+&nbsp;                    imageVector = SurferIcons.Close,
+&nbsp;                    contentDescription = stringResource(
+&nbsp;                        Res.string.workspace_members_invite_cancel_content_description,
+&nbsp;                    ),
+&nbsp;                    tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ViewOnlyHint() {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.large, vertical = AppTheme.spacing.small)
+&nbsp;            .clip(RoundedCornerShape(12.dp))
+&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)
+&nbsp;            .padding(horizontal = 14.dp, vertical = 12.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;    ) {
+&nbsp;        Icon(
+&nbsp;            imageVector = SurferIcons.People,
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            modifier = Modifier.size(16.dp),
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.workspace_members_view_only_hint),
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun EmptyHint(text: String) {
+&nbsp;    val outline = AppTheme.materialColors.outlineVariant
+&nbsp;    Box(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.large, vertical = AppTheme.spacing.small)
+&nbsp;            .clip(RoundedCornerShape(12.dp))
+&nbsp;            .drawBehind {
+&nbsp;                drawRoundRect(
+&nbsp;                    color = outline,
+&nbsp;                    style = Stroke(width = 1.dp.toPx()),
+&nbsp;                    cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx()),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            .padding(horizontal = 14.dp, vertical = 14.dp),
+&nbsp;        contentAlignment = Alignment.Center,
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun LeaveDialog(
+&nbsp;    workspaceName: String,
+&nbsp;    busy: Boolean,
+&nbsp;    onCancel: () -&gt; Unit,
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    AlertDialog(
+&nbsp;        onDismissRequest = { if (!busy) onCancel() },
+&nbsp;        confirmButton = {
+&nbsp;            TextButton(onClick = onConfirm, enabled = !busy) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.workspace_members_leave_confirm),
+&nbsp;                    color = AppTheme.materialColors.error,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;        dismissButton = {
+&nbsp;            TextButton(onClick = onCancel, enabled = !busy) {
+&nbsp;                Text(stringResource(Res.string.workspace_members_leave_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;        title = { Text(stringResource(Res.string.workspace_members_leave_title_format, workspaceName)) },
+&nbsp;        text = { Text(stringResource(Res.string.workspace_members_leave_message_format, workspaceName)) },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun roleLabel(role: WorkspaceRole): String = when (role) {
+&nbsp;    WorkspaceRole.OWNER -&gt; stringResource(Res.string.workspace_members_role_owner)
+&nbsp;    WorkspaceRole.EDITOR -&gt; stringResource(Res.string.workspace_members_role_editor)
+&nbsp;    WorkspaceRole.VIEWER -&gt; stringResource(Res.string.workspace_members_role_viewer)
+&nbsp;}
+&nbsp;
+&nbsp;// ── Previews ─────────────────────────────────────────────────────────────────
+&nbsp;// Each variant exercises a different role / tab / dialog combination so changes
+&nbsp;// to the layout get reviewed in isolation rather than only via the running app.
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerActive() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.OWNER), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerInvited() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerInvitedEmpty() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited, invites = emptyList()),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewEditorActive() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.EDITOR), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewViewerActive() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.VIEWER), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewLeaveDialog() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = previewState(WorkspaceRole.EDITOR, showLeaveDialog = true),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewLoading() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = WorkspaceMembersState.Loading(WorkspaceId(&quot;preview-ws-1&quot;)),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -354,7 +566,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

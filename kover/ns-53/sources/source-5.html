@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PreferencePicker</title>
+  <title>MoneySurfer Coverage Report > PreferencesEffect</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: PreferencePicker (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
+<h1>Coverage Summary for Class: PreferencesEffect (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,16 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">PreferencePicker</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <tr>
+    <td class="name">PreferencesEffect$NavigateBack</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (48/48)
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -220,13 +236,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;/** Which row&#39;s chooser is open. One at a time — every picker is a modal sheet. */
 &nbsp;enum class PreferencePicker {
-<b class="fc">&nbsp;    Language,</b>
-<b class="fc">&nbsp;    Region,</b>
-<b class="fc">&nbsp;    Currency,</b>
-<b class="fc">&nbsp;    NumberFormat,</b>
-<b class="fc">&nbsp;    WeekStart,</b>
-<b class="fc">&nbsp;    HourFormat,</b>
-<b class="fc">&nbsp;    DefaultTransactionType,</b>
+&nbsp;    Language,
+&nbsp;    Region,
+&nbsp;    Currency,
+&nbsp;    NumberFormat,
+&nbsp;    WeekStart,
+&nbsp;    HourFormat,
+&nbsp;    DefaultTransactionType,
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface PreferencesEvent {
@@ -253,7 +269,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * after a configuration change, not a one-shot signal.
 &nbsp; */
 &nbsp;sealed interface PreferencesEffect {
-&nbsp;    data object NavigateBack : PreferencesEffect
+<b class="fc">&nbsp;    data object NavigateBack : PreferencesEffect</b>
 &nbsp;}
 </code>
 </pre>
@@ -278,7 +294,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

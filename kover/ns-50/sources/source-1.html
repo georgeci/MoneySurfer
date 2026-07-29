@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SettingsSubScreenScaffoldKt</title>
+  <title>MoneySurfer Coverage Report > CsvBackupEffect</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.components</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: SettingsSubScreenScaffoldKt (com.georgeci.moneysurfer.feature.settings.components)</h1>
+<h1>Coverage Summary for Class: CsvBackupEffect (com.georgeci.moneysurfer.feature.settings.csv)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,8 +45,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SettingsSubScreenScaffoldKt</td>
+  <tr>
+    <td class="name">CsvBackupEffect$NavigateBack</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CsvBackupEffect$Notify</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,38 +94,97 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CsvBackupEffect$RequestOpenFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    0%
   </span>
   <span class="absValue">
-    (4/12)
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CsvBackupEffect$RequestSaveFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    63.4%
+    100%
   </span>
   <span class="absValue">
-    (26/41)
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    65.5%
+    77.8%
   </span>
   <span class="absValue">
-    (298/455)
+    (14/18)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -99,104 +192,132 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.components
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.csv
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.interaction.MutableInteractionSource
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.ColumnScope
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.CircularProgressIndicator
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.SnackbarHost
-&nbsp;import androidx.compose.material3.SnackbarHostState
-&nbsp;import androidx.compose.material3.TopAppBarDefaults
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.domain.csv.CsvImportReport
+&nbsp;import com.georgeci.moneysurfer.domain.csv.ExportTransactionsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.csv.ImportTransactionsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.csv.TransactionCsvError
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.CancellationException
+&nbsp;import okio.BufferedSink
+&nbsp;import okio.BufferedSource
+&nbsp;import okio.use
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;/**
-&nbsp; * Shared chrome for settings sub-screens (Backup, CSV export/import): themed
-&nbsp; * toolbar, snackbar host, scrollable column, and an optional modal progress
-&nbsp; * scrim while a long-running operation is in flight. [content] receives the
-&nbsp; * scaffold padding so screens can size their bottom spacer.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun SettingsSubScreenScaffold(
-&nbsp;    title: String,
-&nbsp;    snackbarHostState: SnackbarHostState,
-&nbsp;    onBack: () -&gt; Unit,
-&nbsp;    showProgressOverlay: Boolean,
-&nbsp;    content: @Composable ColumnScope.(PaddingValues) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Scaffold(</b>
-<b class="fc">&nbsp;        modifier = Modifier.surferSafeInsets(),</b>
-<b class="fc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
-<b class="fc">&nbsp;        topBar = {</b>
-<b class="fc">&nbsp;            SurferPaneTopBar(</b>
-<b class="fc">&nbsp;                title = title,</b>
-<b class="fc">&nbsp;                onBack = onBack,</b>
-<b class="fc">&nbsp;                colors = TopAppBarDefaults.topAppBarColors(</b>
-<b class="fc">&nbsp;                    containerColor = AppTheme.materialColors.surface,</b>
-<b class="fc">&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,</b>
+&nbsp;@KoinViewModel
+&nbsp;class CsvBackupViewModel(
+&nbsp;    private val exportTransactions: ExportTransactionsUseCase,
+&nbsp;    private val importTransactions: ImportTransactionsUseCase,
+&nbsp;    private val clock: ClockUseCase,
+&nbsp;) : MviViewModel&lt;CsvBackupState, CsvBackupEvent, CsvBackupEffect&gt;(initialState = CsvBackupState()) {
+&nbsp;
+&nbsp;    override fun onEvent(event: CsvBackupEvent) {
+&nbsp;        when (event) {
+&nbsp;            CsvBackupEvent.OnBackClick -&gt; postSideEffect(CsvBackupEffect.NavigateBack)
+&nbsp;            CsvBackupEvent.OnExportClick -&gt;
+&nbsp;                postSideEffect(CsvBackupEffect.RequestSaveFile(suggestedFilename()))
+&nbsp;            is CsvBackupEvent.OnSaveSinkChosen -&gt; handleSaveSink(event.sink)
+&nbsp;            CsvBackupEvent.OnImportClick -&gt; postSideEffect(CsvBackupEffect.RequestOpenFile)
+&nbsp;            is CsvBackupEvent.OnOpenSourceChosen -&gt; handleOpenSource(event.source)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun handleSaveSink(sink: BufferedSink?) {
+&nbsp;        if (sink == null) return
+&nbsp;        updateState { copy(phase = CsvBackupPhase.Exporting) }
+&nbsp;        launch(
+&nbsp;            onError = { error -&gt;
+&nbsp;                // MviViewModel.launch catches Exception (including cancellation);
+&nbsp;                // rethrow so a cleared ViewModel doesn&#39;t surface as a fake error.
+&nbsp;                if (error is CancellationException) throw error
+&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }
+&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))
+&nbsp;                runCatching { sink.close() }
+&nbsp;            },
+&nbsp;        ) {
+&nbsp;            val count = sink.use { exportTransactions(it).getOrThrow() }
+&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle) }
+&nbsp;            postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.ExportSuccess(count)))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun handleOpenSource(source: BufferedSource?) {
+&nbsp;        if (source == null) return
+&nbsp;        updateState { copy(phase = CsvBackupPhase.Importing) }
+&nbsp;        launch(
+&nbsp;            onError = { error -&gt;
+&nbsp;                if (error is CancellationException) throw error
+&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }
+&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))
+&nbsp;                runCatching { source.close() }
+&nbsp;            },
+&nbsp;        ) {
+&nbsp;            val report = source.use { importTransactions(it).getOrThrow() }
+&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle, lastImportReport = report) }
+&nbsp;            postSideEffect(
+&nbsp;                CsvBackupEffect.Notify(
+&nbsp;                    CsvBackupNotice.ImportFinished(
+&nbsp;                        imported = report.imported,
+&nbsp;                        skipped = report.skippedDuplicates,
+&nbsp;                        failed = report.errors.size,
+&nbsp;                    ),
 &nbsp;                ),
 &nbsp;            )
-&nbsp;        },
-<b class="fc">&nbsp;        snackbarHost = { SnackbarHost(snackbarHostState) },</b>
-<b class="fc">&nbsp;    ) { padding -&gt;</b>
-<b class="fc">&nbsp;        Box(modifier = Modifier.fillMaxSize()) {</b>
-<b class="fc">&nbsp;            Column(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .fillMaxSize()</b>
-<b class="fc">&nbsp;                    .surferContentContainer()</b>
-<b class="fc">&nbsp;                    .padding(top = padding.calculateTopPadding())</b>
-<b class="fc">&nbsp;                    .verticalScroll(rememberScrollState()),</b>
-&nbsp;            ) {
-<b class="fc">&nbsp;                content(padding)</b>
-<b class="fc">&nbsp;            }</b>
-&nbsp;
-<b class="pc">&nbsp;            if (showProgressOverlay) {</b>
-<b class="nc">&nbsp;                SettingsProgressOverlay()</b>
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;        }
 &nbsp;    }
-<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;    private fun suggestedFilename(): String {
+&nbsp;        val now = clock.now().toEpochMilliseconds()
+&nbsp;        return &quot;moneysurfer-transactions-$now.csv&quot;
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;data class CsvBackupState(
+&nbsp;    val phase: CsvBackupPhase = CsvBackupPhase.Idle,
+&nbsp;    val lastImportReport: CsvImportReport? = null,
+&nbsp;)
+&nbsp;
+&nbsp;enum class CsvBackupPhase { Idle, Exporting, Importing }
 &nbsp;
 &nbsp;/**
-&nbsp; * Modal scrim while export/import is in flight. The `clickable` with no-op
-&nbsp; * onClick + null indication consumes pointer events so taps don&#39;t reach the
-&nbsp; * settings rows underneath.
+&nbsp; * User-facing notice raised by the CSV flow. Resolution to localised strings
+&nbsp; * happens in the screen layer via Compose resources — keeping the ViewModel
+&nbsp; * free of platform string APIs.
 &nbsp; */
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SettingsProgressOverlay() {</b>
-<b class="nc">&nbsp;    val interactionSource = remember { MutableInteractionSource() }</b>
-<b class="nc">&nbsp;    Box(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxSize()</b>
-<b class="nc">&nbsp;            .background(AppTheme.materialColors.scrim.copy(alpha = SCRIM_ALPHA))</b>
-<b class="nc">&nbsp;            .clickable(</b>
-<b class="nc">&nbsp;                interactionSource = interactionSource,</b>
-<b class="nc">&nbsp;                indication = null,</b>
-<b class="nc">&nbsp;                onClick = {},</b>
-&nbsp;            ),
-<b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        CircularProgressIndicator(color = AppTheme.materialColors.primary)</b>
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;sealed interface CsvBackupNotice {
+&nbsp;    data class ExportSuccess(val count: Int) : CsvBackupNotice
+&nbsp;    data class ImportFinished(val imported: Int, val skipped: Int, val failed: Int) : CsvBackupNotice
+&nbsp;    data object InvalidFile : CsvBackupNotice
+&nbsp;    data object FileTooLarge : CsvBackupNotice
+&nbsp;    data object Generic : CsvBackupNotice
 &nbsp;
-&nbsp;private const val SCRIM_ALPHA = 0.4f
+&nbsp;    companion object {
+&nbsp;        fun fromError(error: Throwable): CsvBackupNotice = when (error) {
+&nbsp;            is TransactionCsvError.EmptyFile,
+&nbsp;            is TransactionCsvError.HeaderMismatch,
+&nbsp;            -&gt; InvalidFile
+&nbsp;            is TransactionCsvError.FileTooLarge -&gt; FileTooLarge
+&nbsp;            else -&gt; Generic
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CsvBackupEvent {
+&nbsp;    data object OnBackClick : CsvBackupEvent
+&nbsp;    data object OnExportClick : CsvBackupEvent
+&nbsp;    data class OnSaveSinkChosen(val sink: BufferedSink?) : CsvBackupEvent
+&nbsp;    data object OnImportClick : CsvBackupEvent
+&nbsp;    data class OnOpenSourceChosen(val source: BufferedSource?) : CsvBackupEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CsvBackupEffect {
+<b class="nc">&nbsp;    data object NavigateBack : CsvBackupEffect</b>
+<b class="fc">&nbsp;    data class RequestSaveFile(val suggestedName: String) : CsvBackupEffect</b>
+<b class="nc">&nbsp;    data object RequestOpenFile : CsvBackupEffect</b>
+<b class="fc">&nbsp;    data class Notify(val notice: CsvBackupNotice) : CsvBackupEffect</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -220,7 +341,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

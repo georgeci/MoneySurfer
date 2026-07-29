@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryAppearance</title>
+  <title>MoneySurfer Coverage Report > BurnRatePace</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryAppearance (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: BurnRatePace (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryAppearance</td>
+  <td class="name">BurnRatePace</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,23 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (21/21)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (181/181)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -101,87 +94,206 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
+&nbsp;
+&nbsp;/** How many days of spend the burn-rate chart draws, ending on the day it was built for. */
+&nbsp;const val BURN_RATE_DAYS: Int = 7
 &nbsp;
 &nbsp;/**
-&nbsp; * Semantic catalogue behind a category&#39;s stored `iconKey` and `hue`.
+&nbsp; * The last [BURN_RATE_DAYS] days of spend, plus the month-to-date total the projection starts from.
 &nbsp; *
-&nbsp; * Both are stored as *values*, never as palette indices: an index is positional, so inserting
-&nbsp; * one icon into the middle of the picker grid would silently re-icon and recolour every
-&nbsp; * category already saved on every device.
+&nbsp; * Every figure is a magnitude in [currency] — the queries behind
+&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository] sum `ABS(amount)`, so an
+&nbsp; * expense reads positive and nothing here is ever negative.
 &nbsp; *
-&nbsp; * The catalogue also supplies the deterministic default a category falls back to when it
-&nbsp; * carries no stored appearance — a row written by an older client, or the additive
-&nbsp; * `iconKey`/`hue` backfill in the Room migration. Deriving both from a stable hash of the
-&nbsp; * category id keeps pre-existing data varied (a blank backfill would render every category in
-&nbsp; * one identical colour) and stable across devices, and reproduces exactly what the UI drew
-&nbsp; * before the fields existed.
+&nbsp; * [days] is always [BURN_RATE_DAYS] long and ends on [today]: the repository leaves out days
+&nbsp; * nothing was booked on, and a chart that skipped those would silently redraw a quiet week as a
+&nbsp; * busy one. Filling them with zero is what makes the bars comparable.
+&nbsp; *
+&nbsp; * **[today] is a partial day.** Its bar and its share of [average] only cover the hours already
+&nbsp; * logged, which drags the average down a little every morning. Counting it anyway is the deliberate
+&nbsp; * trade: a chart that omitted the transaction the user logged ten minutes ago would read as a bug,
+&nbsp; * and the distortion is one seventh of one day.
 &nbsp; */
-&nbsp;object CategoryAppearance {
+&nbsp;data class DailySpendSeries(
+&nbsp;    val days: List&lt;DailySpendPoint&gt;,
+&nbsp;    /** Spend booked from the 1st of [today]&#39;s month through [today], today included. */
+&nbsp;    val monthToDate: Money,
+&nbsp;    /** The last day of [days] — the day the projection is made from. */
+&nbsp;    val today: LocalDate,
+&nbsp;    val currency: CurrencyCode,
+&nbsp;    /**
+&nbsp;     * The workspace these figures were queried for. Carried rather than assumed so anything pairing
+&nbsp;     * the series with a second per-workspace query can check the two agree — see [monthlySpendCap].
+&nbsp;     */
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;) {
 &nbsp;
-&nbsp;    /** Design palette hues in degrees, in colour-picker display order. */
-<b class="fc">&nbsp;    val HUES: List&lt;Int&gt; = listOf(162, 35, 258, 68, 303, 340, 8, 90)</b>
-&nbsp;
-&nbsp;    /** Icon keys in icon-picker display order. Positionally paired with [HUES] for defaults. */
-<b class="fc">&nbsp;    val ICON_KEYS: List&lt;String&gt; = listOf(</b>
-<b class="fc">&nbsp;        &quot;category&quot;,</b>
-<b class="fc">&nbsp;        &quot;card&quot;,</b>
-<b class="fc">&nbsp;        &quot;savings&quot;,</b>
-<b class="fc">&nbsp;        &quot;cash&quot;,</b>
-<b class="fc">&nbsp;        &quot;wallet&quot;,</b>
-<b class="fc">&nbsp;        &quot;receipt&quot;,</b>
-<b class="fc">&nbsp;        &quot;event&quot;,</b>
-<b class="fc">&nbsp;        &quot;tag&quot;,</b>
-&nbsp;    )
-&nbsp;
-&nbsp;    /** Appearance of the seeded system Transfer category. Fixed, so it is always recognisable. */
-&nbsp;    const val TRANSFER_ICON_KEY: String = &quot;transfer&quot;
-&nbsp;    const val TRANSFER_HUE: Int = 258
-&nbsp;
-&nbsp;    /** Sentinel stored by rows that predate the fields — resolved through [defaultHue]. */
-&nbsp;    const val UNSET_HUE: Int = -1
-&nbsp;
-&nbsp;    /** Exclusive upper bound of the hue circle. */
-&nbsp;    const val HUE_DEGREES: Int = 360
-&nbsp;
-&nbsp;    /** Whether [hue] is a usable stored value rather than the [UNSET_HUE] sentinel or junk. */
-<b class="fc">&nbsp;    fun isStoredHue(hue: Int): Boolean = hue in 0 until HUE_DEGREES</b>
-&nbsp;
-&nbsp;    /** Whether [iconKey] is a usable stored value rather than the blank sentinel. */
-<b class="fc">&nbsp;    fun isStoredIconKey(iconKey: String): Boolean = iconKey.isNotBlank()</b>
+&nbsp;    /** What the whole window booked. */
+&nbsp;    val total: Money get() = days.fold(Money.zero()) { sum, point -&gt; sum + point.total }
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Deterministic icon key for a category that has none stored, derived from its id so the
-&nbsp;     * choice is stable across devices and identical to what the pre-field UI rendered.
+&nbsp;     * Mean daily spend across the window. Integer division, so it truncates to the minor unit —
+&nbsp;     * a projection built from it lands a few cents low rather than inventing a fraction of a cent.
 &nbsp;     */
-<b class="fc">&nbsp;    fun defaultIconKey(id: String, systemKind: CategorySystemKind? = null): String =</b>
-<b class="fc">&nbsp;        if (systemKind == CategorySystemKind.TRANSFER) TRANSFER_ICON_KEY else ICON_KEYS[paletteSlot(id)]</b>
-&nbsp;
-&nbsp;    /** Deterministic hue for a category that has none stored. See [defaultIconKey]. */
-<b class="fc">&nbsp;    fun defaultHue(id: String, systemKind: CategorySystemKind? = null): Int =</b>
-<b class="fc">&nbsp;        if (systemKind == CategorySystemKind.TRANSFER) TRANSFER_HUE else HUES[paletteSlot(id)]</b>
+&nbsp;    val average: Money get() = total / BURN_RATE_DAYS
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Palette slot an id hashes into. Both defaults read the same slot, so a backfilled
-&nbsp;     * category keeps the icon/colour pairing the old index-based rendering gave it.
+&nbsp;     * Each day&#39;s bar height against the tallest day of the window, index-aligned with [days].
+&nbsp;     *
+&nbsp;     * Scaled to the peak rather than to the budget: the chart&#39;s job is the *shape* of the week, and
+&nbsp;     * a week that spent a tenth of the cap would otherwise be seven invisible slivers. All zero when
+&nbsp;     * the window booked nothing, which the chart draws as a flat baseline rather than a NaN.
 &nbsp;     */
-<b class="fc">&nbsp;    fun paletteSlot(id: String): Int = nonNegativeMod(stableHash(id), HUES.size)</b>
+&nbsp;    val barFractions: List&lt;Float&gt;
+&nbsp;        get() {
+&nbsp;            val peak = days.maxOfOrNull { it.total.minor } ?: 0L
+&nbsp;            if (peak &lt;= 0L) return List(days.size) { 0f }
+&nbsp;            return days.map { (it.total.minor.toFloat() / peak.toFloat()).coerceIn(0f, 1f) }
+&nbsp;        }
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Stable string hash. Deliberately spelled out rather than delegating to `String.hashCode()`,
-&nbsp;     * which carries no cross-platform guarantee — a backfilled category must land in the same
-&nbsp;     * slot on Android and iOS or the same workspace renders two different colours.
+&nbsp;     * Days of [today]&#39;s month still ahead of it. Today is excluded because its spend is already
+&nbsp;     * inside [monthToDate] — projecting it again would count one day twice.
 &nbsp;     */
-<b class="fc">&nbsp;    fun stableHash(value: String): Long = value.fold(0L) { acc, c -&gt; acc * HASH_MULTIPLIER + c.code }</b>
-&nbsp;
-&nbsp;    private fun nonNegativeMod(value: Long, size: Int): Int {
-<b class="fc">&nbsp;        val bound = size.toLong()</b>
-<b class="fc">&nbsp;        val rem = value % bound</b>
-<b class="fc">&nbsp;        return (if (rem &lt; 0) rem + bound else rem).toInt()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private const val HASH_MULTIPLIER = 31L
+&nbsp;    val daysAheadInMonth: Int
+&nbsp;        get() = lastDayOfMonth(today).day - today.day
 &nbsp;}
+&nbsp;
+&nbsp;/** Whether the projected month-end total lands inside the budget. */
+&nbsp;enum class BurnRatePace {
+<b class="fc">&nbsp;    OnTrack,</b>
+<b class="fc">&nbsp;    OffPace,</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Spend pace for the dashboard: what the last week actually cost per day, and where the month ends
+&nbsp; * up if it keeps costing that.
+&nbsp; *
+&nbsp; * [monthlyLimit] is optional by design — the widget&#39;s whole first half (the week, the average, the
+&nbsp; * projection) is arithmetic over transactions, and a workspace with no budget still deserves to see
+&nbsp; * it. Only [pace] needs a cap to mean anything.
+&nbsp; */
+&nbsp;data class BurnRate(
+&nbsp;    val series: DailySpendSeries,
+&nbsp;    /**
+&nbsp;     * What [DailySpendSeries.monthToDate] grows to if the remaining days of the month each cost
+&nbsp;     * [DailySpendSeries.average]. An estimate, not a forecast — no seasonality, no scheduled bills.
+&nbsp;     */
+&nbsp;    val projectedMonthTotal: Money,
+&nbsp;    /** The monthly cap [projectedMonthTotal] is measured against, or null when no budget sets one. */
+&nbsp;    val monthlyLimit: Money?,
+&nbsp;) {
+&nbsp;
+&nbsp;    val currency: CurrencyCode get() = series.currency
+&nbsp;
+&nbsp;    /** Null without a [monthlyLimit] — the widget then draws the projection with no verdict on it. */
+&nbsp;    val pace: BurnRatePace?
+&nbsp;        get() = monthlyLimit?.let {
+&nbsp;            if (projectedMonthTotal &lt;= it) BurnRatePace.OnTrack else BurnRatePace.OffPace
+&nbsp;        }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The window a [DailySpendSeries] has to be queried over: enough days for the chart, and back to
+&nbsp; * the 1st for the month-to-date.
+&nbsp; *
+&nbsp; * One window rather than two queries — early in the month the chart reaches back into the previous
+&nbsp; * one, and later in the month the 1st is the earlier bound, so whichever is further back wins.
+&nbsp; */
+&nbsp;fun dailySpendSeriesWindow(today: LocalDate): TransactionPeriodWindow = TransactionPeriodWindow(
+&nbsp;    from = minOf(firstDayOfMonth(today), today.minus(BURN_RATE_DAYS - 1, DateTimeUnit.DAY)),
+&nbsp;    to = today,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * [points] folded into the series the widget draws, filling the days the query left out.
+&nbsp; *
+&nbsp; * Points outside the queried window are ignored rather than trusted: [monthToDate] counts only
+&nbsp; * [today]&#39;s own month, so the days [dailySpendSeriesWindow] reaches back into the previous month for
+&nbsp; * cannot leak into it.
+&nbsp; */
+&nbsp;fun dailySpendSeries(
+&nbsp;    points: List&lt;DailySpendPoint&gt;,
+&nbsp;    today: LocalDate,
+&nbsp;    currency: CurrencyCode,
+&nbsp;    workspaceId: WorkspaceId,
+&nbsp;): DailySpendSeries {
+&nbsp;    val byDate = points.associate { it.date to it.total }
+&nbsp;    val firstDay = today.minus(BURN_RATE_DAYS - 1, DateTimeUnit.DAY)
+&nbsp;    val days = List(BURN_RATE_DAYS) { offset -&gt;
+&nbsp;        val date = firstDay.plus(offset, DateTimeUnit.DAY)
+&nbsp;        DailySpendPoint(date = date, total = byDate[date] ?: Money.zero())
+&nbsp;    }
+&nbsp;    val monthStart = firstDayOfMonth(today)
+&nbsp;    val monthToDate = points
+&nbsp;        .filter { it.date &gt;= monthStart &amp;&amp; it.date &lt;= today }
+&nbsp;        .fold(Money.zero()) { sum, point -&gt; sum + point.total }
+&nbsp;    return DailySpendSeries(
+&nbsp;        days = days,
+&nbsp;        monthToDate = monthToDate,
+&nbsp;        today = today,
+&nbsp;        currency = currency,
+&nbsp;        workspaceId = workspaceId,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** The projection [monthlyLimit] is judged against; pass null when no budget backs a cap. */
+&nbsp;fun DailySpendSeries.project(monthlyLimit: Money?): BurnRate = BurnRate(
+&nbsp;    series = this,
+&nbsp;    projectedMonthTotal = monthToDate + average * daysAheadInMonth,
+&nbsp;    monthlyLimit = monthlyLimit,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The cap [workspaceId]&#39;s projected month can honestly be read against, or null when no budget sets
+&nbsp; * one.
+&nbsp; *
+&nbsp; * Three filters do the work. Two are about comparing like with like:
+&nbsp; *
+&nbsp; * - **monthly periods only.** The projection covers a calendar month, so a weekly or yearly limit is
+&nbsp; *   simply a different quantity. Scaling one into a monthly equivalent would invent a number the
+&nbsp; *   user never set.
+&nbsp; * - **general budgets only** — no category filter, so they cover every expense, which is exactly
+&nbsp; *   what the projection sums. A category cap covers a slice of the spend; measuring the whole
+&nbsp; *   month&#39;s projection against it would report &quot;off pace&quot; on a budget that is nowhere near its cap.
+&nbsp; *
+&nbsp; * The third is about not comparing two workspaces. [workspaceId] is required rather than assumed
+&nbsp; * because the caller pairs this list with a spend series read through a *second* subscription to
+&nbsp; * `SessionPointers.currentWorkspaceId`, and two collectors of that pointer are not ordered against
+&nbsp; * each other: on a workspace switch the budget query can already be answering for the new workspace
+&nbsp; * while the series is still the old one. That is the hazard [safeToSpend] avoids by taking its
+&nbsp; * workspace from the budgets themselves — an option here only if a burn rate needed a budget to
+&nbsp; * exist at all, which it does not. Filtering instead makes a mismatched pair yield no cap, so the
+&nbsp; * widget drops the verdict for a frame rather than judging one workspace&#39;s spend by another&#39;s limit.
+&nbsp; *
+&nbsp; * The largest qualifying limit wins. Ties need no further tiebreak: the answer is the amount, so two
+&nbsp; * budgets capped the same are the same answer.
+&nbsp; *
+&nbsp; * [Budget.amount] rather than an effective limit with a rollover carry: a carry belongs to one
+&nbsp; * budget window, and this is measured against a calendar month, which a budget anchored mid-month
+&nbsp; * does not line up with. The plain amount is the per-month cap the user set, whichever day it runs
+&nbsp; * from.
+&nbsp; */
+&nbsp;fun List&lt;Budget&gt;.monthlySpendCap(workspaceId: WorkspaceId): Money? =
+&nbsp;    filter {
+&nbsp;        it.workspaceId == workspaceId &amp;&amp;
+&nbsp;            it.isActive &amp;&amp;
+&nbsp;            it.period == BudgetPeriod.MONTHLY &amp;&amp;
+&nbsp;            it.categoryIds.isEmpty()
+&nbsp;    }.maxOfOrNull { it.amount }
+&nbsp;
+&nbsp;private fun firstDayOfMonth(date: LocalDate): LocalDate = LocalDate(date.year, date.month, 1)
+&nbsp;
+&nbsp;private fun lastDayOfMonth(date: LocalDate): LocalDate =
+&nbsp;    firstDayOfMonth(date).plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
 </code>
 </pre>
 </div>
@@ -205,7 +317,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

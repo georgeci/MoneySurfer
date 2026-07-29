@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoriesManageState</title>
+  <title>MoneySurfer Coverage Report > CategoryChooserState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.category.manage</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoriesManageState (com.georgeci.moneysurfer.feature.category.manage)</h1>
+<h1>Coverage Summary for Class: CategoryChooserState (com.georgeci.moneysurfer.feature.category.picker)</h1>
 
 <table class="coverageStats">
 
@@ -46,11 +46,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">CategoriesManageState$Companion</td>
+    <td class="name">CategoryChooserState$Companion</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">CategoriesManageState$Content</td>
+    <td class="name">CategoryChooserState$Content</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -65,7 +65,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (11/11)
   </span>
 </td>
 <td class="coverageStat">
@@ -73,16 +73,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (71/71)
   </span>
 </td>
   </tr>
   <tr>
-    <td class="name">CategoriesManageState$Content$Companion</td>
+    <td class="name">CategoryChooserState$Content$Companion</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">CategoriesManageState$Loading</td>
+    <td class="name">CategoryChooserState$Loading</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -92,14 +92,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -108,6 +100,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryChooserState$Loading$Companion</td>
+    <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -125,7 +129,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
@@ -133,7 +137,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (16/16)
+    (78/78)
   </span>
 </td>
 </tr>
@@ -144,171 +148,163 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.manage
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.picker
 &nbsp;
 &nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryNode
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.EditCategoryUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
-&nbsp;import com.georgeci.moneysurfer.navigation.SnackbarController
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import moneysurfer.feature.category.generated.resources.Res
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_delete_undo
-&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_deleted_snackbar
 &nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;@KoinViewModel
-&nbsp;class CategoriesManageViewModel(
+&nbsp;class CategoryChooserViewModel(
+&nbsp;    initialSelectedId: CategoryId?,
+&nbsp;    private val filterType: CategoryType?,
+&nbsp;    private val initialVariant: CategoryPickerVariant,
 &nbsp;    private val getCategories: GetCategoriesUseCase,
-&nbsp;    private val deleteCategory: DeleteCategoryUseCase,
-&nbsp;    private val createCategory: CreateCategoryUseCase,
-&nbsp;    private val editCategory: EditCategoryUseCase,
-&nbsp;    private val snackbar: SnackbarController,
-&nbsp;) : MviViewModel&lt;CategoriesManageState, CategoriesManageEvent, CategoriesManageEffect&gt;(
-&nbsp;    initialState = CategoriesManageState.Loading,
+&nbsp;) : MviViewModel&lt;CategoryChooserState, CategoryChooserEvent, CategoryChooserEffect&gt;(
+&nbsp;    initialState = CategoryChooserState.Loading(selectedId = initialSelectedId),
 &nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Every category of every type, unfiltered. The tab row switches type without another read,
+&nbsp;     * and the state only ever carries what the current tab renders.
+&nbsp;     */
+&nbsp;    private var allCategories: List&lt;Category&gt; = emptyList()
 &nbsp;
 &nbsp;    init {
 &nbsp;        observeCategories()
 &nbsp;    }
 &nbsp;
-&nbsp;    override fun onEvent(event: CategoriesManageEvent) {
+&nbsp;    override fun onEvent(event: CategoryChooserEvent) {
 &nbsp;        when (event) {
-&nbsp;            CategoriesManageEvent.OnBackClick -&gt; postSideEffect(CategoriesManageEffect.NavigateBack)
-&nbsp;            CategoriesManageEvent.OnAddCategoryClick -&gt; postSideEffect(
-&nbsp;                CategoriesManageEffect.NavigateToCategoryCreation,
-&nbsp;            )
-&nbsp;            is CategoriesManageEvent.OnCategoryClick -&gt;
-&nbsp;                postSideEffect(CategoriesManageEffect.NavigateToCategoryDetails(event.categoryId))
-&nbsp;            is CategoriesManageEvent.OnEditCategoryClick -&gt;
-&nbsp;                postSideEffect(CategoriesManageEffect.NavigateToCategoryEdit(event.categoryId))
-&nbsp;            is CategoriesManageEvent.OnRemoveCategoryClick -&gt; requestDelete(event.categoryId)
-&nbsp;            CategoriesManageEvent.OnDeleteCancel -&gt; dismissDelete()
-&nbsp;            CategoriesManageEvent.OnDeleteConfirm -&gt; confirmDelete()
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun requestDelete(categoryId: CategoryId) {
-&nbsp;        val content = currentState as? CategoriesManageState.Content ?: return
-&nbsp;        val target = content.categories.firstOrNull { it.id == categoryId } ?: return
-&nbsp;        updateState {
-&nbsp;            CategoriesManageState.content.pendingDelete.modify(this) {
-&nbsp;                CategoriesManagePendingDelete(
-&nbsp;                    id = target.id,
-&nbsp;                    name = target.name,
-&nbsp;                    // Drives the extra line in the dialog: children survive the delete, they
-&nbsp;                    // just move up to the root, and the user should know that before tapping.
-&nbsp;                    childCount = content.categories.count { it.parentId == target.id },
+&nbsp;            is CategoryChooserEvent.OnCategorySelected -&gt;
+&nbsp;                postSideEffect(CategoryChooserEffect.PublishResult(event.id))
+&nbsp;            CategoryChooserEvent.OnCreateNewCategoryClick -&gt;
+&nbsp;                postSideEffect(CategoryChooserEffect.NavigateToCategoryCreation)
+&nbsp;            CategoryChooserEvent.OnDismiss -&gt; postSideEffect(CategoryChooserEffect.Dismiss)
+&nbsp;            is CategoryChooserEvent.OnTypeSelected -&gt; updateContent {
+&nbsp;                // Expansion is per-parent and the parents differ per type, so a stale set would
+&nbsp;                // only ever open the wrong rows.
+&nbsp;                copy(type = event.type, expandedIds = expandedFor(event.type))
+&nbsp;            }
+&nbsp;            is CategoryChooserEvent.OnQueryChange -&gt; updateContent { copy(query = event.query) }
+&nbsp;            CategoryChooserEvent.OnVariantToggle -&gt; updateContent { copy(variant = variant.other()) }
+&nbsp;            is CategoryChooserEvent.OnParentExpandToggle -&gt; updateContent {
+&nbsp;                copy(
+&nbsp;                    expandedIds = if (event.id in expandedIds) {
+&nbsp;                        expandedIds - event.id
+&nbsp;                    } else {
+&nbsp;                        expandedIds + event.id
+&nbsp;                    },
 &nbsp;                )
 &nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun dismissDelete() = updateState {
-&nbsp;        CategoriesManageState.content.pendingDelete.modify(this) { null }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun confirmDelete() {
-&nbsp;        val content = currentState as? CategoriesManageState.Content ?: return
-&nbsp;        val target = content.pendingDelete ?: return
-&nbsp;        updateState { CategoriesManageState.content.pendingDelete.modify(this) { null } }
-&nbsp;        launch {
-&nbsp;            val deletion = deleteCategory(target.id) ?: return@launch
-&nbsp;            snackbar.show(
-&nbsp;                message = Res.string.categories_manage_deleted_snackbar,
-&nbsp;                messageArgs = listOf(deletion.category.name),
-&nbsp;                actionLabel = Res.string.categories_manage_delete_undo,
-&nbsp;                onAction = {
-&nbsp;                    // Restore the parent first — the children carry a foreign key back to it,
-&nbsp;                    // so re-attaching them before it exists would be rejected.
-&nbsp;                    createCategory(deletion.category)
-&nbsp;                    deletion.reparentedChildren.forEach { editCategory(it) }
-&nbsp;                },
-&nbsp;            )
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun observeCategories() {
 &nbsp;        launch {
 &nbsp;            getCategories().collect { categories -&gt;
-&nbsp;                val rows = CategoryTree.flatten(categories).map { it.toUi() }
+&nbsp;                allCategories = categories
 &nbsp;                updateState {
 &nbsp;                    when (this) {
-&nbsp;                        is CategoriesManageState.Loading -&gt; CategoriesManageState.Content(categories = rows)
-&nbsp;                        is CategoriesManageState.Content -&gt; copy(categories = rows)
-&nbsp;                    }
+&nbsp;                        // Type, query and expansion are the user&#39;s; a re-emission from sync
+&nbsp;                        // rebuilds the rows underneath them without resetting any of it.
+&nbsp;                        is CategoryChooserState.Content -&gt; this
+&nbsp;                        is CategoryChooserState.Loading -&gt; newContent()
+&nbsp;                    }.rebuild()
 &nbsp;                }
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun CategoryNode.toUi() = CategoryManageUi(
-&nbsp;        id = category.id,
-&nbsp;        name = category.name,
-&nbsp;        type = category.type,
-&nbsp;        parentId = category.parentId,
-&nbsp;        iconKey = category.iconKey,
-&nbsp;        hue = category.hue,
-&nbsp;        systemKind = category.systemKind?.name,
-&nbsp;        depth = depth,
+&nbsp;    private fun CategoryChooserState.Loading.newContent(): CategoryChooserState.Content {
+&nbsp;        val type = CategoryPickerRows.initialType(allCategories, selectedId, filterType)
+&nbsp;        return CategoryChooserState.Content(
+&nbsp;            selectedId = selectedId,
+&nbsp;            selectedName = null,
+&nbsp;            type = type,
+&nbsp;            typeLocked = filterType != null,
+&nbsp;            query = &quot;&quot;,
+&nbsp;            expandedIds = expandedFor(type),
+&nbsp;            variant = initialVariant,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun CategoryPickerVariant.other(): CategoryPickerVariant = when (this) {
+&nbsp;        CategoryPickerVariant.GRID -&gt; CategoryPickerVariant.TREE
+&nbsp;        CategoryPickerVariant.TREE -&gt; CategoryPickerVariant.GRID
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun expandedFor(type: CategoryType): Set&lt;CategoryId&gt; {
+&nbsp;        val selected = currentState.selectedId?.takeIf { id -&gt;
+&nbsp;            allCategories.firstOrNull { it.id == id }?.type == type
+&nbsp;        }
+&nbsp;        return CategoryPickerRows.expandedForSelection(allCategories, selected)
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Applies [reducer] once the sheet has content; events that land while loading are dropped. */
+&nbsp;    private fun updateContent(reducer: CategoryChooserState.Content.() -&gt; CategoryChooserState.Content) =
+&nbsp;        updateState {
+&nbsp;            when (this) {
+&nbsp;                is CategoryChooserState.Content -&gt; reducer().rebuild()
+&nbsp;                is CategoryChooserState.Loading -&gt; this
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    /** Re-derives everything the sheet draws from the inputs the events just changed. */
+&nbsp;    private fun CategoryChooserState.Content.rebuild() = copy(
+&nbsp;        selectedName = allCategories.firstOrNull { it.id == selectedId }?.name,
+&nbsp;        gridItems = CategoryPickerRows.grid(allCategories, type, query, selectedId),
+&nbsp;        treeItems = CategoryPickerRows.tree(allCategories, type, query, selectedId, expandedIds),
 &nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;@optics
-&nbsp;sealed interface CategoriesManageState {
-<b class="fc">&nbsp;    data object Loading : CategoriesManageState</b>
+&nbsp;sealed interface CategoryChooserState {
+&nbsp;    val selectedId: CategoryId?
 &nbsp;
 <b class="fc">&nbsp;    @optics</b>
-&nbsp;    data class Content(
-<b class="fc">&nbsp;        val categories: List&lt;CategoryManageUi&gt;,</b>
-<b class="fc">&nbsp;        val pendingDelete: CategoriesManagePendingDelete? = null,</b>
-&nbsp;    ) : CategoriesManageState {
+<b class="fc">&nbsp;    data class Loading(override val selectedId: CategoryId?) : CategoryChooserState {</b>
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    @optics</b>
+<b class="fc">&nbsp;    data class Content(</b>
+<b class="fc">&nbsp;        override val selectedId: CategoryId?,</b>
+&nbsp;        /** Name behind [selectedId], for the `Currently: …` subline. Null until it resolves. */
+<b class="fc">&nbsp;        val selectedName: String?,</b>
+<b class="fc">&nbsp;        val type: CategoryType,</b>
+&nbsp;        /** True when the caller pinned the type — the tab row is then not offered at all. */
+<b class="fc">&nbsp;        val typeLocked: Boolean,</b>
+<b class="fc">&nbsp;        val query: String,</b>
+<b class="fc">&nbsp;        val expandedIds: Set&lt;CategoryId&gt;,</b>
+<b class="fc">&nbsp;        val variant: CategoryPickerVariant,</b>
+<b class="fc">&nbsp;        val gridItems: List&lt;CategoryPickerItem&gt; = emptyList(),</b>
+<b class="fc">&nbsp;        val treeItems: List&lt;CategoryTreeGroup&gt; = emptyList(),</b>
+&nbsp;    ) : CategoryChooserState {
 &nbsp;        companion object
 &nbsp;    }
 &nbsp;
 &nbsp;    companion object
 &nbsp;}
 &nbsp;
-&nbsp;data class CategoriesManagePendingDelete(
-&nbsp;    val id: CategoryId,
-&nbsp;    val name: String,
-&nbsp;    /** How many children will be moved up to the root if this delete goes through. */
-&nbsp;    val childCount: Int = 0,
-&nbsp;)
-&nbsp;
-&nbsp;/** One row of the manage list, already placed in the tree by [CategoryTree.flatten]. */
-&nbsp;data class CategoryManageUi(
-&nbsp;    val id: CategoryId,
-&nbsp;    val name: String,
-&nbsp;    val type: CategoryType,
-&nbsp;    val parentId: CategoryId? = null,
-&nbsp;    val iconKey: String = &quot;&quot;,
-&nbsp;    val hue: Int = -1,
-&nbsp;    val systemKind: String? = null,
-&nbsp;    /** 0 for a root, 1 for a child. Drives the row&#39;s indent. */
-&nbsp;    val depth: Int = 0,
-&nbsp;)
-&nbsp;
-&nbsp;sealed interface CategoriesManageEvent {
-&nbsp;    data object OnBackClick : CategoriesManageEvent
-&nbsp;    data object OnAddCategoryClick : CategoriesManageEvent
-&nbsp;    data class OnCategoryClick(val categoryId: CategoryId) : CategoriesManageEvent
-&nbsp;    data class OnEditCategoryClick(val categoryId: CategoryId) : CategoriesManageEvent
-&nbsp;    data class OnRemoveCategoryClick(val categoryId: CategoryId) : CategoriesManageEvent
-&nbsp;    data object OnDeleteConfirm : CategoriesManageEvent
-&nbsp;    data object OnDeleteCancel : CategoriesManageEvent
+&nbsp;sealed interface CategoryChooserEvent {
+&nbsp;    data class OnCategorySelected(val id: CategoryId) : CategoryChooserEvent
+&nbsp;    data class OnTypeSelected(val type: CategoryType) : CategoryChooserEvent
+&nbsp;    data class OnQueryChange(val query: String) : CategoryChooserEvent
+&nbsp;    data class OnParentExpandToggle(val id: CategoryId) : CategoryChooserEvent
+&nbsp;    data object OnVariantToggle : CategoryChooserEvent
+&nbsp;    data object OnCreateNewCategoryClick : CategoryChooserEvent
+&nbsp;    data object OnDismiss : CategoryChooserEvent
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface CategoriesManageEffect {
-&nbsp;    data object NavigateBack : CategoriesManageEffect
-&nbsp;    data object NavigateToCategoryCreation : CategoriesManageEffect
-&nbsp;    data class NavigateToCategoryDetails(val categoryId: CategoryId) : CategoriesManageEffect
-&nbsp;    data class NavigateToCategoryEdit(val categoryId: CategoryId) : CategoriesManageEffect
+&nbsp;sealed interface CategoryChooserEffect {
+&nbsp;    data object NavigateToCategoryCreation : CategoryChooserEffect
+&nbsp;    data object Dismiss : CategoryChooserEffect
+&nbsp;    data class PublishResult(val id: CategoryId) : CategoryChooserEffect
 &nbsp;}
 </code>
 </pre>
@@ -333,7 +329,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

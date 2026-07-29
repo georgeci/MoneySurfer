@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDataDiLocalDataModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > DashboardLayoutCodec</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDataDiLocalDataModuleModuleKt (com.georgeci.moneysurfer.data.di)</h1>
+<h1>Coverage Summary for Class: DashboardLayoutCodec (com.georgeci.moneysurfer.data.preferences)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDataDiLocalDataModuleModuleKt</td>
+  <td class="name">DashboardLayoutCodec</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/933)
+    (22/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (32/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (292/292)
   </span>
 </td>
 </tr>
@@ -90,7 +97,100 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.preferences
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;
+&nbsp;/**
+&nbsp; * Flat string encoding of a [DashboardLayoutConfig], one DataStore key instead of a nested
+&nbsp; * document:
+&nbsp; *
+&nbsp; * ```text
+&nbsp; * Balance:1:Hero|Accounts:1:Compact:strip|Goals:0:Hero
+&nbsp; * ```
+&nbsp; *
+&nbsp; * `type:enabled:size[:variant]`, items separated by `|`. Types and sizes are enum names, but
+&nbsp; * `variant` is free-form widget-defined text, so the separators (and the escape character itself)
+&nbsp; * are percent-escaped on the way in and restored on the way out — a variant containing `|` would
+&nbsp; * otherwise re-split into a bogus extra item.
+&nbsp; *
+&nbsp; * Decoding never throws and never fails the read: anything unparseable is skipped and
+&nbsp; * [DashboardLayoutConfig.normalized] fills the gaps from the default layout, so a store written by
+&nbsp; * a newer build (or corrupted on disk) degrades to a usable dashboard rather than an empty one.
+&nbsp; */
+&nbsp;internal object DashboardLayoutCodec {
+&nbsp;
+&nbsp;    private const val ITEM_SEPARATOR = &#39;|&#39;
+&nbsp;    private const val FIELD_SEPARATOR = &#39;:&#39;
+&nbsp;    private const val ENABLED = &quot;1&quot;
+&nbsp;    private const val DISABLED = &quot;0&quot;
+&nbsp;    private const val MIN_FIELDS = 3
+&nbsp;
+&nbsp;    /** Escape char first on the way in, last on the way out — otherwise escapes eat each other. */
+<b class="fc">&nbsp;    private val VARIANT_ESCAPES = listOf(</b>
+<b class="fc">&nbsp;        &quot;%&quot; to &quot;%25&quot;,</b>
+<b class="fc">&nbsp;        ITEM_SEPARATOR.toString() to &quot;%7C&quot;,</b>
+<b class="fc">&nbsp;        FIELD_SEPARATOR.toString() to &quot;%3A&quot;,</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    fun encode(config: DashboardLayoutConfig): String =
+<b class="fc">&nbsp;        config.items.joinToString(ITEM_SEPARATOR.toString()) { item -&gt;</b>
+<b class="fc">&nbsp;            buildString {</b>
+<b class="fc">&nbsp;                append(item.type.name)</b>
+<b class="fc">&nbsp;                append(FIELD_SEPARATOR)</b>
+<b class="fc">&nbsp;                append(if (item.enabled) ENABLED else DISABLED)</b>
+<b class="fc">&nbsp;                append(FIELD_SEPARATOR)</b>
+<b class="fc">&nbsp;                append(item.cardStyle.size.name)</b>
+<b class="fc">&nbsp;                item.cardStyle.variant?.let {</b>
+<b class="fc">&nbsp;                    append(FIELD_SEPARATOR)</b>
+<b class="fc">&nbsp;                    append(escapeVariant(it))</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    private fun escapeVariant(variant: String): String =
+<b class="fc">&nbsp;        VARIANT_ESCAPES.fold(variant) { acc, (raw, escaped) -&gt; acc.replace(raw, escaped) }</b>
+&nbsp;
+&nbsp;    private fun unescapeVariant(variant: String): String =
+<b class="fc">&nbsp;        VARIANT_ESCAPES.reversed().fold(variant) { acc, (raw, escaped) -&gt; acc.replace(escaped, raw) }</b>
+&nbsp;
+<b class="fc">&nbsp;    fun decode(stored: String): DashboardLayoutConfig = decodeOrNull(stored) ?: DashboardLayoutConfig.DEFAULT</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `null` when nothing in [stored] parsed, so a caller that needs to tell &quot;the user is on the
+&nbsp;     * default layout&quot; from &quot;the stored string is unreadable&quot; can. The configuration engine does:
+&nbsp;     * reporting garbage as a decoded DEFAULT would make that layer *win*, hiding the corruption
+&nbsp;     * from the debug panel and overwriting the string on the next save.
+&nbsp;     */
+&nbsp;    fun decodeOrNull(stored: String): DashboardLayoutConfig? {
+<b class="fc">&nbsp;        if (stored.isBlank()) return null</b>
+<b class="fc">&nbsp;        val items = stored.split(ITEM_SEPARATOR).mapNotNull(::decodeItem)</b>
+<b class="fc">&nbsp;        return if (items.isEmpty()) null else DashboardLayoutConfig(items).normalized()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun decodeItem(stored: String): DashboardLayoutItem? {
+<b class="fc">&nbsp;        val fields = stored.split(FIELD_SEPARATOR, limit = MIN_FIELDS + 1)</b>
+<b class="fc">&nbsp;        if (fields.size &lt; MIN_FIELDS) return null</b>
+<b class="fc">&nbsp;        val type = DashboardWidgetType.entries.firstOrNull { it.name == fields[0] } ?: return null</b>
+<b class="fc">&nbsp;        val size = DashboardWidgetSize.entries.firstOrNull { it.name == fields[2] } ?: DashboardWidgetSize.Expanded</b>
+<b class="fc">&nbsp;        return DashboardLayoutItem(</b>
+<b class="fc">&nbsp;            type = type,</b>
+<b class="fc">&nbsp;            enabled = fields[1] != DISABLED,</b>
+<b class="fc">&nbsp;            cardStyle = DashboardCardStyle(</b>
+<b class="fc">&nbsp;                size = size,</b>
+<b class="fc">&nbsp;                variant = fields.getOrNull(MIN_FIELDS)?.takeIf(String::isNotBlank)?.let(::unescapeVariant),</b>
+&nbsp;            ),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +212,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

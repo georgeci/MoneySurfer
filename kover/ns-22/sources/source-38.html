@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncStep</title>
+  <title>MoneySurfer Coverage Report > SavingsGoalDetails</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncStep (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SavingsGoalDetails (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncStep</td>
+  <td class="name">SavingsGoalDetails</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (78/78)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -94,51 +94,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.filterIsInstance
-&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;
 &nbsp;/**
-&nbsp; * Per-step progress emitted by [com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncRepository].
-&nbsp; * The flow emits [InProgress] before each network/db step starts, and a single terminal
-&nbsp; * [Completed] carrying the aggregated [SyncReport]. Errors are propagated as flow exceptions.
+&nbsp; * How far a [SavingsGoal] has come. [saved] is always `SUM(contributions.amount)` —
+&nbsp; * see the goal model for why it is never stored.
+&nbsp; *
+&nbsp; * [fraction] is uncapped so logic can tell &quot;exactly on target&quot; from &quot;overshot&quot;;
+&nbsp; * [percent] is clamped to `0..1` because the ring and the bar cannot draw more.
 &nbsp; */
-&nbsp;sealed interface SyncProgress {
-&nbsp;    data class InProgress(val step: SyncStep) : SyncProgress
-&nbsp;    data class Completed(val report: SyncReport) : SyncProgress
+&nbsp;data class GoalProgress(
+&nbsp;    val saved: Money,
+&nbsp;    val target: Money,
+&nbsp;) {
+&nbsp;    /** Never negative: a goal past its target has nothing left to save. */
+&nbsp;    val remaining: Money = if (saved &gt;= target) Money.zero() else target - saved
+&nbsp;
+&nbsp;    /** Uncapped ratio of saved to target. `0.0` when the target is zero. */
+&nbsp;    val fraction: Double =
+&nbsp;        if (target.minor &lt;= 0L) 0.0 else saved.minor.toDouble() / target.minor.toDouble()
+&nbsp;
+&nbsp;    /** [fraction] clamped to `0.0..1.0`, for progress bars and rings. */
+&nbsp;    val percent: Double = fraction.coerceIn(0.0, 1.0)
+&nbsp;
+&nbsp;    val isReached: Boolean = target.minor &gt; 0L &amp;&amp; saved &gt;= target
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        fun of(goal: SavingsGoal, saved: Money): GoalProgress =
+&nbsp;            GoalProgress(saved = saved, target = goal.target)
+&nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;enum class SyncStep {
-<b class="fc">&nbsp;    PUSH_WORKSPACE,</b>
+&nbsp;/** A goal plus its derived progress — what the goals list renders. */
+&nbsp;data class SavingsGoalSummary(
+&nbsp;    val goal: SavingsGoal,
+&nbsp;    val progress: GoalProgress,
+&nbsp;)
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Pushes `/workspaces/{wid}/members/{uid}` rows. Must run BEFORE any
-&nbsp;     * sub-collection write — Firestore rules gate sub-collection writes on
-&nbsp;     * `isMember(wid)`, which reads the members doc. Without this step the
-&nbsp;     * first `pushAccounts` after a fresh workspace creation fails with
-&nbsp;     * `PERMISSION_DENIED`.
-&nbsp;     */
-<b class="fc">&nbsp;    PUSH_MEMBERS,</b>
-&nbsp;
-&nbsp;    /** Pushes `/workspaces/{wid}/invites/{id}` rows after members so the roster sees them. */
-<b class="fc">&nbsp;    PUSH_INVITES,</b>
-<b class="fc">&nbsp;    PUSH_ACCOUNTS,</b>
-<b class="fc">&nbsp;    PUSH_CATEGORIES,</b>
-<b class="fc">&nbsp;    PUSH_TRANSACTIONS,</b>
-<b class="fc">&nbsp;    PULL_WORKSPACE,</b>
-&nbsp;
-&nbsp;    /** Mirror of [PUSH_MEMBERS] on the read side — pulls remote membership rows. */
-<b class="fc">&nbsp;    PULL_MEMBERS,</b>
-&nbsp;
-&nbsp;    /** Mirror of [PUSH_INVITES] on the read side. */
-<b class="fc">&nbsp;    PULL_INVITES,</b>
-<b class="fc">&nbsp;    PULL_ACCOUNTS,</b>
-<b class="fc">&nbsp;    PULL_CATEGORIES,</b>
-<b class="fc">&nbsp;    PULL_TRANSACTIONS,</b>
-&nbsp;}
-&nbsp;
-&nbsp;suspend fun Flow&lt;SyncProgress&gt;.awaitReport(): SyncReport =
-&nbsp;    filterIsInstance&lt;SyncProgress.Completed&gt;().first().report
+&nbsp;/** A goal, its progress and its full contribution history — the details screen. */
+<b class="fc">&nbsp;data class SavingsGoalDetails(</b>
+<b class="fc">&nbsp;    val goal: SavingsGoal,</b>
+<b class="fc">&nbsp;    val progress: GoalProgress,</b>
+<b class="fc">&nbsp;    val contributions: List&lt;GoalContribution&gt;,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -162,7 +160,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

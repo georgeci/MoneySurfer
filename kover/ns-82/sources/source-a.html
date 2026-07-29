@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferBudgetStatusKt</title>
+  <title>MoneySurfer Coverage Report > SurferGoalStatusPillKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.goal</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferBudgetStatusKt (com.georgeci.moneysurfer.uikit.components.budget)</h1>
+<h1>Coverage Summary for Class: SurferGoalStatusPillKt (com.georgeci.moneysurfer.uikit.components.goal)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferBudgetStatusKt</td>
+  <td class="name">SurferGoalStatusPillKt</td>
 <td class="coverageStat">
   <span class="percent">
     66.7%
@@ -57,31 +57,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    77.3%
   </span>
   <span class="absValue">
-    (6/9)
+    (17/22)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    97.5%
   </span>
   <span class="absValue">
-    (18/22)
+    (39/40)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.2%
+    97.4%
   </span>
   <span class="absValue">
-    (254/309)
+    (378/388)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SurferBudgetStatusKt$WhenMappings</td>
+    <td class="name">SurferGoalStatusPillKt$WhenMappings</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -96,26 +96,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    77.3%
   </span>
   <span class="absValue">
-    (6/9)
+    (17/22)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    97.5%
   </span>
   <span class="absValue">
-    (18/22)
+    (39/40)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.2%
+    97.4%
   </span>
   <span class="absValue">
-    (254/309)
+    (378/388)
   </span>
 </td>
 </tr>
@@ -126,74 +126,113 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.goal
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material.icons.Icons
+&nbsp;import androidx.compose.material.icons.filled.Check
+&nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.ReadOnlyComposable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+&nbsp;/** Goal lifecycle as the design system sees it — the domain enum stays in `domain`. */
+&nbsp;enum class SurferGoalStatus { Active, Completed, Paused, Archived }
+&nbsp;
 &nbsp;/**
-&nbsp; * How a budget is doing, as far as the design system is concerned. Mirrors the domain&#39;s
-&nbsp; * `BudgetStatus`; uikit does not depend on domain, so the mapping happens in the feature layer.
+&nbsp; * Status chip on a goal card and in the details hero. ACTIVE is outlined with a dot,
+&nbsp; * COMPLETED is filled with a check, PAUSED and ARCHIVED are neutral.
 &nbsp; */
-&nbsp;enum class SurferBudgetStatus {
-&nbsp;    Ok,
-&nbsp;    Warn,
-&nbsp;    Over,
-&nbsp;}
-&nbsp;
-&nbsp;/** The one place a budget status turns into a colour. */
-&nbsp;val SurferBudgetStatus.color: Color
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-<b class="pc">&nbsp;    get() = when (this) {</b>
-<b class="fc">&nbsp;        SurferBudgetStatus.Ok -&gt; AppTheme.materialColors.primary</b>
-<b class="fc">&nbsp;        SurferBudgetStatus.Warn -&gt; AppTheme.semanticColors.warning</b>
-<b class="fc">&nbsp;        SurferBudgetStatus.Over -&gt; AppTheme.materialColors.error</b>
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-&nbsp;/** Small filled pill carrying a status word — &quot;On track&quot;, &quot;Near limit&quot;, &quot;Over&quot;. */
 &nbsp;@Composable
-&nbsp;fun SurferBudgetStatusPill(
+&nbsp;fun SurferGoalStatusPill(
+&nbsp;    status: SurferGoalStatus,
 &nbsp;    label: String,
-&nbsp;    status: SurferBudgetStatus,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val tint = status.color</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .clip(CircleShape)</b>
-<b class="fc">&nbsp;            .background(tint.copy(alpha = 0.14f))</b>
-<b class="fc">&nbsp;            .padding(horizontal = 8.dp, vertical = 2.dp),</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    val filled = status == SurferGoalStatus.Completed</b>
+<b class="fc">&nbsp;    val content = when (status) {</b>
+<b class="fc">&nbsp;        SurferGoalStatus.Active -&gt; colors.primary</b>
+<b class="fc">&nbsp;        SurferGoalStatus.Completed -&gt; colors.onPrimary</b>
+<b class="fc">&nbsp;        SurferGoalStatus.Paused, SurferGoalStatus.Archived -&gt; colors.onSurfaceVariant</b>
+&nbsp;    }
+<b class="fc">&nbsp;    val base = Modifier</b>
+<b class="fc">&nbsp;        .clip(CircleShape)</b>
+<b class="fc">&nbsp;        .then(</b>
+<b class="fc">&nbsp;            if (filled) {</b>
+<b class="fc">&nbsp;                Modifier.background(colors.primary)</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                Modifier.border(1.dp, content.copy(alpha = BORDER_ALPHA), CircleShape)</b>
+&nbsp;            },
+&nbsp;        )
+&nbsp;
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.then(base).padding(horizontal = 10.dp, vertical = 4.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(6.dp),</b>
 &nbsp;    ) {
+<b class="pc">&nbsp;        when (status) {</b>
+<b class="fc">&nbsp;            SurferGoalStatus.Active -&gt; Dot(color = content)</b>
+<b class="fc">&nbsp;            SurferGoalStatus.Completed -&gt; Icon(</b>
+<b class="fc">&nbsp;                imageVector = Icons.Default.Check,</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = content,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(14.dp),</b>
+&nbsp;            )
+&nbsp;
+<b class="fc">&nbsp;            SurferGoalStatus.Paused, SurferGoalStatus.Archived -&gt; Unit</b>
+<b class="nc">&nbsp;        }</b>
 <b class="fc">&nbsp;        Text(</b>
 <b class="fc">&nbsp;            text = label,</b>
 <b class="fc">&nbsp;            style = AppTheme.typography.labelSmall,</b>
-<b class="fc">&nbsp;            color = tint,</b>
+<b class="fc">&nbsp;            color = content,</b>
 &nbsp;        )
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun Dot(color: Color) {</b>
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .size(6.dp)</b>
+<b class="fc">&nbsp;            .clip(CircleShape)</b>
+<b class="fc">&nbsp;            .background(color),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val BORDER_ALPHA = 0.5f
+&nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferBudgetStatusPillPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferBudgetStatusPill(label = &quot;Near limit&quot;, status = SurferBudgetStatus.Warn)
+&nbsp;private fun SurferGoalStatusPillPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;            verticalAlignment = Alignment.CenterVertically,
+&nbsp;        ) {
+&nbsp;            SurferGoalStatusPill(SurferGoalStatus.Active, &quot;Active&quot;)
+&nbsp;            SurferGoalStatusPill(SurferGoalStatus.Completed, &quot;Reached&quot;)
+&nbsp;            SurferGoalStatusPill(SurferGoalStatus.Paused, &quot;Paused&quot;)
+&nbsp;            SurferGoalStatusPill(SurferGoalStatus.Archived, &quot;Archived&quot;)
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -217,7 +256,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

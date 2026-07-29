@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OnboardingScreenKt</title>
+  <title>MoneySurfer Coverage Report > SettingsScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login.onboarding</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: OnboardingScreenKt (com.georgeci.moneysurfer.feature.login.onboarding)</h1>
+<h1>Coverage Summary for Class: SettingsScreenKt (com.georgeci.moneysurfer.feature.settings)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,79 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OnboardingScreenKt</td>
+  <td class="name">SettingsScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    76.2%
+    0%
   </span>
   <span class="absValue">
-    (16/21)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    56.4%
+    0%
   </span>
   <span class="absValue">
-    (66/117)
+    (0/31)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.9%
+    0%
   </span>
   <span class="absValue">
-    (353/372)
+    (0/140)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.4%
+    0%
   </span>
   <span class="absValue">
-    (2681/3139)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">OnboardingScreenKt$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    76.2%
-  </span>
-  <span class="absValue">
-    (16/21)
+    (0/206)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    56.4%
+    0%
   </span>
   <span class="absValue">
-    (66/117)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.9%
-  </span>
-  <span class="absValue">
-    (353/372)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    85.4%
-  </span>
-  <span class="absValue">
-    (2681/3139)
+    (0/2692)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -126,602 +99,483 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login.onboarding
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
 &nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.only
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.safeDrawing
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.widthIn
-&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
 &nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.AlertDialog
 &nbsp;import androidx.compose.material3.Button
 &nbsp;import androidx.compose.material3.ButtonDefaults
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Surface
+&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.semantics.Role
-&nbsp;import androidx.compose.ui.text.font.FontWeight
 &nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.compose.ui.unit.sp
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferNameBlock
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferPendingBadge
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
-&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AuthColors
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.login.generated.resources.Res
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_skip
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_card_body
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_card_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_cash_body
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_cash_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_cta
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_recommended
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_savings_body
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_savings_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_subtitle
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_start_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_step_format
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_cta
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_feature_offline_body
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_feature_offline_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_feature_together_body
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_feature_together_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_feature_track_body
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_feature_track_title
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_note_offline
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_note_online
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_subtitle
-&nbsp;import moneysurfer.feature.login.generated.resources.onboarding_value_title
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_brand
-&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_supporting_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting_dynamic
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_budgets_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_budgets_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_categories_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_categories_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_change_workspace
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_csv_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_goals_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_goals_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_cancel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_message
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_members
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_members_count_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_empty
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_data
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_help
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_personalization
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_workspace
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hub_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hub_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_user_name
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_version_format
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/** Stable selectors for the onboarding screens — see docs/testing/testing-strategy.md. */
-&nbsp;object OnboardingTestTags {
-&nbsp;    const val Root = &quot;onboarding:root&quot;
-&nbsp;    const val Continue = &quot;onboarding:continue&quot;
-&nbsp;    const val Skip = &quot;onboarding:skip&quot;
-&nbsp;
-&nbsp;    fun accountKind(kind: OnboardingAccountKind): String = &quot;onboarding:kind:${kind.name}&quot;
+&nbsp;/**
+&nbsp; * Stable selectors for the Settings screen — see docs/testing/testing-strategy.md.
+&nbsp; *
+&nbsp; * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
+&nbsp; * their absence is what the offline golden Maestro flow asserts via `notVisible`.
+&nbsp; * Everything else — including [GoalsRow], [PreferencesRow] and [BackupRow] — is composed in both
+&nbsp; * variants, and the same flow asserts those positively.
+&nbsp; *
+&nbsp; * [ProfileName] and [MembersRow] are state-gated rather than build-gated: the first needs a
+&nbsp; * profile to show, the second a workspace with members, so assert them only where the flow
+&nbsp; * has put the app in that state.
+&nbsp; *
+&nbsp; * [DebugConfigRow] is the one tag that varies by *build type* rather than by host: it appears
+&nbsp; * whenever a real debug-overrides layer is bound, and never in a release build. No Maestro flow
+&nbsp; * asserts it either way, precisely so the golden path stays independent of build type.
+&nbsp; */
+&nbsp;object SettingsTestTags {
+&nbsp;    const val Root = &quot;settings:root&quot;
+&nbsp;    const val ProfileName = &quot;settings:profileName&quot;
+&nbsp;    const val WorkspaceRow = &quot;settings:workspaceRow&quot;
+&nbsp;    const val MembersRow = &quot;settings:membersRow&quot;
+&nbsp;    const val CategoriesRow = &quot;settings:categoriesRow&quot;
+&nbsp;    const val BudgetsRow = &quot;settings:budgetsRow&quot;
+&nbsp;    const val GoalsRow = &quot;settings:goalsRow&quot;
+&nbsp;    const val AppearanceRow = &quot;settings:appearanceRow&quot;
+&nbsp;    const val PreferencesRow = &quot;settings:preferencesRow&quot;
+&nbsp;    const val AboutRow = &quot;settings:aboutRow&quot;
+&nbsp;    const val SyncRow = &quot;settings:syncRow&quot;
+&nbsp;    const val BackupRow = &quot;settings:backupRow&quot;
+&nbsp;    const val CsvRow = &quot;settings:csvRow&quot;
+&nbsp;    const val LogoutRow = &quot;settings:logoutRow&quot;
+&nbsp;    const val DeleteAccountRow = &quot;settings:deleteAccountRow&quot;
+&nbsp;    const val DebugConfigRow = &quot;settings:debugConfigRow&quot;
 &nbsp;}
 &nbsp;
+&nbsp;// The effect dispatch below is one straight-line branch per destination — flat, exhaustive, and
+&nbsp;// checked by the compiler. Its &quot;complexity&quot; is the number of settings rows, not tangled logic.
+&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
 &nbsp;@Composable
-<b class="nc">&nbsp;fun OnboardingScreen(</b>
-&nbsp;    onNavigateToSignIn: () -&gt; Unit,
-&nbsp;    onNavigateToFirstAccount: (AccountType) -&gt; Unit,
-<b class="nc">&nbsp;    viewModel: OnboardingViewModel = koinViewModel(),</b>
+<b class="nc">&nbsp;fun SettingsScreen(</b>
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToWorkspaceSelector: () -&gt; Unit,
+&nbsp;    onNavigateToIncomingInvites: () -&gt; Unit,
+&nbsp;    onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -&gt; Unit,
+&nbsp;    onNavigateToCategories: () -&gt; Unit,
+&nbsp;    onNavigateToBudgets: () -&gt; Unit,
+&nbsp;    onNavigateToGoals: () -&gt; Unit,
+&nbsp;    onNavigateToAppearance: () -&gt; Unit,
+&nbsp;    onNavigateToPreferences: () -&gt; Unit,
+&nbsp;    onNavigateToSync: () -&gt; Unit,
+&nbsp;    onNavigateToBackup: () -&gt; Unit,
+&nbsp;    onNavigateToCsvBackup: () -&gt; Unit,
+&nbsp;    onNavigateToAbout: () -&gt; Unit,
+&nbsp;    onNavigateToDeleteAccount: () -&gt; Unit,
+&nbsp;    onNavigateToDebugConfig: () -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: SettingsViewModel = koinViewModel(),</b>
 <b class="nc">&nbsp;) {</b>
 <b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
 &nbsp;
 <b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
-<b class="nc">&nbsp;        when (effect) {</b>
-<b class="nc">&nbsp;            OnboardingEffect.NavigateToSignIn -&gt; onNavigateToSignIn()</b>
-<b class="nc">&nbsp;            is OnboardingEffect.NavigateToFirstAccount -&gt; onNavigateToFirstAccount(effect.accountType)</b>
+&nbsp;        when (effect) {
+&nbsp;            SettingsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            SettingsEffect.NavigateToWorkspaceSelector -&gt; onNavigateToWorkspaceSelector()
+&nbsp;            SettingsEffect.NavigateToIncomingInvites -&gt; onNavigateToIncomingInvites()
+&nbsp;            is SettingsEffect.NavigateToMembers -&gt; onNavigateToMembers(effect.workspaceId)
+&nbsp;            SettingsEffect.NavigateToCategories -&gt; onNavigateToCategories()
+&nbsp;            SettingsEffect.NavigateToBudgets -&gt; onNavigateToBudgets()
+&nbsp;            SettingsEffect.NavigateToGoals -&gt; onNavigateToGoals()
+&nbsp;            SettingsEffect.NavigateToAppearance -&gt; onNavigateToAppearance()
+&nbsp;            SettingsEffect.NavigateToPreferences -&gt; onNavigateToPreferences()
+&nbsp;            SettingsEffect.NavigateToSync -&gt; onNavigateToSync()
+&nbsp;            SettingsEffect.NavigateToBackup -&gt; onNavigateToBackup()
+&nbsp;            SettingsEffect.NavigateToCsvBackup -&gt; onNavigateToCsvBackup()
+&nbsp;            SettingsEffect.NavigateToAbout -&gt; onNavigateToAbout()
+&nbsp;            SettingsEffect.NavigateToDeleteAccount -&gt; onNavigateToDeleteAccount()
+&nbsp;            SettingsEffect.NavigateToDebugConfig -&gt; onNavigateToDebugConfig()
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    OnboardingContent(state = state, onEvent = viewModel::onEvent)</b>
+<b class="nc">&nbsp;    SettingsContent(</b>
+<b class="nc">&nbsp;        state = state,</b>
+<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
+&nbsp;    )
 <b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * Stateless body of the onboarding flow. Internal rather than private so the screenshot captures
-&nbsp; * can mount it with an injected [OnboardingState] instead of standing up a Koin-backed
-&nbsp; * [OnboardingViewModel].
-&nbsp; */
 &nbsp;@Composable
-&nbsp;internal fun OnboardingContent(
-&nbsp;    state: OnboardingState,
-&nbsp;    onEvent: (OnboardingEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-&nbsp;    // Same brand backdrop as sign-in, drawn edge to edge so it tints the status bar and the
-&nbsp;    // navigation bar / gesture ribbon; only the content is inset. Both bars sit on a light
-&nbsp;    // surface here — the top of the gradient and the white CTA sheet — so both keep dark icons.
-<b class="fc">&nbsp;    ConfigureSystemBars(darkStatusBarBackground = false, darkNavigationBarBackground = false)</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxSize()</b>
-<b class="fc">&nbsp;            .surferTestTagAsId()</b>
-<b class="fc">&nbsp;            .testTag(OnboardingTestTags.Root),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        SurferAuthBackground(modifier = Modifier.fillMaxSize())</b>
-&nbsp;
-<b class="fc">&nbsp;        Column(modifier = Modifier.fillMaxSize()) {</b>
-<b class="fc">&nbsp;            Column(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .weight(1f)</b>
-<b class="fc">&nbsp;                    .surferSafeInsets(),</b>
-&nbsp;            ) {
-<b class="fc">&nbsp;                OnboardingHeader(state = state, onEvent = onEvent)</b>
-&nbsp;
-<b class="fc">&nbsp;                Column(</b>
-<b class="fc">&nbsp;                    modifier = Modifier</b>
-<b class="fc">&nbsp;                        .weight(1f)</b>
-<b class="fc">&nbsp;                        .verticalScroll(rememberScrollState())</b>
-<b class="fc">&nbsp;                        .padding(horizontal = ScreenPadding),</b>
-&nbsp;                ) {
-<b class="pc">&nbsp;                    when (state.step) {</b>
-<b class="fc">&nbsp;                        OnboardingStep.Value -&gt; ValueStep(isOffline = state.isOffline)</b>
-<b class="fc">&nbsp;                        OnboardingStep.FirstAccount -&gt; FirstAccountStep(</b>
-<b class="fc">&nbsp;                            selected = state.selectedAccountKind,</b>
-<b class="fc">&nbsp;                            onSelect = { onEvent(OnboardingEvent.OnAccountKindSelected(it)) },</b>
-&nbsp;                        )
-<b class="nc">&nbsp;                    }</b>
-<b class="fc">&nbsp;                    Spacer(Modifier.height(ScreenPadding))</b>
-<b class="fc">&nbsp;                }</b>
-<b class="fc">&nbsp;            }</b>
-&nbsp;
-<b class="fc">&nbsp;            OnboardingCta(state = state, onEvent = onEvent)</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Step counter + skip + segmented progress, mirroring `ObHeader` in the design. */
-&nbsp;@Composable
-&nbsp;private fun OnboardingHeader(
-&nbsp;    state: OnboardingState,
-&nbsp;    onEvent: (OnboardingEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    if (!state.showProgress) return</b>
-<b class="fc">&nbsp;    val muted = AuthColors.OnBrandSubtle</b>
-<b class="fc">&nbsp;    Column(</b>
-<b class="fc">&nbsp;        modifier = Modifier.padding(start = ScreenPadding, end = ScreenPadding, top = HeaderTopPadding),</b>
-<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(HeaderGap),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Row(</b>
-<b class="fc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;            horizontalArrangement = Arrangement.SpaceBetween,</b>
-<b class="fc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = stringResource(Res.string.onboarding_step_format, state.stepNumber, state.totalSteps),</b>
-<b class="fc">&nbsp;                fontSize = LabelSize,</b>
-<b class="fc">&nbsp;                fontWeight = FontWeight.SemiBold,</b>
-<b class="fc">&nbsp;                color = muted,</b>
+&nbsp;private fun SettingsContent(
+&nbsp;    state: SettingsState,
+&nbsp;    onEvent: (SettingsEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Scaffold(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .surferSafeInsets()</b>
+<b class="nc">&nbsp;            .surferTestTagAsId()</b>
+<b class="nc">&nbsp;            .testTag(SettingsTestTags.Root),</b>
+<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
+<b class="nc">&nbsp;        topBar = {</b>
+<b class="nc">&nbsp;            SurferToolbar(</b>
+<b class="nc">&nbsp;                title = stringResource(Res.string.settings_title),</b>
+<b class="nc">&nbsp;                onBack = { onEvent(SettingsEvent.OnBackClick) },</b>
+<b class="nc">&nbsp;                colors = TopAppBarDefaults.topAppBarColors(</b>
+<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.surface,</b>
+<b class="nc">&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,</b>
+&nbsp;                ),
 &nbsp;            )
-<b class="fc">&nbsp;            if (state.showSkip) {</b>
-<b class="fc">&nbsp;                TextButton(</b>
-<b class="fc">&nbsp;                    onClick = { onEvent(OnboardingEvent.OnSkipClick) },</b>
-<b class="fc">&nbsp;                    enabled = !state.inFlight,</b>
-<b class="fc">&nbsp;                    modifier = Modifier</b>
-<b class="fc">&nbsp;                        .surferTestTagAsId()</b>
-<b class="fc">&nbsp;                        .testTag(OnboardingTestTags.Skip),</b>
-<b class="fc">&nbsp;                ) {</b>
-<b class="fc">&nbsp;                    Text(</b>
-<b class="fc">&nbsp;                        text = stringResource(Res.string.onboarding_skip),</b>
-<b class="fc">&nbsp;                        fontSize = LabelSize,</b>
-<b class="fc">&nbsp;                        fontWeight = FontWeight.SemiBold,</b>
-<b class="fc">&nbsp;                        color = muted,</b>
+&nbsp;        },
+<b class="nc">&nbsp;    ) { padding -&gt;</b>
+<b class="nc">&nbsp;        Column(</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .fillMaxSize()</b>
+<b class="nc">&nbsp;                .surferContentContainer()</b>
+<b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding())</b>
+<b class="nc">&nbsp;                .verticalScroll(rememberScrollState()),</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            if (state.showProfile) {</b>
+<b class="nc">&nbsp;                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {</b>
+<b class="nc">&nbsp;                    SurferNameBlock(</b>
+<b class="nc">&nbsp;                        name = stringResource(Res.string.settings_user_name),</b>
+<b class="nc">&nbsp;                        email = userEmailText(state),</b>
+<b class="nc">&nbsp;                        trailing = null,</b>
+<b class="nc">&nbsp;                        nameTestTag = SettingsTestTags.ProfileName,</b>
 &nbsp;                    )
-&nbsp;                }
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Row(horizontalArrangement = Arrangement.spacedBy(ProgressGap)) {</b>
-<b class="fc">&nbsp;            repeat(state.totalSteps) { index -&gt;</b>
-<b class="fc">&nbsp;                val done = index &lt; state.stepNumber</b>
-<b class="fc">&nbsp;                val color = if (done) AuthColors.OnBrand else AuthColors.ProgressRest</b>
-<b class="fc">&nbsp;                Box(</b>
-<b class="fc">&nbsp;                    modifier = Modifier</b>
-<b class="fc">&nbsp;                        .weight(1f)</b>
-<b class="fc">&nbsp;                        .height(ProgressHeight)</b>
-<b class="fc">&nbsp;                        .clip(CircleShape)</b>
-<b class="fc">&nbsp;                        .background(color),</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_workspace)) {</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.People,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_change_workspace),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_change_workspace_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.WorkspaceRow),</b>
 &nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+<b class="nc">&nbsp;                if (state.showWorkspaceMembers &amp;&amp; state.currentWorkspaceId != null) {</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        icon = SurferIcons.Sparkle,</b>
+<b class="nc">&nbsp;                        title = stringResource(Res.string.settings_members),</b>
+<b class="nc">&nbsp;                        supportingText = pluralStringResource(</b>
+<b class="nc">&nbsp;                            Res.plurals.settings_members_count_format,</b>
+<b class="nc">&nbsp;                            state.activeMemberCount,</b>
+<b class="nc">&nbsp;                            state.activeMemberCount,</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        onClick = { onEvent(SettingsEvent.OnMembersClick) },</b>
+&nbsp;                        trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.MembersRow),</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                if (state.showPendingInvites) {</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        icon = SurferIcons.Mail,</b>
+<b class="nc">&nbsp;                        title = stringResource(Res.string.settings_pending_invites),</b>
+<b class="nc">&nbsp;                        supporting = if (state.pendingInviteCount &gt; 0) {</b>
+<b class="nc">&nbsp;                            {</b>
+<b class="nc">&nbsp;                                SurferPendingBadge(</b>
+<b class="nc">&nbsp;                                    text = pluralStringResource(</b>
+<b class="nc">&nbsp;                                        Res.plurals.settings_pending_invites_supporting_format,</b>
+<b class="nc">&nbsp;                                        state.pendingInviteCount,</b>
+<b class="nc">&nbsp;                                        state.pendingInviteCount,</b>
+&nbsp;                                    ),
+&nbsp;                                )
+&nbsp;                            }
+<b class="nc">&nbsp;                        } else {</b>
+<b class="nc">&nbsp;                            null</b>
+<b class="nc">&nbsp;                        },</b>
+<b class="nc">&nbsp;                        supportingText = if (state.pendingInviteCount == 0) {</b>
+<b class="nc">&nbsp;                            stringResource(Res.string.settings_pending_invites_supporting_empty)</b>
+<b class="nc">&nbsp;                        } else {</b>
+<b class="nc">&nbsp;                            null</b>
+<b class="nc">&nbsp;                        },</b>
+<b class="nc">&nbsp;                        onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },</b>
+&nbsp;                        trailing = { SurferSettingsChevron() },
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
 &nbsp;
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun ValueStep(isOffline: Boolean) {</b>
-<b class="fc">&nbsp;    Spacer(Modifier.height(ValueTopGap))</b>
-&nbsp;
-<b class="fc">&nbsp;    Row(verticalAlignment = Alignment.CenterVertically) {</b>
-<b class="fc">&nbsp;        SurferAppIcon(size = BrandTileSize)</b>
-<b class="fc">&nbsp;        Spacer(Modifier.size(GapSmall))</b>
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = stringResource(Res.string.sign_in_brand),</b>
-<b class="fc">&nbsp;            fontSize = BrandLabelSize,</b>
-<b class="fc">&nbsp;            fontWeight = FontWeight.Bold,</b>
-<b class="fc">&nbsp;            color = AuthColors.OnBrand,</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-<b class="fc">&nbsp;    Spacer(Modifier.height(ValueTitleGap))</b>
-&nbsp;
-<b class="fc">&nbsp;    Text(</b>
-<b class="fc">&nbsp;        text = stringResource(Res.string.onboarding_value_title),</b>
-<b class="fc">&nbsp;        fontSize = HeroTitleSize,</b>
-<b class="fc">&nbsp;        lineHeight = HeroTitleLineHeight,</b>
-<b class="fc">&nbsp;        fontWeight = FontWeight.ExtraBold,</b>
-<b class="fc">&nbsp;        color = AuthColors.OnBrand,</b>
-&nbsp;    )
-<b class="fc">&nbsp;    Spacer(Modifier.height(GapSmall))</b>
-<b class="fc">&nbsp;    Text(</b>
-<b class="fc">&nbsp;        text = stringResource(Res.string.onboarding_value_subtitle),</b>
-<b class="fc">&nbsp;        fontSize = BodyLargeSize,</b>
-<b class="fc">&nbsp;        lineHeight = BodyLargeLineHeight,</b>
-<b class="fc">&nbsp;        color = AuthColors.OnBrandMuted,</b>
-<b class="fc">&nbsp;        modifier = Modifier.widthIn(max = SubtitleMaxWidth),</b>
-&nbsp;    )
-&nbsp;
-<b class="fc">&nbsp;    Spacer(Modifier.height(FeaturesGap))</b>
-&nbsp;
-<b class="fc">&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(GapDefault)) {</b>
-<b class="fc">&nbsp;        ValueFeature(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Receipt,</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.onboarding_value_feature_track_title),</b>
-<b class="fc">&nbsp;            body = stringResource(Res.string.onboarding_value_feature_track_body),</b>
-&nbsp;        )
-&nbsp;        // The second promise is the one that actually differs per build: the offline app never
-&nbsp;        // needs a network, the online one is about sharing a workspace.
-<b class="fc">&nbsp;        if (isOffline) {</b>
-<b class="fc">&nbsp;            ValueFeature(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.Savings,</b>
-<b class="fc">&nbsp;                title = stringResource(Res.string.onboarding_value_feature_offline_title),</b>
-<b class="fc">&nbsp;                body = stringResource(Res.string.onboarding_value_feature_offline_body),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        } else {</b>
-<b class="fc">&nbsp;            ValueFeature(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.People,</b>
-<b class="fc">&nbsp;                title = stringResource(Res.string.onboarding_value_feature_together_title),</b>
-<b class="fc">&nbsp;                body = stringResource(Res.string.onboarding_value_feature_together_body),</b>
-&nbsp;            )
-&nbsp;        }
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ValueFeature(
-&nbsp;    icon: ImageVector,
-&nbsp;    title: String,
-&nbsp;    body: String,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Row(verticalAlignment = Alignment.CenterVertically) {</b>
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(FeatureTileSize)</b>
-<b class="fc">&nbsp;                .clip(RoundedCornerShape(BrandTileCorner))</b>
-<b class="fc">&nbsp;                .background(AuthColors.BrandTile),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Icon(</b>
-<b class="fc">&nbsp;                imageVector = icon,</b>
-<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;                tint = AuthColors.OnBrand,</b>
-<b class="fc">&nbsp;                modifier = Modifier.size(BrandIconSize),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Spacer(Modifier.size(GapSmall))</b>
-<b class="fc">&nbsp;        Column {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = title,</b>
-<b class="fc">&nbsp;                fontSize = TitleSmallSize,</b>
-<b class="fc">&nbsp;                fontWeight = FontWeight.Bold,</b>
-<b class="fc">&nbsp;                color = AuthColors.OnBrand,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = body,</b>
-<b class="fc">&nbsp;                fontSize = BodySmallSize,</b>
-<b class="fc">&nbsp;                lineHeight = BodySmallLineHeight,</b>
-<b class="fc">&nbsp;                color = AuthColors.OnBrandSubtle,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun FirstAccountStep(
-&nbsp;    selected: OnboardingAccountKind,
-&nbsp;    onSelect: (OnboardingAccountKind) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Spacer(Modifier.height(GapDefault))</b>
-<b class="fc">&nbsp;    Text(</b>
-<b class="fc">&nbsp;        text = stringResource(Res.string.onboarding_start_title),</b>
-<b class="fc">&nbsp;        fontSize = HeadlineSize,</b>
-<b class="fc">&nbsp;        fontWeight = FontWeight.Bold,</b>
-<b class="fc">&nbsp;        color = AuthColors.OnBrand,</b>
-&nbsp;    )
-<b class="fc">&nbsp;    Spacer(Modifier.height(GapXSmall))</b>
-<b class="fc">&nbsp;    Text(</b>
-<b class="fc">&nbsp;        text = stringResource(Res.string.onboarding_start_subtitle),</b>
-<b class="fc">&nbsp;        fontSize = BodyMediumSize,</b>
-<b class="fc">&nbsp;        lineHeight = BodyLargeLineHeight,</b>
-<b class="fc">&nbsp;        color = AuthColors.OnBrandMuted,</b>
-&nbsp;    )
-<b class="fc">&nbsp;    Spacer(Modifier.height(GapLarge))</b>
-&nbsp;
-<b class="fc">&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(GapSmall)) {</b>
-<b class="fc">&nbsp;        OnboardingAccountKind.entries.forEach { kind -&gt;</b>
-<b class="fc">&nbsp;            AccountKindCard(</b>
-<b class="fc">&nbsp;                kind = kind,</b>
-<b class="fc">&nbsp;                selected = kind == selected,</b>
-<b class="fc">&nbsp;                onClick = { onSelect(kind) },</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun AccountKindCard(
-&nbsp;    kind: OnboardingAccountKind,
-&nbsp;    selected: Boolean,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val borderColor = if (selected) AuthColors.PrimaryDark else AuthColors.Divider</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .clip(RoundedCornerShape(CardCorner))</b>
-<b class="fc">&nbsp;            .background(if (selected) AuthColors.GreenSoft else AuthColors.Sheet)</b>
-<b class="fc">&nbsp;            .border(CardBorder, borderColor, RoundedCornerShape(CardCorner))</b>
-<b class="fc">&nbsp;            .clickable(role = Role.RadioButton, onClick = onClick)</b>
-<b class="fc">&nbsp;            .padding(CardPadding)</b>
-<b class="fc">&nbsp;            .surferTestTagAsId()</b>
-<b class="fc">&nbsp;            .testTag(OnboardingTestTags.accountKind(kind)),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(KindTileSize)</b>
-<b class="fc">&nbsp;                .clip(RoundedCornerShape(KindTileCorner))</b>
-<b class="fc">&nbsp;                .background(if (selected) AuthColors.PrimaryDark else AuthColors.GreenSoft),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Icon(</b>
-<b class="fc">&nbsp;                imageVector = kind.icon(),</b>
-<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;                tint = if (selected) AuthColors.OnBrand else AuthColors.PrimaryDark,</b>
-<b class="fc">&nbsp;                modifier = Modifier.size(KindIconSize),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Spacer(Modifier.size(GapSmall))</b>
-<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
-<b class="fc">&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = stringResource(kind.titleRes()),</b>
-<b class="fc">&nbsp;                    fontSize = TitleMediumSize,</b>
-<b class="fc">&nbsp;                    fontWeight = FontWeight.Bold,</b>
-<b class="fc">&nbsp;                    color = AuthColors.Ink,</b>
+<b class="nc">&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_personalization)) {</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Category,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_categories_title),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_categories_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnCategoriesClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.CategoriesRow),</b>
 &nbsp;                )
-<b class="fc">&nbsp;                if (kind.recommended) {</b>
-<b class="fc">&nbsp;                    Spacer(Modifier.size(GapXSmall))</b>
-<b class="fc">&nbsp;                    RecommendedBadge()</b>
-<b class="fc">&nbsp;                }</b>
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = stringResource(kind.bodyRes()),</b>
-<b class="fc">&nbsp;                fontSize = BodySmallSize,</b>
-<b class="fc">&nbsp;                lineHeight = BodySmallLineHeight,</b>
-<b class="fc">&nbsp;                color = AuthColors.SheetMuted,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Spacer(Modifier.size(GapXSmall))</b>
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(RadioSize)</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(if (selected) AuthColors.PrimaryDark else Color.Transparent)</b>
-<b class="fc">&nbsp;                .border(CardBorder, borderColor, CircleShape),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            if (selected) {</b>
-<b class="fc">&nbsp;                Icon(</b>
-<b class="fc">&nbsp;                    imageVector = SurferIcons.Check,</b>
-<b class="fc">&nbsp;                    contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;                    tint = AuthColors.OnBrand,</b>
-<b class="fc">&nbsp;                    modifier = Modifier.size(RadioIconSize),</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Savings,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_budgets_title),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_budgets_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnBudgetsClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.BudgetsRow),</b>
 &nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="fc">&nbsp;private fun RecommendedBadge() {</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .clip(CircleShape)</b>
-<b class="fc">&nbsp;            .background(AuthColors.Sheet)</b>
-<b class="fc">&nbsp;            .border(BadgeBorder, AuthColors.Mint.copy(alpha = BadgeBorderAlpha), CircleShape)</b>
-<b class="fc">&nbsp;            .padding(horizontal = BadgePaddingHorizontal, vertical = BadgePaddingVertical),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = stringResource(Res.string.onboarding_start_recommended),</b>
-<b class="fc">&nbsp;            fontSize = BadgeLabelSize,</b>
-<b class="fc">&nbsp;            fontWeight = FontWeight.Bold,</b>
-<b class="fc">&nbsp;            color = AuthColors.Mint,</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Bottom CTA. It always sits on the white sheet the design pulls over the green backdrop. */
-&nbsp;@Composable
-&nbsp;private fun OnboardingCta(
-&nbsp;    state: OnboardingState,
-&nbsp;    onEvent: (OnboardingEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Surface(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        color = AuthColors.Sheet,</b>
-<b class="fc">&nbsp;        shape = RoundedCornerShape(topStart = SheetCorner, topEnd = SheetCorner),</b>
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        Column(</b>
-&nbsp;            // The sheet spans the full width so the green never shows beside it; it therefore has
-&nbsp;            // to clear the side and bottom insets itself.
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .windowInsetsPadding(</b>
-<b class="fc">&nbsp;                    WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Flag,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_goals_title),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_goals_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnGoalsClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.GoalsRow),</b>
 &nbsp;                )
-<b class="fc">&nbsp;                .padding(</b>
-<b class="fc">&nbsp;                    start = ScreenPadding,</b>
-<b class="fc">&nbsp;                    end = ScreenPadding,</b>
-<b class="fc">&nbsp;                    top = CtaTopPadding,</b>
-<b class="fc">&nbsp;                    bottom = CtaBottomPadding,</b>
-&nbsp;                ),
-<b class="fc">&nbsp;            horizontalAlignment = Alignment.CenterHorizontally,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Button(</b>
-<b class="fc">&nbsp;                onClick = { onEvent(OnboardingEvent.OnContinueClick) },</b>
-<b class="fc">&nbsp;                enabled = !state.inFlight,</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .fillMaxWidth()</b>
-<b class="fc">&nbsp;                    .height(CtaHeight)</b>
-<b class="fc">&nbsp;                    .surferTestTagAsId()</b>
-<b class="fc">&nbsp;                    .testTag(OnboardingTestTags.Continue),</b>
-<b class="fc">&nbsp;                shape = RoundedCornerShape(CtaHeight / 2),</b>
-<b class="fc">&nbsp;                colors = ButtonDefaults.buttonColors(</b>
-<b class="fc">&nbsp;                    containerColor = AuthColors.PrimaryDark,</b>
-<b class="fc">&nbsp;                    contentColor = AuthColors.OnBrand,</b>
-&nbsp;                ),
-<b class="fc">&nbsp;            ) {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = stringResource(</b>
-<b class="fc">&nbsp;                        when (state.step) {</b>
-<b class="fc">&nbsp;                            OnboardingStep.Value -&gt; Res.string.onboarding_value_cta</b>
-<b class="fc">&nbsp;                            OnboardingStep.FirstAccount -&gt; Res.string.onboarding_start_cta</b>
-&nbsp;                        },
-&nbsp;                    ),
-<b class="fc">&nbsp;                    fontSize = TitleMediumSize,</b>
-<b class="fc">&nbsp;                    fontWeight = FontWeight.SemiBold,</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Palette,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_appearance_hub_title),</b>
+<b class="nc">&nbsp;                    supportingText = appearanceSupporting(state.isDynamicColorEnabled),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnAppearanceClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.AppearanceRow),</b>
+&nbsp;                )
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Globe,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_preferences_hub_title),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_hub_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnPreferencesClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.PreferencesRow),</b>
 &nbsp;                )
 &nbsp;            }
-<b class="fc">&nbsp;            if (state.step == OnboardingStep.Value) {</b>
-<b class="fc">&nbsp;                Spacer(Modifier.height(GapXSmall))</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = stringResource(</b>
-<b class="fc">&nbsp;                        if (state.isOffline) {</b>
-<b class="fc">&nbsp;                            Res.string.onboarding_value_note_offline</b>
-&nbsp;                        } else {
-<b class="fc">&nbsp;                            Res.string.onboarding_value_note_online</b>
-&nbsp;                        },
-&nbsp;                    ),
-<b class="fc">&nbsp;                    fontSize = BodySmallSize,</b>
-<b class="fc">&nbsp;                    lineHeight = BodySmallLineHeight,</b>
-<b class="fc">&nbsp;                    color = AuthColors.SheetMuted,</b>
-<b class="fc">&nbsp;                    textAlign = TextAlign.Center,</b>
+&nbsp;
+<b class="nc">&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {</b>
+<b class="nc">&nbsp;                if (state.showSyncSection) {</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        icon = SurferIcons.Sync,</b>
+<b class="nc">&nbsp;                        title = stringResource(Res.string.settings_sync_hub_title),</b>
+<b class="nc">&nbsp;                        supportingText = stringResource(Res.string.settings_sync_hub_supporting),</b>
+<b class="nc">&nbsp;                        onClick = { onEvent(SettingsEvent.OnSyncClick) },</b>
+&nbsp;                        trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.SyncRow),</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Archive,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_backup),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_backup_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnBackupClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.BackupRow),</b>
 &nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Download,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_csv_title),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(Res.string.settings_csv_supporting),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnCsvBackupClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.CsvRow),</b>
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_help)) {</b>
+<b class="nc">&nbsp;                SurferSettingsRow(</b>
+<b class="nc">&nbsp;                    icon = SurferIcons.Info,</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.settings_about),</b>
+<b class="nc">&nbsp;                    supportingText = stringResource(</b>
+<b class="nc">&nbsp;                        Res.string.settings_about_supporting_format,</b>
+<b class="nc">&nbsp;                        state.appVersion,</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    onClick = { onEvent(SettingsEvent.OnAboutClick) },</b>
+&nbsp;                    trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.AboutRow),</b>
+&nbsp;                )
+<b class="nc">&nbsp;                if (state.showDebugConfig) {</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        icon = SurferIcons.Code,</b>
+<b class="nc">&nbsp;                        title = stringResource(Res.string.settings_debug_config),</b>
+<b class="nc">&nbsp;                        supportingText = stringResource(Res.string.settings_debug_config_supporting),</b>
+<b class="nc">&nbsp;                        onClick = { onEvent(SettingsEvent.OnDebugConfigClick) },</b>
+&nbsp;                        trailing = { SurferSettingsChevron() },
+<b class="nc">&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.DebugConfigRow),</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (state.showLogout) {</b>
+<b class="nc">&nbsp;                Spacer(Modifier.height(8.dp))</b>
+<b class="nc">&nbsp;                Box(modifier = Modifier.padding(horizontal = 16.dp)) {</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        icon = SurferIcons.Logout,</b>
+<b class="nc">&nbsp;                        title = stringResource(Res.string.settings_logout),</b>
+<b class="nc">&nbsp;                        danger = true,</b>
+<b class="nc">&nbsp;                        onClick = { onEvent(SettingsEvent.OnLogoutClick) },</b>
+<b class="nc">&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.LogoutRow),</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            if (state.showDeleteAccount) {</b>
+<b class="nc">&nbsp;                Spacer(Modifier.height(8.dp))</b>
+<b class="nc">&nbsp;                Box(modifier = Modifier.padding(horizontal = 16.dp)) {</b>
+<b class="nc">&nbsp;                    SurferSettingsRow(</b>
+<b class="nc">&nbsp;                        icon = SurferIcons.Delete,</b>
+<b class="nc">&nbsp;                        title = stringResource(Res.string.settings_delete_account),</b>
+<b class="nc">&nbsp;                        danger = true,</b>
+<b class="nc">&nbsp;                        onClick = { onEvent(SettingsEvent.OnDeleteAccountClick) },</b>
+<b class="nc">&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.DeleteAccountRow),</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            Spacer(Modifier.height(AppTheme.spacing.large))</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = stringResource(Res.string.settings_version_format, state.appVersion),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                textAlign = TextAlign.Center,</b>
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .fillMaxWidth()</b>
+<b class="nc">&nbsp;                    .padding(horizontal = 24.dp, vertical = AppTheme.spacing.small),</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))</b>
+<b class="nc">&nbsp;        }</b>
 &nbsp;    }
-<b class="fc">&nbsp;}</b>
 &nbsp;
-<b class="fc">&nbsp;private fun OnboardingAccountKind.icon(): ImageVector = when (this) {</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Cash -&gt; SurferIcons.Cash</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Card -&gt; SurferIcons.CreditCard</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Savings -&gt; SurferIcons.Savings</b>
-&nbsp;}
-&nbsp;
-<b class="fc">&nbsp;private fun OnboardingAccountKind.titleRes(): StringResource = when (this) {</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Cash -&gt; Res.string.onboarding_start_cash_title</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Card -&gt; Res.string.onboarding_start_card_title</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Savings -&gt; Res.string.onboarding_start_savings_title</b>
-&nbsp;}
-&nbsp;
-<b class="fc">&nbsp;private fun OnboardingAccountKind.bodyRes(): StringResource = when (this) {</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Cash -&gt; Res.string.onboarding_start_cash_body</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Card -&gt; Res.string.onboarding_start_card_body</b>
-<b class="fc">&nbsp;    OnboardingAccountKind.Savings -&gt; Res.string.onboarding_start_savings_body</b>
-&nbsp;}
-&nbsp;
-<b class="fc">&nbsp;private val ScreenPadding: Dp = 22.dp</b>
-<b class="fc">&nbsp;private val HeaderTopPadding: Dp = 16.dp</b>
-<b class="fc">&nbsp;private val HeaderGap: Dp = 12.dp</b>
-<b class="fc">&nbsp;private val ProgressGap: Dp = 6.dp</b>
-<b class="fc">&nbsp;private val ProgressHeight: Dp = 4.dp</b>
-<b class="fc">&nbsp;private val ValueTopGap: Dp = 28.dp</b>
-<b class="fc">&nbsp;private val ValueTitleGap: Dp = 26.dp</b>
-<b class="fc">&nbsp;private val FeaturesGap: Dp = 22.dp</b>
-<b class="fc">&nbsp;private val GapXSmall: Dp = 8.dp</b>
-<b class="fc">&nbsp;private val GapSmall: Dp = 12.dp</b>
-<b class="fc">&nbsp;private val GapDefault: Dp = 16.dp</b>
-<b class="fc">&nbsp;private val GapLarge: Dp = 22.dp</b>
-<b class="fc">&nbsp;private val BrandTileSize: Dp = 36.dp</b>
-<b class="fc">&nbsp;private val BrandTileCorner: Dp = 12.dp</b>
-<b class="fc">&nbsp;private val BrandIconSize: Dp = 20.dp</b>
-<b class="fc">&nbsp;private val FeatureTileSize: Dp = 40.dp</b>
-<b class="fc">&nbsp;private val SubtitleMaxWidth: Dp = 320.dp</b>
-<b class="fc">&nbsp;private val CardCorner: Dp = 18.dp</b>
-<b class="fc">&nbsp;private val CardBorder: Dp = 2.dp</b>
-<b class="fc">&nbsp;private val CardPadding: Dp = 16.dp</b>
-<b class="fc">&nbsp;private val KindTileSize: Dp = 46.dp</b>
-<b class="fc">&nbsp;private val KindTileCorner: Dp = 14.dp</b>
-<b class="fc">&nbsp;private val KindIconSize: Dp = 22.dp</b>
-<b class="fc">&nbsp;private val RadioSize: Dp = 22.dp</b>
-<b class="fc">&nbsp;private val RadioIconSize: Dp = 14.dp</b>
-<b class="fc">&nbsp;private val BadgeBorder: Dp = 1.dp</b>
-<b class="fc">&nbsp;private val BadgePaddingHorizontal: Dp = 8.dp</b>
-<b class="fc">&nbsp;private val BadgePaddingVertical: Dp = 2.dp</b>
-<b class="fc">&nbsp;private val SheetCorner: Dp = 28.dp</b>
-<b class="fc">&nbsp;private val CtaHeight: Dp = 54.dp</b>
-<b class="fc">&nbsp;private val CtaTopPadding: Dp = 16.dp</b>
-<b class="fc">&nbsp;private val CtaBottomPadding: Dp = 20.dp</b>
-&nbsp;
-&nbsp;private const val BadgeBorderAlpha = 0.33f
-&nbsp;
-<b class="fc">&nbsp;private val HeroTitleSize = 34.sp</b>
-<b class="fc">&nbsp;private val HeroTitleLineHeight = 38.sp</b>
-<b class="fc">&nbsp;private val HeadlineSize = 24.sp</b>
-<b class="fc">&nbsp;private val BrandLabelSize = 16.sp</b>
-<b class="fc">&nbsp;private val TitleMediumSize = 16.sp</b>
-<b class="fc">&nbsp;private val TitleSmallSize = 14.sp</b>
-<b class="fc">&nbsp;private val BodyLargeSize = 16.sp</b>
-<b class="fc">&nbsp;private val BodyLargeLineHeight = 24.sp</b>
-<b class="fc">&nbsp;private val BodyMediumSize = 14.sp</b>
-<b class="fc">&nbsp;private val BodySmallSize = 12.sp</b>
-<b class="fc">&nbsp;private val BodySmallLineHeight = 16.sp</b>
-<b class="fc">&nbsp;private val LabelSize = 14.sp</b>
-<b class="fc">&nbsp;private val BadgeLabelSize = 11.sp</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun OnboardingValueStepPreview() {</b>
-<b class="nc">&nbsp;    OnboardingContent(state = OnboardingState(isOffline = true), onEvent = {})</b>
+<b class="nc">&nbsp;    if (state.showGuestLogoutWarning) {</b>
+<b class="nc">&nbsp;        GuestLogoutWarningDialog(</b>
+<b class="nc">&nbsp;            onConfirm = { onEvent(SettingsEvent.OnGuestLogoutConfirmed) },</b>
+<b class="nc">&nbsp;            onDismiss = { onEvent(SettingsEvent.OnGuestLogoutDismissed) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
 <b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Preview
+&nbsp;/** Guest sessions are local-only — warn that logging out wipes the on-device data for good. */
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun OnboardingFirstAccountStepPreview() {</b>
-<b class="nc">&nbsp;    OnboardingContent(</b>
-<b class="nc">&nbsp;        state = OnboardingState(isOffline = true, step = OnboardingStep.FirstAccount),</b>
-<b class="nc">&nbsp;        onEvent = {},</b>
+&nbsp;private fun GuestLogoutWarningDialog(
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+&nbsp;        icon = {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Logout,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                tint = AppTheme.materialColors.error,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        title = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_logout_guest_warning_title),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        text = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_logout_guest_warning_message),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            Button(</b>
+<b class="nc">&nbsp;                onClick = onConfirm,</b>
+<b class="nc">&nbsp;                colors = ButtonDefaults.buttonColors(</b>
+<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.error,</b>
+<b class="nc">&nbsp;                    contentColor = AppTheme.materialColors.onError,</b>
+&nbsp;                ),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_logout_guest_warning_confirm))
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
+&nbsp;                Text(stringResource(Res.string.settings_logout_guest_warning_cancel))
+&nbsp;            }
+&nbsp;        },
 &nbsp;    )
 <b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun appearanceSupporting(isDynamicColorEnabled: Boolean): String =
+<b class="nc">&nbsp;    if (isDynamicColorEnabled) {</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_appearance_hub_supporting_dynamic)</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_appearance_hub_supporting)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;private fun userEmailText(state: SettingsState): String =
+<b class="nc">&nbsp;    when {</b>
+<b class="nc">&nbsp;        state.isAnonymousUser -&gt; &quot;anon&quot;</b>
+<b class="nc">&nbsp;        !state.userEmail.isNullOrBlank() -&gt; state.userEmail</b>
+<b class="nc">&nbsp;        else -&gt; &quot;anon&quot;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SettingsScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        SettingsContent(
+&nbsp;            state = SettingsState(),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -745,7 +599,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

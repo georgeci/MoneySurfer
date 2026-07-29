@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContributionDao</title>
+  <title>MoneySurfer Coverage Report > SyncConfigKeys</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContributionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: SyncConfigKeys (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContributionDao</td>
+  <td class="name">SyncConfigKeys</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,53 +92,75 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
-&nbsp;import androidx.room.Dao
-&nbsp;import androidx.room.Insert
-&nbsp;import androidx.room.Query
-&nbsp;import androidx.room.Update
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+&nbsp;import com.georgeci.moneysurfer.appconfig.Config
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKey
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKeyGroup
+&nbsp;import com.georgeci.moneysurfer.appconfig.HostConfigKeys
+&nbsp;import com.georgeci.moneysurfer.appconfig.SettingKey
+&nbsp;import com.georgeci.moneysurfer.domain.config.SyncSettings
 &nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;@Dao
-&nbsp;interface GoalContributionDao {
+&nbsp;/**
+&nbsp; * The two non-host terms of [SyncSettings.isEnabled]. The build term is
+&nbsp; * [HostConfigKeys.syncEnabled], because hosts have to declare it themselves.
+&nbsp; */
+&nbsp;internal object SyncConfigKeys {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE workspaceId = :workspaceId ORDER BY occurredOn DESC&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;GoalContributionEntity&gt;&gt;
+&nbsp;    /**
+&nbsp;     * Server kill switch. Default `true` = &quot;not killed&quot;, so a missing remote document leaves the
+&nbsp;     * decision to the build and the user rather than switching sync off for everyone.
+&nbsp;     *
+&nbsp;     * The one `remoteOverridable` key in the app today. It is not a `SettingKey`, so no client can
+&nbsp;     * write it.
+&nbsp;     */
+<b class="fc">&nbsp;    val remoteEnabled: ConfigKey&lt;Boolean&gt; =</b>
+<b class="fc">&nbsp;        ConfigKey.bool(&quot;sync.remote_enabled&quot;, default = true, remoteOverridable = true)</b>
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE goalId = :goalId ORDER BY occurredOn DESC, createdAt DESC&quot;)
-&nbsp;    fun getByGoalId(goalId: String): Flow&lt;List&lt;GoalContributionEntity&gt;&gt;
+&nbsp;    /**
+&nbsp;     * User toggle.
+&nbsp;     *
+&nbsp;     * `sync = false` is mandatory, and for a reason that only became visible once replication was
+&nbsp;     * real: this key gates its own replication. `SyncCoordinatorWorkspaceSyncer` refuses to push or
+&nbsp;     * pull while it is `false`, so the value `false` can never reach Firestore — only `true` can.
+&nbsp;     * Were it `sync = true` it would live in the account-scoped `config_entry` table, which
+&nbsp;     * `LocalDataResetRepositoryImpl.clearAll()` wipes on logout, and the next sign-in would resolve
+&nbsp;     * it to the `true` default with nothing on the server able to restore the user&#39;s choice.
+&nbsp;     * Turning sync off and logging out would silently turn it back on and start uploading.
+&nbsp;     *
+&nbsp;     * Device-scoped is also the honest scope: &quot;do not talk to the server from this device&quot; is a
+&nbsp;     * decision about a device, not an account setting to be mirrored onto the user&#39;s other ones.
+&nbsp;     */
+<b class="fc">&nbsp;    val userEnabled: SettingKey&lt;Boolean&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.bool(&quot;sync.user_enabled&quot;, default = true, sync = false)</b>
 &nbsp;
-&nbsp;    /** Rows of a goal as a one-shot read — the outbox needs them before a cascade drops them. */
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE goalId = :goalId&quot;)
-&nbsp;    suspend fun listByGoalId(goalId: String): List&lt;GoalContributionEntity&gt;
+<b class="fc">&nbsp;    val all: List&lt;ConfigKey&lt;*&gt;&gt; = listOf(remoteEnabled, userEnabled)</b>
+&nbsp;}
 &nbsp;
-&nbsp;    /** A goal&#39;s saved amount. Signed sum, so withdrawals subtract; 0 when there are no rows. */
-&nbsp;    @Query(&quot;SELECT COALESCE(SUM(amount), 0) FROM goal_contributions WHERE goalId = :goalId&quot;)
-&nbsp;    fun observeTotalByGoalId(goalId: String): Flow&lt;Long&gt;
+&nbsp;@Single(binds = [ConfigKeyGroup::class])
+&nbsp;class SyncConfigKeyGroup : ConfigKeyGroup {
+&nbsp;    override val keys: List&lt;ConfigKey&lt;*&gt;&gt; = SyncConfigKeys.all
+&nbsp;}
 &nbsp;
-&nbsp;    @Query(&quot;SELECT COALESCE(SUM(amount), 0) FROM goal_contributions WHERE goalId = :goalId&quot;)
-&nbsp;    suspend fun totalByGoalId(goalId: String): Long
+&nbsp;/**
+&nbsp; * A kill switch must not *replace* a user toggle, it must *zero* it — so the three terms are
+&nbsp; * combined here rather than composed inside the key-value layer.
+&nbsp; *
+&nbsp; * The composition lives in the facade rather than a use case: a use case injecting `Config` would
+&nbsp; * have nowhere legal to live, since features cannot see `app-config` and `domain` must not depend
+&nbsp; * on it.
+&nbsp; */
+&nbsp;@Single(binds = [SyncSettings::class])
+&nbsp;class SyncSettingsImpl(config: Config) : SyncSettings {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): GoalContributionEntity?
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: GoalContributionEntity)
-&nbsp;
-&nbsp;    @Update
-&nbsp;    suspend fun update(entity: GoalContributionEntity)
-&nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;GoalContributionEntity&gt;)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM goal_contributions WHERE id = :id&quot;)
-&nbsp;    suspend fun delete(id: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM goal_contributions&quot;)
-&nbsp;    suspend fun deleteAll()
+&nbsp;    override val isEnabled: Flow&lt;Boolean&gt; = combine(
+&nbsp;        config.observe(HostConfigKeys.syncEnabled),
+&nbsp;        config.observe(SyncConfigKeys.remoteEnabled),
+&nbsp;        config.observe(SyncConfigKeys.userEnabled),
+&nbsp;    ) { build, remote, user -&gt; build &amp;&amp; remote &amp;&amp; user }
 &nbsp;}
 </code>
 </pre>
@@ -115,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

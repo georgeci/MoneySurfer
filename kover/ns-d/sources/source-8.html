@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceDefaultsKt</title>
+  <title>MoneySurfer Coverage Report > WorkspaceDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceDefaultsKt (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: WorkspaceDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceDefaultsKt</td>
+  <td class="name">WorkspaceDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,11 +44,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.constants.PREFILLED_DEFAULT_USER_ID
+&nbsp;import androidx.room.Dao
+&nbsp;import androidx.room.Insert
+&nbsp;import androidx.room.Query
+&nbsp;import androidx.room.Update
+&nbsp;import androidx.room.Upsert
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;internal const val DEFAULT_USER_ID: String = PREFILLED_DEFAULT_USER_ID
+&nbsp;@Dao
+&nbsp;interface WorkspaceDao {
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspaces&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        SELECT w.*
+&nbsp;        FROM workspaces w
+&nbsp;        INNER JOIN workspace_members wm ON wm.workspaceId = w.id
+&nbsp;        WHERE wm.userId = :userId
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    fun getByUserId(userId: String): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspaces WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): WorkspaceEntity?
+&nbsp;
+&nbsp;    @Insert
+&nbsp;    suspend fun insert(entity: WorkspaceEntity)
+&nbsp;
+&nbsp;    @Insert
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceEntity&gt;)
+&nbsp;
+&nbsp;    @Update
+&nbsp;    suspend fun update(entity: WorkspaceEntity)
+&nbsp;
+&nbsp;    @Upsert
+&nbsp;    suspend fun upsertAll(entities: List&lt;WorkspaceEntity&gt;)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM workspaces WHERE id = :id&quot;)
+&nbsp;    suspend fun delete(id: String)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM workspaces&quot;)
+&nbsp;    suspend fun deleteAll()
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -72,7 +114,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

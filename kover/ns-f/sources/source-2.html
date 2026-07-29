@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountExtraDetailsColumn</title>
+  <title>MoneySurfer Coverage Report > AccountExtraDetailsMigrationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountExtraDetailsColumn (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: AccountExtraDetailsMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AccountExtraDetailsColumn</td>
+  <td class="name">AccountExtraDetailsMigrationKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,35 +69,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    72.2%
-  </span>
-  <span class="absValue">
-    (13/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (20/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    95.1%
-  </span>
-  <span class="absValue">
-    (116/122)
+    (6/6)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">AccountExtraDetailsMigrationKt$MIGRATION_30_31$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.9%
+  </span>
+  <span class="absValue">
+    (10/13)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,68 +136,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
-&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetails
-&nbsp;import kotlinx.serialization.json.Json
-&nbsp;import kotlinx.serialization.json.buildJsonArray
-&nbsp;import kotlinx.serialization.json.buildJsonObject
-&nbsp;import kotlinx.serialization.json.contentOrNull
-&nbsp;import kotlinx.serialization.json.jsonArray
-&nbsp;import kotlinx.serialization.json.jsonObject
-&nbsp;import kotlinx.serialization.json.jsonPrimitive
-&nbsp;import kotlinx.serialization.json.put
+&nbsp;import androidx.room.migration.Migration
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.execSQL
 &nbsp;
 &nbsp;/**
-&nbsp; * Codec for [AccountEntity.extraDetails].
+&nbsp; * v30 → v31: give `accounts` the `extraDetails` column the creation screen has been collecting
+&nbsp; * and throwing away (issue #304).
 &nbsp; *
-&nbsp; * JSON rather than the CSV used for transaction tags: an entry is a pair, and a separator-based
-&nbsp; * encoding of pairs would have to escape two characters instead of stripping one — at which point
-&nbsp; * the column stops being readable in a SQL browser anyway, which was CSV&#39;s only advantage.
-&nbsp; *
-&nbsp; * Built on the `JsonElement` API rather than a `@Serializable` holder because this module does not
-&nbsp; * apply the serialization compiler plugin, and because the column is a stored format: spelling the
-&nbsp; * two field names out here makes it obvious that renaming them is a migration, not a refactor.
-&nbsp; *
-&nbsp; * [encode] normalizes, so nothing that violates the [AccountExtraDetails] invariants can reach the
-&nbsp; * database — including documents pulled from a client we do not control. [decode] is deliberately
-&nbsp; * lenient: a column we cannot parse degrades to &quot;this account has no extra details&quot; rather than
-&nbsp; * failing every read of the accounts table.
+&nbsp; * Purely additive, and with no backfill to do: the values never reached storage, so every existing
+&nbsp; * row genuinely has no extra details and the empty-array default is the truthful state rather than
+&nbsp; * a placeholder.
 &nbsp; */
-&nbsp;object AccountExtraDetailsColumn {
-&nbsp;
-&nbsp;    /** Value written for an account with no details — also the column default in the schema. */
-&nbsp;    const val EMPTY: String = &quot;[]&quot;
-&nbsp;
-&nbsp;    private const val FIELD_KEY = &quot;key&quot;
-&nbsp;    private const val FIELD_VALUE = &quot;value&quot;
-&nbsp;
-&nbsp;    fun encode(details: List&lt;AccountExtraDetail&gt;): String {
-<b class="fc">&nbsp;        val normalized = AccountExtraDetails.normalize(details)</b>
-<b class="fc">&nbsp;        if (normalized.isEmpty()) return EMPTY</b>
-<b class="fc">&nbsp;        return buildJsonArray {</b>
-<b class="fc">&nbsp;            normalized.forEach { detail -&gt;</b>
-<b class="fc">&nbsp;                add(</b>
-<b class="fc">&nbsp;                    buildJsonObject {</b>
-<b class="fc">&nbsp;                        put(FIELD_KEY, detail.key)</b>
-<b class="fc">&nbsp;                        put(FIELD_VALUE, detail.value)</b>
-<b class="fc">&nbsp;                    },</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }.toString()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    fun decode(raw: String): List&lt;AccountExtraDetail&gt; {
-<b class="fc">&nbsp;        if (raw.isBlank()) return emptyList()</b>
-<b class="fc">&nbsp;        return runCatching {</b>
-<b class="fc">&nbsp;            Json.parseToJsonElement(raw).jsonArray.mapNotNull { element -&gt;</b>
-<b class="fc">&nbsp;                val obj = element.jsonObject</b>
-<b class="pc">&nbsp;                val key = obj[FIELD_KEY]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null</b>
-<b class="pc">&nbsp;                val value = obj[FIELD_VALUE]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null</b>
-<b class="fc">&nbsp;                AccountExtraDetail(key = key, value = value)</b>
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }.getOrDefault(emptyList())</b>
+<b class="fc">&nbsp;val MIGRATION_30_31: Migration = object : Migration(30, 31) {</b>
+&nbsp;    override fun migrate(connection: SQLiteConnection) {
+<b class="nc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `accounts` ADD COLUMN `extraDetails` TEXT NOT NULL DEFAULT &#39;[]&#39;&quot;)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -186,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

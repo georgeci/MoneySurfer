@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionTags</title>
+  <title>MoneySurfer Coverage Report > SyncProgress</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionTags (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SyncProgress (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,50 +45,90 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
+  <tr>
+    <td class="name">SyncProgress$Completed</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncProgress$InProgress</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
 <tr>
-  <td class="name">TransactionTags</td>
+  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (58/58)
+    (0/14)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -101,45 +138,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.filterIsInstance
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;
 &nbsp;/**
-&nbsp; * Normalization for [Transaction.tags].
-&nbsp; *
-&nbsp; * Tags are an embedded list, not a join table: they are free-form labels with no identity
-&nbsp; * of their own — nothing renames, merges or counts them across transactions yet. A single
-&nbsp; * column costs one migration now; a join table would cost one anyway once a tag manager
-&nbsp; * exists, and buys nothing before then.
-&nbsp; *
-&nbsp; * That storage choice is why normalization is mandatory rather than cosmetic. Room keeps the
-&nbsp; * list as one CSV column, so a comma inside a tag would silently split it in two on the next
-&nbsp; * read. Stripping the separator is the only round-trip-safe option — rejecting the input
-&nbsp; * would surface a storage detail in the UI, and escaping would make the column unreadable
-&nbsp; * in a SQL browser for no gain.
+&nbsp; * Per-step progress emitted by [com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncRepository].
+&nbsp; * The flow emits [InProgress] before each network/db step starts, and a single terminal
+&nbsp; * [Completed] carrying the aggregated [SyncReport]. Errors are propagated as flow exceptions.
 &nbsp; */
-&nbsp;object TransactionTags {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Upper bound on tags per transaction. Bounds both the CSV column and the Firestore doc,
-&nbsp;     * and no design surface shows more than a handful.
-&nbsp;     */
-&nbsp;    const val MAX_TAGS: Int = 10
-&nbsp;
-&nbsp;    private const val SEPARATOR = &#39;,&#39;
-<b class="fc">&nbsp;    private val WHITESPACE_RUN = Regex(&quot;\\s+&quot;)</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Strips separators, trims, drops blanks, removes case-insensitive duplicates keeping the
-&nbsp;     * first spelling the user typed, and caps at [MAX_TAGS].
-&nbsp;     */
-&nbsp;    fun normalize(raw: List&lt;String&gt;): List&lt;String&gt; {
-<b class="fc">&nbsp;        val seen = mutableSetOf&lt;String&gt;()</b>
-<b class="fc">&nbsp;        return raw.asSequence()</b>
-<b class="fc">&nbsp;            .map { it.replace(SEPARATOR, &#39; &#39;).replace(WHITESPACE_RUN, &quot; &quot;).trim() }</b>
-<b class="fc">&nbsp;            .filter { it.isNotEmpty() }</b>
-<b class="fc">&nbsp;            .filter { seen.add(it.lowercase()) }</b>
-<b class="fc">&nbsp;            .take(MAX_TAGS)</b>
-<b class="fc">&nbsp;            .toList()</b>
-&nbsp;    }
+&nbsp;sealed interface SyncProgress {
+<b class="nc">&nbsp;    data class InProgress(val step: SyncStep) : SyncProgress</b>
+<b class="nc">&nbsp;    data class Completed(val report: SyncReport) : SyncProgress</b>
 &nbsp;}
+&nbsp;
+&nbsp;enum class SyncStep {
+&nbsp;    PUSH_WORKSPACE,
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pushes `/workspaces/{wid}/members/{uid}` rows. Must run BEFORE any
+&nbsp;     * sub-collection write — Firestore rules gate sub-collection writes on
+&nbsp;     * `isMember(wid)`, which reads the members doc. Without this step the
+&nbsp;     * first `pushAccounts` after a fresh workspace creation fails with
+&nbsp;     * `PERMISSION_DENIED`.
+&nbsp;     */
+&nbsp;    PUSH_MEMBERS,
+&nbsp;
+&nbsp;    /** Pushes `/workspaces/{wid}/invites/{id}` rows after members so the roster sees them. */
+&nbsp;    PUSH_INVITES,
+&nbsp;    PUSH_ACCOUNTS,
+&nbsp;    PUSH_CATEGORIES,
+&nbsp;    PUSH_TRANSACTIONS,
+&nbsp;    PULL_WORKSPACE,
+&nbsp;
+&nbsp;    /** Mirror of [PUSH_MEMBERS] on the read side — pulls remote membership rows. */
+&nbsp;    PULL_MEMBERS,
+&nbsp;
+&nbsp;    /** Mirror of [PUSH_INVITES] on the read side. */
+&nbsp;    PULL_INVITES,
+&nbsp;    PULL_ACCOUNTS,
+&nbsp;    PULL_CATEGORIES,
+&nbsp;    PULL_TRANSACTIONS,
+&nbsp;}
+&nbsp;
+&nbsp;suspend fun Flow&lt;SyncProgress&gt;.awaitReport(): SyncReport =
+&nbsp;    filterIsInstance&lt;SyncProgress.Completed&gt;().first().report
 </code>
 </pre>
 </div>
@@ -163,7 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferButtonKt</title>
+  <title>MoneySurfer Coverage Report > SurferOutlinedChipKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferButtonKt (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferOutlinedChipKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,79 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferButtonKt</td>
+  <td class="name">SurferOutlinedChipKt</td>
 <td class="coverageStat">
   <span class="percent">
-    54.5%
+    100%
   </span>
   <span class="absValue">
-    (6/11)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    52.5%
+    66.7%
   </span>
   <span class="absValue">
-    (21/40)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.4%
+    25%
   </span>
   <span class="absValue">
-    (68/109)
+    (2/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    59.3%
+    100%
   </span>
   <span class="absValue">
-    (698/1178)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SurferButtonKt$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    54.5%
-  </span>
-  <span class="absValue">
-    (6/11)
+    (26/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    52.5%
+    97.6%
   </span>
   <span class="absValue">
-    (21/40)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    62.4%
-  </span>
-  <span class="absValue">
-    (68/109)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    59.3%
-  </span>
-  <span class="absValue">
-    (698/1178)
+    (287/294)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -126,23 +99,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.FilledTonalButton
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedButton
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
@@ -151,178 +123,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;enum class SurferButtonStyle {
-&nbsp;    Filled,
-&nbsp;    Tonal,
-&nbsp;    Outlined,
-&nbsp;    Text,
-&nbsp;}
-&nbsp;
-&nbsp;enum class SurferButtonSize(val height: Int) {
-&nbsp;    Biggest(52),
-&nbsp;    Regular(48),
-&nbsp;    Small(36),
-&nbsp;}
-&nbsp;
+&nbsp;/**
+&nbsp; * Small outlined action chip: a leading glyph and a label inside a 32dp pill.
+&nbsp; *
+&nbsp; * Lighter than a button and not a filter — it is the &quot;one more thing you may add&quot; affordance,
+&nbsp; * such as the optional account fields or a workspace row&#39;s inline action.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferButton(
-&nbsp;    text: String,
+&nbsp;fun SurferOutlinedChip(
+&nbsp;    label: String,
+&nbsp;    icon: ImageVector,
 &nbsp;    onClick: () -&gt; Unit,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    style: SurferButtonStyle = SurferButtonStyle.Filled,</b>
-<b class="fc">&nbsp;    size: SurferButtonSize = SurferButtonSize.Regular,</b>
 <b class="fc">&nbsp;    enabled: Boolean = true,</b>
-<b class="fc">&nbsp;    startIcon: ImageVector? = null,</b>
-<b class="fc">&nbsp;    endIcon: ImageVector? = null,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val sizedModifier = modifier.height(size.height.dp)</b>
-&nbsp;    // Match SurferCard&#39;s corner radius so a button placed alongside a card row reads as
-&nbsp;    // the same family. AppTheme.shapes.large == RoundedCornerShape(16.dp).
-<b class="fc">&nbsp;    val shape = AppTheme.shapes.large</b>
-&nbsp;
-<b class="pc">&nbsp;    when (style) {</b>
-<b class="fc">&nbsp;        SurferButtonStyle.Filled -&gt; Button(</b>
-<b class="fc">&nbsp;            onClick = onClick,</b>
-<b class="fc">&nbsp;            modifier = sizedModifier,</b>
-<b class="fc">&nbsp;            enabled = enabled,</b>
-<b class="fc">&nbsp;            shape = shape,</b>
-<b class="fc">&nbsp;        ) {</b>
-<b class="fc">&nbsp;            SurferButtonContent(</b>
-<b class="fc">&nbsp;                text = text,</b>
-<b class="fc">&nbsp;                startIcon = startIcon,</b>
-<b class="fc">&nbsp;                endIcon = endIcon,</b>
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-<b class="fc">&nbsp;        SurferButtonStyle.Tonal -&gt; FilledTonalButton(</b>
-<b class="fc">&nbsp;            onClick = onClick,</b>
-<b class="fc">&nbsp;            modifier = sizedModifier,</b>
-<b class="fc">&nbsp;            enabled = enabled,</b>
-<b class="fc">&nbsp;            shape = shape,</b>
-<b class="fc">&nbsp;        ) {</b>
-<b class="fc">&nbsp;            SurferButtonContent(</b>
-<b class="fc">&nbsp;                text = text,</b>
-<b class="fc">&nbsp;                startIcon = startIcon,</b>
-<b class="fc">&nbsp;                endIcon = endIcon,</b>
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-<b class="fc">&nbsp;        SurferButtonStyle.Outlined -&gt; OutlinedButton(</b>
-<b class="fc">&nbsp;            onClick = onClick,</b>
-<b class="fc">&nbsp;            modifier = sizedModifier,</b>
-<b class="fc">&nbsp;            enabled = enabled,</b>
-<b class="fc">&nbsp;            shape = shape,</b>
-<b class="fc">&nbsp;        ) {</b>
-<b class="fc">&nbsp;            SurferButtonContent(</b>
-<b class="fc">&nbsp;                text = text,</b>
-<b class="fc">&nbsp;                startIcon = startIcon,</b>
-<b class="fc">&nbsp;                endIcon = endIcon,</b>
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-<b class="fc">&nbsp;        SurferButtonStyle.Text -&gt; TextButton(</b>
-<b class="fc">&nbsp;            onClick = onClick,</b>
-<b class="fc">&nbsp;            modifier = sizedModifier,</b>
-<b class="fc">&nbsp;            enabled = enabled,</b>
-<b class="fc">&nbsp;            shape = shape,</b>
-<b class="fc">&nbsp;        ) {</b>
-<b class="fc">&nbsp;            SurferButtonContent(</b>
-<b class="fc">&nbsp;                text = text,</b>
-<b class="fc">&nbsp;                startIcon = startIcon,</b>
-<b class="fc">&nbsp;                endIcon = endIcon,</b>
-&nbsp;            )
-&nbsp;        }
-<b class="nc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SurferButtonContent(
-&nbsp;    text: String,
-&nbsp;    startIcon: ImageVector?,
-&nbsp;    endIcon: ImageVector?,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Row {</b>
-<b class="fc">&nbsp;        if (startIcon != null) {</b>
-<b class="fc">&nbsp;            Icon(</b>
-<b class="fc">&nbsp;                imageVector = startIcon,</b>
-<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))</b>
-<b class="fc">&nbsp;        }</b>
-&nbsp;
-<b class="fc">&nbsp;        Text(text)</b>
-&nbsp;
-<b class="fc">&nbsp;        if (endIcon != null) {</b>
-<b class="fc">&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))</b>
-<b class="fc">&nbsp;            Icon(</b>
-<b class="fc">&nbsp;                imageVector = endIcon,</b>
-<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .height(ChipHeight)</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(ChipCorner))</b>
+<b class="fc">&nbsp;            .border(1.dp, AppTheme.materialColors.outline, RoundedCornerShape(ChipCorner))</b>
+<b class="fc">&nbsp;            .clickable(enabled = enabled, onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(horizontal = 12.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(6.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Icon(</b>
+<b class="fc">&nbsp;            imageVector = icon,</b>
+<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;            tint = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;            modifier = Modifier.size(IconSize),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = label,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+&nbsp;        )
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;// One preview per [SurferButtonStyle] showing both [SurferButtonSize] heights side-by-side
-&nbsp;// plus an icons + disabled row. Compact matrix — pick the variant you need without opening
-&nbsp;// a dozen previews.
+<b class="fc">&nbsp;private val ChipHeight = 32.dp</b>
+<b class="fc">&nbsp;private val ChipCorner = 16.dp</b>
+<b class="fc">&nbsp;private val IconSize = 14.dp</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferButtonFilledPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Filled, &quot;Save&quot;) }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferButtonTonalPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Tonal, &quot;Tonal&quot;) }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferButtonOutlinedPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Outlined, &quot;Cancel&quot;) }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferButtonTextPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Text, &quot;Skip&quot;) }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun ButtonStyleMatrix(style: SurferButtonStyle, label: String) {</b>
-<b class="nc">&nbsp;    Column(</b>
-<b class="nc">&nbsp;        modifier = Modifier.padding(16.dp),</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        SurferButtonSize.entries.forEach { size -&gt;</b>
-<b class="nc">&nbsp;            SurferButton(</b>
-<b class="nc">&nbsp;                text = &quot;$label · ${size.name}&quot;,</b>
-<b class="nc">&nbsp;                onClick = {},</b>
-<b class="nc">&nbsp;                modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;                style = style,</b>
-<b class="nc">&nbsp;                size = size,</b>
-&nbsp;            )
-<b class="nc">&nbsp;            Spacer(Modifier.height(8.dp))</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        SurferButton(</b>
-<b class="nc">&nbsp;            text = &quot;With icons&quot;,</b>
-<b class="nc">&nbsp;            onClick = {},</b>
-<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;            style = style,</b>
-<b class="nc">&nbsp;            startIcon = SurferIcons.Check,</b>
-<b class="nc">&nbsp;            endIcon = SurferIcons.ChevronRight,</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Spacer(Modifier.height(8.dp))</b>
-<b class="nc">&nbsp;        SurferButton(</b>
-<b class="nc">&nbsp;            text = &quot;Disabled&quot;,</b>
-<b class="nc">&nbsp;            onClick = {},</b>
-<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;            style = style,</b>
-<b class="nc">&nbsp;            enabled = false,</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;private fun SurferOutlinedChipPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Row(horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small)) {
+&nbsp;            SurferOutlinedChip(label = &quot;IBAN&quot;, icon = SurferIcons.Add, onClick = {})
+&nbsp;            SurferOutlinedChip(label = &quot;Description&quot;, icon = SurferIcons.Add, onClick = {})
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -346,7 +198,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

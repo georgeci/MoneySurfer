@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryEntity</title>
+  <title>MoneySurfer Coverage Report > ConfigEntryMigrationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: ConfigEntryMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryEntity</td>
+  <td class="name">ConfigEntryMigrationKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -58,6 +55,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigEntryMigrationKt$MIGRATION_33_34$1</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +89,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +97,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (60/60)
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,49 +136,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
 &nbsp;
-&nbsp;import androidx.room.ColumnInfo
-&nbsp;import androidx.room.Entity
-&nbsp;import androidx.room.ForeignKey
-&nbsp;import androidx.room.Index
-&nbsp;import androidx.room.PrimaryKey
+&nbsp;import androidx.room.migration.Migration
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.execSQL
 &nbsp;
-<b class="fc">&nbsp;@Entity(</b>
-&nbsp;    tableName = &quot;categories&quot;,
-&nbsp;    foreignKeys = [
-&nbsp;        ForeignKey(
-&nbsp;            entity = WorkspaceEntity::class,
-&nbsp;            parentColumns = [&quot;id&quot;],
-&nbsp;            childColumns = [&quot;workspaceId&quot;],
-&nbsp;        ),
-&nbsp;        ForeignKey(
-&nbsp;            entity = CategoryEntity::class,
-&nbsp;            parentColumns = [&quot;id&quot;],
-&nbsp;            childColumns = [&quot;parentId&quot;],
-&nbsp;        ),
-&nbsp;    ],
-&nbsp;    indices = [Index(&quot;workspaceId&quot;), Index(&quot;parentId&quot;)],
-&nbsp;)
-&nbsp;data class CategoryEntity(
-<b class="fc">&nbsp;    @PrimaryKey</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;parentId&quot;) val parentId: String?,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;systemKind&quot;) val systemKind: String? = null,</b>
-&nbsp;    /**
-&nbsp;     * Semantic icon key. Blank means &quot;never stored&quot; — a row added by the additive v26 backfill
-&nbsp;     * always carries a value, but a row pushed by an older client can still arrive empty, and
-&nbsp;     * the domain mapper resolves that back to the deterministic default.
-&nbsp;     */
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;iconKey&quot;, defaultValue = &quot;&#39;&#39;&quot;) val iconKey: String = &quot;&quot;,</b>
-&nbsp;    /** Hue in degrees, 0 until 360. `-1` is the same &quot;never stored&quot; sentinel as a blank [iconKey]. */
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;hue&quot;, defaultValue = &quot;-1&quot;) val hue: Int = -1,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * v33 → v34: add `config_entry`, the account-scoped home of every `sync = true` setting.
+&nbsp; *
+&nbsp; * Pure addition. Nothing is backfilled from the DataStore values the settings live in today: the
+&nbsp; * app is not released, so losing current dev/test settings is the cheaper side of the trade — a
+&nbsp; * decision ADR-004 marks as expiring at the first production release.
+&nbsp; *
+&nbsp; * The migration is not optional busywork. `getRoomDatabase` ends in
+&nbsp; * `fallbackToDestructiveMigration(dropAllTables = true)`, so a missing 33 → 34 path would not fail
+&nbsp; * loudly — it would silently drop every table on the first launch after the upgrade.
+&nbsp; *
+&nbsp; * The DDL is the one Room generates for `ConfigEntryEntity`; keep the two in step or Room&#39;s schema
+&nbsp; * validation fails at open time.
+&nbsp; */
+<b class="fc">&nbsp;val MIGRATION_33_34: Migration = object : Migration(33, 34) {</b>
+&nbsp;    override fun migrate(connection: SQLiteConnection) {
+<b class="fc">&nbsp;        connection.execSQL(</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            CREATE TABLE IF NOT EXISTS `config_entry` (
+&nbsp;                `key` TEXT NOT NULL,
+&nbsp;                `value` TEXT NOT NULL,
+&nbsp;                `updatedAt` INTEGER NOT NULL,
+&nbsp;                `lastPushedAt` INTEGER,
+&nbsp;                PRIMARY KEY(`key`)
+&nbsp;            )
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent(),</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -158,7 +194,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

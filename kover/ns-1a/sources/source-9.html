@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContribution</title>
+  <title>MoneySurfer Coverage Report > RemoteConfigRefresh</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: RemoteConfigRefresh (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContribution</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">RemoteConfigRefresh</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (84/84)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,35 +44,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
 &nbsp;/**
-&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
-&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
+&nbsp; * Re-reads the server-owned flag document into the configuration engine&#39;s RemoteGlobal layer.
 &nbsp; *
-&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
-&nbsp; * touched. It exists so the money-backed model can later store the id of a real
-&nbsp; * transfer here without a schema change on either side of the wire.
+&nbsp; * Called on launch and on every foreground return, which is the whole propagation model: there is no
+&nbsp; * snapshot listener, so a flag flipped in the console reaches a running app the next time it comes
+&nbsp; * back to the front, and reaches a cold one on its next start.
+&nbsp; *
+&nbsp; * Deliberately separate from [ConfigHydration]. Hydration is local, fast and awaited before the start
+&nbsp; * route is resolved; this one reaches the network and must never be awaited there — its result lands
+&nbsp; * in the mirror and is picked up by `Config.observe`. Failures are swallowed by the layer, so callers
+&nbsp; * have nothing to handle: an unreachable server leaves the last mirrored values in place.
+&nbsp; *
+&nbsp; * A domain facade for the same reason [ConfigHydration] is one — `navigation` must not depend on
+&nbsp; * `app-config`. The offline build binds it over `RemoteGlobalConfigSource.Empty`, where it no-ops.
 &nbsp; */
-<b class="fc">&nbsp;data class GoalContribution(</b>
-<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val goalId: GoalId,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
-<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-&nbsp;)
+&nbsp;fun interface RemoteConfigRefresh {
+&nbsp;    suspend fun refresh()
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -144,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

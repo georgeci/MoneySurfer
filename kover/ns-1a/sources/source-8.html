@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Currency</title>
+  <title>MoneySurfer Coverage Report > SyncSettings</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: Currency (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SyncSettings (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">Currency</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+  <td class="name">SyncSettings</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/17)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,15 +44,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-<b class="nc">&nbsp;data class Currency(</b>
-<b class="nc">&nbsp;    val code: CurrencyCode,</b>
-<b class="nc">&nbsp;    val symbol: String,</b>
-<b class="nc">&nbsp;    val displayName: String,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * Whether sync may run at all. Replaces `SyncFeatureFlag`.
+&nbsp; *
+&nbsp; * Gates the Settings → Sync screen, the manual &quot;Force sync&quot; action, the in-process periodic
+&nbsp; * ticker, and every use-case-driven trigger (post-auth bootstrap, create-workspace push,
+&nbsp; * accept-invite hydration, incoming-invite refresh).
+&nbsp; *
+&nbsp; * [isEnabled] combines **three** terms — build AND server kill switch AND user toggle. The build
+&nbsp; * term matters: the offline host has no Firebase to sync against, and a server/user pair would
+&nbsp; * have no slot for that, so dropping it would switch sync on there.
+&nbsp; *
+&nbsp; * A flow rather than a `Boolean`, because a server-side kill switch can retract mid-session.
+&nbsp; */
+&nbsp;interface SyncSettings {
+&nbsp;    val isEnabled: Flow&lt;Boolean&gt;
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -124,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

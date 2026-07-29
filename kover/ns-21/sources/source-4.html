@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InsightTone</title>
+  <title>MoneySurfer Coverage Report > PiiRedactionKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.insight</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.logging</a>
 </div>
 
-<h1>Coverage Summary for Class: InsightTone (com.georgeci.moneysurfer.domain.insight)</h1>
+<h1>Coverage Summary for Class: PiiRedactionKt (com.georgeci.moneysurfer.domain.logging)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">InsightTone</td>
+  <td class="name">PiiRedactionKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,16 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (106/106)
   </span>
 </td>
 </tr>
@@ -92,128 +99,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.insight
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.logging
 &nbsp;
 &nbsp;/**
-&nbsp; * How an insight reads. Maps 1:1 onto `uikit.widgets.SurferInsightTone`, and is decided here
-&nbsp; * rather than in the widget so the rule that produced a sentence is what decides its colour.
-&nbsp; */
-&nbsp;enum class InsightTone {
-&nbsp;    /** Something went the user&#39;s way. */
-<b class="fc">&nbsp;    Good,</b>
-&nbsp;
-&nbsp;    /** Something worth looking at. Never an error — no insight is a failure. */
-<b class="fc">&nbsp;    Warn,</b>
-&nbsp;
-&nbsp;    /** A fact, with no direction to it. */
-<b class="fc">&nbsp;    Neutral,</b>
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Which way a spend figure moved against the period before it.
+&nbsp; * PII redaction helpers for log messages. Emails and user identifiers (Firebase
+&nbsp; * UIDs / `UserId` values) are personal data and must never reach logcat or the
+&nbsp; * iOS unified log in cleartext — not even in release, where anyone with brief
+&nbsp; * physical access (`adb logcat`, Xcode Console) or a log / bug-report collector
+&nbsp; * could harvest the user&#39;s and their invitees&#39; identities (issue #154).
 &nbsp; *
-&nbsp; * The tone follows from the direction rather than from the rule, because everything the engine
-&nbsp; * measures is spend: more is always [InsightTone.Warn] and less is always [InsightTone.Good].
-&nbsp; * Nothing here judges income.
+&nbsp; * The masks keep just enough for a developer to correlate log lines without
+&nbsp; * exposing the underlying identity, and are applied at the call sites regardless
+&nbsp; * of build type — so a stray [co.touchlab.kermit.LogWriter] or a mistakenly
+&nbsp; * lowered min-severity can never leak the raw value. Release muting
+&nbsp; * ([configureLogging]) is the second layer.
 &nbsp; */
-&nbsp;enum class SpendTrend {
-&nbsp;    Up,
-&nbsp;    Down,
 &nbsp;
-&nbsp;    /** Moved, but not by enough to be worth a sentence about the change. */
-&nbsp;    Flat,
-&nbsp;
-&nbsp;    ;
-&nbsp;
-&nbsp;    val tone: InsightTone
-&nbsp;        get() = when (this) {
-&nbsp;            Up -&gt; InsightTone.Warn
-&nbsp;            Down -&gt; InsightTone.Good
-&nbsp;            Flat -&gt; InsightTone.Neutral
-&nbsp;        }
+&nbsp;/** `john.doe@example.com` -&gt; `j***@***.com`; blank / malformed -&gt; a fixed marker. */
+&nbsp;fun String?.redactEmail(): String {
+<b class="fc">&nbsp;    val email = this?.trim().orEmpty()</b>
+<b class="fc">&nbsp;    if (email.isEmpty()) return BLANK_EMAIL</b>
+<b class="fc">&nbsp;    val at = email.indexOf(&#39;@&#39;)</b>
+<b class="fc">&nbsp;    if (at &lt;= 0 || at == email.length - 1) return REDACTED_EMAIL</b>
+<b class="fc">&nbsp;    val maskedLocal = &quot;${email.first()}$MASK&quot;</b>
+<b class="fc">&nbsp;    val domain = email.substring(at + 1)</b>
+<b class="fc">&nbsp;    val lastDot = domain.lastIndexOf(&#39;.&#39;)</b>
+<b class="fc">&nbsp;    val maskedDomain = if (lastDot &gt; 0) &quot;$MASK${domain.substring(lastDot)}&quot; else MASK</b>
+<b class="fc">&nbsp;    return &quot;$maskedLocal@$maskedDomain&quot;</b>
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * One generated sentence about the workspace&#39;s spending, as data rather than as text: the rules
-&nbsp; * live in `domain` and the copy lives in a feature module&#39;s string resources, so a rule can be
-&nbsp; * tested without a locale and translated without a rule change.
+&nbsp; * Firebase UID / `UserId` mask: keeps a short prefix for cross-line correlation
+&nbsp; * and drops the rest. `abcd1234efgh` -&gt; `abcd***`; blank or too-short values are
+&nbsp; * fully masked so nothing identifying survives.
 &nbsp; */
-&nbsp;sealed interface Insight {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Stable across recomputation: the same finding keeps the same id for as long as the period
-&nbsp;     * lasts. That is what lets a &quot;N new&quot; badge stop counting one insight forever, and what a
-&nbsp;     * future &quot;dismiss&quot; would be persisted against. Ids therefore name the rule, its subject and
-&nbsp;     * the period — never the numbers, which change with every transaction logged.
-&nbsp;     */
-&nbsp;    val id: String
-&nbsp;
-&nbsp;    val tone: InsightTone
-&nbsp;
-&nbsp;    /** The workspace base currency every [Money] on this insight is denominated in. */
-&nbsp;    val currency: CurrencyCode
-&nbsp;
-&nbsp;    /**
-&nbsp;     * A category that moved against the previous period.
-&nbsp;     *
-&nbsp;     * Overspend and savings win are one finding read in two directions, so they are one type
-&nbsp;     * rather than two near-identical ones; [isIncrease] is the direction.
-&nbsp;     */
-&nbsp;    data class CategoryChange(
-&nbsp;        override val id: String,
-&nbsp;        /**
-&nbsp;         * `null` for the uncategorized bucket, which is a real slice rather than a missing one —
-&nbsp;         * see [com.georgeci.moneysurfer.domain.model.CategorySpendSlice].
-&nbsp;         */
-&nbsp;        val categoryId: CategoryId?,
-&nbsp;        /** `null` when the slice has no category, or names one this workspace no longer holds. */
-&nbsp;        val categoryName: String?,
-&nbsp;        val current: Money,
-&nbsp;        val previous: Money,
-&nbsp;        /** Magnitude of the move as whole percent of [previous]; always positive. */
-&nbsp;        val changePercent: Int,
-&nbsp;        override val currency: CurrencyCode,
-&nbsp;    ) : Insight {
-&nbsp;
-&nbsp;        /** A category is only worth a sentence for having moved, so there is no flat case here. */
-&nbsp;        val isIncrease: Boolean get() = current &gt; previous
-&nbsp;
-&nbsp;        override val tone: InsightTone
-&nbsp;            get() = if (isIncrease) InsightTone.Warn else InsightTone.Good
-&nbsp;    }
-&nbsp;
-&nbsp;    /** Total spend this period against the same stretch of the one before it. */
-&nbsp;    data class PeriodSpend(
-&nbsp;        override val id: String,
-&nbsp;        val trend: SpendTrend,
-&nbsp;        val current: Money,
-&nbsp;        val previous: Money,
-&nbsp;        /** Magnitude of the move as whole percent of [previous]; always positive. */
-&nbsp;        val changePercent: Int,
-&nbsp;        override val currency: CurrencyCode,
-&nbsp;    ) : Insight {
-&nbsp;        override val tone: InsightTone get() = trend.tone
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * How many recurring charges are live, and what they come to in a month.
-&nbsp;     *
-&nbsp;     * Neutral on purpose: a subscription is not a problem, and the engine has no way to tell a
-&nbsp;     * forgotten one from a wanted one. The number is the insight.
-&nbsp;     */
-&nbsp;    data class ActiveSubscriptions(
-&nbsp;        override val id: String,
-&nbsp;        val count: Int,
-&nbsp;        val monthlyTotal: Money,
-&nbsp;        override val currency: CurrencyCode,
-&nbsp;    ) : Insight {
-&nbsp;        override val tone: InsightTone get() = InsightTone.Neutral
-&nbsp;    }
+&nbsp;fun String?.redactUid(): String {
+<b class="fc">&nbsp;    val uid = this?.trim().orEmpty()</b>
+<b class="fc">&nbsp;    if (uid.isEmpty()) return BLANK_UID</b>
+<b class="fc">&nbsp;    return if (uid.length &lt;= PREFIX_LEN) MASK else &quot;${uid.take(PREFIX_LEN)}$MASK&quot;</b>
 &nbsp;}
+&nbsp;
+&nbsp;private const val MASK = &quot;***&quot;
+&nbsp;private const val BLANK_EMAIL = &quot;&lt;blank-email&gt;&quot;
+&nbsp;private const val REDACTED_EMAIL = &quot;&lt;redacted-email&gt;&quot;
+&nbsp;private const val BLANK_UID = &quot;&lt;blank-uid&gt;&quot;
+&nbsp;private const val PREFIX_LEN = 4
 </code>
 </pre>
 </div>
@@ -237,7 +167,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

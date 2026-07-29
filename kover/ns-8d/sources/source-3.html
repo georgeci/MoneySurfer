@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppSpacing</title>
+  <title>MoneySurfer Coverage Report > SurferPaneRole</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.tokens</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.window</a>
 </div>
 
-<h1>Coverage Summary for Class: AppSpacing (com.georgeci.moneysurfer.uikit.tokens)</h1>
+<h1>Coverage Summary for Class: SurferPaneRole (com.georgeci.moneysurfer.uikit.window)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppSpacing</td>
+  <td class="name">SurferPaneRole</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,10 +60,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.9%
+    100%
   </span>
   <span class="absValue">
-    (10/11)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (60/60)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -92,23 +92,63 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.tokens
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.window
 &nbsp;
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.compose.runtime.Immutable
+&nbsp;import androidx.compose.runtime.ProvidableCompositionLocal
+&nbsp;import androidx.compose.runtime.compositionLocalOf
 &nbsp;
-&nbsp;object AppSpacing {
-<b class="fc">&nbsp;    val None: Dp = 0.dp</b>
-<b class="fc">&nbsp;    val XXSmall: Dp = 2.dp</b>
-<b class="fc">&nbsp;    val XSmall: Dp = 4.dp</b>
-<b class="fc">&nbsp;    val Small: Dp = 8.dp</b>
-<b class="fc">&nbsp;    val Medium: Dp = 12.dp</b>
-<b class="fc">&nbsp;    val Default: Dp = 16.dp</b>
-<b class="fc">&nbsp;    val Large: Dp = 24.dp</b>
-<b class="fc">&nbsp;    val XLarge: Dp = 32.dp</b>
-<b class="fc">&nbsp;    val XXLarge: Dp = 48.dp</b>
-<b class="fc">&nbsp;    val XXXLarge: Dp = 64.dp</b>
+&nbsp;/** Which pane of the host layout a screen is currently composing into. */
+&nbsp;enum class SurferPaneRole {
+&nbsp;    /**
+&nbsp;     * The screen is the only thing on screen — every compact-width window, and every route the
+&nbsp;     * pane host does not lay out side by side. Chrome behaves exactly as it always has.
+&nbsp;     */
+<b class="fc">&nbsp;    Single,</b>
+&nbsp;
+&nbsp;    /** The list pane of a two-pane layout. Owns the section&#39;s top app bar and its FAB. */
+<b class="fc">&nbsp;    List,</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The detail pane of a two-pane layout, displayed *next to* its list pane. The list pane is
+&nbsp;     * already drawing the section&#39;s top app bar and FAB, so this one must not draw its own.
+&nbsp;     */
+<b class="fc">&nbsp;    Detail,</b>
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * How the pane host is displaying the screen currently composing, published through
+&nbsp; * [LocalSurferPane].
+&nbsp; *
+&nbsp; * A screen reads this instead of measuring the window itself: whether a sibling pane is on screen
+&nbsp; * is a fact about the *back stack* as much as about the width, and only the host knows both. See
+&nbsp; * `SurferPaneSceneStrategy` in `:navigation` for where the value comes from.
+&nbsp; *
+&nbsp; * @param role which pane the screen occupies.
+&nbsp; * @param hasPaneBackStack whether a back affordance on this screen still leads somewhere inside
+&nbsp; *   the two-pane layout rather than merely swapping the detail pane for its placeholder — either
+&nbsp; *   an earlier entry of the same pane to return to (a settings sub-screen that opened another,
+&nbsp; *   About → Licenses) or an entry stacked above this one (a list route pushed from a detail, which
+&nbsp; *   leaves the detail beside a list that is not its own). A detail opened straight from its list
+&nbsp; *   has neither, and is the one case that drops the affordance.
+&nbsp; */
+&nbsp;@Immutable
+&nbsp;data class SurferPane(
+&nbsp;    val role: SurferPaneRole = SurferPaneRole.Single,
+&nbsp;    val hasPaneBackStack: Boolean = false,
+&nbsp;) {
+&nbsp;    /**
+&nbsp;     * Whether this screen draws the section&#39;s top app bar and floating action button. Only the
+&nbsp;     * detail pane of a two-pane layout gives them up — its list pane is already drawing both.
+&nbsp;     */
+&nbsp;    val ownsSectionChrome: Boolean get() = role != SurferPaneRole.Detail
+&nbsp;
+&nbsp;    /** Whether a back affordance on this screen still has somewhere to go. */
+&nbsp;    val showsBackNavigation: Boolean get() = ownsSectionChrome || hasPaneBackStack
+&nbsp;}
+&nbsp;
+&nbsp;/** The [SurferPane] the current composition sits in. Defaults to a plain full-window screen. */
+&nbsp;val LocalSurferPane: ProvidableCompositionLocal&lt;SurferPane&gt; = compositionLocalOf { SurferPane() }
 </code>
 </pre>
 </div>
@@ -132,7 +172,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

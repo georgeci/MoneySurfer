@@ -1,0 +1,114 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > CategorySpendRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+</div>
+
+<h1>Coverage Summary for Class: CategorySpendRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">CategorySpendRepository</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;
+&nbsp;/**
+&nbsp; * Read-only aggregates over transactions grouped by category and month.
+&nbsp; *
+&nbsp; * Separate from [TransactionRepository] on purpose: that interface hands back whole transactions,
+&nbsp; * and a six-month trend over a busy category would mean loading every row just to sum it in
+&nbsp; * memory on every emission. This one is answered by a `GROUP BY` in SQLite, so the amount of
+&nbsp; * data crossing the boundary is one row per category per month regardless of volume.
+&nbsp; */
+&nbsp;fun interface CategorySpendRepository {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Per-month totals for [categoryIds], over the months [fromMonth]..[toMonth] inclusive.
+&nbsp;     *
+&nbsp;     * Only `ACTUAL` transactions of [type] count — a planned transaction is not spend that
+&nbsp;     * happened, and mixing income into an expense trend would net the two out to nonsense.
+&nbsp;     * Months a category booked nothing in are simply absent from the result.
+&nbsp;     *
+&nbsp;     * The rest of the filter is the canonical spend predicate shared with
+&nbsp;     * [SpendAnalyticsRepository]: transfer legs never count, and only [baseCurrency] rows do.
+&nbsp;     * A null [baseCurrency] — a workspace that could not be read — yields nothing, matching what
+&nbsp;     * [com.georgeci.moneysurfer.domain.model.Budget.counts] does with the same input.
+&nbsp;     */
+&nbsp;    fun monthlyTotals(
+&nbsp;        workspaceId: WorkspaceId,
+&nbsp;        categoryIds: List&lt;CategoryId&gt;,
+&nbsp;        type: TransactionType,
+&nbsp;        baseCurrency: CurrencyCode?,
+&nbsp;        fromMonth: YearMonth,
+&nbsp;        toMonth: YearMonth,
+&nbsp;    ): Flow&lt;List&lt;CategoryMonthlyTotal&gt;&gt;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
+</div>
+</body>
+</html>

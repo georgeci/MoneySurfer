@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PendingMutationQueueImpl</title>
+  <title>MoneySurfer Coverage Report > NoOpRecalculateLocalProjectionsUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: PendingMutationQueueImpl (com.georgeci.moneysurfer.sync.internal.repository)</h1>
+<h1>Coverage Summary for Class: NoOpRecalculateLocalProjectionsUseCase (com.georgeci.moneysurfer.sync.internal.usecase)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PendingMutationQueueImpl</td>
+  <td class="name">NoOpRecalculateLocalProjectionsUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,93 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (111/111)
+    (7/7)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">PendingMutationQueueImpl$observeOutbox$$inlined$map$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">PendingMutationQueueImpl$observeOutbox$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">PendingMutationQueueImpl$observeOutbox$$inlined$map$1$2</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">PendingMutationQueueImpl$observeOutbox$$inlined$map$1$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">PendingMutationQueueImpl$pending$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">PendingMutationQueueImpl$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    72.7%
-  </span>
-  <span class="absValue">
-    (8/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (111/111)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -162,92 +92,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
-&nbsp;import com.georgeci.moneysurfer.sync.repository.MutationOperation
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import arrow.core.right
+&nbsp;import com.georgeci.moneysurfer.domain.sync.ProjectionScope
+&nbsp;import com.georgeci.moneysurfer.domain.sync.ProjectionSummary
+&nbsp;import com.georgeci.moneysurfer.domain.sync.RecalculateLocalProjectionsUseCase
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
 &nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Instant
 &nbsp;
-<b class="fc">&nbsp;@Single(binds = [PendingMutationQueue::class])</b>
-&nbsp;class PendingMutationQueueImpl(
-<b class="fc">&nbsp;    private val dao: PendingMutationDao,</b>
-&nbsp;) : PendingMutationQueue {
-&nbsp;
-&nbsp;    /** Insert-if-absent — see [PendingMutationDao.insertIfAbsent] for why the dedup lives in SQL. */
-&nbsp;    override suspend fun enqueue(mutation: PendingMutation) {
-<b class="fc">&nbsp;        val entity = mutation.toEntity(status = PendingMutationEntity.STATUS_PENDING)</b>
-<b class="fc">&nbsp;        dao.insertIfAbsent(</b>
-<b class="fc">&nbsp;            id = entity.id,</b>
-<b class="fc">&nbsp;            entityType = entity.entityType,</b>
-<b class="fc">&nbsp;            entityId = entity.entityId,</b>
-<b class="fc">&nbsp;            operation = entity.operation,</b>
-<b class="fc">&nbsp;            workspaceId = entity.workspaceId,</b>
-<b class="fc">&nbsp;            createdAt = entity.createdAt,</b>
-<b class="fc">&nbsp;            attempts = entity.attempts,</b>
-<b class="fc">&nbsp;            status = entity.status,</b>
-<b class="fc">&nbsp;            lastError = entity.lastError,</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun pending(scope: SyncScope, limit: Int): List&lt;PendingMutation&gt; =
-<b class="fc">&nbsp;        dao.pending(workspaceId = workspaceFilterFor(scope), limit = limit)</b>
-<b class="fc">&nbsp;            .map { it.toDomain() }</b>
-&nbsp;
-&nbsp;    override suspend fun markInFlight(ids: List&lt;String&gt;) {
-<b class="fc">&nbsp;        if (ids.isNotEmpty()) dao.markInFlight(ids)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun markCompleted(ids: List&lt;String&gt;) {
-<b class="fc">&nbsp;        if (ids.isNotEmpty()) dao.deleteByIds(ids)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun markFailed(id: String, error: String) {
-<b class="fc">&nbsp;        dao.markFailed(id, error)</b>
-&nbsp;    }
-&nbsp;
-<b class="fc">&nbsp;    override val pendingCount: Flow&lt;Int&gt; = dao.pendingCount()</b>
-&nbsp;
-&nbsp;    override fun observeOutbox(limit: Int): Flow&lt;List&lt;PendingMutation&gt;&gt; =
-<b class="fc">&nbsp;        dao.observeAll(limit).map { rows -&gt; rows.map { it.toDomain() } }</b>
-&nbsp;
-<b class="fc">&nbsp;    private fun workspaceFilterFor(scope: SyncScope): String? = when (scope) {</b>
-&nbsp;        SyncScope.UploadOnly,
-&nbsp;        SyncScope.ActiveWorkspace,
-&nbsp;        SyncScope.AllUserData,
-&nbsp;        SyncScope.ChangedSinceLastSync,
-<b class="fc">&nbsp;        -&gt; null</b>
-&nbsp;    }
+&nbsp;/**
+&nbsp; * Placeholder kept until the real projection subsystem is implemented (Phase 5+).
+&nbsp; *
+&nbsp; * Real account-balance / aggregate recalculation depends on the project&#39;s
+&nbsp; * balance computation rules (signed amounts, INITIAL_BALANCE handling,
+&nbsp; * multi-currency). It will be implemented as a dedicated subsystem in Phase 5+
+&nbsp; * alongside projections / derived views work, then wired up here as the
+&nbsp; * no-op replacement.
+&nbsp; *
+&nbsp; * The contract is preserved: the coordinator only invokes this step when
+&nbsp; * `pullSummary.downloadedCount &gt; 0` (FAQ №7), so a NoOp here costs nothing
+&nbsp; * on idle cycles.
+&nbsp; */
+<b class="fc">&nbsp;@Single(binds = [RecalculateLocalProjectionsUseCase::class])</b>
+&nbsp;internal class NoOpRecalculateLocalProjectionsUseCase : RecalculateLocalProjectionsUseCase {
+&nbsp;    override suspend fun invoke(
+&nbsp;        scope: ProjectionScope,
+&nbsp;        cancelToken: SyncCancelToken,
+<b class="fc">&nbsp;    ): SyncResult&lt;ProjectionSummary&gt; = ProjectionSummary(recalculatedCount = 0).right()</b>
 &nbsp;}
-&nbsp;
-&nbsp;private fun PendingMutation.toEntity(status: String) = PendingMutationEntity(
-&nbsp;    id = id,
-&nbsp;    entityType = entityType,
-&nbsp;    entityId = entityId,
-&nbsp;    operation = operation.name,
-&nbsp;    workspaceId = scopeKey,
-&nbsp;    createdAt = createdAt.toEpochMilliseconds(),
-&nbsp;    attempts = attempts,
-&nbsp;    status = status,
-&nbsp;    lastError = lastError,
-&nbsp;)
-&nbsp;
-&nbsp;private fun PendingMutationEntity.toDomain() = PendingMutation(
-&nbsp;    id = id,
-&nbsp;    entityType = entityType,
-&nbsp;    entityId = entityId,
-&nbsp;    operation = MutationOperation.valueOf(operation),
-&nbsp;    scopeKey = workspaceId,
-&nbsp;    createdAt = Instant.fromEpochMilliseconds(createdAt),
-&nbsp;    attempts = attempts,
-&nbsp;    lastError = lastError,
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -271,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

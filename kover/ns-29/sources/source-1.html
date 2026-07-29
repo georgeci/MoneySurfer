@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AbandonAuthSessionUseCase</title>
+  <title>MoneySurfer Coverage Report > BudgetPeriodWindow</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.util</a>
 </div>
 
-<h1>Coverage Summary for Class: AbandonAuthSessionUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: BudgetPeriodWindow (com.georgeci.moneysurfer.domain.util)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AbandonAuthSessionUseCase</td>
+  <td class="name">BudgetPeriodWindow</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,53 +79,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (87/87)
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">AbandonAuthSessionUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">AbandonAuthSessionUseCase$invoke$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (87/87)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -130,63 +99,80 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.util
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.daysUntil
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.monthsUntil
+&nbsp;import kotlinx.datetime.plus
+&nbsp;import kotlinx.datetime.yearsUntil
+&nbsp;
+&nbsp;private const val DAYS_PER_WEEK = 7
 &nbsp;
 &nbsp;/**
-&nbsp; * Undoes a half-finished sign-in: the auth provider accepted the credentials and the session
-&nbsp; * pointers were already pinned, but [PostAuthBootstrapUseCase] failed afterwards.
+&nbsp; * A single half-open budget period: `[startInclusive, endExclusive)`.
 &nbsp; *
-&nbsp; * Without this the app is left &quot;signed in&quot; with no workspace, and `resolveStartRoute` sends the
-&nbsp; * next cold start straight to the workspace selector — the sign-in screen is skipped, and the
-&nbsp; * bootstrap has no retry path of its own (issue #342). Clearing the pointers puts the user back
-&nbsp; * on the sign-in form, where retrying re-runs the whole flow.
-&nbsp; *
-&nbsp; * Deliberately *not* [LogoutUseCase]: nothing was hydrated yet, so there is no local data to
-&nbsp; * wipe and no shutdown gate to trip. The `users` row written by
-&nbsp; * [com.georgeci.moneysurfer.domain.auth.AuthLocalRepository] is left in place — it is an idempotent
-&nbsp; * upsert that the retry rewrites anyway, and deleting it would cascade into rows a later attempt
-&nbsp; * still wants.
+&nbsp; * Half-open so consecutive windows tile the timeline without overlapping —
+&nbsp; * a transaction on a boundary date belongs to exactly one window.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class AbandonAuthSessionUseCase(
-<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
-<b class="fc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
+<b class="fc">&nbsp;data class BudgetPeriodWindow(</b>
+<b class="fc">&nbsp;    val startInclusive: LocalDate,</b>
+<b class="fc">&nbsp;    val endExclusive: LocalDate,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+<b class="fc">&nbsp;    operator fun contains(date: LocalDate): Boolean = date &gt;= startInclusive &amp;&amp; date &lt; endExclusive</b>
+&nbsp;}
 &nbsp;
-&nbsp;    /**
-&nbsp;     * [isAnon] must be `true` for an anonymous sign-in. An anonymous account has no credential to
-&nbsp;     * sign back in with: `signInAnonymously()` reuses `auth.currentUser` when there is one and
-&nbsp;     * mints a brand-new uid otherwise. Signing out would therefore make the *previous* anonymous
-&nbsp;     * account — and whatever it already owns on Firestore — permanently unreachable, over what may
-&nbsp;     * be a transient bootstrap failure. Clearing the local pointers is enough to put the user back
-&nbsp;     * on the sign-in screen; the provider session is left alone so a retry lands on the same uid.
-&nbsp;     */
-&nbsp;    suspend operator fun invoke(isAnon: Boolean) {
-<b class="fc">&nbsp;        log.w { &quot;[rollback] clearing session pointers after a failed post-auth bootstrap&quot; }</b>
-&nbsp;        // One store edit, so a crash mid-rollback cannot leave a half-cleared session behind —
-&nbsp;        // which is the state this use case exists to get out of.
-<b class="fc">&nbsp;        sessionMutator.clearSession()</b>
+&nbsp;/**
+&nbsp; * The window that contains [today]. Pure — the caller supplies the date, so there is
+&nbsp; * no `Clock` dependency and the maths stays trivially testable.
+&nbsp; */
+&nbsp;fun Budget.currentWindow(today: LocalDate): BudgetPeriodWindow = windowContaining(today)
 &nbsp;
-<b class="fc">&nbsp;        if (isAnon) {</b>
-<b class="fc">&nbsp;            log.i { &quot;[rollback] keeping the anonymous provider session — signing out would orphan it&quot; }</b>
-&nbsp;            return
-&nbsp;        }
-&nbsp;        // Best-effort: a provider session that outlives the pointers is harmless — the next
-&nbsp;        // sign-in overwrites it — but a throw here would mask the original bootstrap failure.
-<b class="fc">&nbsp;        Either.catch { authRemoteRepository.signOut() }</b>
-<b class="fc">&nbsp;            .onLeft { log.w(it) { &quot;[rollback] signOut failed — pointers are cleared regardless&quot; } }</b>
-&nbsp;    }
+&nbsp;/**
+&nbsp; * The window containing [date], counting whole periods from [Budget.startDate].
+&nbsp; *
+&nbsp; * Windows extend backwards before `startDate` too — [previousWindow] relies on that to
+&nbsp; * compute a rollover carry for the very first period.
+&nbsp; */
+&nbsp;fun Budget.windowContaining(date: LocalDate): BudgetPeriodWindow {
+&nbsp;    var index = estimatedIndexOf(date)
+&nbsp;    while (anchorAt(index) &gt; date) index--
+&nbsp;    while (anchorAt(index + 1) &lt;= date) index++
+&nbsp;    return BudgetPeriodWindow(anchorAt(index), anchorAt(index + 1))
+&nbsp;}
 &nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;AbandonAuthSession&quot;
-&nbsp;    }
+&nbsp;/** The window immediately preceding [window] — the source of a rollover carry. */
+&nbsp;fun Budget.previousWindow(window: BudgetPeriodWindow): BudgetPeriodWindow =
+&nbsp;    windowContaining(window.startInclusive.minus(1, DateTimeUnit.DAY))
+&nbsp;
+&nbsp;/**
+&nbsp; * The period boundary [index] whole periods after [Budget.startDate], negative index
+&nbsp; * counting backwards.
+&nbsp; *
+&nbsp; * Every anchor is derived from `startDate` itself rather than from the previous anchor, so
+&nbsp; * short-month clamping never accumulates: a budget anchored on the 31st yields Jan 31 →
+&nbsp; * Feb 28 → Mar 31, not Jan 31 → Feb 28 → Mar 28. `LocalDate.plus` clamps a month/year step
+&nbsp; * to the last valid day of the target month, which is exactly the anchoring rule we want
+&nbsp; * (including Feb 29 → Feb 28 for a yearly budget in a non-leap year).
+&nbsp; */
+&nbsp;private fun Budget.anchorAt(index: Int): LocalDate = when (period) {
+&nbsp;    BudgetPeriod.WEEKLY -&gt; startDate.plus(index * DAYS_PER_WEEK, DateTimeUnit.DAY)
+&nbsp;    BudgetPeriod.MONTHLY -&gt; startDate.plus(index, DateTimeUnit.MONTH)
+&nbsp;    BudgetPeriod.YEARLY -&gt; startDate.plus(index, DateTimeUnit.YEAR)
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * A cheap first guess at the index whose window holds [date]. Clamping and truncation make it
+&nbsp; * off by at most one period, which the correction loops in [windowContaining] walk off.
+&nbsp; */
+&nbsp;private fun Budget.estimatedIndexOf(date: LocalDate): Int = when (period) {
+&nbsp;    BudgetPeriod.WEEKLY -&gt; startDate.daysUntil(date).floorDiv(DAYS_PER_WEEK)
+&nbsp;    BudgetPeriod.MONTHLY -&gt; startDate.monthsUntil(date)
+&nbsp;    BudgetPeriod.YEARLY -&gt; startDate.yearsUntil(date)
 &nbsp;}
 </code>
 </pre>
@@ -211,7 +197,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

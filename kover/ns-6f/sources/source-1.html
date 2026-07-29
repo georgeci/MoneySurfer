@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SessionShutdownGateImpl</title>
+  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.di</a>
 </div>
 
-<h1>Coverage Summary for Class: SessionShutdownGateImpl (com.georgeci.moneysurfer.sync.internal)</h1>
+<h1>Coverage Summary for Class: ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt (com.georgeci.moneysurfer.sync.internal.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SessionShutdownGateImpl</td>
+  <td class="name">ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (5/5)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (15/15)
+    (0/226)
   </span>
 </td>
 </tr>
@@ -90,38 +90,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-
-<pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
-&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
-&nbsp;import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
-&nbsp;import org.koin.core.annotation.Single
-&nbsp;
-&nbsp;/**
-&nbsp; * Order matters:
-&nbsp; * 1. Cancel queued / running sync first so no in-flight push/pull races
-&nbsp; *    with the upcoming local data wipe.
-&nbsp; * 2. Cancel background schedules so they don&#39;t fire after wipe and re-upload
-&nbsp; *    nothing or hit `AuthRequired` because the session is gone.
-&nbsp; *
-&nbsp; * Both [SyncCoordinator.cancelAll] and [BackgroundSyncScheduler.cancelAll]
-&nbsp; * are idempotent — safe to call multiple times.
-&nbsp; */
-<b class="fc">&nbsp;@Single(binds = [SessionShutdownGate::class])</b>
-&nbsp;class SessionShutdownGateImpl(
-<b class="fc">&nbsp;    private val coordinator: SyncCoordinator,</b>
-<b class="fc">&nbsp;    private val scheduler: BackgroundSyncScheduler,</b>
-&nbsp;) : SessionShutdownGate {
-&nbsp;
-&nbsp;    override suspend fun shutdown() {
-<b class="fc">&nbsp;        coordinator.cancelAll()</b>
-<b class="fc">&nbsp;        scheduler.cancelAll()</b>
-&nbsp;    }
-&nbsp;}
-</code>
-</pre>
+  <code class="sourceCode">Source code is not available<br /></code>
 </div>
 
 <script type="text/javascript">
@@ -143,7 +112,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>

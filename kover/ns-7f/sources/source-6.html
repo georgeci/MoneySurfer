@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferAuthBackgroundKt</title>
+  <title>MoneySurfer Coverage Report > SurferFilterChipRowKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferAuthBackgroundKt (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferFilterChipRowKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferAuthBackgroundKt</td>
+  <td class="name">SurferFilterChipRowKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,18 +60,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
     50%
   </span>
   <span class="absValue">
-    (4/8)
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55%
+  </span>
+  <span class="absValue">
+    (11/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (76/76)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.6%
+    96%
   </span>
   <span class="absValue">
-    (499/506)
+    (288/300)
   </span>
 </td>
 </tr>
@@ -99,169 +99,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import androidx.compose.foundation.Canvas
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.Brush
-&nbsp;import androidx.compose.ui.graphics.Path
-&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AuthColors
-&nbsp;
-<b class="fc">&nbsp;private val WaveBandHeight: Dp = 220.dp</b>
-&nbsp;
-&nbsp;private const val DefaultCp1X: Float = 0.22f
-&nbsp;private const val DefaultCp1Y: Float = -30f
-&nbsp;private const val DefaultCp2X: Float = 0.42f
-&nbsp;private const val DefaultCp2Y: Float = 30f
-&nbsp;private const val DefaultMidX: Float = 0.63f
-&nbsp;private const val DefaultCp3X: Float = 0.78f
-&nbsp;private const val DefaultCp3Y: Float = -25f
-&nbsp;private const val DefaultCp4X: Float = 0.92f
-&nbsp;private const val DefaultCp4Y: Float = 15f
-&nbsp;
-&nbsp;private data class WaveCrest(
-&nbsp;    val startY: Float,
-&nbsp;    val midY: Float,
-&nbsp;    val endY: Float,
-&nbsp;    val cp1X: Float = DefaultCp1X,
-&nbsp;    val cp1Y: Float = DefaultCp1Y,
-&nbsp;    val cp2X: Float = DefaultCp2X,
-&nbsp;    val cp2Y: Float = DefaultCp2Y,
-&nbsp;    val midX: Float = DefaultMidX,
-&nbsp;    val cp3X: Float = DefaultCp3X,
-&nbsp;    val cp3Y: Float = DefaultCp3Y,
-&nbsp;    val cp4X: Float = DefaultCp4X,
-&nbsp;    val cp4Y: Float = DefaultCp4Y,
-&nbsp;)
-&nbsp;
-<b class="fc">&nbsp;private val BackCrest = WaveCrest(startY = 0.40f, midY = 0.60f, endY = 0.50f)</b>
-<b class="fc">&nbsp;private val MidCrest = WaveCrest(startY = 0.60f, midY = 0.78f, endY = 0.65f)</b>
-&nbsp;private const val BackCrestAlpha: Float = 0.55f
-&nbsp;private const val MidCrestAlpha: Float = 0.85f
-&nbsp;private const val FrontCrestStartY: Float = 0.82f
-&nbsp;private const val FrontCp1X: Float = 0.20f
-&nbsp;private const val FrontCp1Y: Float = 0.74f
-&nbsp;private const val FrontCp2X: Float = 0.45f
-&nbsp;private const val FrontCp2Y: Float = 0.93f
-&nbsp;private const val FrontMidX: Float = 0.66f
-&nbsp;private const val FrontMidY: Float = 0.84f
-&nbsp;private const val FrontCp3X: Float = 0.83f
-&nbsp;private const val FrontCp3Y: Float = 0.76f
-&nbsp;private const val FrontCp4X: Float = 0.95f
-&nbsp;private const val FrontCp4Y: Float = 0.88f
-&nbsp;private const val FrontEndY: Float = 0.82f
-&nbsp;private const val FrontGradientStartY: Float = 0.74f
-&nbsp;private const val FrontGradientAlpha: Float = 0.55f
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/**
-&nbsp; * The green gradient + wave band behind every pre-auth screen (onboarding + sign-in). Draw it edge
-&nbsp; * to edge (outside of [com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets]) so it tints the
-&nbsp; * status bar and the navigation bar / gesture ribbon as well.
+&nbsp; * Row of mutually-exclusive filter chips. Each chip is a [SurferSelectableChip]: the selected one
+&nbsp; * fills with `secondaryContainer` and shows a leading check, the rest stay outline-only. Caller
+&nbsp; * maps the picked option however it likes — the row is stateless.
+&nbsp; *
+&nbsp; * [optionTestTag] tags each chip individually. The row-level [modifier] cannot do that, and
+&nbsp; * without a per-chip tag an E2E driver has nothing to aim at but the chip&#39;s localized label —
+&nbsp; * which is exactly the coupling issue #352 removes.
 &nbsp; */
 &nbsp;@Composable
-<b class="pc">&nbsp;fun SurferAuthBackground(modifier: Modifier = Modifier) {</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = modifier.background(</b>
-<b class="fc">&nbsp;            Brush.verticalGradient(</b>
-<b class="fc">&nbsp;                colors = listOf(AuthColors.GreenTop, AuthColors.GreenBottom),</b>
-&nbsp;            ),
-&nbsp;        ),
+&nbsp;fun &lt;T&gt; SurferFilterChipRow(
+&nbsp;    options: List&lt;T&gt;,
+&nbsp;    selected: T,
+&nbsp;    label: @Composable (T) -&gt; String,
+&nbsp;    onSelect: (T) -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    optionTestTag: ((T) -&gt; String)? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
 &nbsp;    ) {
-<b class="fc">&nbsp;        WaveDecoration(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .align(Alignment.BottomCenter)</b>
-<b class="fc">&nbsp;                .fillMaxWidth()</b>
-<b class="fc">&nbsp;                .height(WaveBandHeight),</b>
-&nbsp;        )
+<b class="fc">&nbsp;        options.forEach { option -&gt;</b>
+<b class="fc">&nbsp;            SurferSelectableChip(</b>
+<b class="fc">&nbsp;                label = label(option),</b>
+<b class="fc">&nbsp;                selected = option == selected,</b>
+<b class="fc">&nbsp;                onClick = { onSelect(option) },</b>
+<b class="pc">&nbsp;                modifier = optionTestTag?.let { Modifier.testTag(it(option)) } ?: Modifier,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
+&nbsp;@Preview
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun WaveDecoration(modifier: Modifier = Modifier) {</b>
-<b class="fc">&nbsp;    Canvas(modifier = modifier) {</b>
-<b class="fc">&nbsp;        val w = size.width</b>
-<b class="fc">&nbsp;        val h = size.height</b>
-&nbsp;
-&nbsp;        fun crestPath(crest: WaveCrest): Path {
-<b class="fc">&nbsp;            val startY = h * crest.startY</b>
-<b class="fc">&nbsp;            val midY = h * crest.midY</b>
-<b class="fc">&nbsp;            val endY = h * crest.endY</b>
-<b class="fc">&nbsp;            return Path().apply {</b>
-<b class="fc">&nbsp;                moveTo(0f, startY)</b>
-<b class="fc">&nbsp;                cubicTo(</b>
-<b class="fc">&nbsp;                    w * crest.cp1X,</b>
-<b class="fc">&nbsp;                    startY + crest.cp1Y,</b>
-<b class="fc">&nbsp;                    w * crest.cp2X,</b>
-<b class="fc">&nbsp;                    midY + crest.cp2Y,</b>
-<b class="fc">&nbsp;                    w * crest.midX,</b>
-<b class="fc">&nbsp;                    midY,</b>
-&nbsp;                )
-<b class="fc">&nbsp;                cubicTo(</b>
-<b class="fc">&nbsp;                    w * crest.cp3X,</b>
-<b class="fc">&nbsp;                    midY + crest.cp3Y,</b>
-<b class="fc">&nbsp;                    w * crest.cp4X,</b>
-<b class="fc">&nbsp;                    endY + crest.cp4Y,</b>
-<b class="fc">&nbsp;                    w,</b>
-<b class="fc">&nbsp;                    endY,</b>
-&nbsp;                )
-<b class="fc">&nbsp;                lineTo(w, h)</b>
-<b class="fc">&nbsp;                lineTo(0f, h)</b>
-&nbsp;                close()
-<b class="fc">&nbsp;            }</b>
-&nbsp;        }
-&nbsp;
-<b class="fc">&nbsp;        drawPath(</b>
-<b class="fc">&nbsp;            path = crestPath(BackCrest),</b>
-<b class="fc">&nbsp;            color = AuthColors.WaveBack,</b>
-<b class="fc">&nbsp;            alpha = BackCrestAlpha,</b>
-&nbsp;        )
-<b class="fc">&nbsp;        drawPath(</b>
-<b class="fc">&nbsp;            path = crestPath(MidCrest),</b>
-<b class="fc">&nbsp;            color = AuthColors.WaveMid,</b>
-<b class="fc">&nbsp;            alpha = MidCrestAlpha,</b>
-&nbsp;        )
-<b class="fc">&nbsp;        drawPath(</b>
-<b class="fc">&nbsp;            path = Path().apply {</b>
-<b class="fc">&nbsp;                moveTo(0f, h * FrontCrestStartY)</b>
-<b class="fc">&nbsp;                cubicTo(</b>
-<b class="fc">&nbsp;                    w * FrontCp1X,</b>
-<b class="fc">&nbsp;                    h * FrontCp1Y,</b>
-<b class="fc">&nbsp;                    w * FrontCp2X,</b>
-<b class="fc">&nbsp;                    h * FrontCp2Y,</b>
-<b class="fc">&nbsp;                    w * FrontMidX,</b>
-<b class="fc">&nbsp;                    h * FrontMidY,</b>
-&nbsp;                )
-<b class="fc">&nbsp;                cubicTo(</b>
-<b class="fc">&nbsp;                    w * FrontCp3X,</b>
-<b class="fc">&nbsp;                    h * FrontCp3Y,</b>
-<b class="fc">&nbsp;                    w * FrontCp4X,</b>
-<b class="fc">&nbsp;                    h * FrontCp4Y,</b>
-<b class="fc">&nbsp;                    w,</b>
-<b class="fc">&nbsp;                    h * FrontEndY,</b>
-&nbsp;                )
-<b class="fc">&nbsp;                lineTo(w, h)</b>
-<b class="fc">&nbsp;                lineTo(0f, h)</b>
-&nbsp;                close()
-<b class="fc">&nbsp;            },</b>
-<b class="fc">&nbsp;            brush = Brush.verticalGradient(</b>
-<b class="fc">&nbsp;                colors = listOf(</b>
-<b class="fc">&nbsp;                    AuthColors.WaveFront.copy(alpha = 0f),</b>
-<b class="fc">&nbsp;                    AuthColors.WaveFront.copy(alpha = FrontGradientAlpha),</b>
-&nbsp;                ),
-<b class="fc">&nbsp;                startY = h * FrontGradientStartY,</b>
-<b class="fc">&nbsp;                endY = h,</b>
-&nbsp;            ),
+&nbsp;private fun SurferFilterChipRowPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferFilterChipRow(
+&nbsp;            modifier = Modifier.padding(all = 16.dp),
+&nbsp;            options = listOf(&quot;All&quot;, &quot;Expenses&quot;, &quot;Income&quot;),
+&nbsp;            selected = &quot;All&quot;,
+&nbsp;            label = { it },
+&nbsp;            onSelect = {},
 &nbsp;        )
 &nbsp;    }
-<b class="fc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -285,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-29 14:00</div>
 </div>
 </body>
 </html>
