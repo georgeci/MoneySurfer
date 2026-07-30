@@ -23,6 +23,7 @@
     <string name="dashboard_customize_widget_goals">Цели</string>
     <string name="dashboard_customize_widget_recent">Последние транзакции</string>
     <string name="dashboard_customize_widget_insights">Подсказки</string>
+    <string name="dashboard_customize_widget_spent_month">Расходы за месяц</string>
     <string name="dashboard_customize_style_subtitle">Выберите, как эта карточка выглядит на дашборде.</string>
     <string name="dashboard_customize_style_size">Размер</string>
     <string name="dashboard_customize_style_variant">Стиль</string>
@@ -82,6 +83,12 @@
     <string name="dashboard_safe_to_spend_empty_title">Бюджета пока нет</string>
     <string name="dashboard_safe_to_spend_empty_subtitle">Задайте лимит, чтобы видеть, сколько можно потратить.</string>
     <string name="dashboard_safe_to_spend_set_budget">Задать бюджет</string>
+    <string name="dashboard_spent_month_title">Расходы за месяц</string>
+    <string name="dashboard_spent_month_of_budget">из бюджета %1$s</string>
+    <string name="dashboard_spent_month_no_budget">Бюджет не задан</string>
+    <string name="dashboard_spent_month_delta_up">+%1$d% к прошлому</string>
+    <string name="dashboard_spent_month_delta_down">−%1$d% к прошлому</string>
+    <string name="dashboard_spent_month_delta_flat">На уровне прошлого</string>
     <string name="dashboard_burn_rate_title">Темп трат</string>
     <string name="dashboard_burn_rate_average">%1$s в день</string>
     <string name="dashboard_burn_rate_caption">за последние 7 дней</string>

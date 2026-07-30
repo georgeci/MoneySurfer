@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -8,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.feature.dashboard.spentMonthCardHeight
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -43,6 +45,7 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentMonthWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
@@ -94,8 +97,17 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_cate
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_down
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_of_budget
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_title
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+
+/** The picker's half of the size mapping — lifted out so the tile table stays a table. */
+private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
+    DashboardWidgetSize.Expanded -> SurferWidgetSize.Expanded
+    DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
+}
 
 /**
  * Width the sample widget is laid out at before it is scaled into a picker tile: the dashboard's
@@ -119,17 +131,14 @@ internal fun DashboardWidgetPreview(
     cardStyle: DashboardCardStyle,
     modifier: Modifier = Modifier,
 ) {
-    val widgetSize = when (cardStyle.size) {
-        DashboardWidgetSize.Expanded -> SurferWidgetSize.Expanded
-        DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
-    }
-    CompositionLocalProvider(LocalSurferWidgetSize provides widgetSize) {
+    CompositionLocalProvider(LocalSurferWidgetSize provides cardStyle.size.toWidgetSize()) {
         val content = Modifier
             .surferScaleToWidth(PREVIEW_CONTENT_WIDTH)
             .fillMaxWidth()
         when (type) {
             DashboardWidgetType.Balance -> BalancePreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
+            DashboardWidgetType.SpentMonth -> SpentMonthPreview(modifier.then(content))
             DashboardWidgetType.SafeToSpend -> SafeToSpendPreview(modifier.then(content))
             DashboardWidgetType.BurnRate -> BurnRatePreview(modifier.then(content))
             DashboardWidgetType.Budgets -> BudgetsPreview(modifier.then(content))
@@ -206,6 +215,28 @@ private fun SafeToSpendPreview(modifier: Modifier) {
             status = SurferBudgetStatus.Ok,
         ),
         modifier = modifier,
+    )
+}
+
+/**
+ * Sample numbers again, for the same reason [SafeToSpendPreview] uses them: the tile is drawn for
+ * every widget in the picker, including the ones switched off, so it must not depend on the month
+ * holding any spend — or on a budget existing to measure it against.
+ *
+ * The card fills the height it is given, so the tile takes the dashboard's own height for the size
+ * being previewed — the picker's whole job is showing what that size looks like, and the two
+ * densities really are different heights.
+ */
+@Composable
+private fun SpentMonthPreview(modifier: Modifier) {
+    SurferSpentMonthWidget(
+        title = stringResource(Res.string.dashboard_spent_month_title),
+        spent = SAMPLE_SPENT_MONTH,
+        progress = SAMPLE_SPENT_MONTH_PROGRESS,
+        caption = stringResource(Res.string.dashboard_spent_month_of_budget, SAMPLE_BUDGET_LIMIT),
+        trailingLabel = stringResource(Res.string.dashboard_spent_month_delta_down, SAMPLE_SPENT_MONTH_DELTA),
+        trailingLabelColor = AppTheme.semanticColors.income,
+        modifier = modifier.height(spentMonthCardHeight()),
     )
 }
 
@@ -535,6 +566,9 @@ private const val SAMPLE_SAFE_PER_DAY = "€53.52"
 private const val SAMPLE_DAYS_LEFT = 12
 private const val SAMPLE_SAFE_PROGRESS = 0.64f
 private const val SAMPLE_SAFE_PACE = 0.6f
+private const val SAMPLE_SPENT_MONTH = "€1,173.69"
+private const val SAMPLE_SPENT_MONTH_PROGRESS = 0.65f
+private const val SAMPLE_SPENT_MONTH_DELTA = 18
 private const val SAMPLE_BURN_AVERAGE = "€42.10"
 private const val SAMPLE_BURN_PROJECTION = "€1,263"
 private const val SAMPLE_BURN_FIRST_DAY = 22

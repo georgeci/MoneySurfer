@@ -95,6 +95,9 @@ object DashboardTestTags {
      * their labels, both of which this screen owns.
      */
     const val QuickActions = "dashboard:quickActions"
+
+    /** The whole spent-this-month card, with or without a budget behind its bar. */
+    const val SpentMonth = "dashboard:spentMonth"
     const val SafeToSpend = "dashboard:safeToSpend"
 
     /** The "Set a budget" link, shown only while the safe-to-spend widget has no budget to read. */
@@ -271,6 +274,7 @@ internal fun DashboardWidget(
     when (type) {
         DashboardWidgetType.Balance -> BalanceWidget(state, variant)
         DashboardWidgetType.QuickActions -> QuickActionsWidget(state, onEvent)
+        DashboardWidgetType.SpentMonth -> SpentMonthWidget(state)
         DashboardWidgetType.SafeToSpend -> SafeToSpendWidget(state, onEvent)
         DashboardWidgetType.BurnRate -> BurnRateWidget(state)
         DashboardWidgetType.Budgets -> BudgetsWidget(state, onEvent)
