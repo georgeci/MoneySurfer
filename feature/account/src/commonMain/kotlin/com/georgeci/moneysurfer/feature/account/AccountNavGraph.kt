@@ -15,6 +15,8 @@ import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
 import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 import io.github.irgaly.navigation3.resultstate.LocalNavigationResultProducer
 import io.github.irgaly.navigation3.resultstate.setResult
 
@@ -74,13 +76,24 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.AccountDetails>(
         metadata = SurferPaneSceneStrategy.detailPane(),
     ) { key ->
+        // The panel route is only pushed on a window that can actually lay it out as a third
+        // column. Below that it would be presented as the ordinary full-screen form anyway, and
+        // pushing it would leave an extra-pane entry buried in the back stack: anything stacked on
+        // top of it (the form's own "create category", say) makes the pane host decline the whole
+        // scene, collapsing the section from two panes to one. Pushing the plain creation route
+        // keeps narrow and Expanded windows exactly where they were.
+        val inlinePanel = currentSurferWindowSize() >= SurferWindowSize.Large
         AccountDetailsScreen(
             accountId = AccountId(key.accountId),
             onNavigateBack = { navigator.pop() },
-            // The Accounts-scoped creation route: the same form, presented as the design's inline
-            // add panel on a three-column window and as the usual full-screen route below it.
             onNavigateToTransactionCreation = { accountId ->
-                navigator.push(Route.AccountTransactionCreation(accountId = accountId.value))
+                navigator.push(
+                    if (inlinePanel) {
+                        Route.AccountTransactionCreation(accountId = accountId.value)
+                    } else {
+                        Route.TransactionCreation(accountId = accountId.value)
+                    },
+                )
             },
             onNavigateToTransactionDetails = { transactionId ->
                 navigator.push(Route.TransactionDetails(transactionId.value))

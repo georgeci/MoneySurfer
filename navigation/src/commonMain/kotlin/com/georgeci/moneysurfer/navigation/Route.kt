@@ -165,8 +165,11 @@ sealed interface Route : NavKey {
      *
      * It cannot simply be [TransactionCreation] with different metadata: a nav entry declares its
      * pane once, for every caller, and the transactions list opens the very same form *as* its
-     * detail pane. Below the three-column breakpoint this route behaves exactly like
-     * [TransactionCreation] — same full-screen form, same state.
+     * detail pane.
+     *
+     * Only pushed on a window wide enough for that third column — below it the account detail
+     * pushes plain [TransactionCreation] instead, so no extra-pane entry is ever left buried in a
+     * back stack that cannot lay one out.
      */
     @Serializable
     data class AccountTransactionCreation(val accountId: String) : Route
