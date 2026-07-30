@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -37,9 +38,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun SpentMonthWidget(state: DashboardState.Content) {
     val spentMonth = state.spentMonth
-    // Read here as well as inside the card, so the height the card is given matches the density it
-    // draws at — otherwise the user's Compact choice buys a denser card in the same footprint.
-    val compact = LocalSurferWidgetSize.current == SurferWidgetSize.Compact
     SurferSpentMonthWidget(
         title = stringResource(Res.string.dashboard_spent_month_title),
         spent = spentMonth?.spentFormatted ?: NO_AMOUNT,
@@ -51,7 +49,7 @@ internal fun SpentMonthWidget(state: DashboardState.Content) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
-            .height(if (compact) SPENT_MONTH_COMPACT_HEIGHT else SPENT_MONTH_HEIGHT)
+            .height(spentMonthCardHeight())
             .testTag(DashboardTestTags.SpentMonth),
     )
 }
@@ -99,11 +97,25 @@ private fun SpentMonthDeltaUi.color(): Color? = when (trend) {
 }
 
 /**
- * Fixed heights, unlike the list-shaped cards' floor: this card draws the same four rows whatever the
- * month holds, so it needs a height rather than a minimum — `SurferSpentMonthWidget` fills what it is
- * given. One per density, so the size the user picked changes the card's footprint and not only its
+ * The height this card is drawn at, for the density in scope.
+ *
+ * Fixed, unlike the list-shaped cards' floor: it draws the same four rows whatever the month holds,
+ * so it needs a height rather than a minimum — `SurferSpentMonthWidget` fills what it is given. One
+ * value per density, so the size the user picked changes the card's footprint and not only its
  * typography.
+ *
+ * Internal and shared with the customize picker's tile rather than restated there: the picker exists
+ * to show what the two sizes look like, so a tile drawn at a height the dashboard does not use is a
+ * thumbnail that misrepresents the choice it is offering.
  */
+@Composable
+internal fun spentMonthCardHeight(): Dp =
+    if (LocalSurferWidgetSize.current == SurferWidgetSize.Compact) {
+        SPENT_MONTH_COMPACT_HEIGHT
+    } else {
+        SPENT_MONTH_HEIGHT
+    }
+
 private val SPENT_MONTH_HEIGHT = 160.dp
 private val SPENT_MONTH_COMPACT_HEIGHT = 132.dp
 

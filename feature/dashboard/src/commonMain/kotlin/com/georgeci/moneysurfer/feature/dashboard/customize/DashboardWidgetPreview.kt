@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.feature.dashboard.spentMonthCardHeight
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -222,7 +223,9 @@ private fun SafeToSpendPreview(modifier: Modifier) {
  * every widget in the picker, including the ones switched off, so it must not depend on the month
  * holding any spend — or on a budget existing to measure it against.
  *
- * The card fills the height it is given, so the tile pins the one the dashboard draws it at.
+ * The card fills the height it is given, so the tile takes the dashboard's own height for the size
+ * being previewed — the picker's whole job is showing what that size looks like, and the two
+ * densities really are different heights.
  */
 @Composable
 private fun SpentMonthPreview(modifier: Modifier) {
@@ -233,7 +236,7 @@ private fun SpentMonthPreview(modifier: Modifier) {
         caption = stringResource(Res.string.dashboard_spent_month_of_budget, SAMPLE_BUDGET_LIMIT),
         trailingLabel = stringResource(Res.string.dashboard_spent_month_delta_down, SAMPLE_SPENT_MONTH_DELTA),
         trailingLabelColor = AppTheme.semanticColors.income,
-        modifier = modifier.height(SAMPLE_SPENT_MONTH_HEIGHT),
+        modifier = modifier.height(spentMonthCardHeight()),
     )
 }
 
@@ -566,7 +569,6 @@ private const val SAMPLE_SAFE_PACE = 0.6f
 private const val SAMPLE_SPENT_MONTH = "€1,173.69"
 private const val SAMPLE_SPENT_MONTH_PROGRESS = 0.65f
 private const val SAMPLE_SPENT_MONTH_DELTA = 18
-private val SAMPLE_SPENT_MONTH_HEIGHT = 160.dp
 private const val SAMPLE_BURN_AVERAGE = "€42.10"
 private const val SAMPLE_BURN_PROJECTION = "€1,263"
 private const val SAMPLE_BURN_FIRST_DAY = 22
