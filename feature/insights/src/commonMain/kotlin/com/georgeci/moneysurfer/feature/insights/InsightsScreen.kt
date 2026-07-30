@@ -105,8 +105,12 @@ fun InsightsScreen(
     InsightsContent(state = state, onEvent = viewModel::onEvent)
 }
 
+/**
+ * The stateless half of the screen. Public, like `DashboardContent`, because the desktop UI tests in
+ * `:composeApp` mount it with an injected state — see docs/testing/testing-strategy.md.
+ */
 @Composable
-internal fun InsightsContent(
+fun InsightsContent(
     state: InsightsState,
     onEvent: (InsightsEvent) -> Unit,
 ) {
