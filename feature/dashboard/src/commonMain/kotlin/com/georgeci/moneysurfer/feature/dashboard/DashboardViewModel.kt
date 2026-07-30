@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.SpentByCategory
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
+import com.georgeci.moneysurfer.domain.model.UpcomingRecurring
 import com.georgeci.moneysurfer.domain.model.buildBalanceTrend
 import com.georgeci.moneysurfer.domain.model.safeToSpend
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -29,6 +30,7 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
@@ -42,6 +44,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetUpcomingRecurringUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -73,6 +76,7 @@ class DashboardViewModel(
     private val generateInsights: GenerateInsightsUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
+    private val getUpcomingRecurring: GetUpcomingRecurringUseCase,
     uiPreferences: UiPreferences,
     hostCapabilities: HostCapabilities,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
@@ -191,6 +195,13 @@ class DashboardViewModel(
                 // rest of the dashboard draw without waiting on them.
                 .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights ->
                     content.copy(insights = insights.map { it.toUi() })
+                }
+                // Chained rather than folded in above for the same reason the insights are: the
+                // five-flow ceiling is already taken, and joining here costs the upcoming card
+                // nothing — it re-dates itself on a timer, so it is never what the rest is waiting
+                // on.
+                .combine(getUpcomingRecurring().onStart { emit(emptyList()) }) { content, upcoming ->
+                    content.copy(upcoming = upcoming.map { it.toUi() })
                 }
                 .collect { newContent -> updateState { newContent } }
         }
@@ -483,6 +494,12 @@ sealed interface DashboardState {
         val burnRate: BurnRateUi? = null,
         /** Generated spending insights, most actionable first. Empty until the engine has run. */
         val insights: List<InsightUi> = emptyList(),
+        /**
+         * The scheduled payments still to come, soonest first. Empty is the upcoming card's own
+         * "nothing scheduled" state — a workspace that keeps no recurring rules is the common case,
+         * not a missing read.
+         */
+        val upcoming: List<UpcomingRecurringUi> = emptyList(),
         val isOffline: Boolean = false,
         /**
          * Whether this build offers multi-account transfers. The quick-actions widget is the only
@@ -527,6 +544,23 @@ private data class WidgetSources(
     val budgetProgress: List<BudgetProgress>,
     val burnRate: BurnRate?,
     val categorySpend: SpentByCategory?,
+)
+
+/**
+ * One scheduled payment as the card draws it. The due *label* is not built here: "Today" and
+ * "Tomorrow" are copy, and the fallback is a date — so the screen gets the day count and the ISO
+ * date and picks between them where the string resources are.
+ *
+ * File-level like the spend rows' mapper below, rather than a method: it reads nothing off the view
+ * model, and the class is at detekt's function ceiling.
+ */
+private fun UpcomingRecurring.toUi() = UpcomingRecurringUi(
+    id = ruleId,
+    name = title,
+    amountFormatted = MoneyFormatter.format(amount, currency),
+    dueDateIso = dueDate.toString(),
+    daysUntil = daysUntil,
+    isImminent = isImminent,
 )
 
 /**
@@ -743,6 +777,22 @@ data class BurnRateDayUi(
     val fraction: Float,
     /** The last bar — a day still being spent, which the chart draws solid. */
     val isToday: Boolean,
+)
+
+/**
+ * One row of the upcoming card. Money is formatted here; the due label is assembled on the screen,
+ * which is where the "Today"/"Tomorrow" strings are.
+ */
+data class UpcomingRecurringUi(
+    val id: RecurringRuleId,
+    val name: String,
+    val amountFormatted: String,
+    /** ISO — the fallback label, for the reason the balance card's "as of" date is one. */
+    val dueDateIso: String,
+    /** Whole days from today. `0` is today, `1` tomorrow; never negative. */
+    val daysUntil: Int,
+    /** Whether the row gets the tint — today and tomorrow. Decided in the domain, not re-derived. */
+    val isImminent: Boolean,
 )
 
 data class TransactionUi(

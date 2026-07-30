@@ -117,6 +117,9 @@ object DashboardTestTags {
     const val AddAccount = "dashboard:addAccount"
     const val AccountsManage = "dashboard:accountsManage"
     const val Insights = "dashboard:insights"
+
+    /** The whole upcoming-payments card, whether it lists rows or its empty state. */
+    const val Recurring = "dashboard:recurring"
     const val Recent = "dashboard:recent"
     const val RecentSeeAll = "dashboard:recentSeeAll"
     const val RecentEmpty = "dashboard:recentEmpty"
@@ -278,6 +281,7 @@ internal fun DashboardWidget(
         DashboardWidgetType.CategoriesDonut -> CategoriesDonutWidget(state)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Insights -> InsightsWidget(state, variant)
+        DashboardWidgetType.Recurring -> RecurringWidget(state, onEvent)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)
         DashboardWidgetType.RecentTransactions -> RecentTransactionsWidget(state, onEvent)
     }

@@ -122,9 +122,9 @@ data class DashboardLayoutConfig(
         /**
          * Variant A from the design: the balance headline first, the quick actions under it, then
          * safe-to-spend, the burn rate that explains it, the budgets both are read off, where
-         * the period's money went, the accounts strip, the same spend as a donut, the generated
-         * insights, goals, and the recent-transactions list. Every widget starts enabled and
-         * Hero-sized.
+         * the period's money went, the accounts strip, the same spend as a donut, the payments
+         * still to come, the generated insights, goals, and the recent-transactions list. Every
+         * widget starts enabled and Hero-sized.
          *
          * The spans are that same order read as the desktop mock's three bands: a hero balance
          * beside the shortcuts, a row of three stat cards, the spend chart with the accounts rail
@@ -146,6 +146,7 @@ data class DashboardLayoutConfig(
                 DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),
                 DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),
                 DashboardLayoutItem(DashboardWidgetType.CategoriesDonut, span = DashboardWidgetSpan.Full),
+                DashboardLayoutItem(DashboardWidgetType.Recurring, span = DashboardWidgetSpan.Full),
                 DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),

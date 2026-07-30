@@ -23,6 +23,7 @@
     <string name="dashboard_customize_widget_goals">Goals</string>
     <string name="dashboard_customize_widget_recent">Recent transactions</string>
     <string name="dashboard_customize_widget_insights">Insights</string>
+    <string name="dashboard_customize_widget_recurring">Upcoming payments</string>
     <string name="dashboard_customize_style_subtitle">Pick how this card looks on the dashboard.</string>
     <string name="dashboard_customize_style_size">Size</string>
     <string name="dashboard_customize_style_variant">Style</string>
@@ -126,8 +127,11 @@
     <string name="dashboard_goals_empty_subtitle">Set a savings target to track progress here.</string>
     <string name="dashboard_recurring_title">Upcoming</string>
     <string name="dashboard_recurring_action">Manage</string>
+    <string name="dashboard_recurring_see_all">See all</string>
     <string name="dashboard_recurring_empty_title">Nothing scheduled</string>
     <string name="dashboard_recurring_empty_subtitle">Subscriptions and recurring bills will appear here.</string>
+    <string name="dashboard_recurring_due_today">Today</string>
+    <string name="dashboard_recurring_due_tomorrow">Tomorrow</string>
     <string name="dashboard_insights_title">Insights</string>
     <string name="dashboard_insights_empty_text">Nothing notable this period.</string>
     <string name="dashboard_insights_uncategorized">Uncategorized</string>

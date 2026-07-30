@@ -51,6 +51,14 @@ enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
      * Phase 2. Until then the switch does not claim to drive this card.
      */
     Insights,
+
+    /**
+     * The scheduled payments the next few days hold. **Not** period-scoped, and this one could not
+     * be: it looks forward, and [DashboardPeriod] names a window that has already elapsed. Switching
+     * to Week must not turn "what is about to be charged" into "the next seven days only" —
+     * a rent payment eight days out is exactly what the card exists to warn about.
+     */
+    Recurring,
     Goals,
     RecentTransactions,
 }
