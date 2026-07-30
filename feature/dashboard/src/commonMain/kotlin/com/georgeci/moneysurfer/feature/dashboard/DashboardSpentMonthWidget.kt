@@ -10,7 +10,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentMonthWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_down
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_flat
@@ -35,6 +37,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun SpentMonthWidget(state: DashboardState.Content) {
     val spentMonth = state.spentMonth
+    // Read here as well as inside the card, so the height the card is given matches the density it
+    // draws at — otherwise the user's Compact choice buys a denser card in the same footprint.
+    val compact = LocalSurferWidgetSize.current == SurferWidgetSize.Compact
     SurferSpentMonthWidget(
         title = stringResource(Res.string.dashboard_spent_month_title),
         spent = spentMonth?.spentFormatted ?: NO_AMOUNT,
@@ -46,7 +51,7 @@ internal fun SpentMonthWidget(state: DashboardState.Content) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
-            .height(DASHBOARD_SPENT_MONTH_HEIGHT)
+            .height(if (compact) SPENT_MONTH_COMPACT_HEIGHT else SPENT_MONTH_HEIGHT)
             .testTag(DashboardTestTags.SpentMonth),
     )
 }
@@ -54,13 +59,15 @@ internal fun SpentMonthWidget(state: DashboardState.Content) {
 /**
  * The line under the amount: the cap it is measured against, or the fact that nothing caps it.
  *
- * The no-budget line is shown for the not-yet-resolved state too. It is the honest caption either
- * way — a workspace with no numbers yet has no budget on screen to speak of — and it keeps the card
- * from reflowing as the two flows land a frame apart.
+ * Null while the figure itself is unresolved, which is *not* the same as no budget — a workspace the
+ * device has not pulled yet may well have one, and saying otherwise states something about the
+ * user's money the app has not read. The card loses nothing by staying quiet: its height is pinned
+ * below, and `SurferSpentMonthWidget` drops the caption row entirely when it has nothing for it.
  */
 @Composable
-private fun SpentMonthUi?.caption(): String {
-    val cap = this?.capFormatted ?: return stringResource(Res.string.dashboard_spent_month_no_budget)
+private fun SpentMonthUi?.caption(): String? {
+    val resolved = this ?: return null
+    val cap = resolved.capFormatted ?: return stringResource(Res.string.dashboard_spent_month_no_budget)
     return stringResource(Res.string.dashboard_spent_month_of_budget, cap)
 }
 
@@ -92,10 +99,13 @@ private fun SpentMonthDeltaUi.color(): Color? = when (trend) {
 }
 
 /**
- * Fixed height, unlike the list-shaped cards' floor: this card draws the same four rows whatever the
- * month holds, and the full-width slot it takes in the default grid would otherwise stretch it.
+ * Fixed heights, unlike the list-shaped cards' floor: this card draws the same four rows whatever the
+ * month holds, so it needs a height rather than a minimum — `SurferSpentMonthWidget` fills what it is
+ * given. One per density, so the size the user picked changes the card's footprint and not only its
+ * typography.
  */
-private val DASHBOARD_SPENT_MONTH_HEIGHT = 160.dp
+private val SPENT_MONTH_HEIGHT = 160.dp
+private val SPENT_MONTH_COMPACT_HEIGHT = 132.dp
 
 /** Stands in for the amount until a workspace and a base currency resolve — see [SpentMonthWidget]. */
 private const val NO_AMOUNT = "—"

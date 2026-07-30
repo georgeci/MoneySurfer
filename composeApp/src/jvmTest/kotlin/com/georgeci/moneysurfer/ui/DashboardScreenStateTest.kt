@@ -18,6 +18,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -33,6 +34,8 @@ import com.georgeci.moneysurfer.feature.dashboard.DashboardEvent
 import com.georgeci.moneysurfer.feature.dashboard.DashboardState
 import com.georgeci.moneysurfer.feature.dashboard.DashboardTestTags
 import com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi
+import com.georgeci.moneysurfer.feature.dashboard.SpentMonthDeltaUi
+import com.georgeci.moneysurfer.feature.dashboard.SpentMonthUi
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -238,6 +241,67 @@ class DashboardScreenStateTest : StringSpec({
             onNodeWithText("$BURN_RATE_AVERAGE a day").assertIsDisplayed()
             onNodeWithText("$BURN_RATE_PROJECTION projected by month end").assertIsDisplayed()
             onNodeWithText("Off pace").assertIsDisplayed()
+        }
+    }
+
+    "the spent-this-month card draws the amount, the cap it is under and the month before it" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = SpentMonthUi(
+                            spentFormatted = SPENT_MONTH_AMOUNT,
+                            capFormatted = SPENT_MONTH_CAP,
+                            progress = 0.65f,
+                            delta = SpentMonthDeltaUi(trend = SpendTrend.Down, percent = 18),
+                        ),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.SpentMonth).assertIsDisplayed()
+            onNodeWithText(SPENT_MONTH_AMOUNT).assertIsDisplayed()
+            onNodeWithText("of $SPENT_MONTH_CAP budget").assertIsDisplayed()
+            onNodeWithText("\u221218% vs last").assertIsDisplayed()
+        }
+    }
+
+    "with no budget the spent-this-month card says so rather than inventing a limit" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = SpentMonthUi(
+                            spentFormatted = SPENT_MONTH_AMOUNT,
+                            capFormatted = null,
+                            progress = 0f,
+                        ),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("No budget set").assertIsDisplayed()
+        }
+    }
+
+    "before the month's figure resolves the card claims nothing about a budget" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true)
+                        .copy(spentMonth = null, layout = SPENT_MONTH_ONLY),
+                    onEvent = {},
+                )
+            }
+
+            // A workspace the device has not pulled yet may well have a budget — saying "No budget
+            // set" here would state something about the user's money the app has not read.
+            onNodeWithTag(DashboardTestTags.SpentMonth).assertIsDisplayed()
+            onNodeWithText("No budget set").assertDoesNotExist()
         }
     }
 
@@ -489,6 +553,14 @@ private fun safeToSpendUi(
 
 private const val BURN_RATE_AVERAGE = "€42.10"
 private const val BURN_RATE_PROJECTION = "€1,263.00"
+
+private const val SPENT_MONTH_AMOUNT = "\u20ac1,173.69"
+private const val SPENT_MONTH_CAP = "\u20ac1,800.00"
+
+/** The spent-this-month card alone, for the same reason [BURN_RATE_ONLY] pins the burn rate. */
+private val SPENT_MONTH_ONLY = DashboardLayoutConfig(
+    items = listOf(DashboardLayoutItem(type = DashboardWidgetType.SpentMonth)),
+)
 
 /**
  * The burn-rate card alone, so its projection and pace rows are composed rather than scrolled off
