@@ -115,6 +115,7 @@ class DashboardViewModelTest : StringSpec({
             DashboardWidgetType.Budgets,
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.CategoriesDonut,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )

@@ -30,6 +30,14 @@ enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
     BurnRate,
     Budgets,
     SpentByCategory(isPeriodScoped = true),
+
+    /**
+     * The same per-category spend [SpentByCategory] reads, drawn as a donut with a legend rather
+     * than as rows — so it is period-scoped for exactly the same reason. Two cards over one figure
+     * is a deliberate offer, not a duplicate: the rows answer "how much on what", the donut answers
+     * "what shape is the period", and both read the same use case, so they cannot disagree.
+     */
+    CategoriesDonut(isPeriodScoped = true),
     Accounts,
 
     /**

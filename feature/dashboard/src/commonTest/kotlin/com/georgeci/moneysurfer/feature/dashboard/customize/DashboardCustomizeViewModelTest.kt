@@ -43,6 +43,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.Budgets,
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.CategoriesDonut,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
@@ -64,6 +65,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.Budgets,
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.CategoriesDonut,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
@@ -89,6 +91,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.Budgets,
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.CategoriesDonut,
             DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
@@ -117,6 +120,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.Budgets,
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.CategoriesDonut,
             DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
         )

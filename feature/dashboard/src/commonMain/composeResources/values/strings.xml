@@ -18,6 +18,7 @@
     <string name="dashboard_customize_widget_burn_rate">Burn rate</string>
     <string name="dashboard_customize_widget_budgets">Budgets</string>
     <string name="dashboard_customize_widget_spent_by_category">Spent by category</string>
+    <string name="dashboard_customize_widget_categories_donut">Category donut</string>
     <string name="dashboard_customize_widget_accounts">Accounts</string>
     <string name="dashboard_customize_widget_goals">Goals</string>
     <string name="dashboard_customize_widget_recent">Recent transactions</string>
@@ -53,6 +54,7 @@
     <string name="dashboard_customize_preview_transaction_salary">Salary</string>
     <string name="dashboard_customize_preview_transaction_coffee">Coffee</string>
     <string name="dashboard_customize_preview_transaction_rent">Rent</string>
+    <string name="dashboard_customize_preview_transaction_transport">Transport</string>
     <string name="dashboard_add_transaction">Add transaction</string>
     <string name="dashboard_quick_action_transfer">Transfer</string>
     <string name="dashboard_balance_title">Total balance</string>
@@ -101,6 +103,10 @@
     <string name="dashboard_spent_by_category_over_cap">over %1$s</string>
     <string name="dashboard_spent_by_category_status_warn">Near limit</string>
     <string name="dashboard_spent_by_category_status_over">Over</string>
+    <!-- Sits above the total in the middle of the category donut -->
+    <string name="dashboard_categories_donut_center_label">Spent</string>
+    <string name="dashboard_categories_donut_empty_center">No spend</string>
+    <string name="dashboard_categories_donut_empty_legend">Expenses you log in this period split up here.</string>
     <string name="dashboard_budgets_title">Budgets</string>
     <string name="dashboard_budgets_see_all">See all</string>
     <string name="dashboard_budgets_empty_title">No budgets yet</string>

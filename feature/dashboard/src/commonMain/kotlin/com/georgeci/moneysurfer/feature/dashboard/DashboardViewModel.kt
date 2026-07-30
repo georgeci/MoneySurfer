@@ -160,6 +160,8 @@ class DashboardViewModel(
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     safeToSpend = widgets.safeToSpend?.toUi(),
                     spentByCategory = widgets.categorySpend?.toUi().orEmpty(),
+                    spentByCategoryTotal = widgets.categorySpend
+                        ?.let { MoneyFormatter.format(it.total, it.currency) },
                     budgets = widgets.budgetProgress.toBudgetsUi(),
                     burnRate = widgets.burnRate?.toUi(),
                     isOffline = isOffline,
@@ -390,6 +392,13 @@ sealed interface DashboardState {
          * spend, which is the spent-by-category widget's own empty state rather than a missing one.
          */
         val spentByCategory: List<CategorySpendUi> = emptyList(),
+        /**
+         * Everything [spentByCategory] adds up to, formatted — the donut's centre figure. Kept
+         * beside the rows rather than re-summed on the screen: the rows carry formatted strings,
+         * not money, so a screen-side sum would have to parse its way back to the amounts. Null
+         * while no workspace backs a breakdown, which is not the same as a breakdown of zero.
+         */
+        val spentByCategoryTotal: String? = null,
         /**
          * The week's spend pace and where the month lands at it, or null while no workspace backs a
          * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
