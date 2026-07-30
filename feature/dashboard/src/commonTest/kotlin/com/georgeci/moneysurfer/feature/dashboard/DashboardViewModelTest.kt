@@ -110,6 +110,7 @@ class DashboardViewModelTest : StringSpec({
             DashboardWidgetType.Goals,
             // widgets the stored layout never heard of are appended rather than dropped
             DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SpentMonth,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.BurnRate,
             DashboardWidgetType.Budgets,

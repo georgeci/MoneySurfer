@@ -120,21 +120,24 @@ data class DashboardLayoutConfig(
 
     companion object {
         /**
-         * Variant A from the design: the balance headline first, the quick actions under it, then
-         * safe-to-spend, the burn rate that explains it, the budgets both are read off, where
-         * the period's money went, the accounts strip, the generated
-         * insights, goals, and the recent-transactions list. Every widget starts enabled and
-         * Hero-sized.
+         * Variant A from the design: the balance headline first, the quick actions under it, the
+         * month's spend against its budget, then safe-to-spend, the burn rate that explains it, the
+         * budgets both are read off, where the period's money went, the accounts strip, the
+         * generated insights, goals, and the recent-transactions list. Every widget starts enabled
+         * and Hero-sized.
          *
-         * The spans are that same order read as the desktop mock's three bands: a hero balance
-         * beside the shortcuts, a row of three stat cards, the spend chart with the accounts rail
-         * next to it, insights and goals paired, and the activity list full width at the bottom.
-         * Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
+         * The spans are that same order read as the desktop mock's bands: a hero balance beside the
+         * shortcuts, the spent-this-month band full width under them, a row of three stat cards, the
+         * spend chart with the accounts rail next to it, insights and goals paired, and the activity
+         * list full width at the bottom. Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so
+         * the default grid has no gaps — which is also why the new band takes a whole row rather
+         * than a share of an existing one.
          */
         val DEFAULT = DashboardLayoutConfig(
             items = listOf(
                 DashboardLayoutItem(DashboardWidgetType.Balance, span = DashboardWidgetSpan.TwoThirds),
                 DashboardLayoutItem(DashboardWidgetType.QuickActions, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.SpentMonth),
                 DashboardLayoutItem(DashboardWidgetType.SafeToSpend, span = DashboardWidgetSpan.Third),
                 DashboardLayoutItem(DashboardWidgetType.BurnRate, span = DashboardWidgetSpan.Third),
                 DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),

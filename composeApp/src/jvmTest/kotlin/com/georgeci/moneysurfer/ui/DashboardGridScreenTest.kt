@@ -83,12 +83,14 @@ class DashboardGridScreenTest : StringSpec({
         runDashboardAt(DESKTOP_WIDTH_PX) {
             setContent { DashboardContent(state = CONTENT, onEvent = {}) }
 
-            val recent = onNodeWithTag(DashboardTestTags.Recent).getUnclippedBoundsInRoot()
-            val goals = onNodeWithTag(DashboardTestTags.Goals).getUnclippedBoundsInRoot()
+            val spentMonth = onNodeWithTag(DashboardTestTags.SpentMonth).getUnclippedBoundsInRoot()
+            val quickActions = onNodeWithTag(DashboardTestTags.QuickActions).getUnclippedBoundsInRoot()
 
-            // Recent transactions is the only Full-span widget in the default layout.
-            (recent.top >= goals.bottom) shouldBe true
-            (recent.width > goals.width) shouldBe true
+            // Spent-this-month is the first Full-span widget in the default layout, so it starts the
+            // band under the hero row rather than joining it. Read against a neighbour near the top
+            // of the column: a widget far enough down the grid is never composed to be measured.
+            (spentMonth.top >= quickActions.bottom) shouldBe true
+            (spentMonth.width > quickActions.width) shouldBe true
         }
     }
 

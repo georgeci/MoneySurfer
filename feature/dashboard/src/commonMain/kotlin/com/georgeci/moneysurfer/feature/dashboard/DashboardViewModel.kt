@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.SpentByCategory
+import com.georgeci.moneysurfer.domain.model.SpentMonth
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 import com.georgeci.moneysurfer.domain.model.safeToSpend
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -39,6 +40,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -67,6 +69,7 @@ class DashboardViewModel(
     private val getCategorySpend: GetCategorySpendUseCase,
     private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
     private val getBurnRate: GetBurnRateUseCase,
+    private val getSpentMonth: GetSpentMonthUseCase,
     private val generateInsights: GenerateInsightsUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
@@ -173,6 +176,13 @@ class DashboardViewModel(
                 // rest of the dashboard draw without waiting on them.
                 .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights ->
                     content.copy(insights = insights.map { it.toUi() })
+                }
+                // Appended for the same reason the insights are, not because it is slow: the fold
+                // above is already at `combine`'s five-flow ceiling, and chaining one reader on is
+                // the cheaper edit than repacking six widget sources into a second holder type.
+                // Takes no period — see `DashboardWidgetType.SpentMonth`.
+                .combine(getSpentMonth().onStart { emit(null) }) { content, spentMonth ->
+                    content.copy(spentMonth = spentMonth?.toUi())
                 }
                 .collect { newContent -> updateState { newContent } }
         }
@@ -294,6 +304,21 @@ class DashboardViewModel(
         pace = pace,
     )
 
+    /**
+     * The month's spend as the card draws it.
+     *
+     * [SpentMonthUi.capFormatted] carries the "is there a budget" answer rather than a second
+     * boolean: the caption is either "of <cap>" or the no-budget line, and one nullable string
+     * cannot disagree with itself. The bar reads 0 without a cap — there is no limit to fill it
+     * against, and inventing one from the spend would draw a full bar on an unbudgeted month.
+     */
+    private fun SpentMonth.toUi(): SpentMonthUi = SpentMonthUi(
+        spentFormatted = MoneyFormatter.format(spent, currency),
+        capFormatted = cap?.let { MoneyFormatter.format(it, currency) },
+        progress = capFraction ?: 0f,
+        delta = delta?.let { SpentMonthDeltaUi(trend = it.trend, percent = it.changePercent) },
+    )
+
     private fun SavingsGoalSummary.toUi() = GoalUi(
         id = goal.id,
         name = goal.title,
@@ -396,6 +421,12 @@ sealed interface DashboardState {
          * the "no cap to miss" state, and the chart is drawn either way.
          */
         val burnRate: BurnRateUi? = null,
+        /**
+         * What this month has cost, or null while no workspace and base currency back the figure.
+         * Like [burnRate] this one does not need a budget — a null cap inside it is the "no budget
+         * set" state the card is partly *for*, and the amount is drawn either way.
+         */
+        val spentMonth: SpentMonthUi? = null,
         /** Generated spending insights, most actionable first. Empty until the engine has run. */
         val insights: List<InsightUi> = emptyList(),
         val isOffline: Boolean = false,
@@ -628,6 +659,29 @@ data class BurnRateUi(
      * normal state, not a loading one — see [com.georgeci.moneysurfer.domain.model.BurnRate].
      */
     val pace: BurnRatePace?,
+)
+
+/**
+ * The spent-this-month card's numbers. Money is formatted here; the sentences around it are built on
+ * the screen, which is where the string resources are.
+ */
+data class SpentMonthUi(
+    val spentFormatted: String,
+    /** The monthly cap, or null when no budget sets one — which is the caption the card shows. */
+    val capFormatted: String?,
+    /** Spend against the cap, `0f` without one. Can exceed 1, which the bar clamps. */
+    val progress: Float,
+    /** How the month compares to the last one, or null when no honest comparison is available. */
+    val delta: SpentMonthDeltaUi? = null,
+)
+
+/**
+ * The month-over-month change. [percent] is a magnitude — [trend] picks which sentence and which
+ * colour it is printed in, so a sign is never formatted into the number itself.
+ */
+data class SpentMonthDeltaUi(
+    val trend: SpendTrend,
+    val percent: Int,
 )
 
 /**

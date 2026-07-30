@@ -417,6 +417,7 @@ private fun WidgetRow(
 private fun DashboardWidgetType.icon(): ImageVector = when (this) {
     DashboardWidgetType.Balance -> SurferIcons.Wallet
     DashboardWidgetType.QuickActions -> SurferIcons.Bolt
+    DashboardWidgetType.SpentMonth -> SurferIcons.Calendar
     DashboardWidgetType.SafeToSpend -> SurferIcons.Cash
     DashboardWidgetType.BurnRate -> SurferIcons.Clock
     DashboardWidgetType.Budgets -> SurferIcons.Category

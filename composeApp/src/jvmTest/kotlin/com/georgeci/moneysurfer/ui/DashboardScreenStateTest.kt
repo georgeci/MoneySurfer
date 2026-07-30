@@ -228,6 +228,7 @@ class DashboardScreenStateTest : StringSpec({
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
                         burnRate = burnRateUi(pace = BurnRatePace.OffPace),
+                        layout = BURN_RATE_ONLY,
                     ),
                     onEvent = {},
                 )
@@ -244,7 +245,10 @@ class DashboardScreenStateTest : StringSpec({
         runPhoneUiTest {
             setContent {
                 DashboardContent(
-                    state = contentWith(accounts = 2, transferEnabled = true).copy(burnRate = burnRateUi()),
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        burnRate = burnRateUi(),
+                        layout = BURN_RATE_ONLY,
+                    ),
                     onEvent = {},
                 )
             }
@@ -485,6 +489,14 @@ private fun safeToSpendUi(
 
 private const val BURN_RATE_AVERAGE = "€42.10"
 private const val BURN_RATE_PROJECTION = "€1,263.00"
+
+/**
+ * The burn-rate card alone, so its projection and pace rows are composed rather than scrolled off
+ * the bottom of the dashboard column — the same reason the spent-by-category specs pin a layout.
+ */
+private val BURN_RATE_ONLY = DashboardLayoutConfig(
+    items = listOf(DashboardLayoutItem(type = DashboardWidgetType.BurnRate)),
+)
 
 private fun burnRateUi(pace: BurnRatePace? = null) = BurnRateUi(
     averageFormatted = BURN_RATE_AVERAGE,
