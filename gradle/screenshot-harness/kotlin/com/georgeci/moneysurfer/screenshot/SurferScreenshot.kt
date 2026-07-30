@@ -47,6 +47,34 @@ private const val ScreenWidthDp = 411
 private const val ScreenHeightDp = 891
 
 /**
+ * The window widths a responsive screen is captured at (issue #392, gap G9).
+ *
+ * One entry per [com.georgeci.moneysurfer.uikit.window.SurferWindowSize] branch the app actually
+ * lays out differently — Medium is left out because nothing in the two-pane work distinguishes it
+ * from Compact, and an unused width is one more set of PNGs to re-record on every token change.
+ *
+ * The dimensions are devices, not breakpoint boundaries: capturing at exactly 840 dp would put
+ * every wide reference one dp away from falling back to the compact layout, so a rounding change
+ * would silently re-render the frame instead of failing a boundary test. [ScreenshotWidth.Large]
+ * is the design's 1360 × 880 desktop canvas, which is also what the JVM host opens at.
+ */
+enum class ScreenshotWidth(val widthDp: Int, val heightDp: Int) {
+    /** A phone in portrait — the same viewport [captureFullScreen] uses. */
+    Compact(widthDp = ScreenWidthDp, heightDp = ScreenHeightDp),
+
+    /** A tablet in landscape: two panes, no third column. */
+    Expanded(widthDp = 1024, heightDp = 800),
+
+    /** The design's desktop canvas: wide enough for the inline panel's third column. */
+    Large(widthDp = 1360, heightDp = 880),
+
+    ;
+
+    /** File-name segment, inserted before the theme suffix: `<name>_expanded_dark.png`. */
+    val suffix: String get() = name.lowercase()
+}
+
+/**
  * Per-pixel colour tolerance, as a normalised RGB distance.
  *
  * Alpha compositing rounds differently on the macOS and Linux Skia builds: capturing
@@ -99,10 +127,39 @@ fun captureLightAndDark(name: String, content: @Composable () -> Unit) {
  */
 fun captureFullScreen(name: String, content: @Composable () -> Unit) {
     captureBothThemes(name, widthDp = ScreenWidthDp, heightDp = ScreenHeightDp) { darkTheme ->
-        AppTheme(darkTheme = darkTheme) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                content()
-            }
+        FullScreen(darkTheme = darkTheme, content = content)
+    }
+}
+
+/**
+ * [captureFullScreen] repeated across [widths], writing `<name>_<width>_<theme>.png` per pair.
+ *
+ * Roborazzi's `size` option resizes the Robolectric display itself rather than only the
+ * composition, so `LocalWindowInfo.containerSize` — and with it `currentSurferWindowSize()` and
+ * every adaptive branch below it — reports the width being captured. That is the whole point: a
+ * screen that ignores the window renders three identical frames, which is visible in review.
+ */
+fun captureFullScreenAtWidths(
+    name: String,
+    widths: List<ScreenshotWidth> = ScreenshotWidth.entries,
+    content: @Composable () -> Unit,
+) {
+    widths.forEach { width ->
+        captureBothThemes(
+            name = "${name}_${width.suffix}",
+            widthDp = width.widthDp,
+            heightDp = width.heightDp,
+        ) { darkTheme ->
+            FullScreen(darkTheme = darkTheme, content = content)
+        }
+    }
+}
+
+@Composable
+private fun FullScreen(darkTheme: Boolean, content: @Composable () -> Unit) {
+    AppTheme(darkTheme = darkTheme) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            content()
         }
     }
 }
