@@ -6,6 +6,7 @@ import androidx.compose.ui.test.SkikoComposeUiTest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,6 +19,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -34,10 +36,13 @@ import com.georgeci.moneysurfer.feature.dashboard.DashboardEvent
 import com.georgeci.moneysurfer.feature.dashboard.DashboardState
 import com.georgeci.moneysurfer.feature.dashboard.DashboardTestTags
 import com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi
+import com.georgeci.moneysurfer.feature.dashboard.SpentMonthDeltaUi
+import com.georgeci.moneysurfer.feature.dashboard.SpentMonthUi
 import com.georgeci.moneysurfer.feature.dashboard.UpcomingRecurringUi
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 
 /**
  * Desktop UI cover for the dashboard widgets whose behaviour lives on the screen rather than in
@@ -281,6 +286,7 @@ class DashboardScreenStateTest : StringSpec({
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
                         burnRate = burnRateUi(pace = BurnRatePace.OffPace),
+                        layout = BURN_RATE_ONLY,
                     ),
                     onEvent = {},
                 )
@@ -293,11 +299,138 @@ class DashboardScreenStateTest : StringSpec({
         }
     }
 
+    "the spent-this-month card draws the amount, the cap it is under and the month before it" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = SpentMonthUi(
+                            spentFormatted = SPENT_MONTH_AMOUNT,
+                            capFormatted = SPENT_MONTH_CAP,
+                            progress = 0.65f,
+                            delta = SpentMonthDeltaUi(trend = SpendTrend.Down, percent = 18),
+                        ),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.SpentMonth).assertIsDisplayed()
+            onNodeWithText(SPENT_MONTH_AMOUNT).assertIsDisplayed()
+            onNodeWithText("of $SPENT_MONTH_CAP budget").assertIsDisplayed()
+            onNodeWithText("\u221218% vs last").assertIsDisplayed()
+        }
+    }
+
+    "a month that outspent the last one is labelled as a rise" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = spentMonthUi(SpentMonthDeltaUi(trend = SpendTrend.Up, percent = 24)),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("+24% vs last").assertIsDisplayed()
+        }
+    }
+
+    "a month in line with the last one says so instead of printing a zero" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = spentMonthUi(SpentMonthDeltaUi(trend = SpendTrend.Flat, percent = 0)),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("In line with last").assertIsDisplayed()
+            onNodeWithText("+0% vs last").assertDoesNotExist()
+        }
+    }
+
+    "the compact spent-this-month card is shorter than the expanded one" {
+        var expandedHeight = 0f
+        var compactHeight = 0f
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true)
+                        .copy(spentMonth = spentMonthUi(), layout = SPENT_MONTH_ONLY),
+                    onEvent = {},
+                )
+            }
+            val bounds = onNodeWithTag(DashboardTestTags.SpentMonth).getUnclippedBoundsInRoot()
+            expandedHeight = (bounds.bottom - bounds.top).value
+        }
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true)
+                        .copy(spentMonth = spentMonthUi(), layout = SPENT_MONTH_ONLY_COMPACT),
+                    onEvent = {},
+                )
+            }
+            val bounds = onNodeWithTag(DashboardTestTags.SpentMonth).getUnclippedBoundsInRoot()
+            compactHeight = (bounds.bottom - bounds.top).value
+        }
+
+        // The size the user picked has to change the card's footprint, not only its typography.
+        (compactHeight < expandedHeight) shouldBe true
+    }
+
+    "with no budget the spent-this-month card says so rather than inventing a limit" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = SpentMonthUi(
+                            spentFormatted = SPENT_MONTH_AMOUNT,
+                            capFormatted = null,
+                            progress = 0f,
+                        ),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("No budget set").assertIsDisplayed()
+        }
+    }
+
+    "before the month's figure resolves the card claims nothing about a budget" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true)
+                        .copy(spentMonth = null, layout = SPENT_MONTH_ONLY),
+                    onEvent = {},
+                )
+            }
+
+            // A workspace the device has not pulled yet may well have a budget — saying "No budget
+            // set" here would state something about the user's money the app has not read.
+            onNodeWithTag(DashboardTestTags.SpentMonth).assertIsDisplayed()
+            onNodeWithText("No budget set").assertDoesNotExist()
+        }
+    }
+
     "with no budget the burn-rate card still draws the projection, minus the verdict" {
         runPhoneUiTest {
             setContent {
                 DashboardContent(
-                    state = contentWith(accounts = 2, transferEnabled = true).copy(burnRate = burnRateUi()),
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        burnRate = burnRateUi(),
+                        layout = BURN_RATE_ONLY,
+                    ),
                     onEvent = {},
                 )
             }
@@ -640,6 +773,36 @@ private fun safeToSpendUi(
 
 private const val BURN_RATE_AVERAGE = "€42.10"
 private const val BURN_RATE_PROJECTION = "€1,263.00"
+
+private const val SPENT_MONTH_AMOUNT = "\u20ac1,173.69"
+private const val SPENT_MONTH_CAP = "\u20ac1,800.00"
+
+/** The spent-this-month card alone, for the same reason [BURN_RATE_ONLY] pins the burn rate. */
+private val SPENT_MONTH_ONLY = DashboardLayoutConfig(
+    items = listOf(DashboardLayoutItem(type = DashboardWidgetType.SpentMonth)),
+)
+
+/** The same card at the other density, for the footprint comparison. */
+private val SPENT_MONTH_ONLY_COMPACT = DashboardLayoutConfig(
+    items = listOf(
+        DashboardLayoutItem(type = DashboardWidgetType.SpentMonth, cardStyle = DashboardCardStyle.COMPACT),
+    ),
+)
+
+private fun spentMonthUi(delta: SpentMonthDeltaUi? = null) = SpentMonthUi(
+    spentFormatted = SPENT_MONTH_AMOUNT,
+    capFormatted = SPENT_MONTH_CAP,
+    progress = 0.65f,
+    delta = delta,
+)
+
+/**
+ * The burn-rate card alone, so its projection and pace rows are composed rather than scrolled off
+ * the bottom of the dashboard column — the same reason the spent-by-category specs pin a layout.
+ */
+private val BURN_RATE_ONLY = DashboardLayoutConfig(
+    items = listOf(DashboardLayoutItem(type = DashboardWidgetType.BurnRate)),
+)
 
 private fun burnRateUi(pace: BurnRatePace? = null) = BurnRateUi(
     averageFormatted = BURN_RATE_AVERAGE,

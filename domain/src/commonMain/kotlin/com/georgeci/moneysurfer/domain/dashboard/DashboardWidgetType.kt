@@ -14,6 +14,18 @@ package com.georgeci.moneysurfer.domain.dashboard
 enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
     Balance,
     QuickActions,
+
+    /**
+     * Spend-oriented, and **not** period-scoped — a decision, not an oversight.
+     *
+     * The card is month-shaped end to end: the headline is what *this month* has cost, the bar is
+     * that against a monthly budget cap (`monthlySpendCap` qualifies monthly budgets only), and the
+     * label compares it against the same stretch of the month before. Pointing it at
+     * [DashboardPeriod.Week] would not narrow a window — it would have to pick a different cap and
+     * a different baseline, which is a different card. Its title says "this month" for that reason,
+     * so the switch never claims to drive it. See `md/insights.md` Phase 2.
+     */
+    SpentMonth,
     SafeToSpend(isPeriodScoped = true),
 
     /**

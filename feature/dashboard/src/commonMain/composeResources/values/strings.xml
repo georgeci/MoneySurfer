@@ -15,6 +15,7 @@
     <string name="dashboard_customize_widget_balance">Total balance</string>
     <string name="dashboard_customize_widget_quick_actions">Quick actions</string>
     <string name="dashboard_customize_widget_safe_to_spend">Safe to spend</string>
+    <string name="dashboard_customize_widget_spent_month">Spent this month</string>
     <string name="dashboard_customize_widget_burn_rate">Burn rate</string>
     <string name="dashboard_customize_widget_budgets">Budgets</string>
     <string name="dashboard_customize_widget_spent_by_category">Spent by category</string>
@@ -75,6 +76,14 @@
     <string name="dashboard_recent_empty_subtitle">Transactions you log will show up here.</string>
     <!-- Meta line of a collapsed split row: how many categories the receipt covers -->
     <string name="dashboard_recent_split_categories">%1$d categories</string>
+    <string name="dashboard_spent_month_title">Spent this month</string>
+    <string name="dashboard_spent_month_of_budget">of %1$s budget</string>
+    <string name="dashboard_spent_month_no_budget">No budget set</string>
+    <!-- The vs-last-month label. Compared against the same stretch of the previous month, so the
+         wording says "vs last" rather than naming a full month. -->
+    <string name="dashboard_spent_month_delta_up">+%1$d% vs last</string>
+    <string name="dashboard_spent_month_delta_down">−%1$d% vs last</string>
+    <string name="dashboard_spent_month_delta_flat">In line with last</string>
     <string name="dashboard_safe_to_spend_title">Safe to spend</string>
     <string name="dashboard_safe_to_spend_caption">of %1$s · %2$s</string>
     <string name="dashboard_safe_to_spend_over_caption">over %1$s · %2$s</string>

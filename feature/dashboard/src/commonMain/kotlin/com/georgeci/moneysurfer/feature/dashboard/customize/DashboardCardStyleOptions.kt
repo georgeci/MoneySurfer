@@ -42,6 +42,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_wid
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recurring
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_safe_to_spend
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_spent_by_category
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_spent_month
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -65,6 +66,7 @@ internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> 
     DashboardWidgetType.SpentByCategory -> SPENT_BY_CATEGORY_VARIANTS
     DashboardWidgetType.Insights -> INSIGHTS_VARIANTS
     DashboardWidgetType.QuickActions,
+    DashboardWidgetType.SpentMonth,
     DashboardWidgetType.SafeToSpend,
     DashboardWidgetType.BurnRate,
     DashboardWidgetType.Budgets,
@@ -180,6 +182,7 @@ private fun styleSummary(item: DashboardLayoutItem): String {
 internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.Balance -> Res.string.dashboard_customize_widget_balance
     DashboardWidgetType.QuickActions -> Res.string.dashboard_customize_widget_quick_actions
+    DashboardWidgetType.SpentMonth -> Res.string.dashboard_customize_widget_spent_month
     DashboardWidgetType.SafeToSpend -> Res.string.dashboard_customize_widget_safe_to_spend
     DashboardWidgetType.BurnRate -> Res.string.dashboard_customize_widget_burn_rate
     DashboardWidgetType.Budgets -> Res.string.dashboard_customize_widget_budgets
