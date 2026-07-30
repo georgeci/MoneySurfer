@@ -17,7 +17,7 @@ import arrow.core.Either
  * Re-running adds another batch of transactions. Accounts, budgets and goals are matched by
  * name first, so only the transaction count grows.
  */
-interface DebugDataPrefiller {
+fun interface DebugDataPrefiller {
 
     suspend fun prefill(): Either<DebugPrefillError, DebugPrefillReport>
 }

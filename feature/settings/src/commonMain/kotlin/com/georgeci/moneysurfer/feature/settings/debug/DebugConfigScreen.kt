@@ -101,7 +101,7 @@ fun DebugConfigScreen(
         pendingInvalid = null
     }
 
-    val prefillText: String? = pendingPrefill?.let { rememberPrefillMessage(it) }
+    val prefillText: String? = pendingPrefill?.let { prefillMessage(it) }
     LaunchedEffect(prefillText) {
         val text = prefillText ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Long)
@@ -226,10 +226,12 @@ fun DebugConfigContent(
  * The snackbar line for a finished prefill run.
  *
  * Resolved during composition, like the invalid-value message above, so the indexed placeholders go
- * through Compose's own format path rather than being assembled inside the effect.
+ * through Compose's own format path rather than being assembled inside the effect. Public for the
+ * same reason [DebugConfigContent] is: the counts are positional, and only a rendered assertion
+ * catches them being read off the wrong report field.
  */
 @Composable
-private fun rememberPrefillMessage(outcome: PrefillOutcome): String = when (outcome) {
+fun prefillMessage(outcome: PrefillOutcome): String = when (outcome) {
     is PrefillOutcome.Done -> stringResource(
         Res.string.settings_debug_prefill_done_format,
         outcome.report.transactions,
