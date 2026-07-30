@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ExchangeRateApiConfig</title>
+  <title>MoneySurfer Coverage Report > DesktopFirebasePlatform</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: ExchangeRateApiConfig (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: DesktopFirebasePlatform (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,35 +46,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ExchangeRateApiConfig</td>
+  <td class="name">DesktopFirebasePlatform</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (25/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (232/233)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">ExchangeRateApiConfig$Companion</td>
+    <td class="name">DesktopFirebasePlatform$Companion</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -84,24 +91,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (7/7)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (25/25)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    99.6%
   </span>
   <span class="absValue">
-    (11/11)
+    (232/233)
   </span>
 </td>
 </tr>
@@ -114,64 +128,200 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import kotlinx.serialization.SerialName
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlin.time.Instant
+&nbsp;import android.app.Application
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.storage.appDataDir
+&nbsp;import com.google.firebase.FirebasePlatform
+&nbsp;import dev.gitlive.firebase.Firebase
+&nbsp;import dev.gitlive.firebase.FirebaseOptions
+&nbsp;import dev.gitlive.firebase.initialize
+&nbsp;import java.io.File
+&nbsp;import java.nio.file.Files
+&nbsp;import java.nio.file.StandardCopyOption
+&nbsp;import java.util.Properties
 &nbsp;
 &nbsp;/**
-&nbsp; * Where the FX quotes come from.
+&nbsp; * Initializes the default `FirebaseApp` for the desktop (JVM) host.
 &nbsp; *
-&nbsp; * Default is ExchangeRate-API&#39;s *open* endpoint (`open.er-api.com`): free, no API key, no
-&nbsp; * registration, ~160 currencies, refreshed daily. Its free tier asks for attribution wherever the
-&nbsp; * rates are shown, which the dashboard&#39;s &quot;as of&quot; footnote carries.
+&nbsp; * Android gets this for free from `google-services.json` + the Google Services
+&nbsp; * plugin, and iOS from `GoogleService-Info.plist` via `FirebaseApp.configure()`
+&nbsp; * ([iosApp/iosApp/iOSApp.swift](../../../../../../../../iosApp/iosApp/iOSApp.swift)).
+&nbsp; * The JVM has neither, so the default app has to be built by hand — without it
+&nbsp; * the first `Firebase.firestore` read inside Koin fails the whole graph with
+&nbsp; * &quot;Default FirebaseApp is not initialized in this process&quot;.
 &nbsp; *
-&nbsp; * Bound in `RemoteDataModule` so the URL is one override away — swapping providers means replacing
-&nbsp; * this binding and [ExchangeRateLatestDto], nothing above the data layer.
+&nbsp; * Must run **before** `initKoin`: `RemoteDataModule` resolves `Firebase.firestore`
+&nbsp; * / `Firebase.auth` lazily, but the first resolution happens while the app graph
+&nbsp; * is being built.
+&nbsp; *
+&nbsp; * Two option sources, mirroring the iOS host:
+&nbsp; * - Emulator runs (`MS_USE_EMULATOR=true`) use demo-project options — no
+&nbsp; *   credentials needed, the `demo-` project prefix puts the Firebase tooling in
+&nbsp; *   demo mode. The project id follows `FIREBASE_PROJECT_ID` when set, matching
+&nbsp; *   the `scripts/firebase` entry points. This is the documented desktop flow,
+&nbsp; *   see [docs/testing/firebase-emulator.md](../../../../../../../../docs/testing/firebase-emulator.md).
+&nbsp; * - Everything else reads `MS_FIREBASE_APP_ID` / `MS_FIREBASE_API_KEY` /
+&nbsp; *   `MS_FIREBASE_PROJECT_ID` from the environment. Desktop is a developer-only
+&nbsp; *   host with no shipped release, so real project credentials stay out of the
+&nbsp; *   repo (`google-services.json` is git-ignored) and are supplied per developer.
+&nbsp; *
+&nbsp; * Idempotent — a second call is a no-op.
 &nbsp; */
-&nbsp;data class ExchangeRateApiConfig(
-<b class="fc">&nbsp;    val baseUrl: String = DEFAULT_BASE_URL,</b>
-&nbsp;) {
-&nbsp;    /** `…/v6/latest/USD` — the base currency is a path segment, so nothing needs URL-encoding. */
-<b class="fc">&nbsp;    fun latestUrl(base: CurrencyCode): String = &quot;$baseUrl/${base.value}&quot;</b>
+&nbsp;fun initializeDesktopFirebase() {
+&nbsp;    if (initialized) return
+&nbsp;    // The platform hook has to be installed before any FirebaseApp work: the java-sdk routes all
+&nbsp;    // persistence (installation ids, auth tokens) and logging through it and has no default.
+&nbsp;    FirebasePlatform.initializeFirebasePlatform(
+&nbsp;        DesktopFirebasePlatform(File(appDataDir(), STORE_FILE_NAME)),
+&nbsp;    )
+&nbsp;    // `android.app.Application` here is the stub shipped *by* `firebase-java-sdk`, not the real
+&nbsp;    // Android class. gitlive&#39;s JVM artifacts are Android sources repackaged, so they cast this
+&nbsp;    // argument to Android types and the java-sdk supplies JVM-side stand-ins. It has to be
+&nbsp;    // `Application`, not its `Context` supertype: Firestore&#39;s ComponentProvider casts down to
+&nbsp;    // `Application` to register lifecycle callbacks, and a plain `Context` panics its async
+&nbsp;    // queue with a ClassCastException on the first read.
+&nbsp;    Firebase.initialize(Application(), desktopFirebaseOptions())
+&nbsp;    initialized = true
+&nbsp;}
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        const val DEFAULT_BASE_URL: String = &quot;https://open.er-api.com/v6/latest&quot;
+&nbsp;@Volatile
+&nbsp;private var initialized = false
+&nbsp;
+&nbsp;/**
+&nbsp; * Which Firebase project this host talks to. [useEmulator] and [env] are parameters
+&nbsp; * rather than direct reads so the branching — in particular the `FIREBASE_PROJECT_ID`
+&nbsp; * override, which is what keeps the desktop host on the same namespace the emulator
+&nbsp; * was booted with — is reachable from tests. Production always takes the defaults.
+&nbsp; */
+&nbsp;internal fun desktopFirebaseOptions(
+&nbsp;    useEmulator: Boolean = defaultUseEmulator(),
+&nbsp;    env: (String) -&gt; String? = System::getenv,
+&nbsp;): FirebaseOptions = if (useEmulator) emulatorOptions(env) else configuredOptions(env)
+&nbsp;
+&nbsp;/**
+&nbsp; * Demo-project options for emulator runs. The emulator ignores the values, but
+&nbsp; * `FirebaseInstallations` still validates the API key&#39;s *format* — it must be 39
+&nbsp; * characters starting with &quot;AI&quot;, or launch dies on an installations exception.
+&nbsp; * Same dummy shape as the iOS host (issue #219).
+&nbsp; */
+&nbsp;private fun emulatorOptions(env: (String) -&gt; String?): FirebaseOptions = FirebaseOptions(
+&nbsp;    applicationId = &quot;1:000000000000:android:0000000000000000&quot;,
+&nbsp;    apiKey = &quot;AIza&quot; + &quot;0&quot;.repeat(API_KEY_LENGTH - &quot;AIza&quot;.length),
+&nbsp;    projectId = env(ENV_EMULATOR_PROJECT_ID)?.takeIf { it.isNotBlank() }
+&nbsp;        ?: EMULATOR_PROJECT_ID,
+&nbsp;    gcmSenderId = &quot;000000000000&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;private fun configuredOptions(env: (String) -&gt; String?): FirebaseOptions = FirebaseOptions(
+&nbsp;    applicationId = requiredEnv(ENV_APP_ID, env),
+&nbsp;    apiKey = requiredEnv(ENV_API_KEY, env),
+&nbsp;    projectId = requiredEnv(ENV_PROJECT_ID, env),
+&nbsp;)
+&nbsp;
+&nbsp;private fun requiredEnv(name: String, env: (String) -&gt; String?): String =
+&nbsp;    env(name)?.takeIf { it.isNotBlank() } ?: error(
+&nbsp;        &quot;Desktop Firebase is not configured: set $ENV_APP_ID, $ENV_API_KEY and $ENV_PROJECT_ID &quot; +
+&nbsp;            &quot;(values from the Firebase console), or run against the emulator with &quot; +
+&nbsp;            &quot;MS_USE_EMULATOR=true. Missing: $name.&quot;,
+&nbsp;    )
+&nbsp;
+&nbsp;/**
+&nbsp; * Key-value store + logging sink the java-sdk needs in place of Android&#39;s
+&nbsp; * `SharedPreferences`. Backed by a properties file in the app-data directory so
+&nbsp; * the installation id and refresh tokens survive a restart, exactly as they do
+&nbsp; * on Android.
+&nbsp; */
+<b class="fc">&nbsp;internal class DesktopFirebasePlatform(private val storeFile: File) : FirebasePlatform() {</b>
+&nbsp;
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Guards [values] together with the file write. Firebase calls in on several
+&nbsp;     * background executors at once — `FirebaseInstallations` and the heartbeat
+&nbsp;     * storage both write during startup — and two unsynchronized [flush] calls
+&nbsp;     * would each truncate and rewrite the same file concurrently.
+&nbsp;     */
+<b class="fc">&nbsp;    private val lock = Any()</b>
+&nbsp;
+<b class="fc">&nbsp;    private val values = Properties().apply {</b>
+<b class="fc">&nbsp;        if (storeFile.exists()) {</b>
+<b class="fc">&nbsp;            storeFile.inputStream().use(::load)</b>
+&nbsp;        }
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    override fun store(key: String, value: String) {
+<b class="fc">&nbsp;        synchronized(lock) {</b>
+<b class="fc">&nbsp;            values.setProperty(key, value)</b>
+<b class="fc">&nbsp;            flush()</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    override fun retrieve(key: String): String? = synchronized(lock) { values.getProperty(key) }</b>
+&nbsp;
+&nbsp;    override fun clear(key: String) {
+<b class="fc">&nbsp;        synchronized(lock) {</b>
+<b class="fc">&nbsp;            values.remove(key)</b>
+<b class="fc">&nbsp;            flush()</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun log(msg: String) {
+<b class="fc">&nbsp;        log.d { msg }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Where Firestore puts its local persistence SQLite file. Only the *parent*
+&nbsp;     * is created — calling `mkdirs()` on the returned path makes a directory
+&nbsp;     * where the database file belongs, and SQLite then fails with
+&nbsp;     * `SQLITE_CANTOPEN`, panicking Firestore&#39;s async queue on first use.
+&nbsp;     */
+&nbsp;    override fun getDatabasePath(name: String): File =
+<b class="pc">&nbsp;        File(storeFile.parentFile, name).also { it.parentFile?.mkdirs() }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serialize to a sibling temp file, then rename over the target. Writing
+&nbsp;     * straight into [storeFile] truncates it first, so a crash mid-write — or a
+&nbsp;     * second writer — leaves a partial file that fails `Properties.load` on the
+&nbsp;     * next launch, which would throw out of `initializeDesktopFirebase()` before
+&nbsp;     * the window opens. The temp file is a sibling, so the move stays within one
+&nbsp;     * file system and can be atomic.
+&nbsp;     */
+&nbsp;    private fun flush() {
+<b class="fc">&nbsp;        val temp = File(storeFile.parentFile, &quot;${storeFile.name}.tmp&quot;)</b>
+<b class="fc">&nbsp;        temp.outputStream().use { values.store(it, null) }</b>
+<b class="fc">&nbsp;        Files.move(</b>
+<b class="fc">&nbsp;            temp.toPath(),</b>
+<b class="fc">&nbsp;            storeFile.toPath(),</b>
+<b class="fc">&nbsp;            StandardCopyOption.REPLACE_EXISTING,</b>
+<b class="fc">&nbsp;            StandardCopyOption.ATOMIC_MOVE,</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;DesktopFirebase&quot;
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The subset of the provider&#39;s payload that matters. Unknown fields (`provider`, `terms_of_use`,
-&nbsp; * `time_next_update_*`, …) are ignored by the decoder rather than modelled.
-&nbsp; */
-&nbsp;@Serializable
-&nbsp;internal data class ExchangeRateLatestDto(
-&nbsp;    val result: String = &quot;&quot;,
-&nbsp;    @SerialName(&quot;base_code&quot;) val baseCode: String = &quot;&quot;,
-&nbsp;    @SerialName(&quot;time_last_update_unix&quot;) val timeLastUpdateUnix: Long = 0L,
-&nbsp;    val rates: Map&lt;String, Double&gt; = emptyMap(),
-&nbsp;)
+&nbsp;private const val STORE_FILE_NAME = &quot;firebase.properties&quot;
 &nbsp;
 &nbsp;/**
-&nbsp; * Maps the payload to the domain table, or `null` when it is not usable: a non-success `result`,
-&nbsp; * an empty quote set, a base that is not the one asked for (a redirect or a provider fallback), or
-&nbsp; * a missing publication timestamp — all of which would otherwise cache a table the UI would
-&nbsp; * mislabel.
+&nbsp; * Shared emulator project id — keep in sync with
+&nbsp; * `EmulatorFirebaseConfig.DEFAULT_PROJECT_ID` in `:data-test-fixtures`, which
+&nbsp; * this production module deliberately does not depend on.
 &nbsp; */
-&nbsp;internal fun ExchangeRateLatestDto.toDomain(requested: CurrencyCode): ExchangeRateTable? {
-&nbsp;    if (result != RESULT_SUCCESS || rates.isEmpty() || timeLastUpdateUnix &lt;= 0L) return null
-&nbsp;    if (!baseCode.equals(requested.value, ignoreCase = true)) return null
-&nbsp;    return ExchangeRateTable(
-&nbsp;        baseCurrency = requested,
-&nbsp;        rates = rates
-&nbsp;            .filterValues { it.isFinite() &amp;&amp; it &gt; 0.0 }
-&nbsp;            .mapKeys { (code, _) -&gt; CurrencyCode(code.uppercase()) },
-&nbsp;        asOf = Instant.fromEpochSeconds(timeLastUpdateUnix),
-&nbsp;    )
-&nbsp;}
+&nbsp;private const val EMULATOR_PROJECT_ID = &quot;demo-moneysurfer&quot;
 &nbsp;
-&nbsp;private const val RESULT_SUCCESS = &quot;success&quot;
+&nbsp;/**
+&nbsp; * Same override the `scripts/firebase` entry points honour. The emulator only
+&nbsp; * serves the project it was booted with, so a developer who starts it on a
+&nbsp; * different id has to be able to point the desktop host at that id too —
+&nbsp; * otherwise the app silently reads an empty namespace.
+&nbsp; */
+&nbsp;private const val ENV_EMULATOR_PROJECT_ID = &quot;FIREBASE_PROJECT_ID&quot;
+&nbsp;private const val API_KEY_LENGTH = 39
+&nbsp;private const val ENV_APP_ID = &quot;MS_FIREBASE_APP_ID&quot;
+&nbsp;private const val ENV_API_KEY = &quot;MS_FIREBASE_API_KEY&quot;
+&nbsp;private const val ENV_PROJECT_ID = &quot;MS_FIREBASE_PROJECT_ID&quot;
 </code>
 </pre>
 </div>
@@ -195,7 +345,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

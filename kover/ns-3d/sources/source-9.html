@@ -52,15 +52,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.3%
+    61.2%
   </span>
   <span class="absValue">
-    (38/62)
+    (41/67)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.6%
   </span>
   <span class="absValue">
-    (255/256)
+    (277/278)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.2%
+    98.3%
   </span>
   <span class="absValue">
-    (2082/2120)
+    (2326/2367)
   </span>
 </td>
 </tr>
@@ -91,15 +91,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.3%
+    61.2%
   </span>
   <span class="absValue">
-    (38/62)
+    (41/67)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,15 +107,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.6%
   </span>
   <span class="absValue">
-    (255/256)
+    (277/278)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.2%
+    98.3%
   </span>
   <span class="absValue">
-    (2082/2120)
+    (2326/2367)
   </span>
 </td>
 </tr>
@@ -145,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceTrend
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
@@ -154,8 +154,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
@@ -188,6 +190,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_projection
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_center_label
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
@@ -203,6 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_groceries
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_rent
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_transport
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
@@ -217,6 +221,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
 &nbsp;import org.jetbrains.compose.resources.pluralStringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
@@ -258,6 +263,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            DashboardWidgetType.Budgets -&gt; BudgetsPreview(modifier.then(content))</b>
 &nbsp;            DashboardWidgetType.SpentByCategory -&gt;
 <b class="fc">&nbsp;                SpentByCategoryPreview(cardStyle.variant, modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.CategoriesDonut -&gt; CategoriesDonutPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Accounts -&gt; AccountsPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Insights -&gt; InsightsPreview(cardStyle.variant, modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Goals -&gt; GoalsPreview(modifier.then(content))</b>
@@ -266,13 +272,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 <b class="fc">&nbsp;}</b>
 &nbsp;
+&nbsp;/**
+&nbsp; * Sample curve as well as sample figures: half of what tells the six treatments apart is how much
+&nbsp; * room each gives the trend, and a tile drawn from a workspace with no history would show none of
+&nbsp; * that.
+&nbsp; */
 &nbsp;@Composable
 <b class="pc">&nbsp;private fun BalancePreview(variant: String?, modifier: Modifier) {</b>
 <b class="fc">&nbsp;    SurferBalanceWidget(</b>
 <b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_balance_title),</b>
 <b class="fc">&nbsp;        balance = SAMPLE_TOTAL,</b>
 <b class="fc">&nbsp;        variant = SurferBalanceVariant.fromKey(variant),</b>
-<b class="fc">&nbsp;        footnote = SurferBalanceFootnote.Trend(SAMPLE_TREND),</b>
+<b class="fc">&nbsp;        trend = SurferBalanceTrend(text = SAMPLE_TREND, series = SAMPLE_BALANCE_SERIES),</b>
 <b class="fc">&nbsp;        modifier = modifier,</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
@@ -374,6 +385,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            ),
 &nbsp;        ),
 <b class="fc">&nbsp;        variant = SurferSpentByCategoryVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample segments, for the same reason [SpentByCategoryPreview] uses sample rows. Five of them,
+&nbsp; * because the legend keeps five at Hero and three at Compact — a tile with three would look
+&nbsp; * identical at both sizes, and the size is exactly what this picker is asking about.
+&nbsp; *
+&nbsp; * The last one is the uncategorized bucket, drawn under its real label: it is a segment the live
+&nbsp; * widget shows whenever the period holds spend nobody filed, so the preview should not pretend
+&nbsp; * every wedge has a category behind it.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun CategoriesDonutPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    val tints = SurferCategoryPalette.tints</b>
+<b class="fc">&nbsp;    val labels = listOf(</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_groceries),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_transport),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_spent_by_category_uncategorized),</b>
+&nbsp;    )
+<b class="fc">&nbsp;    SurferCategoriesDonutWidget(</b>
+&nbsp;        // Zipped rather than indexed: the shares are a separate list, and a label added to one
+&nbsp;        // without the other should shorten the sample, not crash the picker.
+<b class="fc">&nbsp;        segments = labels.zip(SAMPLE_DONUT_SHARES).mapIndexed { index, (label, share) -&gt;</b>
+<b class="fc">&nbsp;            SurferDonutSegment(</b>
+<b class="fc">&nbsp;                label = label,</b>
+<b class="fc">&nbsp;                percent = share,</b>
+<b class="fc">&nbsp;                color = tints[index % tints.size],</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        },
+<b class="fc">&nbsp;        centerLabel = stringResource(Res.string.dashboard_categories_donut_center_label),</b>
+<b class="fc">&nbsp;        centerValue = SAMPLE_DONUT_TOTAL,</b>
 <b class="fc">&nbsp;        modifier = modifier,</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
@@ -597,6 +643,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val SAMPLE_CURRENCY = &quot;EUR&quot;
 &nbsp;private const val SAMPLE_TOTAL = &quot;€11,575.32&quot;
 &nbsp;private const val SAMPLE_TREND = &quot;+€412&quot;
+<b class="fc">&nbsp;private val SAMPLE_BALANCE_SERIES = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f)</b>
 &nbsp;private const val SAMPLE_ACCOUNT_ONE = &quot;€2,480.32&quot;
 &nbsp;private const val SAMPLE_ACCOUNT_TWO = &quot;€8,915.00&quot;
 &nbsp;private const val SAMPLE_ACCOUNT_THREE = &quot;€180.00&quot;
@@ -643,6 +690,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val SAMPLE_PERCENT_RENT = 62
 &nbsp;private const val SAMPLE_PERCENT_COFFEE = 13
 &nbsp;private const val SAMPLE_CAP_PROGRESS = 0.95f
+&nbsp;
+&nbsp;/** Adds up to 1 exactly, so the sample donut closes rather than leaving a wedge of track showing. */
+<b class="fc">&nbsp;private val SAMPLE_DONUT_SHARES = listOf(0.42f, 0.22f, 0.14f, 0.12f, 0.1f)</b>
+&nbsp;private const val SAMPLE_DONUT_TOTAL = &quot;€1,214.60&quot;
 </code>
 </pre>
 </div>
@@ -666,7 +717,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

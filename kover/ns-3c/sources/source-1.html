@@ -110,10 +110,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 &nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
+&nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 &nbsp;import com.georgeci.moneysurfer.domain.model.SpentByCategory
 &nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
+&nbsp;import com.georgeci.moneysurfer.domain.model.buildBalanceTrend
 &nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -131,6 +133,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
@@ -163,6 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val getBurnRate: GetBurnRateUseCase,
 &nbsp;    private val generateInsights: GenerateInsightsUseCase,
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
+&nbsp;    private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
 &nbsp;    uiPreferences: UiPreferences,
 &nbsp;    hostCapabilities: HostCapabilities,
 &nbsp;) : MviViewModel&lt;DashboardState, DashboardEvent, DashboardEffect&gt;(
@@ -227,17 +231,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            getCategorySpend(period).onStart { emit(null) },
 &nbsp;            ::WidgetSources,
 &nbsp;        )
+&nbsp;        // The balance widget&#39;s two non-account inputs, folded for the same reason the chrome is: the
+&nbsp;        // cached FX table is what turns the account list into one figure, and the monthly nets are
+&nbsp;        // what shape the curve under it. Neither is read anywhere else, and together they leave the
+&nbsp;        // fifth `combine` slot below free.
+&nbsp;        val balanceSources = combine(
+&nbsp;            getExchangeRates().onStart { emit(null) },
+&nbsp;            getMonthlyNetHistory().onStart { emit(null) },
+&nbsp;            ::BalanceSources,
+&nbsp;        )
 &nbsp;        launch {
 &nbsp;            combine(
 &nbsp;                getAccounts().onStart { emit(emptyList()) },
 &nbsp;                getRecentTransactions(),
 &nbsp;                getGoals(),
-&nbsp;                getExchangeRates().onStart { emit(null) },
+&nbsp;                balanceSources,
 &nbsp;                widgetSources,
 &nbsp;                // Read by name rather than destructured: at five members the positional form is
 &nbsp;                // one reordered field away from a silent swap, and detekt caps it at three.
-&nbsp;            ) { accounts, transactions, goals, rates, widgets -&gt;
-&nbsp;                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
+&nbsp;            ) { accounts, transactions, goals, balanceInputs, widgets -&gt;
+&nbsp;                val balance = accounts.convertedTotal(balanceInputs.rates)
+&nbsp;                    ?.toBalanceUi(balanceInputs.netHistory)
 &nbsp;                DashboardState.Content(
 &nbsp;                    accounts = accounts.map { it.toUi() },
 &nbsp;                    transactions = transactions
@@ -250,10 +264,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    workspaceName = null,
 &nbsp;                    workspaceInitial = null,
 &nbsp;                    greeting = null,
-&nbsp;                    formattedTrendDelta = null,
+&nbsp;                    formattedTrendDelta = balance?.trend?.text,
+&nbsp;                    isTrendDeltaNegative = balance?.trend?.isNegative == true,
+&nbsp;                    balanceSeries = balance?.trend?.series.orEmpty(),
 &nbsp;                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
 &nbsp;                    safeToSpend = widgets.safeToSpend?.toUi(),
 &nbsp;                    spentByCategory = widgets.categorySpend?.toUi().orEmpty(),
+&nbsp;                    spentByCategoryTotal = widgets.categorySpend
+&nbsp;                        ?.let { MoneyFormatter.format(it.total, it.currency) },
 &nbsp;                    budgets = widgets.budgetProgress.toBudgetsUi(),
 &nbsp;                    burnRate = widgets.burnRate?.toUi(),
 &nbsp;                    isOffline = isOffline,
@@ -288,8 +306,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * bucket instead of going empty. `formattedTotalBalance == null` is the screen&#39;s &quot;no accounts
 &nbsp;     * at all&quot; signal, and letting an unconvertible balance trip it would tell a user who *has*
 &nbsp;     * money to add their first account.
+&nbsp;     *
+&nbsp;     * That fallback headline gets no trend: [history] is quoted in the base currency, and hanging
+&nbsp;     * its curve off a total that is one currency&#39;s bucket would draw a shape belonging to neither.
+&nbsp;     * Neither does a headline that took a rate to assemble — see [coversWholeHeadline].
 &nbsp;     */
-&nbsp;    private fun ConvertedTotal.toBalanceUi(): BalanceUi {
+&nbsp;    private fun ConvertedTotal.toBalanceUi(history: MonthlyNetHistory?): BalanceUi {
 &nbsp;        val leftOver = unconverted.map { MoneyFormatter.format(it.amount, it.currencyCode) }
 &nbsp;        return when (val converted = total) {
 &nbsp;            null -&gt; BalanceUi(
@@ -301,8 +323,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                headline = MoneyFormatter.format(converted, baseCurrency),
 &nbsp;                notConverted = leftOver,
 &nbsp;                asOf = asOf?.asIsoDate(),
+&nbsp;                trend = history?.takeIf { coversWholeHeadline }?.toTrendUi(converted, baseCurrency),
 &nbsp;            )
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether base-currency history can account for the whole headline, which is what it takes for a
+&nbsp;     * delta folded out of that history to be the movement of *this* figure.
+&nbsp;     *
+&nbsp;     * The aggregate behind the nets filters on the base currency and the app caches only today&#39;s
+&nbsp;     * rates, so a foreign account&#39;s movement is outside the fold no matter how it is anchored. It is
+&nbsp;     * inside the headline, though, the moment a rate could price it — and &quot;+$0.00 this month&quot; beside
+&nbsp;     * a balance that grew by a third of itself is the class of answer
+&nbsp;     * [ConvertedTotal] exists to prevent. So the trend stands down unless every balance in the
+&nbsp;     * workspace was already in the base currency: nothing left unconverted ([ConvertedTotal.isComplete])
+&nbsp;     * and no quote needed to build the total (a null `asOf`, which is exactly that signal).
+&nbsp;     *
+&nbsp;     * Costs multi-currency workspaces their trend until the day transactions carry a rate snapshot.
+&nbsp;     * A figure that silently omits money is worse than no figure.
+&nbsp;     */
+&nbsp;    private val ConvertedTotal.coversWholeHeadline: Boolean
+&nbsp;        get() = isComplete &amp;&amp; asOf == null
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This month&#39;s movement and the curve behind it, or null when there is nothing honest to draw:
+&nbsp;     *
+&nbsp;     * - the nets are *filtered* to their own workspace&#39;s base currency, and the total is converted
+&nbsp;     *   into whatever the cached FX table is based on. The two agree except in the window between a
+&nbsp;     *   base-currency change and the next rate refresh, and in that window a fold would subtract
+&nbsp;     *   euros from dollars;
+&nbsp;     * - a window that booked nothing has no curve. The fold would still produce six points — the
+&nbsp;     *   present balance repeated — and a flat line across half a year is a claim about months the
+&nbsp;     *   aggregate cannot see, since opening balances are outside its monthly nets by construction.
+&nbsp;     */
+&nbsp;    private fun MonthlyNetHistory.toTrendUi(total: Money, base: CurrencyCode): BalanceTrendUi? {
+&nbsp;        if (currency != base || nets.isEmpty()) return null
+&nbsp;        val trend = buildBalanceTrend(currentBalance = total, nets = nets, months = months)
+&nbsp;        val formatted = MoneyFormatter.format(trend.delta, base)
+&nbsp;        return BalanceTrendUi(
+&nbsp;            // Locale formatting only signs negatives; a flat month reads as &quot;+&quot; too, since &quot;no
+&nbsp;            // change&quot; is not a loss. Same call as the account details chart&#39;s delta.
+&nbsp;            text = if (trend.delta.isNegative()) formatted else &quot;+$formatted&quot;,
+&nbsp;            isNegative = trend.delta.isNegative(),
+&nbsp;            // Major units: the curve only needs its own shape, and minor units are a Long the
+&nbsp;            // chart would have to narrow anyway.
+&nbsp;            series = trend.points.map { (it.balance.minor / Money.MINOR_PER_MAJOR).toFloat() },
+&nbsp;        )
 &nbsp;    }
 &nbsp;
 &nbsp;    /** ISO date — the &quot;as of&quot; label has to be unambiguous, and the app ships no date locale rules. */
@@ -473,7 +540,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val workspaceName: String?,
 &nbsp;        val workspaceInitial: String?,
 &nbsp;        val greeting: String?,
+&nbsp;        /**
+&nbsp;         * What the balance moved by this month, signed and formatted, or null when no window of
+&nbsp;         * base-currency history backs a figure — see `toTrendUi`.
+&nbsp;         */
 &nbsp;        val formattedTrendDelta: String?,
+&nbsp;        /** Whether [formattedTrendDelta] went down. Picks the arrow the widget draws beside it. */
+&nbsp;        val isTrendDeltaNegative: Boolean = false,
+&nbsp;        /**
+&nbsp;         * The balance at the close of each of the charted months, oldest first, in major units.
+&nbsp;         * Empty when there is no curve to draw — the widget needs two points to draw one.
+&nbsp;         */
+&nbsp;        val balanceSeries: List&lt;Float&gt; = emptyList(),
 &nbsp;        val goals: List&lt;GoalUi&gt; = emptyList(),
 &nbsp;        /** What is still safe to spend this period, or null while no active budget backs a number. */
 &nbsp;        val safeToSpend: SafeToSpendUi? = null,
@@ -484,6 +562,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * spend, which is the spent-by-category widget&#39;s own empty state rather than a missing one.
 &nbsp;         */
 &nbsp;        val spentByCategory: List&lt;CategorySpendUi&gt; = emptyList(),
+&nbsp;        /**
+&nbsp;         * Everything [spentByCategory] adds up to, formatted — the donut&#39;s centre figure. Kept
+&nbsp;         * beside the rows rather than re-summed on the screen: the rows carry formatted strings,
+&nbsp;         * not money, so a screen-side sum would have to parse its way back to the amounts. Null
+&nbsp;         * while no workspace backs a breakdown, which is not the same as a breakdown of zero.
+&nbsp;         */
+&nbsp;        val spentByCategoryTotal: String? = null,
 &nbsp;        /**
 &nbsp;         * The week&#39;s spend pace and where the month lands at it, or null while no workspace backs a
 &nbsp;         * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
@@ -569,11 +654,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val period: DashboardPeriod,
 &nbsp;)
 &nbsp;
-&nbsp;/** The three strings the balance widget needs, already formatted. */
+&nbsp;/** Everything the balance widget draws, already formatted. */
 &nbsp;private data class BalanceUi(
 &nbsp;    val headline: String?,
 &nbsp;    val notConverted: List&lt;String&gt;,
 &nbsp;    val asOf: String?,
+&nbsp;    /** Null when no base-currency history could be anchored on the headline. */
+&nbsp;    val trend: BalanceTrendUi? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/** The balance card&#39;s movement half: the delta as a signed string, and the curve behind it. */
+&nbsp;private data class BalanceTrendUi(
+&nbsp;    val text: String,
+&nbsp;    val isNegative: Boolean,
+&nbsp;    val series: List&lt;Float&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The two flows behind the headline figure and its curve, folded into one so the screen&#39;s
+&nbsp; * five-source `combine` still fits. See `observeDashboard`.
+&nbsp; */
+&nbsp;private data class BalanceSources(
+&nbsp;    val rates: ExchangeRateSnapshot?,
+&nbsp;    val netHistory: MonthlyNetHistory?,
 &nbsp;)
 &nbsp;
 <b class="fc">&nbsp;data class AccountUi(</b>
@@ -870,7 +973,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

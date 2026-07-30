@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionTotal</title>
+  <title>MoneySurfer Coverage Report > TransactionReferenceKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionTotal (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: TransactionReferenceKt (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionTotal</td>
+  <td class="name">TransactionReferenceKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,24 +63,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    96.5%
   </span>
   <span class="absValue">
-    (17/17)
+    (55/57)
   </span>
 </td>
 </tr>
@@ -94,22 +101,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;
+&nbsp;private const val REFERENCE_PREFIX = &quot;TX-&quot;
+&nbsp;private const val REFERENCE_DIGITS = 4
 &nbsp;
 &nbsp;/**
-&nbsp; * Sum of transaction magnitudes for one (type, currency) pair inside a date window.
+&nbsp; * Short human-facing label for a transaction (`TX-8A13`), shown on the details screen.
 &nbsp; *
-&nbsp; * Aggregated by the database rather than by folding a loaded list, so the transactions-list
-&nbsp; * summary stays exact even when the list itself is paged. Split per currency because minor
-&nbsp; * units of different currencies must never be added together.
+&nbsp; * Derived, never stored: it is a pure function of [TransactionId], so there is no column to
+&nbsp; * migrate, no wire field for the rules to validate, and nothing that can drift from the id it
+&nbsp; * labels. [TransactionId] is UUID-backed, so its trailing hex digits are already uniformly
+&nbsp; * distributed and no hashing is needed.
+&nbsp; *
+&nbsp; * This is a display label, not a key: four hex digits collide, and nothing looks a transaction
+&nbsp; * up by it. If a bank-supplied reference ever has to survive a statement import, that is a
+&nbsp; * *stored* field with different semantics — add it then, next to this one, not instead of it.
 &nbsp; */
-<b class="fc">&nbsp;data class TransactionTotal(</b>
-<b class="fc">&nbsp;    val type: TransactionType,</b>
-<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
-<b class="fc">&nbsp;    val total: Money,</b>
-&nbsp;)
+&nbsp;val TransactionId.reference: String
+&nbsp;    get() {
+<b class="fc">&nbsp;        val digits = value.filter(Char::isReferenceDigit)</b>
+<b class="fc">&nbsp;            .takeLast(REFERENCE_DIGITS)</b>
+<b class="fc">&nbsp;            .padStart(REFERENCE_DIGITS, &#39;0&#39;)</b>
+<b class="fc">&nbsp;        return REFERENCE_PREFIX + digits.uppercase()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;// Ids reaching us from an import may not be UUIDs; keeping only hex digits guarantees a
+&nbsp;// stable, printable label for any id shape rather than echoing stray punctuation.
+&nbsp;private fun Char.isReferenceDigit(): Boolean =
+<b class="pc">&nbsp;    this in &#39;0&#39;..&#39;9&#39; || this in &#39;a&#39;..&#39;f&#39; || this in &#39;A&#39;..&#39;F&#39;</b>
 </code>
 </pre>
 </div>
@@ -133,7 +153,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

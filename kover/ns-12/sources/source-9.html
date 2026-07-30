@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseAccountDeletionRemoteSource</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateLatestDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseAccountDeletionRemoteSource (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: ExchangeRateLatestDto (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,120 +46,100 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseAccountDeletionRemoteSource</td>
+  <td class="name">ExchangeRateLatestDto</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/16)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    30.8%
   </span>
   <span class="absValue">
-    (0/16)
+    (8/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/46)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    65.4%
   </span>
   <span class="absValue">
-    (0/720)
+    (125/191)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$Companion</td>
+    <td class="name">ExchangeRateLatestDto$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$deleteAllDocs$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$deleteEmailMapping$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$deleteUserCollection$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$deleteUserDoc$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$deleteWorkspace$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$deleteWorkspaceCollection$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$fetchEmailMappingUid$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$fetchMembers$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$fetchWorkspaceIds$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$fetchWorkspaceOwnerId$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">FirebaseAccountDeletionRemoteSource$markMemberLeft$1</td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/16)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    30.8%
   </span>
   <span class="absValue">
-    (0/16)
+    (8/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/46)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.2%
   </span>
   <span class="absValue">
-    (0/720)
+    (129/195)
   </span>
 </td>
 </tr>
@@ -172,119 +152,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
-&nbsp;import dev.gitlive.firebase.firestore.CollectionReference
-&nbsp;import dev.gitlive.firebase.firestore.DocumentReference
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestoreException
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import kotlinx.serialization.SerialName
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * The only Firebase-aware part of the account-deletion purge: maps [AccountDeletionRemoteSource]
-&nbsp; * primitives onto Firestore document paths, DTOs and write batches. Deliberately free of
-&nbsp; * decision logic — what gets purged versus left is decided in
-&nbsp; * [UserAccountDeletionRepositoryImpl][com.georgeci.moneysurfer.data.repository.UserAccountDeletionRepositoryImpl].
+&nbsp; * Where the FX quotes come from.
+&nbsp; *
+&nbsp; * Default is ExchangeRate-API&#39;s *open* endpoint (`open.er-api.com`): free, no API key, no
+&nbsp; * registration, ~160 currencies, refreshed daily. Its free tier asks for attribution wherever the
+&nbsp; * rates are shown, which the dashboard&#39;s &quot;as of&quot; footnote carries.
+&nbsp; *
+&nbsp; * Bound in `RemoteDataModule` so the URL is one override away — swapping providers means replacing
+&nbsp; * this binding and [ExchangeRateLatestDto], nothing above the data layer.
 &nbsp; */
-<b class="nc">&nbsp;@Single(binds = [AccountDeletionRemoteSource::class])</b>
-&nbsp;// Mirrors the interface one-to-one, so it inherits the same over-ceiling justification.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;class FirebaseAccountDeletionRemoteSource(
-<b class="nc">&nbsp;    private val firestore: FirebaseFirestore,</b>
-&nbsp;) : AccountDeletionRemoteSource {
+&nbsp;data class ExchangeRateApiConfig(
+&nbsp;    val baseUrl: String = DEFAULT_BASE_URL,
+&nbsp;) {
+&nbsp;    /** `…/v6/latest/USD` — the base currency is a path segment, so nothing needs URL-encoding. */
+&nbsp;    fun latestUrl(base: CurrencyCode): String = &quot;$baseUrl/${base.value}&quot;
 &nbsp;
-<b class="nc">&nbsp;    override suspend fun fetchWorkspaceIds(uid: String): List&lt;String&gt; = denyingAware {</b>
-<b class="nc">&nbsp;        val snap = userRef(uid).get()</b>
-<b class="nc">&nbsp;        if (!snap.exists) emptyList() else snap.data(UserDoc.serializer()).workspaceIds.distinct()</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun fetchWorkspaceOwnerId(workspaceId: String): String? = denyingAware {</b>
-<b class="nc">&nbsp;        val snap = workspaceRef(workspaceId).get()</b>
-<b class="nc">&nbsp;        if (!snap.exists) null else snap.data(WorkspaceDoc.serializer()).ownerId</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun fetchMembers(workspaceId: String): List&lt;RemoteMemberRef&gt; = denyingAware {</b>
-<b class="nc">&nbsp;        workspaceRef(workspaceId).collection(MEMBERS).get().documents.map { snap -&gt;</b>
-<b class="nc">&nbsp;            RemoteMemberRef(</b>
-<b class="nc">&nbsp;                uid = snap.id,</b>
-<b class="nc">&nbsp;                status = snap.data(WorkspaceMemberDoc.serializer()).status.toMemberStatus(),</b>
-<b class="nc">&nbsp;            )</b>
-<b class="nc">&nbsp;        }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun deleteWorkspaceCollection(workspaceId: String, collectionName: String) =
-<b class="nc">&nbsp;        denyingAware { deleteAllDocs(workspaceRef(workspaceId).collection(collectionName)) }</b>
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun deleteWorkspace(workspaceId: String) = denyingAware {</b>
-<b class="nc">&nbsp;        workspaceRef(workspaceId).delete()</b>
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun markMemberLeft(workspaceId: String, uid: String, nowMillis: Long) = denyingAware {</b>
-<b class="nc">&nbsp;        workspaceRef(workspaceId).collection(MEMBERS).document(uid).update(</b>
-<b class="nc">&nbsp;            &quot;status&quot; to WorkspaceMemberStatus.LEFT.name,</b>
-<b class="nc">&nbsp;            &quot;leftAt&quot; to nowMillis,</b>
-<b class="nc">&nbsp;            &quot;updatedAt&quot; to nowMillis,</b>
-<b class="nc">&nbsp;            &quot;clientVersionCode&quot; to CLIENT_VERSION_CODE,</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun fetchEmailMappingUid(emailKey: String): String? = denyingAware {</b>
-<b class="nc">&nbsp;        val snap = firestore.collection(USER_EMAILS).document(emailKey).get()</b>
-<b class="nc">&nbsp;        if (!snap.exists) null else snap.data(UserEmailDoc.serializer()).uid</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun deleteEmailMapping(emailKey: String) = denyingAware {</b>
-<b class="nc">&nbsp;        firestore.collection(USER_EMAILS).document(emailKey).delete()</b>
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    override suspend fun deleteUserCollection(uid: String, collectionName: String) =
-<b class="nc">&nbsp;        denyingAware { deleteAllDocs(userRef(uid).collection(collectionName)) }</b>
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun deleteUserDoc(uid: String) = denyingAware { userRef(uid).delete() }</b>
-&nbsp;
-&nbsp;    private fun userRef(uid: String): DocumentReference =
-<b class="nc">&nbsp;        firestore.collection(USERS).document(uid)</b>
-&nbsp;
-&nbsp;    private fun workspaceRef(workspaceId: String): DocumentReference =
-<b class="nc">&nbsp;        firestore.collection(WORKSPACES).document(workspaceId)</b>
-&nbsp;
-&nbsp;    /** Firestore caps a write batch at 500 operations; chunk well below that. */
-&nbsp;    private suspend fun deleteAllDocs(collection: CollectionReference) {
-<b class="nc">&nbsp;        collection.get().documents.chunked(MAX_BATCH_SIZE).forEach { chunk -&gt;</b>
-<b class="nc">&nbsp;            val batch = firestore.batch()</b>
-<b class="nc">&nbsp;            chunk.forEach { snap -&gt; batch.delete(snap.reference) }</b>
-<b class="nc">&nbsp;            batch.commit()</b>
-<b class="nc">&nbsp;        }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /** Unknown / absent statuses on legacy docs are treated as ACTIVE, matching firestore.rules. */
-&nbsp;    private fun String.toMemberStatus(): WorkspaceMemberStatus =
-<b class="nc">&nbsp;        WorkspaceMemberStatus.entries.firstOrNull { it.name == this } ?: WorkspaceMemberStatus.ACTIVE</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Translates Firestore&#39;s PERMISSION_DENIED into the SDK-free [RemoteAccessDeniedException] so
-&nbsp;     * callers never import a Firebase type. Mirrors SyncErrorClassifier: gitlive exposes no
-&nbsp;     * cross-platform code enum, so the message is what we can inspect.
-&nbsp;     */
-&nbsp;    private inline fun &lt;T&gt; denyingAware(block: () -&gt; T): T =
-&nbsp;        try {
-<b class="nc">&nbsp;            block()</b>
-&nbsp;        } catch (e: FirebaseFirestoreException) {
-<b class="nc">&nbsp;            if (e.message?.lowercase()?.contains(&quot;permission&quot;) == true) {</b>
-<b class="nc">&nbsp;                throw RemoteAccessDeniedException(e.message, e)</b>
-&nbsp;            }
-<b class="nc">&nbsp;            throw e</b>
-&nbsp;        }
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val USERS = SyncCollection.USERS
-&nbsp;        const val USER_EMAILS = &quot;userEmails&quot;
-&nbsp;        const val WORKSPACES = SyncCollection.WORKSPACES
-&nbsp;        const val MEMBERS = SyncCollection.WORKSPACE_MEMBERS
-&nbsp;        const val CLIENT_VERSION_CODE = 1
-&nbsp;        const val MAX_BATCH_SIZE = 400
+&nbsp;    companion object {
+&nbsp;        const val DEFAULT_BASE_URL: String = &quot;https://open.er-api.com/v6/latest&quot;
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The subset of the provider&#39;s payload that matters. Unknown fields (`provider`, `terms_of_use`,
+&nbsp; * `time_next_update_*`, …) are ignored by the decoder rather than modelled.
+&nbsp; */
+<b class="pc">&nbsp;@Serializable</b>
+&nbsp;internal data class ExchangeRateLatestDto(
+<b class="fc">&nbsp;    val result: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    @SerialName(&quot;base_code&quot;) val baseCode: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    @SerialName(&quot;time_last_update_unix&quot;) val timeLastUpdateUnix: Long = 0L,</b>
+<b class="fc">&nbsp;    val rates: Map&lt;String, Double&gt; = emptyMap(),</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Maps the payload to the domain table, or `null` when it is not usable: a non-success `result`,
+&nbsp; * an empty quote set, a base that is not the one asked for (a redirect or a provider fallback), or
+&nbsp; * a missing publication timestamp — all of which would otherwise cache a table the UI would
+&nbsp; * mislabel.
+&nbsp; */
+&nbsp;internal fun ExchangeRateLatestDto.toDomain(requested: CurrencyCode): ExchangeRateTable? {
+&nbsp;    if (result != RESULT_SUCCESS || rates.isEmpty() || timeLastUpdateUnix &lt;= 0L) return null
+&nbsp;    if (!baseCode.equals(requested.value, ignoreCase = true)) return null
+&nbsp;    return ExchangeRateTable(
+&nbsp;        baseCurrency = requested,
+&nbsp;        rates = rates
+&nbsp;            .filterValues { it.isFinite() &amp;&amp; it &gt; 0.0 }
+&nbsp;            .mapKeys { (code, _) -&gt; CurrencyCode(code.uppercase()) },
+&nbsp;        asOf = Instant.fromEpochSeconds(timeLastUpdateUnix),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private const val RESULT_SUCCESS = &quot;success&quot;
 </code>
 </pre>
 </div>
@@ -308,7 +233,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

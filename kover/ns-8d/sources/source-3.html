@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (30/30)
   </span>
 </td>
 </tr>
@@ -114,6 +114,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * already drawing the section&#39;s top app bar and FAB, so this one must not draw its own.
 &nbsp;     */
 <b class="fc">&nbsp;    Detail,</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The extra pane of a three-pane layout — the design&#39;s inline &quot;add&quot; panel, displayed to the
+&nbsp;     * right of the detail pane it was opened from (issue #391). Like the detail pane it draws no
+&nbsp;     * section chrome; the list pane on the far side still owns the top app bar and the FAB.
+&nbsp;     */
+<b class="fc">&nbsp;    Extra,</b>
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -130,7 +137,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; *   an earlier entry of the same pane to return to (a settings sub-screen that opened another,
 &nbsp; *   About → Licenses) or an entry stacked above this one (a list route pushed from a detail, which
 &nbsp; *   leaves the detail beside a list that is not its own). A detail opened straight from its list
-&nbsp; *   has neither, and is the one case that drops the affordance.
+&nbsp; *   has neither, and is the one case that drops the affordance. An [SurferPaneRole.Extra] panel
+&nbsp; *   always has one: dismissing it leaves the list and the detail it was opened from in place.
 &nbsp; */
 &nbsp;@Immutable
 &nbsp;data class SurferPane(
@@ -139,9 +147,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;) {
 &nbsp;    /**
 &nbsp;     * Whether this screen draws the section&#39;s top app bar and floating action button. Only the
-&nbsp;     * detail pane of a two-pane layout gives them up — its list pane is already drawing both.
+&nbsp;     * panes displayed *beside* a list pane give them up — that list pane is already drawing both.
 &nbsp;     */
-&nbsp;    val ownsSectionChrome: Boolean get() = role != SurferPaneRole.Detail
+&nbsp;    val ownsSectionChrome: Boolean
+&nbsp;        get() = role == SurferPaneRole.Single || role == SurferPaneRole.List
 &nbsp;
 &nbsp;    /** Whether a back affordance on this screen still has somewhere to go. */
 &nbsp;    val showsBackNavigation: Boolean get() = ownsSectionChrome || hasPaneBackStack
@@ -172,7 +181,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

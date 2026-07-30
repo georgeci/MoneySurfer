@@ -188,7 +188,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/13)
+    (0/8)
   </span>
 </td>
   </tr>
@@ -403,7 +403,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/669)
+    (0/664)
   </span>
 </td>
 </tr>
@@ -493,8 +493,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        AccountDetailsScreen(</b>
 <b class="nc">&nbsp;            accountId = AccountId(key.accountId),</b>
 <b class="nc">&nbsp;            onNavigateBack = { navigator.pop() },</b>
+&nbsp;            // The Accounts-scoped creation route: the same form, presented as the design&#39;s inline
+&nbsp;            // add panel on a three-column window and as the usual full-screen route below it.
 <b class="nc">&nbsp;            onNavigateToTransactionCreation = { accountId -&gt;</b>
-<b class="nc">&nbsp;                navigator.push(Route.TransactionCreation(accountId = accountId.value))</b>
+<b class="nc">&nbsp;                navigator.push(Route.AccountTransactionCreation(accountId = accountId.value))</b>
 &nbsp;            },
 <b class="nc">&nbsp;            onNavigateToTransactionDetails = { transactionId -&gt;</b>
 <b class="nc">&nbsp;                navigator.push(Route.TransactionDetails(transactionId.value))</b>
@@ -538,7 +540,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

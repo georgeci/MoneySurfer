@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSafeToSpendEmpty</title>
+  <title>MoneySurfer Coverage Report > SurferSafeToSpendData</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSafeToSpendEmpty (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: SurferSafeToSpendData (com.georgeci.moneysurfer.uikit.widgets)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSafeToSpendEmpty</td>
+  <td class="name">SurferSafeToSpendData</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (35/35)
+    (42/42)
   </span>
 </td>
 </tr>
@@ -126,16 +126,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 &nbsp;data class SurferSafeToSpendData(
 &nbsp;    /** The headline — what is still safe to spend. Signed, so an overspent budget reads negative. */
-&nbsp;    val amount: String,
+<b class="fc">&nbsp;    val amount: String,</b>
 &nbsp;    /** One line under the headline: the limit the headline is measured against, and whose it is. */
-&nbsp;    val caption: String,
-&nbsp;    val perDay: String,
-&nbsp;    val daysLeft: String,
-&nbsp;    val progress: Float,
-&nbsp;    val paceFraction: Float,
-&nbsp;    val status: SurferBudgetStatus,
+<b class="fc">&nbsp;    val caption: String,</b>
+<b class="fc">&nbsp;    val perDay: String,</b>
+<b class="fc">&nbsp;    val daysLeft: String,</b>
+<b class="fc">&nbsp;    val progress: Float,</b>
+<b class="fc">&nbsp;    val paceFraction: Float,</b>
+<b class="fc">&nbsp;    val status: SurferBudgetStatus,</b>
 &nbsp;    /** What a screen reader gets for the bar; the shape restates numbers already in the text. */
-&nbsp;    val progressContentDescription: String? = null,
+<b class="fc">&nbsp;    val progressContentDescription: String? = null,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -146,11 +146,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * screen owns the value, since where it leads is a step in the host&#39;s flow.
 &nbsp; */
 &nbsp;data class SurferSafeToSpendEmpty(
-<b class="fc">&nbsp;    val title: String? = null,</b>
-<b class="fc">&nbsp;    val subtitle: String? = null,</b>
-<b class="fc">&nbsp;    val actionLabel: String? = null,</b>
-<b class="fc">&nbsp;    val onActionClick: (() -&gt; Unit)? = null,</b>
-<b class="fc">&nbsp;    val actionTestTag: String? = null,</b>
+&nbsp;    val title: String? = null,
+&nbsp;    val subtitle: String? = null,
+&nbsp;    val actionLabel: String? = null,
+&nbsp;    val onActionClick: (() -&gt; Unit)? = null,
+&nbsp;    val actionTestTag: String? = null,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -399,7 +399,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

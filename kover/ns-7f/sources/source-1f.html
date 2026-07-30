@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferNavigationDrawerTestTags</title>
+  <title>MoneySurfer Coverage Report > SurferToolbarTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferNavigationDrawerTestTags (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferToolbarTestTags (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferNavigationDrawerTestTags</td>
+  <td class="name">SurferToolbarTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,334 +46,328 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import androidx.compose.foundation.Image
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.only
+&nbsp;import androidx.compose.foundation.layout.RowScope
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.safeDrawing
 &nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.selection.selectable
-&nbsp;import androidx.compose.foundation.selection.selectableGroup
 &nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.HorizontalDivider
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.FilledTonalButton
 &nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.VerticalDivider
+&nbsp;import androidx.compose.material3.TopAppBar
+&nbsp;import androidx.compose.material3.TopAppBarColors
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.Immutable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.semantics.Role
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_app_icon
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_brand
-&nbsp;import org.jetbrains.compose.resources.painterResource
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_back
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/** One destination row of [SurferNavigationDrawer]. */
-&nbsp;@Immutable
-&nbsp;data class SurferDrawerItem(
-&nbsp;    val label: String,
-&nbsp;    val icon: ImageVector,
-&nbsp;    val selected: Boolean,
-&nbsp;    val onClick: () -&gt; Unit,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * A group of [items] under an optional caption.
-&nbsp; *
-&nbsp; * [label] is rendered uppercase by the drawer, so pass it in its natural case (&quot;Manage&quot;) — the
-&nbsp; * same string is what a screen reader announces and what a rail would show if it ever grew
-&nbsp; * grouping.
-&nbsp; */
-&nbsp;@Immutable
-&nbsp;data class SurferDrawerSection(
-&nbsp;    val items: List&lt;SurferDrawerItem&gt;,
-&nbsp;    val label: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * The permanent navigation drawer for wide windows: brand header, grouped destinations, and a
-&nbsp; * user/workspace block pinned to the bottom.
-&nbsp; *
-&nbsp; * `NavigationSuiteScaffold`&#39;s own drawer models none of those three (issue #389, gap G5) — it
-&nbsp; * takes a flat item list and nothing else — which is why this is a component rather than a
-&nbsp; * configuration of it. It is deliberately presentational: it knows nothing about routes, so the
-&nbsp; * caller maps its destinations onto [sections] and keeps the selection rule.
-&nbsp; *
-&nbsp; * Sized to the design&#39;s 210 dp sidebar. The destination list scrolls if the window is too short
-&nbsp; * to hold every group, so the footer stays reachable rather than being pushed off the bottom.
-&nbsp; *
-&nbsp; * @param userName primary line of the footer — a display name, an email, or a placeholder.
-&nbsp; * @param workspaceName secondary line; omitted when no workspace is selected yet.
-&nbsp; * @param onUserClick makes the footer a button (the workspace switcher). Null leaves it inert.
-&nbsp; * @param windowInsets the insets the drawer keeps its content clear of. Owned here rather than by
-&nbsp; *   the host for the same reason `NavigationRail` owns its own: the surface has to paint edge to
-&nbsp; *   edge — under the status bar and any start-edge cutout — while the brand header and the user
-&nbsp; *   footer stay out from under them. The default matches `NavigationRailDefaults.windowInsets`.
-&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-&nbsp;fun SurferNavigationDrawer(
-&nbsp;    sections: List&lt;SurferDrawerSection&gt;,
-&nbsp;    userName: String,
+&nbsp;fun SurferToolbar(
+&nbsp;    title: String,
 &nbsp;    modifier: Modifier = Modifier,
-&nbsp;    brand: String = stringResource(Res.string.uikit_brand),
-&nbsp;    workspaceName: String? = null,
-&nbsp;    onUserClick: (() -&gt; Unit)? = null,
-&nbsp;    windowInsets: WindowInsets =
-&nbsp;        WindowInsets.safeDrawing.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical),
+&nbsp;    onBack: (() -&gt; Unit)? = null,
+&nbsp;    navigationIcon: (@Composable () -&gt; Unit)? = null,
+&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
 &nbsp;) {
-&nbsp;    Row(modifier = modifier.fillMaxHeight().width(DrawerWidth)) {
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .weight(1f)
-&nbsp;                .fillMaxHeight()
-&nbsp;                .background(AppTheme.materialColors.surfaceContainerLow)
-&nbsp;                // Inside the background, so the surface still reaches the window edge.
-&nbsp;                .windowInsetsPadding(windowInsets)
-&nbsp;                .testTag(SurferNavigationDrawerTestTags.Root),
-&nbsp;        ) {
-&nbsp;            BrandHeader(brand = brand)
-&nbsp;            Column(
-&nbsp;                modifier = Modifier
-&nbsp;                    .weight(1f)
-&nbsp;                    .verticalScroll(rememberScrollState())
-&nbsp;                    .selectableGroup(),
-&nbsp;            ) {
-&nbsp;                sections.forEach { section -&gt; DrawerSection(section = section) }
+&nbsp;    SurferToolbar(
+&nbsp;        modifier = modifier,
+&nbsp;        navigationIcon = {
+&nbsp;            when {
+&nbsp;                onBack != null -&gt; IconButton(
+&nbsp;                    onClick = onBack,
+&nbsp;                    modifier = Modifier.testTag(SurferToolbarTestTags.Back),
+&nbsp;                ) {
+&nbsp;                    Icon(
+&nbsp;                        imageVector = SurferIcons.Back,
+&nbsp;                        contentDescription = stringResource(Res.string.uikit_back),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                navigationIcon != null -&gt; navigationIcon()
 &nbsp;            }
-&nbsp;            UserFooter(
-&nbsp;                userName = userName,
-&nbsp;                workspaceName = workspaceName,
-&nbsp;                onClick = onUserClick,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        VerticalDivider(color = AppTheme.materialColors.outlineVariant)
-&nbsp;    }
+&nbsp;        },
+&nbsp;        colors = colors,
+&nbsp;        actions = actions,
+&nbsp;        title = { Text(title) },
+&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;/** Stable selectors for [SurferNavigationDrawer] — see docs/testing/testing-strategy.md. */
-&nbsp;object SurferNavigationDrawerTestTags {
-&nbsp;    const val Root = &quot;drawer:root&quot;
-&nbsp;    const val User = &quot;drawer:user&quot;
+&nbsp;/**
+&nbsp; * Stable selectors for [SurferToolbar] — see docs/testing/testing-strategy.md.
+&nbsp; *
+&nbsp; * [Back] is on the navigation [IconButton] every screen with an `onBack` gets, so an E2E flow
+&nbsp; * can go back by id instead of matching the localized &quot;Back&quot; content description.
+&nbsp; */
+&nbsp;object SurferToolbarTestTags {
+&nbsp;    const val Back = &quot;toolbar:back&quot;
 &nbsp;}
 &nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-&nbsp;private fun BrandHeader(brand: String) {
-&nbsp;    Row(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(horizontal = HorizontalInset, vertical = AppTheme.spacing.default),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
-&nbsp;    ) {
-&nbsp;        Image(
-&nbsp;            painter = painterResource(Res.drawable.uikit_app_icon),
-&nbsp;            contentDescription = SurferSemantics.Decorative,
-&nbsp;            modifier = Modifier
-&nbsp;                .size(BrandLogoSize)
-&nbsp;                .clip(RoundedCornerShape(BrandLogoCorner)),
-&nbsp;        )
-&nbsp;        Text(
-&nbsp;            text = brand,
-&nbsp;            style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-&nbsp;            color = AppTheme.materialColors.onSurface,
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = TextOverflow.Ellipsis,
-&nbsp;        )
-&nbsp;    }
+&nbsp;fun SurferToolbar(
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    navigationIcon: @Composable () -&gt; Unit = {},
+&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
+&nbsp;    title: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    TopAppBar(
+&nbsp;        title = title,
+&nbsp;        modifier = modifier,
+&nbsp;        navigationIcon = navigationIcon,
+&nbsp;        actions = {
+&nbsp;            SurferSyncStatusBadge()
+&nbsp;            actions()
+&nbsp;        },
+&nbsp;        colors = colors,
+&nbsp;    )
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Icon action for the trailing edge of [SurferToolbar] / [SurferDashboardToolbar]. Wraps
+&nbsp; * [IconButton] so every toolbar action gets the same 48dp tap target, tint, and content-
+&nbsp; * description handling without repeating boilerplate at every call site.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun DrawerSection(section: SurferDrawerSection) {
-&nbsp;    if (section.label != null) {
-&nbsp;        Text(
-&nbsp;            // Uppercased here rather than by the caller so the label stays readable at its
-&nbsp;            // source and in the accessibility tree.
-&nbsp;            text = section.label.uppercase(),
-&nbsp;            style = AppTheme.typography.labelSmall,
-&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = TextOverflow.Ellipsis,
-&nbsp;            modifier = Modifier.padding(
-&nbsp;                start = HorizontalInset + ItemInset,
-&nbsp;                end = HorizontalInset,
-&nbsp;                top = AppTheme.spacing.default,
-&nbsp;                bottom = AppTheme.spacing.xSmall,
-&nbsp;            ),
+&nbsp;fun SurferToolbarAction(
+&nbsp;    icon: ImageVector,
+&nbsp;    contentDescription: String?,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    tint: Color = AppTheme.materialColors.onSurface,
+&nbsp;) {
+&nbsp;    IconButton(onClick = onClick, modifier = modifier) {
+&nbsp;        Icon(
+&nbsp;            imageVector = icon,
+&nbsp;            contentDescription = contentDescription,
+&nbsp;            tint = tint,
 &nbsp;        )
 &nbsp;    }
-&nbsp;    section.items.forEach { item -&gt; DrawerItemRow(item = item) }
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Pill-shaped tonal button with a leading icon and a label, sized for the trailing edge of
+&nbsp; * [SurferToolbar]. Use for primary commit-style toolbar actions (&quot;Save&quot;, &quot;Update&quot;) that need
+&nbsp; * more weight than a [SurferToolbarAction] icon.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun DrawerItemRow(item: SurferDrawerItem) {
-&nbsp;    val contentColor = if (item.selected) {
-&nbsp;        AppTheme.materialColors.onSecondaryContainer
-&nbsp;    } else {
-&nbsp;        AppTheme.materialColors.onSurfaceVariant
-&nbsp;    }
-&nbsp;    Row(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(horizontal = HorizontalInset, vertical = ItemGap)
-&nbsp;            .clip(RoundedCornerShape(ItemCorner))
-&nbsp;            .background(
-&nbsp;                if (item.selected) AppTheme.materialColors.secondaryContainer else Color.Transparent,
-&nbsp;            )
-&nbsp;            .selectable(
-&nbsp;                selected = item.selected,
-&nbsp;                role = Role.Tab,
-&nbsp;                onClick = item.onClick,
-&nbsp;            )
-&nbsp;            .height(ItemHeight)
-&nbsp;            .padding(horizontal = ItemInset),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;fun SurferToolbarButtonAction(
+&nbsp;    icon: ImageVector,
+&nbsp;    text: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    enabled: Boolean = true,
+&nbsp;) {
+&nbsp;    FilledTonalButton(
+&nbsp;        onClick = onClick,
+&nbsp;        enabled = enabled,
+&nbsp;        shape = RoundedCornerShape(18.dp),
+&nbsp;        modifier = modifier.padding(end = 8.dp),
 &nbsp;    ) {
 &nbsp;        Icon(
-&nbsp;            imageVector = item.icon,
+&nbsp;            imageVector = icon,
 &nbsp;            contentDescription = SurferSemantics.Decorative,
-&nbsp;            tint = contentColor,
-&nbsp;            modifier = Modifier.size(ItemIconSize),
+&nbsp;            modifier = Modifier.size(16.dp),
 &nbsp;        )
-&nbsp;        Text(
-&nbsp;            text = item.label,
-&nbsp;            style = AppTheme.typography.labelLarge,
-&nbsp;            color = contentColor,
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = TextOverflow.Ellipsis,
-&nbsp;        )
+&nbsp;        Spacer(Modifier.width(6.dp))
+&nbsp;        Text(text = text, style = AppTheme.typography.labelLarge)
 &nbsp;    }
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Dashboard-flavoured top app bar: a colored letter bubble on the left, a two-line title
+&nbsp; * (small label + larger headline), and trailing actions. Use for the home/dashboard screen
+&nbsp; * where the toolbar needs to identify the active workspace.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-&nbsp;private fun UserFooter(
-&nbsp;    userName: String,
-&nbsp;    workspaceName: String?,
-&nbsp;    onClick: (() -&gt; Unit)?,
+&nbsp;fun SurferDashboardToolbar(
+&nbsp;    letter: String,
+&nbsp;    primaryText: String,
+&nbsp;    secondaryText: String,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    letterBackgroundColor: Color = AppTheme.materialColors.primaryContainer,
+&nbsp;    letterContentColor: Color = AppTheme.materialColors.onPrimaryContainer,
+&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
 &nbsp;) {
-&nbsp;    HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
-&nbsp;    Row(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-&nbsp;            .padding(horizontal = HorizontalInset, vertical = AppTheme.spacing.medium)
-&nbsp;            .testTag(SurferNavigationDrawerTestTags.User),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(AvatarSize)
-&nbsp;                .clip(CircleShape)
-&nbsp;                .background(AppTheme.materialColors.primaryContainer),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Text(
-&nbsp;                text = userName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),
-&nbsp;                style = AppTheme.typography.labelLarge,
-&nbsp;                color = AppTheme.materialColors.onPrimaryContainer,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        Column(modifier = Modifier.weight(1f)) {
-&nbsp;            Text(
-&nbsp;                text = userName,
-&nbsp;                style = AppTheme.typography.bodyMedium,
-&nbsp;                color = AppTheme.materialColors.onSurface,
-&nbsp;                maxLines = 1,
-&nbsp;                overflow = TextOverflow.Ellipsis,
-&nbsp;            )
-&nbsp;            if (workspaceName != null) {
+&nbsp;    SurferToolbar(
+&nbsp;        modifier = modifier,
+&nbsp;        navigationIcon = {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .padding(start = 12.dp)
+&nbsp;                    .size(40.dp)
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(letterBackgroundColor),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
 &nbsp;                Text(
-&nbsp;                    text = workspaceName,
-&nbsp;                    style = AppTheme.typography.bodySmall,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                    maxLines = 1,
-&nbsp;                    overflow = TextOverflow.Ellipsis,
+&nbsp;                    text = letter,
+&nbsp;                    style = AppTheme.typography.titleSmall,
+&nbsp;                    color = letterContentColor,
 &nbsp;                )
 &nbsp;            }
-&nbsp;        }
+&nbsp;        },
+&nbsp;        colors = colors,
+&nbsp;        actions = actions,
+&nbsp;        title = {
+&nbsp;            Column {
+&nbsp;                Text(
+&nbsp;                    text = primaryText,
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;                Text(
+&nbsp;                    text = secondaryText,
+&nbsp;                    style = AppTheme.typography.titleSmall,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(title = &quot;Screen Title&quot;)
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** The design&#39;s 210 dp sidebar, divider included. */
-&nbsp;private val DrawerWidth: Dp = 210.dp
-&nbsp;private val BrandLogoSize: Dp = 34.dp
-&nbsp;private val BrandLogoCorner: Dp = 10.dp
-&nbsp;private val HorizontalInset: Dp = 10.dp
-&nbsp;private val ItemInset: Dp = 10.dp
-&nbsp;private val ItemGap: Dp = 2.dp
-&nbsp;
-&nbsp;/** The 48 dp minimum touch target — `Modifier.selectable` does not expand one of its own. */
-&nbsp;private val ItemHeight: Dp = 48.dp
-&nbsp;private val ItemCorner: Dp = 10.dp
-&nbsp;private val ItemIconSize: Dp = 20.dp
-&nbsp;private val AvatarSize: Dp = 32.dp
-&nbsp;
-&nbsp;private fun previewItem(
-&nbsp;    label: String,
-&nbsp;    icon: ImageVector,
-&nbsp;    selected: Boolean = false,
-&nbsp;) = SurferDrawerItem(label = label, icon = icon, selected = selected, onClick = {})
-&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferNavigationDrawerPreview() {
+&nbsp;private fun SurferToolbarWithBackPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        Box(modifier = Modifier.height(520.dp)) {
-&nbsp;            SurferNavigationDrawer(
-&nbsp;                sections = listOf(
-&nbsp;                    SurferDrawerSection(
-&nbsp;                        items = listOf(
-&nbsp;                            previewItem(&quot;Dashboard&quot;, SurferIcons.Dashboard, selected = true),
-&nbsp;                            previewItem(&quot;Accounts&quot;, SurferIcons.Wallet),
-&nbsp;                            previewItem(&quot;Transactions&quot;, SurferIcons.SwapHoriz),
-&nbsp;                            previewItem(&quot;Budgets&quot;, SurferIcons.Savings),
-&nbsp;                            previewItem(&quot;Goals&quot;, SurferIcons.Flag),
-&nbsp;                        ),
-&nbsp;                    ),
-&nbsp;                    SurferDrawerSection(
-&nbsp;                        label = &quot;Manage&quot;,
-&nbsp;                        items = listOf(
-&nbsp;                            previewItem(&quot;Categories&quot;, SurferIcons.Category),
-&nbsp;                            previewItem(&quot;Settings&quot;, SurferIcons.Settings),
-&nbsp;                        ),
-&nbsp;                    ),
-&nbsp;                ),
-&nbsp;                userName = &quot;Georgy&quot;,
-&nbsp;                workspaceName = &quot;Household budget&quot;,
-&nbsp;                onUserClick = {},
-&nbsp;            )
-&nbsp;        }
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Details with back&quot;,
+&nbsp;//            onBack = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarWithActionsPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Dashboard&quot;,
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Settings,
+&nbsp;                    contentDescription = &quot;Settings&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarFullPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit Account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Delete,
+&nbsp;                    contentDescription = &quot;Delete&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarWithButtonActionPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;New transaction&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Check,
+&nbsp;                    text = &quot;Save&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarWithButtonActionDisabledPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Check,
+&nbsp;                    text = &quot;Update&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                    enabled = false,
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferDashboardToolbarPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferDashboardToolbar(
+&nbsp;            letter = &quot;F&quot;,
+&nbsp;            primaryText = &quot;Family&quot;,
+&nbsp;            secondaryText = &quot;Good evening, Kasia&quot;,
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Notifications,
+&nbsp;                    contentDescription = &quot;Notifications&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Settings,
+&nbsp;                    contentDescription = &quot;Settings&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -399,7 +393,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

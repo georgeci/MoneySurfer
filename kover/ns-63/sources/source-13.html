@@ -263,6 +263,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
   </tr>
   <tr>
+    <td class="name">Route$AccountTransactionCreation</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.1%
+  </span>
+  <span class="absValue">
+    (23/28)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Route$AccountTransactionCreation$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
     <td class="name">Route$BudgetCreation</td>
 <td class="coverageStat">
   <span class="percent">
@@ -1995,15 +2058,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (64/64)
+    (66/66)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    55.9%
+    55.8%
   </span>
   <span class="absValue">
-    (114/204)
+    (115/206)
   </span>
 </td>
 <td class="coverageStat">
@@ -2011,7 +2074,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (98/98)
+    (101/101)
   </span>
 </td>
 <td class="coverageStat">
@@ -2019,7 +2082,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     87.9%
   </span>
   <span class="absValue">
-    (1595/1814)
+    (1622/1846)
   </span>
 </td>
 </tr>
@@ -2190,6 +2253,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val transfer: Boolean = false,</b>
 &nbsp;    ) : Route
 &nbsp;
+&nbsp;    /**
+&nbsp;     * Adding a transaction from an account&#39;s detail pane — the same screen and the same ViewModel
+&nbsp;     * as [TransactionCreation], reached through its own route only so the pane host can present it
+&nbsp;     * as the design&#39;s inline add panel beside the account (issue #391).
+&nbsp;     *
+&nbsp;     * It cannot simply be [TransactionCreation] with different metadata: a nav entry declares its
+&nbsp;     * pane once, for every caller, and the transactions list opens the very same form *as* its
+&nbsp;     * detail pane. Below the three-column breakpoint this route behaves exactly like
+&nbsp;     * [TransactionCreation] — same full-screen form, same state.
+&nbsp;     */
+<b class="pc">&nbsp;    @Serializable</b>
+<b class="fc">&nbsp;    data class AccountTransactionCreation(val accountId: String) : Route</b>
+&nbsp;
 <b class="pc">&nbsp;    @Serializable</b>
 <b class="fc">&nbsp;    data class AccountDetails(val accountId: String) : Route</b>
 &nbsp;
@@ -2281,7 +2357,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

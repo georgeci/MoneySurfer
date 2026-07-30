@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (112/112)
+    (119/119)
   </span>
 </td>
 </tr>
@@ -124,6 +124,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    BurnRate,</b>
 <b class="fc">&nbsp;    Budgets,</b>
 <b class="fc">&nbsp;    SpentByCategory(isPeriodScoped = true),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The same per-category spend [SpentByCategory] reads, drawn as a donut with a legend rather
+&nbsp;     * than as rows — so it is period-scoped for exactly the same reason. Two cards over one figure
+&nbsp;     * is a deliberate offer, not a duplicate: the rows answer &quot;how much on what&quot;, the donut answers
+&nbsp;     * &quot;what shape is the period&quot;, and both read the same use case, so they cannot disagree.
+&nbsp;     */
+<b class="fc">&nbsp;    CategoriesDonut(isPeriodScoped = true),</b>
 <b class="fc">&nbsp;    Accounts,</b>
 &nbsp;
 &nbsp;    /**
@@ -163,7 +171,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ExchangeRateApiKt</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateApiConfig</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: ExchangeRateApiKt (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: ExchangeRateApiConfig (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,13 +46,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ExchangeRateApiKt</td>
+  <td class="name">ExchangeRateApiConfig</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -63,35 +69,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (14/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (77/77)
+    (11/11)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">ExchangeRateApiConfig$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -118,10 +131,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * this binding and [ExchangeRateLatestDto], nothing above the data layer.
 &nbsp; */
 &nbsp;data class ExchangeRateApiConfig(
-&nbsp;    val baseUrl: String = DEFAULT_BASE_URL,
+<b class="fc">&nbsp;    val baseUrl: String = DEFAULT_BASE_URL,</b>
 &nbsp;) {
 &nbsp;    /** `…/v6/latest/USD` — the base currency is a path segment, so nothing needs URL-encoding. */
-&nbsp;    fun latestUrl(base: CurrencyCode): String = &quot;$baseUrl/${base.value}&quot;
+<b class="fc">&nbsp;    fun latestUrl(base: CurrencyCode): String = &quot;$baseUrl/${base.value}&quot;</b>
 &nbsp;
 &nbsp;    companion object {
 &nbsp;        const val DEFAULT_BASE_URL: String = &quot;https://open.er-api.com/v6/latest&quot;
@@ -147,14 +160,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * mislabel.
 &nbsp; */
 &nbsp;internal fun ExchangeRateLatestDto.toDomain(requested: CurrencyCode): ExchangeRateTable? {
-<b class="fc">&nbsp;    if (result != RESULT_SUCCESS || rates.isEmpty() || timeLastUpdateUnix &lt;= 0L) return null</b>
-<b class="fc">&nbsp;    if (!baseCode.equals(requested.value, ignoreCase = true)) return null</b>
-<b class="fc">&nbsp;    return ExchangeRateTable(</b>
-<b class="fc">&nbsp;        baseCurrency = requested,</b>
-<b class="fc">&nbsp;        rates = rates</b>
-<b class="fc">&nbsp;            .filterValues { it.isFinite() &amp;&amp; it &gt; 0.0 }</b>
-<b class="fc">&nbsp;            .mapKeys { (code, _) -&gt; CurrencyCode(code.uppercase()) },</b>
-<b class="fc">&nbsp;        asOf = Instant.fromEpochSeconds(timeLastUpdateUnix),</b>
+&nbsp;    if (result != RESULT_SUCCESS || rates.isEmpty() || timeLastUpdateUnix &lt;= 0L) return null
+&nbsp;    if (!baseCode.equals(requested.value, ignoreCase = true)) return null
+&nbsp;    return ExchangeRateTable(
+&nbsp;        baseCurrency = requested,
+&nbsp;        rates = rates
+&nbsp;            .filterValues { it.isFinite() &amp;&amp; it &gt; 0.0 }
+&nbsp;            .mapKeys { (code, _) -&gt; CurrencyCode(code.uppercase()) },
+&nbsp;        asOf = Instant.fromEpochSeconds(timeLastUpdateUnix),
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -182,7 +195,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

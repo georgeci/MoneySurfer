@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSpentByCategoryWidgetKt</title>
+  <title>MoneySurfer Coverage Report > SurferSpentByCategoryVariant</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSpentByCategoryWidgetKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: SurferSpentByCategoryVariant (com.georgeci.moneysurfer.uikit.widgets)</h1>
 
 <table class="coverageStats">
 
@@ -46,76 +46,100 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSpentByCategoryWidgetKt</td>
+  <td class="name">SurferSpentByCategoryVariant</td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    100%
   </span>
   <span class="absValue">
-    (18/22)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.1%
+    100%
   </span>
   <span class="absValue">
-    (107/167)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    83.8%
-  </span>
-  <span class="absValue">
-    (238/284)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    91.1%
-  </span>
-  <span class="absValue">
-    (2651/2909)
+    (41/41)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SurferSpentByCategoryWidgetKt$WhenMappings</td>
-    <td class="coverageStat"/>
+    <td class="name">SurferSpentByCategoryVariant$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    100%
   </span>
   <span class="absValue">
-    (18/22)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.1%
+    100%
   </span>
   <span class="absValue">
-    (107/167)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83.8%
+    100%
   </span>
   <span class="absValue">
-    (238/284)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.1%
+    100%
   </span>
   <span class="absValue">
-    (2651/2909)
+    (55/55)
   </span>
 </td>
 </tr>
@@ -189,24 +213,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;enum class SurferSpentByCategoryVariant {
 &nbsp;
 &nbsp;    /** One row per category: name, amount, a meter, and the line that names what it measures. */
-&nbsp;    Bar,
+<b class="fc">&nbsp;    Bar,</b>
 &nbsp;
 &nbsp;    /** The top category as a donut, the runners-up as a legend beside it. */
-&nbsp;    Ring,
+<b class="fc">&nbsp;    Ring,</b>
 &nbsp;
 &nbsp;    /** The top category alone on a half-turn dial — the single-category reading of the card. */
-&nbsp;    Gauge,
+<b class="fc">&nbsp;    Gauge,</b>
 &nbsp;
 &nbsp;    /** Every category as a pill. The densest variant, and the only one that draws no meter. */
-&nbsp;    Chips,
+<b class="fc">&nbsp;    Chips,</b>
 &nbsp;
 &nbsp;    /** One stacked bar carrying every category&#39;s share at once, with a legend under it. */
-&nbsp;    Multi,
+<b class="fc">&nbsp;    Multi,</b>
 &nbsp;
 &nbsp;    ;
 &nbsp;
 &nbsp;    companion object {
-&nbsp;        fun fromKey(key: String?): SurferSpentByCategoryVariant = entries.firstOrNull { it.name == key } ?: Bar
+<b class="fc">&nbsp;        fun fromKey(key: String?): SurferSpentByCategoryVariant = entries.firstOrNull { it.name == key } ?: Bar</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
@@ -263,281 +287,281 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * still say why it has nothing to show.
 &nbsp; */
 &nbsp;@Composable
-<b class="nc">&nbsp;fun SurferSpentByCategoryWidget(</b>
+&nbsp;fun SurferSpentByCategoryWidget(
 &nbsp;    title: String,
 &nbsp;    items: List&lt;SurferCategorySpendItem&gt;,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,</b>
-<b class="fc">&nbsp;    variant: SurferSpentByCategoryVariant = SurferSpentByCategoryVariant.Bar,</b>
-<b class="fc">&nbsp;    empty: SurferSpentByCategoryEmpty = SurferSpentByCategoryEmpty(),</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    SurferWidgetCard(title = title, modifier = modifier) {</b>
-<b class="fc">&nbsp;        if (items.isEmpty()) {</b>
-<b class="fc">&nbsp;            SurferWidgetEmptyState(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.Category,</b>
-<b class="fc">&nbsp;                title = empty.title,</b>
-<b class="fc">&nbsp;                subtitle = empty.subtitle,</b>
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,
+&nbsp;    variant: SurferSpentByCategoryVariant = SurferSpentByCategoryVariant.Bar,
+&nbsp;    empty: SurferSpentByCategoryEmpty = SurferSpentByCategoryEmpty(),
+&nbsp;) {
+&nbsp;    SurferWidgetCard(title = title, modifier = modifier) {
+&nbsp;        if (items.isEmpty()) {
+&nbsp;            SurferWidgetEmptyState(
+&nbsp;                icon = SurferIcons.Category,
+&nbsp;                title = empty.title,
+&nbsp;                subtitle = empty.subtitle,
 &nbsp;            )
 &nbsp;            return@SurferWidgetCard
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        val hero = size == SurferWidgetSize.Expanded</b>
-<b class="fc">&nbsp;        Column(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .fillMaxWidth()</b>
-<b class="fc">&nbsp;                .padding(horizontal = 16.dp)</b>
-<b class="fc">&nbsp;                .padding(top = if (hero) 10.dp else 6.dp),</b>
-<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(if (hero) 12.dp else 8.dp),</b>
+&nbsp;        }
+&nbsp;        val hero = size == SurferWidgetSize.Expanded
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxWidth()
+&nbsp;                .padding(horizontal = 16.dp)
+&nbsp;                .padding(top = if (hero) 10.dp else 6.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(if (hero) 12.dp else 8.dp),
 &nbsp;        ) {
-<b class="pc">&nbsp;            when (variant) {</b>
-<b class="fc">&nbsp;                SurferSpentByCategoryVariant.Bar -&gt; BarBody(items.visible(hero), hero)</b>
-<b class="fc">&nbsp;                SurferSpentByCategoryVariant.Ring -&gt; RingBody(items, hero)</b>
-<b class="fc">&nbsp;                SurferSpentByCategoryVariant.Gauge -&gt; GaugeBody(items.first(), hero)</b>
-<b class="fc">&nbsp;                SurferSpentByCategoryVariant.Chips -&gt; ChipsBody(items.visible(hero))</b>
-<b class="fc">&nbsp;                SurferSpentByCategoryVariant.Multi -&gt; MultiBody(items, hero)</b>
-<b class="nc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;            when (variant) {
+&nbsp;                SurferSpentByCategoryVariant.Bar -&gt; BarBody(items.visible(hero), hero)
+&nbsp;                SurferSpentByCategoryVariant.Ring -&gt; RingBody(items, hero)
+&nbsp;                SurferSpentByCategoryVariant.Gauge -&gt; GaugeBody(items.first(), hero)
+&nbsp;                SurferSpentByCategoryVariant.Chips -&gt; ChipsBody(items.visible(hero))
+&nbsp;                SurferSpentByCategoryVariant.Multi -&gt; MultiBody(items, hero)
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
-<b class="fc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
 &nbsp;/**
 &nbsp; * The rows a size actually shows. Everything past them still counts towards the shares and the
 &nbsp; * stacked bar — the card trims what it lists, never what it measures.
 &nbsp; */
 &nbsp;private fun List&lt;SurferCategorySpendItem&gt;.visible(hero: Boolean): List&lt;SurferCategorySpendItem&gt; =
-<b class="fc">&nbsp;    take(if (hero) HERO_ROWS else COMPACT_ROWS)</b>
+&nbsp;    take(if (hero) HERO_ROWS else COMPACT_ROWS)
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun BarBody(items: List&lt;SurferCategorySpendItem&gt;, hero: Boolean) {</b>
-<b class="fc">&nbsp;    items.forEach { item -&gt;</b>
-<b class="fc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(if (hero) 6.dp else 4.dp)) {</b>
-<b class="fc">&nbsp;            HeadlineRow(item = item, hero = hero)</b>
-<b class="fc">&nbsp;            CategoryMeter(</b>
-<b class="fc">&nbsp;                fraction = item.meterFraction,</b>
-<b class="fc">&nbsp;                color = item.meterColor(),</b>
-<b class="fc">&nbsp;                height = if (hero) 8.dp else 6.dp,</b>
+&nbsp;private fun BarBody(items: List&lt;SurferCategorySpendItem&gt;, hero: Boolean) {
+&nbsp;    items.forEach { item -&gt;
+&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(if (hero) 6.dp else 4.dp)) {
+&nbsp;            HeadlineRow(item = item, hero = hero)
+&nbsp;            CategoryMeter(
+&nbsp;                fraction = item.meterFraction,
+&nbsp;                color = item.meterColor(),
+&nbsp;                height = if (hero) 8.dp else 6.dp,
 &nbsp;            )
 &nbsp;            // Kept at both sizes, unlike the safe-to-spend card&#39;s caption: this one is not a
 &nbsp;            // restatement of the meter but the only thing that says what the meter measured, and a
 &nbsp;            // Compact card is already the shorter card through its type scale and its row count.
-<b class="fc">&nbsp;            CaptionRow(item)</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;            CaptionRow(item)
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun RingBody(items: List&lt;SurferCategorySpendItem&gt;, hero: Boolean) {</b>
-<b class="fc">&nbsp;    val top = items.first()</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(16.dp),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;private fun RingBody(items: List&lt;SurferCategorySpendItem&gt;, hero: Boolean) {
+&nbsp;    val top = items.first()
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(16.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
 &nbsp;    ) {
 &nbsp;        // The ring stands for the whole period, so it fills to the top category&#39;s share of it, and
 &nbsp;        // it takes the same colour the row would get anywhere else on this card — otherwise the arc
 &nbsp;        // and its own legend dot, an inch apart, would show one category in two colours.
-<b class="fc">&nbsp;        SurferBudgetRing(</b>
-<b class="fc">&nbsp;            progress = top.share,</b>
-<b class="pc">&nbsp;            status = top.cap?.status ?: SurferBudgetStatus.Ok,</b>
-<b class="fc">&nbsp;            size = if (hero) 116.dp else 84.dp,</b>
-<b class="fc">&nbsp;            strokeWidth = if (hero) 12.dp else 9.dp,</b>
-<b class="fc">&nbsp;            color = top.meterColor(),</b>
-<b class="fc">&nbsp;        ) {</b>
+&nbsp;        SurferBudgetRing(
+&nbsp;            progress = top.share,
+&nbsp;            status = top.cap?.status ?: SurferBudgetStatus.Ok,
+&nbsp;            size = if (hero) 116.dp else 84.dp,
+&nbsp;            strokeWidth = if (hero) 12.dp else 9.dp,
+&nbsp;            color = top.meterColor(),
+&nbsp;        ) {
 &nbsp;            // The amount alone: the legend beside it names this category on its first row, and the
 &nbsp;            // hole is too narrow to repeat a name without truncating it.
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = top.amount,</b>
-<b class="fc">&nbsp;                style = if (hero) AppTheme.typography.titleMedium else AppTheme.typography.titleSmall,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;                maxLines = 1,</b>
-<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;            Text(
+&nbsp;                text = top.amount,
+&nbsp;                style = if (hero) AppTheme.typography.titleMedium else AppTheme.typography.titleSmall,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                maxLines = 1,
+&nbsp;                overflow = TextOverflow.Ellipsis,
 &nbsp;            )
 &nbsp;        }
-<b class="fc">&nbsp;        Column(</b>
-<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
-<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(if (hero) 8.dp else 6.dp),</b>
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(if (hero) 8.dp else 6.dp),
 &nbsp;        ) {
 &nbsp;            // The top category leads the legend as well as filling the ring: the ring&#39;s hole has
 &nbsp;            // no room for its status word, and the ring is the one shape here that carries a
 &nbsp;            // status colour with nothing to read it by.
-<b class="fc">&nbsp;            items.take(if (hero) RING_LEGEND_ROWS else RING_LEGEND_ROWS_COMPACT)</b>
-<b class="fc">&nbsp;                .forEach { LegendRow(item = it, hero = hero) }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;            items.take(if (hero) RING_LEGEND_ROWS else RING_LEGEND_ROWS_COMPACT)
+&nbsp;                .forEach { LegendRow(item = it, hero = hero) }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun GaugeBody(item: SurferCategorySpendItem, hero: Boolean) {</b>
-<b class="fc">&nbsp;    Column(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(if (hero) 6.dp else 4.dp),</b>
+&nbsp;private fun GaugeBody(item: SurferCategorySpendItem, hero: Boolean) {
+&nbsp;    Column(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
+&nbsp;        verticalArrangement = Arrangement.spacedBy(if (hero) 6.dp else 4.dp),
 &nbsp;    ) {
-<b class="fc">&nbsp;        SurferBudgetGauge(</b>
-<b class="fc">&nbsp;            progress = item.meterFraction,</b>
-<b class="pc">&nbsp;            status = item.cap?.status ?: SurferBudgetStatus.Ok,</b>
-<b class="fc">&nbsp;            width = if (hero) 180.dp else 128.dp,</b>
-<b class="fc">&nbsp;            strokeWidth = if (hero) 12.dp else 9.dp,</b>
-<b class="fc">&nbsp;            color = item.meterColor(),</b>
-<b class="fc">&nbsp;        ) {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = item.amount,</b>
-<b class="fc">&nbsp;                style = if (hero) AppTheme.typography.headlineSmall else AppTheme.typography.titleMedium,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;                maxLines = 1,</b>
-<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;        SurferBudgetGauge(
+&nbsp;            progress = item.meterFraction,
+&nbsp;            status = item.cap?.status ?: SurferBudgetStatus.Ok,
+&nbsp;            width = if (hero) 180.dp else 128.dp,
+&nbsp;            strokeWidth = if (hero) 12.dp else 9.dp,
+&nbsp;            color = item.meterColor(),
+&nbsp;        ) {
+&nbsp;            Text(
+&nbsp;                text = item.amount,
+&nbsp;                style = if (hero) AppTheme.typography.headlineSmall else AppTheme.typography.titleMedium,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                maxLines = 1,
+&nbsp;                overflow = TextOverflow.Ellipsis,
 &nbsp;            )
 &nbsp;        }
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.name,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.titleSmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
+&nbsp;        Text(
+&nbsp;            text = item.name,
+&nbsp;            style = AppTheme.typography.titleSmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
 &nbsp;        )
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.caption,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
+&nbsp;        Text(
+&nbsp;            text = item.caption,
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@OptIn(ExperimentalLayoutApi::class)
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun ChipsBody(items: List&lt;SurferCategorySpendItem&gt;) {</b>
-<b class="fc">&nbsp;    FlowRow(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
-<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),</b>
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        items.forEach { item -&gt;</b>
-<b class="fc">&nbsp;            val tint = item.meterColor()</b>
-<b class="fc">&nbsp;            Row(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .clip(CircleShape)</b>
-<b class="fc">&nbsp;                    .background(tint.copy(alpha = 0.14f))</b>
-<b class="fc">&nbsp;                    .padding(horizontal = 10.dp, vertical = 6.dp),</b>
-<b class="fc">&nbsp;                horizontalArrangement = Arrangement.spacedBy(6.dp),</b>
-<b class="fc">&nbsp;                verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;private fun ChipsBody(items: List&lt;SurferCategorySpendItem&gt;) {
+&nbsp;    FlowRow(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;    ) {
+&nbsp;        items.forEach { item -&gt;
+&nbsp;            val tint = item.meterColor()
+&nbsp;            Row(
+&nbsp;                modifier = Modifier
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(tint.copy(alpha = 0.14f))
+&nbsp;                    .padding(horizontal = 10.dp, vertical = 6.dp),
+&nbsp;                horizontalArrangement = Arrangement.spacedBy(6.dp),
+&nbsp;                verticalAlignment = Alignment.CenterVertically,
 &nbsp;            ) {
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = item.name,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;                    maxLines = 1,</b>
-<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                Text(
+&nbsp;                    text = item.name,
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                    maxLines = 1,
+&nbsp;                    overflow = TextOverflow.Ellipsis,
 &nbsp;                )
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = item.amount,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;                    color = tint,</b>
-<b class="fc">&nbsp;                    maxLines = 1,</b>
+&nbsp;                Text(
+&nbsp;                    text = item.amount,
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = tint,
+&nbsp;                    maxLines = 1,
 &nbsp;                )
 &nbsp;                // The chip has no meter and no caption, so a cap would otherwise reach it as a
 &nbsp;                // colour and nothing else.
-<b class="fc">&nbsp;                val statusLabel = item.cap?.statusLabel</b>
-<b class="fc">&nbsp;                if (statusLabel != null) {</b>
-<b class="fc">&nbsp;                    Text(</b>
-<b class="fc">&nbsp;                        text = statusLabel,</b>
-<b class="fc">&nbsp;                        style = AppTheme.typography.labelSmall,</b>
-<b class="fc">&nbsp;                        color = tint,</b>
-<b class="fc">&nbsp;                        maxLines = 1,</b>
+&nbsp;                val statusLabel = item.cap?.statusLabel
+&nbsp;                if (statusLabel != null) {
+&nbsp;                    Text(
+&nbsp;                        text = statusLabel,
+&nbsp;                        style = AppTheme.typography.labelSmall,
+&nbsp;                        color = tint,
+&nbsp;                        maxLines = 1,
 &nbsp;                    )
-<b class="fc">&nbsp;                }</b>
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
-<b class="fc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun MultiBody(items: List&lt;SurferCategorySpendItem&gt;, hero: Boolean) {</b>
+&nbsp;private fun MultiBody(items: List&lt;SurferCategorySpendItem&gt;, hero: Boolean) {
 &nbsp;    // Every category is in the bar, including the ones the legend below has no room to name.
-<b class="fc">&nbsp;    StackedShareBar(items = items, height = if (hero) 12.dp else 9.dp)</b>
-<b class="fc">&nbsp;    items.visible(hero).forEach { LegendRow(item = it, hero = hero) }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    StackedShareBar(items = items, height = if (hero) 12.dp else 9.dp)
+&nbsp;    items.visible(hero).forEach { LegendRow(item = it, hero = hero) }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun HeadlineRow(item: SurferCategorySpendItem, hero: Boolean) {</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
+&nbsp;private fun HeadlineRow(item: SurferCategorySpendItem, hero: Boolean) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),
 &nbsp;    ) {
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.name,</b>
-<b class="fc">&nbsp;            style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        Text(
+&nbsp;            text = item.name,
+&nbsp;            style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
+&nbsp;            modifier = Modifier.weight(1f),
 &nbsp;        )
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.amount,</b>
-<b class="fc">&nbsp;            style = if (hero) AppTheme.typography.labelLarge else AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
+&nbsp;        Text(
+&nbsp;            text = item.amount,
+&nbsp;            style = if (hero) AppTheme.typography.labelLarge else AppTheme.typography.labelMedium,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            maxLines = 1,
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun CaptionRow(item: SurferCategorySpendItem) {</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
+&nbsp;private fun CaptionRow(item: SurferCategorySpendItem) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),
 &nbsp;    ) {
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.caption,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        Text(
+&nbsp;            text = item.caption,
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
+&nbsp;            modifier = Modifier.weight(1f),
 &nbsp;        )
-<b class="fc">&nbsp;        StatusPill(item.cap)</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;        StatusPill(item.cap)
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun LegendRow(item: SurferCategorySpendItem, hero: Boolean) {</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
+&nbsp;private fun LegendRow(item: SurferCategorySpendItem, hero: Boolean) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),
 &nbsp;    ) {
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(10.dp)</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(item.tint),</b>
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(10.dp)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(item.tint),
 &nbsp;        )
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.name,</b>
-<b class="fc">&nbsp;            style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        Text(
+&nbsp;            text = item.name,
+&nbsp;            style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
+&nbsp;            modifier = Modifier.weight(1f),
 &nbsp;        )
-<b class="fc">&nbsp;        StatusPill(item.cap)</b>
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.amount,</b>
-<b class="fc">&nbsp;            style = if (hero) AppTheme.typography.labelMedium else AppTheme.typography.labelSmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
+&nbsp;        StatusPill(item.cap)
+&nbsp;        Text(
+&nbsp;            text = item.amount,
+&nbsp;            style = if (hero) AppTheme.typography.labelMedium else AppTheme.typography.labelSmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            maxLines = 1,
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;/** The status word, drawn only for the states worth interrupting the row for. */
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun StatusPill(cap: SurferCategorySpendCap?) {</b>
-<b class="pc">&nbsp;    val label = cap?.statusLabel ?: return</b>
-<b class="fc">&nbsp;    SurferBudgetStatusPill(label = label, status = cap.status)</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;private fun StatusPill(cap: SurferCategorySpendCap?) {
+&nbsp;    val label = cap?.statusLabel ?: return
+&nbsp;    SurferBudgetStatusPill(label = label, status = cap.status)
+&nbsp;}
 &nbsp;
 &nbsp;/**
 &nbsp; * A category keeps its own colour until there is something to report about its cap.
@@ -550,52 +574,52 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * while the legend dots and the stacked bar went on showing each category&#39;s own.
 &nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;private fun SurferCategorySpendItem.meterColor(): Color {</b>
-<b class="pc">&nbsp;    val status = cap?.status?.takeIf { it != SurferBudgetStatus.Ok } ?: return tint</b>
-<b class="fc">&nbsp;    return status.color</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;private fun SurferCategorySpendItem.meterColor(): Color {
+&nbsp;    val status = cap?.status?.takeIf { it != SurferBudgetStatus.Ok } ?: return tint
+&nbsp;    return status.color
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun CategoryMeter(fraction: Float, color: Color, height: Dp) {</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .height(height)</b>
-<b class="fc">&nbsp;            .clip(CircleShape)</b>
-<b class="fc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerHighest),</b>
+&nbsp;private fun CategoryMeter(fraction: Float, color: Color, height: Dp) {
+&nbsp;    Box(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .height(height)
+&nbsp;            .clip(CircleShape)
+&nbsp;            .background(AppTheme.materialColors.surfaceContainerHighest),
 &nbsp;    ) {
 &nbsp;        // Capped at the full width — past 100 % the colour carries the overspend, not the geometry.
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .fillMaxWidth(fraction.coerceIn(0f, 1f))</b>
-<b class="fc">&nbsp;                .fillMaxHeight()</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(color),</b>
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+&nbsp;                .fillMaxHeight()
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(color),
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun StackedShareBar(items: List&lt;SurferCategorySpendItem&gt;, height: Dp) {</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .height(height)</b>
-<b class="fc">&nbsp;            .clip(CircleShape)</b>
-<b class="fc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerHighest),</b>
+&nbsp;private fun StackedShareBar(items: List&lt;SurferCategorySpendItem&gt;, height: Dp) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .height(height)
+&nbsp;            .clip(CircleShape)
+&nbsp;            .background(AppTheme.materialColors.surfaceContainerHighest),
 &nbsp;    ) {
-<b class="fc">&nbsp;        items.forEach { item -&gt;</b>
-<b class="fc">&nbsp;            Box(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
+&nbsp;        items.forEach { item -&gt;
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
 &nbsp;                    // A weight has to be positive, and a category that rounds to nothing still
 &nbsp;                    // deserves a hairline rather than vanishing out of the total it is part of.
-<b class="fc">&nbsp;                    .weight(item.share.coerceAtLeast(MIN_SEGMENT_SHARE))</b>
-<b class="fc">&nbsp;                    .fillMaxHeight()</b>
-<b class="fc">&nbsp;                    .background(item.tint),</b>
+&nbsp;                    .weight(item.share.coerceAtLeast(MIN_SEGMENT_SHARE))
+&nbsp;                    .fillMaxHeight()
+&nbsp;                    .background(item.tint),
 &nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;/** Rows a Hero card lists. Deeper than Compact because the extra height is what Hero is for. */
 &nbsp;private const val HERO_ROWS = 5
@@ -612,56 +636,56 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val PREVIEW_TITLE = &quot;Spent by category&quot;
 &nbsp;
 &nbsp;private val previewItems: List&lt;SurferCategorySpendItem&gt;
-<b class="nc">&nbsp;    @Composable get() = listOf(</b>
-<b class="nc">&nbsp;        SurferCategorySpendItem(</b>
-<b class="nc">&nbsp;            id = &quot;rent&quot;,</b>
-<b class="nc">&nbsp;            name = &quot;Rent&quot;,</b>
-<b class="nc">&nbsp;            amount = &quot;€760.00&quot;,</b>
-<b class="nc">&nbsp;            share = 0.45f,</b>
-<b class="nc">&nbsp;            caption = &quot;45% of spending&quot;,</b>
-<b class="nc">&nbsp;            tint = SurferCategoryPalette.tints[0],</b>
+&nbsp;    @Composable get() = listOf(
+&nbsp;        SurferCategorySpendItem(
+&nbsp;            id = &quot;rent&quot;,
+&nbsp;            name = &quot;Rent&quot;,
+&nbsp;            amount = &quot;€760.00&quot;,
+&nbsp;            share = 0.45f,
+&nbsp;            caption = &quot;45% of spending&quot;,
+&nbsp;            tint = SurferCategoryPalette.tints[0],
 &nbsp;        ),
-<b class="nc">&nbsp;        SurferCategorySpendItem(</b>
-<b class="nc">&nbsp;            id = &quot;groceries&quot;,</b>
-<b class="nc">&nbsp;            name = &quot;Groceries&quot;,</b>
-<b class="nc">&nbsp;            amount = &quot;€142.10&quot;,</b>
-<b class="nc">&nbsp;            share = 0.22f,</b>
-<b class="nc">&nbsp;            caption = &quot;€142.10 of €150&quot;,</b>
-<b class="nc">&nbsp;            tint = SurferCategoryPalette.tints[1],</b>
-<b class="nc">&nbsp;            cap = SurferCategorySpendCap(</b>
-<b class="nc">&nbsp;                progress = 0.95f,</b>
-<b class="nc">&nbsp;                status = SurferBudgetStatus.Warn,</b>
-<b class="nc">&nbsp;                statusLabel = &quot;Near limit&quot;,</b>
+&nbsp;        SurferCategorySpendItem(
+&nbsp;            id = &quot;groceries&quot;,
+&nbsp;            name = &quot;Groceries&quot;,
+&nbsp;            amount = &quot;€142.10&quot;,
+&nbsp;            share = 0.22f,
+&nbsp;            caption = &quot;€142.10 of €150&quot;,
+&nbsp;            tint = SurferCategoryPalette.tints[1],
+&nbsp;            cap = SurferCategorySpendCap(
+&nbsp;                progress = 0.95f,
+&nbsp;                status = SurferBudgetStatus.Warn,
+&nbsp;                statusLabel = &quot;Near limit&quot;,
 &nbsp;            ),
 &nbsp;        ),
-<b class="nc">&nbsp;        SurferCategorySpendItem(</b>
-<b class="nc">&nbsp;            id = &quot;dining&quot;,</b>
-<b class="nc">&nbsp;            name = &quot;Eating out&quot;,</b>
-<b class="nc">&nbsp;            amount = &quot;€96.40&quot;,</b>
-<b class="nc">&nbsp;            share = 0.12f,</b>
-<b class="nc">&nbsp;            caption = &quot;over €80&quot;,</b>
-<b class="nc">&nbsp;            tint = SurferCategoryPalette.tints[2],</b>
-<b class="nc">&nbsp;            cap = SurferCategorySpendCap(</b>
-<b class="nc">&nbsp;                progress = 1.2f,</b>
-<b class="nc">&nbsp;                status = SurferBudgetStatus.Over,</b>
-<b class="nc">&nbsp;                statusLabel = &quot;Over&quot;,</b>
+&nbsp;        SurferCategorySpendItem(
+&nbsp;            id = &quot;dining&quot;,
+&nbsp;            name = &quot;Eating out&quot;,
+&nbsp;            amount = &quot;€96.40&quot;,
+&nbsp;            share = 0.12f,
+&nbsp;            caption = &quot;over €80&quot;,
+&nbsp;            tint = SurferCategoryPalette.tints[2],
+&nbsp;            cap = SurferCategorySpendCap(
+&nbsp;                progress = 1.2f,
+&nbsp;                status = SurferBudgetStatus.Over,
+&nbsp;                statusLabel = &quot;Over&quot;,
 &nbsp;            ),
 &nbsp;        ),
-<b class="nc">&nbsp;        SurferCategorySpendItem(</b>
-<b class="nc">&nbsp;            id = &quot;transport&quot;,</b>
-<b class="nc">&nbsp;            name = &quot;Transport&quot;,</b>
-<b class="nc">&nbsp;            amount = &quot;€54.00&quot;,</b>
-<b class="nc">&nbsp;            share = 0.08f,</b>
-<b class="nc">&nbsp;            caption = &quot;8% of spending&quot;,</b>
-<b class="nc">&nbsp;            tint = SurferCategoryPalette.tints[3],</b>
+&nbsp;        SurferCategorySpendItem(
+&nbsp;            id = &quot;transport&quot;,
+&nbsp;            name = &quot;Transport&quot;,
+&nbsp;            amount = &quot;€54.00&quot;,
+&nbsp;            share = 0.08f,
+&nbsp;            caption = &quot;8% of spending&quot;,
+&nbsp;            tint = SurferCategoryPalette.tints[3],
 &nbsp;        ),
-<b class="nc">&nbsp;        SurferCategorySpendItem(</b>
-<b class="nc">&nbsp;            id = &quot;leisure&quot;,</b>
-<b class="nc">&nbsp;            name = &quot;Leisure&quot;,</b>
-<b class="nc">&nbsp;            amount = &quot;€38.20&quot;,</b>
-<b class="nc">&nbsp;            share = 0.06f,</b>
-<b class="nc">&nbsp;            caption = &quot;6% of spending&quot;,</b>
-<b class="nc">&nbsp;            tint = SurferCategoryPalette.tints[4],</b>
+&nbsp;        SurferCategorySpendItem(
+&nbsp;            id = &quot;leisure&quot;,
+&nbsp;            name = &quot;Leisure&quot;,
+&nbsp;            amount = &quot;€38.20&quot;,
+&nbsp;            share = 0.06f,
+&nbsp;            caption = &quot;6% of spending&quot;,
+&nbsp;            tint = SurferCategoryPalette.tints[4],
 &nbsp;        ),
 &nbsp;    )
 &nbsp;
@@ -748,7 +772,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

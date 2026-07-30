@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContribution</title>
+  <title>MoneySurfer Coverage Report > DailySpendSeries</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: DailySpendSeries (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContribution</td>
+  <td class="name">DailySpendSeries</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,24 +63,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (5/5)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    97.3%
   </span>
   <span class="absValue">
-    (84/84)
+    (146/150)
   </span>
 </td>
 </tr>
@@ -94,33 +101,206 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import kotlinx.datetime.DateTimeUnit
 &nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
+&nbsp;
+&nbsp;/** How many days of spend the burn-rate chart draws, ending on the day it was built for. */
+&nbsp;const val BURN_RATE_DAYS: Int = 7
 &nbsp;
 &nbsp;/**
-&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
-&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
+&nbsp; * The last [BURN_RATE_DAYS] days of spend, plus the month-to-date total the projection starts from.
 &nbsp; *
-&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
-&nbsp; * touched. It exists so the money-backed model can later store the id of a real
-&nbsp; * transfer here without a schema change on either side of the wire.
+&nbsp; * Every figure is a magnitude in [currency] — the queries behind
+&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository] sum `ABS(amount)`, so an
+&nbsp; * expense reads positive and nothing here is ever negative.
+&nbsp; *
+&nbsp; * [days] is always [BURN_RATE_DAYS] long and ends on [today]: the repository leaves out days
+&nbsp; * nothing was booked on, and a chart that skipped those would silently redraw a quiet week as a
+&nbsp; * busy one. Filling them with zero is what makes the bars comparable.
+&nbsp; *
+&nbsp; * **[today] is a partial day.** Its bar and its share of [average] only cover the hours already
+&nbsp; * logged, which drags the average down a little every morning. Counting it anyway is the deliberate
+&nbsp; * trade: a chart that omitted the transaction the user logged ten minutes ago would read as a bug,
+&nbsp; * and the distortion is one seventh of one day.
 &nbsp; */
-<b class="fc">&nbsp;data class GoalContribution(</b>
-<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
+<b class="fc">&nbsp;data class DailySpendSeries(</b>
+<b class="fc">&nbsp;    val days: List&lt;DailySpendPoint&gt;,</b>
+&nbsp;    /** Spend booked from the 1st of [today]&#39;s month through [today], today included. */
+<b class="fc">&nbsp;    val monthToDate: Money,</b>
+&nbsp;    /** The last day of [days] — the day the projection is made from. */
+<b class="fc">&nbsp;    val today: LocalDate,</b>
+<b class="fc">&nbsp;    val currency: CurrencyCode,</b>
+&nbsp;    /**
+&nbsp;     * The workspace these figures were queried for. Carried rather than assumed so anything pairing
+&nbsp;     * the series with a second per-workspace query can check the two agree — see [monthlySpendCap].
+&nbsp;     */
 <b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val goalId: GoalId,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
-<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+&nbsp;) {
+&nbsp;
+&nbsp;    /** What the whole window booked. */
+<b class="fc">&nbsp;    val total: Money get() = days.fold(Money.zero()) { sum, point -&gt; sum + point.total }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mean daily spend across the window. Integer division, so it truncates to the minor unit —
+&nbsp;     * a projection built from it lands a few cents low rather than inventing a fraction of a cent.
+&nbsp;     */
+<b class="fc">&nbsp;    val average: Money get() = total / BURN_RATE_DAYS</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Each day&#39;s bar height against the tallest day of the window, index-aligned with [days].
+&nbsp;     *
+&nbsp;     * Scaled to the peak rather than to the budget: the chart&#39;s job is the *shape* of the week, and
+&nbsp;     * a week that spent a tenth of the cap would otherwise be seven invisible slivers. All zero when
+&nbsp;     * the window booked nothing, which the chart draws as a flat baseline rather than a NaN.
+&nbsp;     */
+&nbsp;    val barFractions: List&lt;Float&gt;
+&nbsp;        get() {
+<b class="pc">&nbsp;            val peak = days.maxOfOrNull { it.total.minor } ?: 0L</b>
+<b class="fc">&nbsp;            if (peak &lt;= 0L) return List(days.size) { 0f }</b>
+<b class="fc">&nbsp;            return days.map { (it.total.minor.toFloat() / peak.toFloat()).coerceIn(0f, 1f) }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Days of [today]&#39;s month still ahead of it. Today is excluded because its spend is already
+&nbsp;     * inside [monthToDate] — projecting it again would count one day twice.
+&nbsp;     */
+&nbsp;    val daysAheadInMonth: Int
+<b class="fc">&nbsp;        get() = lastDayOfMonth(today).day - today.day</b>
+&nbsp;}
+&nbsp;
+&nbsp;/** Whether the projected month-end total lands inside the budget. */
+&nbsp;enum class BurnRatePace {
+&nbsp;    OnTrack,
+&nbsp;    OffPace,
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Spend pace for the dashboard: what the last week actually cost per day, and where the month ends
+&nbsp; * up if it keeps costing that.
+&nbsp; *
+&nbsp; * [monthlyLimit] is optional by design — the widget&#39;s whole first half (the week, the average, the
+&nbsp; * projection) is arithmetic over transactions, and a workspace with no budget still deserves to see
+&nbsp; * it. Only [pace] needs a cap to mean anything.
+&nbsp; */
+&nbsp;data class BurnRate(
+&nbsp;    val series: DailySpendSeries,
+&nbsp;    /**
+&nbsp;     * What [DailySpendSeries.monthToDate] grows to if the remaining days of the month each cost
+&nbsp;     * [DailySpendSeries.average]. An estimate, not a forecast — no seasonality, no scheduled bills.
+&nbsp;     */
+&nbsp;    val projectedMonthTotal: Money,
+&nbsp;    /** The monthly cap [projectedMonthTotal] is measured against, or null when no budget sets one. */
+&nbsp;    val monthlyLimit: Money?,
+&nbsp;) {
+&nbsp;
+&nbsp;    val currency: CurrencyCode get() = series.currency
+&nbsp;
+&nbsp;    /** Null without a [monthlyLimit] — the widget then draws the projection with no verdict on it. */
+&nbsp;    val pace: BurnRatePace?
+&nbsp;        get() = monthlyLimit?.let {
+&nbsp;            if (projectedMonthTotal &lt;= it) BurnRatePace.OnTrack else BurnRatePace.OffPace
+&nbsp;        }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The window a [DailySpendSeries] has to be queried over: enough days for the chart, and back to
+&nbsp; * the 1st for the month-to-date.
+&nbsp; *
+&nbsp; * One window rather than two queries — early in the month the chart reaches back into the previous
+&nbsp; * one, and later in the month the 1st is the earlier bound, so whichever is further back wins.
+&nbsp; */
+&nbsp;fun dailySpendSeriesWindow(today: LocalDate): TransactionPeriodWindow = TransactionPeriodWindow(
+&nbsp;    from = minOf(firstDayOfMonth(today), today.minus(BURN_RATE_DAYS - 1, DateTimeUnit.DAY)),
+&nbsp;    to = today,
 &nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * [points] folded into the series the widget draws, filling the days the query left out.
+&nbsp; *
+&nbsp; * Points outside the queried window are ignored rather than trusted: [monthToDate] counts only
+&nbsp; * [today]&#39;s own month, so the days [dailySpendSeriesWindow] reaches back into the previous month for
+&nbsp; * cannot leak into it.
+&nbsp; */
+&nbsp;fun dailySpendSeries(
+&nbsp;    points: List&lt;DailySpendPoint&gt;,
+&nbsp;    today: LocalDate,
+&nbsp;    currency: CurrencyCode,
+&nbsp;    workspaceId: WorkspaceId,
+&nbsp;): DailySpendSeries {
+&nbsp;    val byDate = points.associate { it.date to it.total }
+&nbsp;    val firstDay = today.minus(BURN_RATE_DAYS - 1, DateTimeUnit.DAY)
+&nbsp;    val days = List(BURN_RATE_DAYS) { offset -&gt;
+&nbsp;        val date = firstDay.plus(offset, DateTimeUnit.DAY)
+&nbsp;        DailySpendPoint(date = date, total = byDate[date] ?: Money.zero())
+&nbsp;    }
+&nbsp;    val monthStart = firstDayOfMonth(today)
+&nbsp;    val monthToDate = points
+&nbsp;        .filter { it.date &gt;= monthStart &amp;&amp; it.date &lt;= today }
+&nbsp;        .fold(Money.zero()) { sum, point -&gt; sum + point.total }
+&nbsp;    return DailySpendSeries(
+&nbsp;        days = days,
+&nbsp;        monthToDate = monthToDate,
+&nbsp;        today = today,
+&nbsp;        currency = currency,
+&nbsp;        workspaceId = workspaceId,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** The projection [monthlyLimit] is judged against; pass null when no budget backs a cap. */
+&nbsp;fun DailySpendSeries.project(monthlyLimit: Money?): BurnRate = BurnRate(
+&nbsp;    series = this,
+&nbsp;    projectedMonthTotal = monthToDate + average * daysAheadInMonth,
+&nbsp;    monthlyLimit = monthlyLimit,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The cap [workspaceId]&#39;s projected month can honestly be read against, or null when no budget sets
+&nbsp; * one.
+&nbsp; *
+&nbsp; * Three filters do the work. Two are about comparing like with like:
+&nbsp; *
+&nbsp; * - **monthly periods only.** The projection covers a calendar month, so a weekly or yearly limit is
+&nbsp; *   simply a different quantity. Scaling one into a monthly equivalent would invent a number the
+&nbsp; *   user never set.
+&nbsp; * - **general budgets only** — no category filter, so they cover every expense, which is exactly
+&nbsp; *   what the projection sums. A category cap covers a slice of the spend; measuring the whole
+&nbsp; *   month&#39;s projection against it would report &quot;off pace&quot; on a budget that is nowhere near its cap.
+&nbsp; *
+&nbsp; * The third is about not comparing two workspaces. [workspaceId] is required rather than assumed
+&nbsp; * because the caller pairs this list with a spend series read through a *second* subscription to
+&nbsp; * `SessionPointers.currentWorkspaceId`, and two collectors of that pointer are not ordered against
+&nbsp; * each other: on a workspace switch the budget query can already be answering for the new workspace
+&nbsp; * while the series is still the old one. That is the hazard [safeToSpend] avoids by taking its
+&nbsp; * workspace from the budgets themselves — an option here only if a burn rate needed a budget to
+&nbsp; * exist at all, which it does not. Filtering instead makes a mismatched pair yield no cap, so the
+&nbsp; * widget drops the verdict for a frame rather than judging one workspace&#39;s spend by another&#39;s limit.
+&nbsp; *
+&nbsp; * The largest qualifying limit wins. Ties need no further tiebreak: the answer is the amount, so two
+&nbsp; * budgets capped the same are the same answer.
+&nbsp; *
+&nbsp; * [Budget.amount] rather than an effective limit with a rollover carry: a carry belongs to one
+&nbsp; * budget window, and this is measured against a calendar month, which a budget anchored mid-month
+&nbsp; * does not line up with. The plain amount is the per-month cap the user set, whichever day it runs
+&nbsp; * from.
+&nbsp; */
+&nbsp;fun List&lt;Budget&gt;.monthlySpendCap(workspaceId: WorkspaceId): Money? =
+&nbsp;    filter {
+&nbsp;        it.workspaceId == workspaceId &amp;&amp;
+&nbsp;            it.isActive &amp;&amp;
+&nbsp;            it.period == BudgetPeriod.MONTHLY &amp;&amp;
+&nbsp;            it.categoryIds.isEmpty()
+&nbsp;    }.maxOfOrNull { it.amount }
+&nbsp;
+&nbsp;private fun firstDayOfMonth(date: LocalDate): LocalDate = LocalDate(date.year, date.month, 1)
+&nbsp;
+&nbsp;private fun lastDayOfMonth(date: LocalDate): LocalDate =
+&nbsp;    firstDayOfMonth(date).plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
 </code>
 </pre>
 </div>
@@ -144,7 +324,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

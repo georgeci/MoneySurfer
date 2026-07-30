@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardState_Content__OpticsKt</title>
+  <title>MoneySurfer Coverage Report > DashboardSafeToSpendWidgetKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardState_Content__OpticsKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: DashboardSafeToSpendWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardState_Content__OpticsKt</td>
+  <td class="name">DashboardSafeToSpendWidgetKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    60%
   </span>
   <span class="absValue">
-    (0/114)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/114)
+    (9/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/817)
+    (38/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98%
+  </span>
+  <span class="absValue">
+    (339/346)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">DashboardSafeToSpendWidgetKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (9/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98%
+  </span>
+  <span class="absValue">
+    (339/346)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,216 +128,94 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
 &nbsp;
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendEmpty
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_bar_a11y
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_empty_subtitle
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_empty_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_over_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_set_budget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
+&nbsp;/**
+&nbsp; * What is still safe to spend this period, and the pace that makes it last.
+&nbsp; *
+&nbsp; * Unlike the quick-actions row this one keeps drawing with nothing behind it: &quot;no budget&quot; is a
+&nbsp; * state the widget is *for*, and the card that says so also carries the link that fixes it.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SafeToSpendWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferSafeToSpendWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_safe_to_spend_title),</b>
+<b class="fc">&nbsp;        data = state.safeToSpend?.toWidgetData(),</b>
+<b class="fc">&nbsp;        empty = SurferSafeToSpendEmpty(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_safe_to_spend_empty_title),</b>
+<b class="fc">&nbsp;            subtitle = stringResource(Res.string.dashboard_safe_to_spend_empty_subtitle),</b>
+<b class="fc">&nbsp;            actionLabel = stringResource(Res.string.dashboard_safe_to_spend_set_budget),</b>
+<b class="fc">&nbsp;            onActionClick = { onEvent(DashboardEvent.OnSetBudgetClick) },</b>
+<b class="fc">&nbsp;            actionTestTag = DashboardTestTags.SafeToSpendSetBudget,</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.SafeToSpend),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`accounts`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.AccountUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`accounts` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.AccountUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`accounts` = value)</b>
+&nbsp;/**
+&nbsp; * The sentences around the numbers. The bar restates figures the card already prints, so its
+&nbsp; * screen-reader line is the spend against the limit rather than a percentage read off the shape.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun SafeToSpendUi.toWidgetData(): SurferSafeToSpendData {</b>
+<b class="fc">&nbsp;    val daysLeftLabel = pluralStringResource(Res.plurals.dashboard_days_left, daysLeft, daysLeft)</b>
+<b class="fc">&nbsp;    val captionResource = if (isOver) {</b>
+<b class="fc">&nbsp;        Res.string.dashboard_safe_to_spend_over_caption</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;        Res.string.dashboard_safe_to_spend_caption</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return SurferSafeToSpendData(</b>
+<b class="fc">&nbsp;        amount = remainingFormatted,</b>
+<b class="fc">&nbsp;        caption = stringResource(captionResource, limitFormatted, budgetName),</b>
+<b class="fc">&nbsp;        perDay = stringResource(Res.string.dashboard_safe_to_spend_per_day, perDayFormatted),</b>
+<b class="fc">&nbsp;        daysLeft = daysLeftLabel,</b>
+<b class="fc">&nbsp;        progress = progress,</b>
+<b class="fc">&nbsp;        paceFraction = paceFraction,</b>
+<b class="fc">&nbsp;        status = status.toWidgetStatus(),</b>
+<b class="fc">&nbsp;        progressContentDescription = stringResource(</b>
+<b class="fc">&nbsp;            Res.string.dashboard_safe_to_spend_bar_a11y,</b>
+<b class="fc">&nbsp;            spentFormatted,</b>
+<b class="fc">&nbsp;            limitFormatted,</b>
+<b class="fc">&nbsp;            daysLeftLabel,</b>
+&nbsp;        ),
+&nbsp;    )
 &nbsp;}
-&nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`transactions`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.TransactionUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`transactions` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.TransactionUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`transactions` = value)</b>
+&nbsp;/** `uikit` does not depend on `domain`, so the status word crosses over here. */
+<b class="fc">&nbsp;internal fun BudgetStatus.toWidgetStatus(): SurferBudgetStatus = when (this) {</b>
+<b class="fc">&nbsp;    BudgetStatus.OK -&gt; SurferBudgetStatus.Ok</b>
+<b class="fc">&nbsp;    BudgetStatus.WARN -&gt; SurferBudgetStatus.Warn</b>
+<b class="fc">&nbsp;    BudgetStatus.OVER -&gt; SurferBudgetStatus.Over</b>
 &nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`formattedTotalBalance`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`formattedTotalBalance` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.String? -&gt;
-<b class="nc">&nbsp;  content.copy(`formattedTotalBalance` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`otherCurrencyTotals`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;kotlin.String&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`otherCurrencyTotals` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;kotlin.String&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`otherCurrencyTotals` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`ratesAsOf`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`ratesAsOf` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.String? -&gt;
-<b class="nc">&nbsp;  content.copy(`ratesAsOf` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`workspaceName`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`workspaceName` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.String? -&gt;
-<b class="nc">&nbsp;  content.copy(`workspaceName` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`workspaceInitial`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`workspaceInitial` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.String? -&gt;
-<b class="nc">&nbsp;  content.copy(`workspaceInitial` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`greeting`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`greeting` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.String? -&gt;
-<b class="nc">&nbsp;  content.copy(`greeting` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`formattedTrendDelta`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`formattedTrendDelta` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.String? -&gt;
-<b class="nc">&nbsp;  content.copy(`formattedTrendDelta` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`goals`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.GoalUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`goals` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.GoalUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`goals` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`safeToSpend`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`safeToSpend` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi? -&gt;
-<b class="nc">&nbsp;  content.copy(`safeToSpend` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`budgets`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`budgets` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`budgets` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`spentByCategory`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`spentByCategory` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`spentByCategory` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`burnRate`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, com.georgeci.moneysurfer.feature.dashboard.BurnRateUi?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`burnRate` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: com.georgeci.moneysurfer.feature.dashboard.BurnRateUi? -&gt;
-<b class="nc">&nbsp;  content.copy(`burnRate` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`insights`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.InsightUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`insights` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.InsightUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`insights` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`isOffline`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`isOffline` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.Boolean -&gt;
-<b class="nc">&nbsp;  content.copy(`isOffline` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`transferEnabled`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`transferEnabled` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: kotlin.Boolean -&gt;
-<b class="nc">&nbsp;  content.copy(`transferEnabled` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`layout`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`layout` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig -&gt;
-<b class="nc">&nbsp;  content.copy(`layout` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.Companion.`period`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content -&gt; content.`period` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content, value: com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod -&gt;
-<b class="nc">&nbsp;  content.copy(`period` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`accounts`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.AccountUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`accounts`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`accounts`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.AccountUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`accounts`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`accounts`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.AccountUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`accounts`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`transactions`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.TransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`transactions`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`transactions`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.TransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`transactions`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`transactions`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.TransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`transactions`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`formattedTotalBalance`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`formattedTotalBalance`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`formattedTotalBalance`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`formattedTotalBalance`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`formattedTotalBalance`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`formattedTotalBalance`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`otherCurrencyTotals`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;kotlin.String&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`otherCurrencyTotals`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`otherCurrencyTotals`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;kotlin.String&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`otherCurrencyTotals`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`otherCurrencyTotals`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;kotlin.String&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`otherCurrencyTotals`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`ratesAsOf`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`ratesAsOf`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`ratesAsOf`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`ratesAsOf`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`ratesAsOf`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`ratesAsOf`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`workspaceName`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`workspaceName`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`workspaceName`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`workspaceName`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`workspaceName`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`workspaceName`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`workspaceInitial`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`workspaceInitial`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`workspaceInitial`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`workspaceInitial`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`workspaceInitial`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`workspaceInitial`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`greeting`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`greeting`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`greeting`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`greeting`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`greeting`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`greeting`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`formattedTrendDelta`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`formattedTrendDelta`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`formattedTrendDelta`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`formattedTrendDelta`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`formattedTrendDelta`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`formattedTrendDelta`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`goals`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.GoalUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`goals`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`goals`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.GoalUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`goals`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`goals`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.GoalUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`goals`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`safeToSpend`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`safeToSpend`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`safeToSpend`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`safeToSpend`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`safeToSpend`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`safeToSpend`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`budgets`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`budgets`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`budgets`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`budgets`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`budgets`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`budgets`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`spentByCategory`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`spentByCategory`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`spentByCategory`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`spentByCategory`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`spentByCategory`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`spentByCategory`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`burnRate`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.BurnRateUi?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`burnRate`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`burnRate`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.BurnRateUi?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`burnRate`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`burnRate`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.BurnRateUi?&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`burnRate`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`insights`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.InsightUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`insights`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`insights`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.InsightUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`insights`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`insights`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.dashboard.InsightUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`insights`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`isOffline`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`isOffline`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`isOffline`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`isOffline`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`isOffline`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`isOffline`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`transferEnabled`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`transferEnabled`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`transferEnabled`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`transferEnabled`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`transferEnabled`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`transferEnabled`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`layout`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`layout`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`layout`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`layout`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`layout`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`layout`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`period`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`period`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`period`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`period`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content&gt;.`period`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod&gt;  get() = this + com.georgeci.moneysurfer.feature.dashboard.DashboardState.Content.`period`</b>
 </code>
 </pre>
 </div>
@@ -327,7 +239,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferErrorStateTestTags</title>
+  <title>MoneySurfer Coverage Report > SurferCurrencyBottomSheetTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferErrorStateTestTags (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferCurrencyBottomSheetTestTags (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferErrorStateTestTags</td>
+  <td class="name">SurferCurrencyBottomSheetTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,117 +46,157 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
 &nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.ModalBottomSheet
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.rememberModalBottomSheetState
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+&nbsp;data class SurferCurrencyOption(
+&nbsp;    val code: String,
+&nbsp;    val symbol: String,
+&nbsp;    val name: String,
+&nbsp;)
+&nbsp;
 &nbsp;/**
-&nbsp; * Centered error-state block: an error-tinted icon medallion, a title, an optional subtitle
-&nbsp; * and an optional retry action. Mirrors [SurferEmptyState] but signals a failed load rather
-&nbsp; * than absent content — use [SurferEmptyState] when the load succeeded but produced nothing.
+&nbsp; * Currency chooser as a modal bottom sheet: title, search field, and one [SurferCurrencyRow]
+&nbsp; * card per currency. The list is as tall as the whole currency set needs, capped at
+&nbsp; * [ListMaxHeight] — a short set reads as a compact sheet instead of a full-height page, and a
+&nbsp; * search query narrows the rows without resizing the sheet under the user&#39;s fingers.
 &nbsp; *
-&nbsp; * @param onRetry when non-null, renders a retry button; override [retryLabel] to relabel it.
+&nbsp; * Departure from the design: the mockup has no search field. The supported list keeps growing,
+&nbsp; * so the field stays — it is the reason this sheet replaced the segmented control at all.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+&nbsp;fun SurferCurrencyBottomSheet(
+&nbsp;    title: String,
+&nbsp;    searchPlaceholder: String,
+&nbsp;    currencies: List&lt;SurferCurrencyOption&gt;,
+&nbsp;    selectedCode: String?,
+&nbsp;    onSelect: (SurferCurrencyOption) -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+&nbsp;
+&nbsp;    ModalBottomSheet(
+&nbsp;        onDismissRequest = onDismiss,
+&nbsp;        sheetState = sheetState,
+&nbsp;        containerColor = AppTheme.materialColors.surfaceContainerLow,
+&nbsp;        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+&nbsp;    ) {
+&nbsp;        SurferCurrencyBottomSheetContent(
+&nbsp;            title = title,
+&nbsp;            searchPlaceholder = searchPlaceholder,
+&nbsp;            currencies = currencies,
+&nbsp;            selectedCode = selectedCode,
+&nbsp;            onSelect = onSelect,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Stable selectors for [SurferCurrencyBottomSheet] — see docs/testing/testing-strategy.md. */
+&nbsp;object SurferCurrencyBottomSheetTestTags {
+&nbsp;    const val Search = &quot;currencySheet:search&quot;
+&nbsp;    const val List = &quot;currencySheet:list&quot;
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The sheet&#39;s body, without the modal shell — public so a UI test can mount it directly, the way
+&nbsp; * `DashboardCardStyleSheetContent` is.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferErrorState(
+&nbsp;fun SurferCurrencyBottomSheetContent(
 &nbsp;    title: String,
+&nbsp;    searchPlaceholder: String,
+&nbsp;    currencies: List&lt;SurferCurrencyOption&gt;,
+&nbsp;    selectedCode: String?,
+&nbsp;    onSelect: (SurferCurrencyOption) -&gt; Unit,
 &nbsp;    modifier: Modifier = Modifier,
-&nbsp;    subtitle: String? = null,
-&nbsp;    icon: ImageVector = SurferIcons.Info,
-&nbsp;    retryLabel: String = &quot;Retry&quot;,
-&nbsp;    onRetry: (() -&gt; Unit)? = null,
 &nbsp;) {
-&nbsp;    Column(
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(AppTheme.spacing.large),
-&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
-&nbsp;        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(64.dp)
-&nbsp;                .clip(CircleShape)
-&nbsp;                .background(AppTheme.materialColors.errorContainer),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = icon,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.onErrorContainer,
-&nbsp;                modifier = Modifier.size(28.dp),
-&nbsp;            )
+&nbsp;    var query by remember { mutableStateOf(&quot;&quot;) }
+&nbsp;    val filtered = remember(currencies, query) {
+&nbsp;        if (query.isBlank()) {
+&nbsp;            currencies
+&nbsp;        } else {
+&nbsp;            val q = query.trim().lowercase()
+&nbsp;            currencies.filter { c -&gt;
+&nbsp;                c.code.lowercase().contains(q) ||
+&nbsp;                    c.name.lowercase().contains(q) ||
+&nbsp;                    c.symbol.contains(q)
+&nbsp;            }
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    Column(modifier = modifier.fillMaxWidth().padding(bottom = 12.dp)) {
 &nbsp;        Text(
 &nbsp;            text = title,
 &nbsp;            style = AppTheme.typography.titleMedium,
 &nbsp;            color = AppTheme.materialColors.onSurface,
-&nbsp;            textAlign = TextAlign.Center,
+&nbsp;            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 12.dp),
 &nbsp;        )
-&nbsp;        if (subtitle != null) {
-&nbsp;            Text(
-&nbsp;                text = subtitle,
-&nbsp;                style = AppTheme.typography.bodyMedium,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        if (onRetry != null) {
-&nbsp;            SurferButton(
-&nbsp;                text = retryLabel,
-&nbsp;                onClick = onRetry,
-&nbsp;                style = SurferButtonStyle.Tonal,
-&nbsp;                modifier = Modifier
-&nbsp;                    .padding(top = AppTheme.spacing.xSmall)
-&nbsp;                    .testTag(SurferErrorStateTestTags.RetryButton),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;object SurferErrorStateTestTags {
-&nbsp;    const val RetryButton = &quot;errorState:retry&quot;
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferErrorStatePreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferErrorState(
-&nbsp;            title = &quot;Something went wrong&quot;,
-&nbsp;            subtitle = &quot;We couldn&#39;t load your accounts. Check your connection and try again.&quot;,
-&nbsp;            onRetry = {},
+&nbsp;        SurferSearchField(
+&nbsp;            value = query,
+&nbsp;            onValueChange = { query = it },
+&nbsp;            placeholder = searchPlaceholder,
+&nbsp;            modifier = Modifier.testTag(SurferCurrencyBottomSheetTestTags.Search),
 &nbsp;        )
+&nbsp;        Spacer(Modifier.height(8.dp))
+&nbsp;        LazyColumn(
+&nbsp;            // Sized from the *unfiltered* list, so typing a query filters the rows without the
+&nbsp;            // sheet collapsing around the one that matched and re-growing when it is cleared.
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxWidth()
+&nbsp;                .height(listHeight(currencies.size))
+&nbsp;                .testTag(SurferCurrencyBottomSheetTestTags.List),
+&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;        ) {
+&nbsp;            items(filtered, key = { it.code }) { currency -&gt;
+&nbsp;                SurferCurrencyRow(
+&nbsp;                    symbol = currency.symbol,
+&nbsp;                    code = currency.code,
+&nbsp;                    name = currency.name,
+&nbsp;                    selected = currency.code == selectedCode,
+&nbsp;                    onClick = { onSelect(currency) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferErrorStateNoRetryPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferErrorState(title = &quot;Failed to sync&quot;)
-&nbsp;    }
-&nbsp;}
+&nbsp;/**
+&nbsp; * How tall the list is for [currencyCount] currencies: every row it can show, capped at
+&nbsp; * [ListMaxHeight]. An estimate per row rather than a measured one — the only thing it has to get
+&nbsp; * right is that the height does not depend on the *filtered* count, and a few dp of slack under a
+&nbsp; * list too short to fill the sheet is cheaper than a sheet that resizes on every keystroke.
+&nbsp; */
+&nbsp;private fun listHeight(currencyCount: Int): Dp =
+&nbsp;    minOf(RowHeight * currencyCount, ListMaxHeight)
+&nbsp;
+&nbsp;private val ListMaxHeight = 420.dp
+&nbsp;
+&nbsp;/** One [SurferCurrencyRow] plus the 10dp gap under it. */
+&nbsp;private val RowHeight = 76.dp
 </code>
 </pre>
 </div>
@@ -180,7 +220,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

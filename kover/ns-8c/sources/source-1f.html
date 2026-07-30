@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSafeToSpendData</title>
+  <title>MoneySurfer Coverage Report > SurferRecurringWidgetKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSafeToSpendData (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: SurferRecurringWidgetKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSafeToSpendData</td>
+  <td class="name">SurferRecurringWidgetKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (42/42)
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/98)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1112)
   </span>
 </td>
 </tr>
@@ -94,261 +101,184 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
 &nbsp;
+&nbsp;import androidx.compose.foundation.background
 &nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.TextStyle
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.text.font.FontWeight
 &nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetProgressBar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;/**
-&nbsp; * The numbers the safe-to-spend card draws, already formatted and localized by the caller — uikit
-&nbsp; * neither knows the currency nor owns the copy.
-&nbsp; *
-&nbsp; * [progress] is spend against the limit and [paceFraction] is how much of the period has gone, so
-&nbsp; * the bar reads as a pace: fill behind the tick means the money is outlasting the days.
-&nbsp; */
-&nbsp;data class SurferSafeToSpendData(
-&nbsp;    /** The headline — what is still safe to spend. Signed, so an overspent budget reads negative. */
-<b class="fc">&nbsp;    val amount: String,</b>
-&nbsp;    /** One line under the headline: the limit the headline is measured against, and whose it is. */
-<b class="fc">&nbsp;    val caption: String,</b>
-<b class="fc">&nbsp;    val perDay: String,</b>
-<b class="fc">&nbsp;    val daysLeft: String,</b>
-<b class="fc">&nbsp;    val progress: Float,</b>
-<b class="fc">&nbsp;    val paceFraction: Float,</b>
-<b class="fc">&nbsp;    val status: SurferBudgetStatus,</b>
-&nbsp;    /** What a screen reader gets for the bar; the shape restates numbers already in the text. */
-<b class="fc">&nbsp;    val progressContentDescription: String? = null,</b>
+&nbsp;data class SurferRecurringItem(
+&nbsp;    val id: String,
+&nbsp;    val name: String,
+&nbsp;    val dueLabel: String,
+&nbsp;    val amountFormatted: String,
+&nbsp;    val isImminent: Boolean = false,
+&nbsp;    val icon: ImageVector = SurferIcons.Calendar,
 &nbsp;)
 &nbsp;
-&nbsp;/**
-&nbsp; * The &quot;no budget yet&quot; half of the card: what it says, and the way out of it.
-&nbsp; *
-&nbsp; * Grouped rather than spread across the widget&#39;s parameter list, the way `SurferAddAccountCta`
-&nbsp; * carries the accounts widget&#39;s empty-state call to action. [actionTestTag] tags the link; the host
-&nbsp; * screen owns the value, since where it leads is a step in the host&#39;s flow.
-&nbsp; */
-&nbsp;data class SurferSafeToSpendEmpty(
-&nbsp;    val title: String? = null,
-&nbsp;    val subtitle: String? = null,
-&nbsp;    val actionLabel: String? = null,
-&nbsp;    val onActionClick: (() -&gt; Unit)? = null,
-&nbsp;    val actionTestTag: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Safe-to-spend widget for the dashboard column: one number, the pace it has to hold, and how long
-&nbsp; * it has to hold it.
-&nbsp; *
-&nbsp; * A null [data] draws [empty] instead — the card keeps its heading and offers the way out rather
-&nbsp; * than disappearing, because a widget the user switched on should still say why it has nothing to
-&nbsp; * show.
-&nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferSafeToSpendWidget(
+<b class="nc">&nbsp;fun SurferRecurringWidget(</b>
+&nbsp;    items: List&lt;SurferRecurringItem&gt;,
 &nbsp;    title: String,
-&nbsp;    data: SurferSafeToSpendData?,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,
-&nbsp;    empty: SurferSafeToSpendEmpty = SurferSafeToSpendEmpty(),
-&nbsp;) {
-&nbsp;    SurferWidgetCard(
-&nbsp;        title = title,
-&nbsp;        modifier = modifier,
-&nbsp;        trailing = { if (data == null) EmptyStateAction(empty) },
+&nbsp;    actionLabel: String,
+&nbsp;    onActionClick: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,</b>
+<b class="nc">&nbsp;    onItemClick: ((SurferRecurringItem) -&gt; Unit)? = null,</b>
+<b class="nc">&nbsp;    subtitle: String? = null,</b>
+<b class="nc">&nbsp;    emptyTitle: String? = null,</b>
+<b class="nc">&nbsp;    emptySubtitle: String? = null,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val hero = size == SurferWidgetSize.Expanded</b>
+<b class="nc">&nbsp;    val visibleItems = if (hero) items.take(3) else items.take(2)</b>
+&nbsp;
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .clip(RoundedCornerShape(16.dp))</b>
+<b class="nc">&nbsp;            .background(AppTheme.materialColors.surface)</b>
+<b class="nc">&nbsp;            .padding(vertical = 14.dp),</b>
 &nbsp;    ) {
-&nbsp;        if (data == null) {
-&nbsp;            SurferWidgetEmptyState(
-&nbsp;                icon = SurferIcons.Cash,
-&nbsp;                title = empty.title,
-&nbsp;                subtitle = empty.subtitle,
-&nbsp;            )
-&nbsp;            return@SurferWidgetCard
-&nbsp;        }
-&nbsp;        SafeToSpendBody(data = data, sizing = safeToSpendSizing(size == SurferWidgetSize.Expanded))
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun EmptyStateAction(empty: SurferSafeToSpendEmpty) {
-&nbsp;    val label = empty.actionLabel ?: return
-&nbsp;    val onClick = empty.onActionClick ?: return
-&nbsp;    Text(
-&nbsp;        text = label,
-&nbsp;        style = AppTheme.typography.labelMedium,
-&nbsp;        color = AppTheme.materialColors.primary,
-&nbsp;        modifier = Modifier
-&nbsp;            .clickable(onClick = onClick)
-&nbsp;            .then(empty.actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Everything the Compact/Hero switch changes, resolved in one place so the body below reads as a
-&nbsp; * single layout instead of a column of size ternaries.
-&nbsp; */
-&nbsp;private data class SafeToSpendSizing(
-&nbsp;    val topPadding: Dp,
-&nbsp;    val gap: Dp,
-&nbsp;    val amountStyle: TextStyle,
-&nbsp;    val figureStyle: TextStyle,
-&nbsp;    val barHeight: Dp,
-&nbsp;    /**
-&nbsp;     * Compact drops the caption rather than shrinking every line: the headline, the pace bar and
-&nbsp;     * the two figures under it are what the widget is for, and the limit is restated on the budget
-&nbsp;     * screen.
-&nbsp;     */
-&nbsp;    val showsCaption: Boolean,
-&nbsp;)
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun safeToSpendSizing(hero: Boolean): SafeToSpendSizing = if (hero) {
-&nbsp;    SafeToSpendSizing(
-&nbsp;        topPadding = 10.dp,
-&nbsp;        gap = 10.dp,
-&nbsp;        amountStyle = AppTheme.typography.displaySmall,
-&nbsp;        figureStyle = AppTheme.typography.labelLarge,
-&nbsp;        barHeight = 10.dp,
-&nbsp;        showsCaption = true,
-&nbsp;    )
-&nbsp;} else {
-&nbsp;    SafeToSpendSizing(
-&nbsp;        topPadding = 6.dp,
-&nbsp;        gap = 6.dp,
-&nbsp;        amountStyle = AppTheme.typography.headlineSmall,
-&nbsp;        figureStyle = AppTheme.typography.labelSmall,
-&nbsp;        barHeight = 8.dp,
-&nbsp;        showsCaption = false,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SafeToSpendBody(data: SurferSafeToSpendData, sizing: SafeToSpendSizing) {
-&nbsp;    Column(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(horizontal = 16.dp)
-&nbsp;            .padding(top = sizing.topPadding),
-&nbsp;        verticalArrangement = Arrangement.spacedBy(sizing.gap),
-&nbsp;    ) {
-&nbsp;        Text(
-&nbsp;            text = data.amount,
-&nbsp;            style = sizing.amountStyle,
-&nbsp;            color = if (data.status == SurferBudgetStatus.Over) {
-&nbsp;                AppTheme.materialColors.error
-&nbsp;            } else {
-&nbsp;                AppTheme.materialColors.onSurface
-&nbsp;            },
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = TextOverflow.Ellipsis,
-&nbsp;        )
-&nbsp;        if (sizing.showsCaption) {
-&nbsp;            Text(
-&nbsp;                text = data.caption,
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                maxLines = 1,
-&nbsp;                overflow = TextOverflow.Ellipsis,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        SurferBudgetProgressBar(
-&nbsp;            progress = data.progress,
-&nbsp;            status = data.status,
-&nbsp;            tickFraction = data.paceFraction,
-&nbsp;            height = sizing.barHeight,
-&nbsp;            contentDescription = data.progressContentDescription,
-&nbsp;        )
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            horizontalArrangement = Arrangement.SpaceBetween,
+<b class="nc">&nbsp;        Row(</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .fillMaxWidth()</b>
+<b class="nc">&nbsp;                .padding(horizontal = 20.dp),</b>
+<b class="nc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
 &nbsp;        ) {
-&nbsp;            Text(
-&nbsp;                text = data.perDay,
-&nbsp;                style = sizing.figureStyle,
-&nbsp;                color = AppTheme.materialColors.onSurface,
+<b class="nc">&nbsp;            Column(modifier = Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = title,</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.titleMedium,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+&nbsp;                )
+<b class="nc">&nbsp;                if (subtitle != null) {</b>
+<b class="nc">&nbsp;                    Spacer(Modifier.height(2.dp))</b>
+<b class="nc">&nbsp;                    Text(</b>
+<b class="nc">&nbsp;                        text = subtitle,</b>
+<b class="nc">&nbsp;                        style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = actionLabel,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.primary,</b>
+<b class="nc">&nbsp;                modifier = Modifier.clickable(onClick = onActionClick),</b>
 &nbsp;            )
-&nbsp;            Text(
-&nbsp;                text = data.daysLeft,
-&nbsp;                style = sizing.figureStyle,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (items.isEmpty()) {</b>
+<b class="nc">&nbsp;            SurferWidgetEmptyState(</b>
+<b class="nc">&nbsp;                icon = SurferIcons.Calendar,</b>
+<b class="nc">&nbsp;                title = emptyTitle,</b>
+<b class="nc">&nbsp;                subtitle = emptySubtitle,</b>
 &nbsp;            )
-&nbsp;        }
+&nbsp;            return@Column
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        Spacer(Modifier.height(8.dp))</b>
+<b class="nc">&nbsp;        visibleItems.forEach { item -&gt;</b>
+<b class="nc">&nbsp;            RecurringRow(</b>
+<b class="nc">&nbsp;                item = item,</b>
+<b class="nc">&nbsp;                onClick = onItemClick?.let { handler -&gt; { handler(item) } },</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun RecurringRow(item: SurferRecurringItem, onClick: (() -&gt; Unit)?) {</b>
+<b class="nc">&nbsp;    val rowModifier = if (onClick != null) {</b>
+<b class="nc">&nbsp;        Modifier.fillMaxWidth().clickable(onClick = onClick)</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        Modifier.fillMaxWidth()</b>
 &nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;private const val PREVIEW_TITLE = &quot;Safe to spend&quot;
-&nbsp;
-&nbsp;private val previewData = SurferSafeToSpendData(
-&nbsp;    amount = &quot;€642.30&quot;,
-&nbsp;    caption = &quot;of €1,800 · Everyday&quot;,
-&nbsp;    perDay = &quot;€53.52 a day&quot;,
-&nbsp;    daysLeft = &quot;12 days left&quot;,
-&nbsp;    progress = 0.64f,
-&nbsp;    paceFraction = 0.6f,
-&nbsp;    status = SurferBudgetStatus.Ok,
-&nbsp;)
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = rowModifier</b>
+<b class="nc">&nbsp;            .background(</b>
+<b class="nc">&nbsp;                if (item.isImminent) {</b>
+<b class="nc">&nbsp;                    AppTheme.materialColors.surfaceContainerLow</b>
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    androidx.compose.ui.graphics.Color.Transparent</b>
+<b class="nc">&nbsp;                },</b>
+&nbsp;            )
+<b class="nc">&nbsp;            .padding(horizontal = 20.dp, vertical = 10.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Box(</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .size(40.dp)</b>
+<b class="nc">&nbsp;                .clip(RoundedCornerShape(12.dp))</b>
+<b class="nc">&nbsp;                .background(AppTheme.materialColors.surfaceContainerHigh),</b>
+<b class="nc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            Icon(</b>
+<b class="nc">&nbsp;                imageVector = item.icon,</b>
+<b class="nc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                modifier = Modifier.size(20.dp),</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = item.name,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                maxLines = 1,</b>
+<b class="nc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = item.dueLabel,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = item.amountFormatted,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.titleSmall,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferSafeToSpendWidgetHeroPreview() {
+&nbsp;private fun SurferRecurringWidgetHeroPreview() {
 &nbsp;    SurferComponentPreview {
 &nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferSafeToSpendWidget(
-&nbsp;                title = PREVIEW_TITLE,
-&nbsp;                data = previewData,
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferSafeToSpendWidgetCompactPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferSafeToSpendWidget(
-&nbsp;                title = PREVIEW_TITLE,
-&nbsp;                data = previewData,
-&nbsp;                size = SurferWidgetSize.Compact,
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferSafeToSpendWidgetOverPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferSafeToSpendWidget(
-&nbsp;                title = PREVIEW_TITLE,
-&nbsp;                data = previewData.copy(
-&nbsp;                    amount = &quot;−€120.00&quot;,
-&nbsp;                    perDay = &quot;€0.00 a day&quot;,
-&nbsp;                    daysLeft = &quot;4 days left&quot;,
-&nbsp;                    progress = 1.07f,
-&nbsp;                    paceFraction = 0.87f,
-&nbsp;                    status = SurferBudgetStatus.Over,
+&nbsp;            SurferRecurringWidget(
+&nbsp;                items = listOf(
+&nbsp;                    SurferRecurringItem(&quot;1&quot;, &quot;Spotify&quot;, &quot;Tomorrow&quot;, &quot;€9.99&quot;, isImminent = true),
+&nbsp;                    SurferRecurringItem(&quot;2&quot;, &quot;Rent&quot;, &quot;Apr 30&quot;, &quot;€980&quot;),
+&nbsp;                    SurferRecurringItem(&quot;3&quot;, &quot;Gym&quot;, &quot;May 02&quot;, &quot;€32&quot;),
 &nbsp;                ),
+&nbsp;                title = &quot;Upcoming&quot;,
+&nbsp;                subtitle = &quot;€1,021.99 due in next 7 days&quot;,
+&nbsp;                actionLabel = &quot;Manage&quot;,
+&nbsp;                onActionClick = {},
 &nbsp;                modifier = Modifier.fillMaxWidth(),
 &nbsp;            )
 &nbsp;        }
@@ -357,18 +287,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferSafeToSpendWidgetEmptyPreview() {
+&nbsp;private fun SurferRecurringWidgetEmptyPreview() {
 &nbsp;    SurferComponentPreview {
 &nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferSafeToSpendWidget(
-&nbsp;                title = PREVIEW_TITLE,
-&nbsp;                data = null,
-&nbsp;                empty = SurferSafeToSpendEmpty(
-&nbsp;                    title = &quot;No budget yet&quot;,
-&nbsp;                    subtitle = &quot;Set a cap to see what is safe to spend.&quot;,
-&nbsp;                    actionLabel = &quot;Set a budget&quot;,
-&nbsp;                    onActionClick = {},
-&nbsp;                ),
+&nbsp;            SurferRecurringWidget(
+&nbsp;                items = emptyList(),
+&nbsp;                title = &quot;Upcoming&quot;,
+&nbsp;                actionLabel = &quot;Manage&quot;,
+&nbsp;                onActionClick = {},
+&nbsp;                emptyTitle = &quot;Nothing scheduled&quot;,
+&nbsp;                emptySubtitle = &quot;Subscriptions and recurring bills will appear here.&quot;,
 &nbsp;                modifier = Modifier
 &nbsp;                    .fillMaxWidth()
 &nbsp;                    .height(180.dp),
@@ -399,7 +327,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Workspace</title>
+  <title>MoneySurfer Coverage Report > TransactionSplitGroupKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: Workspace (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: TransactionSplitGroupKt (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Workspace</td>
+  <td class="name">TransactionSplitGroupKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -66,13 +66,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    87.5%
   </span>
   <span class="absValue">
-    (9/9)
+    (7/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (65/65)
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.7%
+  </span>
+  <span class="absValue">
+    (58/60)
   </span>
 </td>
 </tr>
@@ -94,21 +101,54 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlin.time.Instant
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;
-<b class="fc">&nbsp;data class Workspace(</b>
-<b class="fc">&nbsp;    val id: WorkspaceId,</b>
-<b class="fc">&nbsp;    val name: String,</b>
-<b class="fc">&nbsp;    val description: String,</b>
-<b class="fc">&nbsp;    val baseCurrency: CurrencyCode,</b>
-<b class="fc">&nbsp;    val ownerId: UserId,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-<b class="fc">&nbsp;    val archived: Boolean = false,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * One receipt: either an ordinary transaction on its own, or the legs it was split across.
+&nbsp; *
+&nbsp; * A group is what the transaction list, the recent-activity widget and search results render as a
+&nbsp; * single row — a payment the user made once should be one line, whatever number of categories it
+&nbsp; * was filed under. Everything that reasons about categories (budgets, monthly totals, spend
+&nbsp; * history, CSV) keeps working on the legs and never sees this type.
+&nbsp; */
+&nbsp;data class TransactionSplitGroup(val legs: List&lt;Transaction&gt;) {
+&nbsp;
+&nbsp;    init {
+&nbsp;        require(legs.isNotEmpty()) { &quot;A split group needs at least one leg&quot; }
+&nbsp;    }
+&nbsp;
+&nbsp;    /** The row that stands for the group: its id is what opening the group navigates to. */
+&nbsp;    val primary: Transaction get() = legs.first()
+&nbsp;
+&nbsp;    val isSplit: Boolean get() = legs.size &gt; 1
+&nbsp;
+&nbsp;    /** Magnitude of the whole receipt — the legs share a currency, so a plain sum is sound. */
+&nbsp;    val total: Money = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.money.abs() }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Distinct categories the receipt was filed under. Legs left uncategorized count once between
+&nbsp;     * them, which is what the &quot;N categories&quot; badge should say for a half-filled split.
+&nbsp;     */
+&nbsp;    val categoryCount: Int = legs.map { it.categoryId }.distinct().size
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Collapses split legs into groups, preserving the order the rows arrived in: a group takes the
+&nbsp; * position of its topmost leg, so a list sorted newest-first stays sorted.
+&nbsp; *
+&nbsp; * Legs are matched across the whole list rather than only between neighbours — two legs of one
+&nbsp; * receipt sort adjacently in practice but nothing guarantees another row cannot land between them.
+&nbsp; */
+&nbsp;fun List&lt;Transaction&gt;.groupSplitLegs(): List&lt;TransactionSplitGroup&gt; {
+<b class="pc">&nbsp;    val bySplit = filter { it.splitId != null }.groupBy { it.splitId }</b>
+<b class="fc">&nbsp;    val seen = mutableSetOf&lt;Any&gt;()</b>
+<b class="fc">&nbsp;    return mapNotNull { transaction -&gt;</b>
+<b class="fc">&nbsp;        val splitId = transaction.splitId</b>
+<b class="fc">&nbsp;            ?: return@mapNotNull TransactionSplitGroup(listOf(transaction))</b>
+<b class="fc">&nbsp;        if (!seen.add(splitId)) return@mapNotNull null</b>
+<b class="fc">&nbsp;        TransactionSplitGroup(bySplit.getValue(splitId))</b>
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -132,7 +172,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

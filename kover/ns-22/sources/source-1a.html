@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryNode</title>
+  <title>MoneySurfer Coverage Report > CategoryCapCoverage</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryNode (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategoryCapCoverage (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,16 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">CategoryNode</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <tr>
+    <td class="name">CategoryCapCoverage$Editable</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryCapCoverage$Managed</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -95,135 +139,60 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;
-&nbsp;/** A category placed in the tree, carrying how deep under a root it sits. */
-<b class="fc">&nbsp;data class CategoryNode(</b>
-<b class="fc">&nbsp;    val category: Category,</b>
-<b class="fc">&nbsp;    val depth: Int,</b>
-&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Shapes a flat category list into the parent/child structure both the manage screen and the
-&nbsp; * parent picker need. Kept in the domain because the rule it encodes — a category may not
-&nbsp; * become its own ancestor — is a data-integrity rule, not a rendering detail.
+&nbsp; * What the category form&#39;s monthly-cap shortcut is allowed to do for one category.
+&nbsp; *
+&nbsp; * Budgets owns limits — `Category` carries no `cap` field (md/categories.md, decision 1). A
+&nbsp; * per-category cap *is* a budget naming exactly that one category, so the shortcut may only ever
+&nbsp; * touch such a budget. It must never add a second limit on top of one the user already built on
+&nbsp; * the Budgets screen, which would leave two caps on one category and no defined winner.
 &nbsp; */
-&nbsp;object CategoryTree {
+&nbsp;sealed interface CategoryCapCoverage {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Deepest indent the UI draws. [eligibleParents] refuses to create anything deeper, but
-&nbsp;     * [flatten] still *renders* deeper rows — it just stops indenting them.
+&nbsp;     * The control is an editable amount field. [budget] is the single-category budget backing the
+&nbsp;     * cap today, or null when there is none and saving an amount should create one.
 &nbsp;     */
-&nbsp;    const val MAX_DEPTH: Int = 1
+<b class="fc">&nbsp;    data class Editable(val budget: Budget?) : CategoryCapCoverage</b>
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Flattens to display order: every category, depth-first, each one immediately followed by
-&nbsp;     * its subtree.
-&nbsp;     *
-&nbsp;     * Every input category comes out exactly once. That is the whole contract, and it is worth
-&nbsp;     * stating because the shapes this has to survive are not the shapes the UI can create:
-&nbsp;     *
-&nbsp;     * - A child whose parent is not in [categories] is treated as a root — sync legitimately
-&nbsp;     *   delivers a child before its parent.
-&nbsp;     * - A subtree deeper than [MAX_DEPTH] is rendered in full, with the indent clamped. The UI
-&nbsp;     *   will not build one, but another client&#39;s write can.
-&nbsp;     * - A category caught in a parent cycle is reachable from no root at all. It is emitted at
-&nbsp;     *   the top level once the real roots are exhausted.
-&nbsp;     *
-&nbsp;     * In every one of those cases the alternative is a category that silently disappears from
-&nbsp;     * the manage screen, which is strictly worse than one drawn at the wrong indent.
+&nbsp;     * A limit the shortcut must not compete with already covers this category. The control goes
+&nbsp;     * read-only and names [budget]; the user changes the limit on the Budgets screen instead.
 &nbsp;     */
-&nbsp;    fun flatten(categories: List&lt;Category&gt;): List&lt;CategoryNode&gt; {
-&nbsp;        val present = categories.mapTo(mutableSetOf()) { it.id }
-&nbsp;        val childrenByParent = categories
-&nbsp;            .filter { it.parentId != null &amp;&amp; it.parentId in present }
-&nbsp;            .groupBy { requireNotNull(it.parentId) }
-&nbsp;        val (roots, nested) = categories.partition { it.parentId == null || it.parentId !in present }
+<b class="fc">&nbsp;    data class Managed(val budget: Budget) : CategoryCapCoverage</b>
+&nbsp;}
 &nbsp;
-&nbsp;        val emitted = mutableSetOf&lt;CategoryId&gt;()
-&nbsp;        val result = mutableListOf&lt;CategoryNode&gt;()
-&nbsp;        val stack = ArrayDeque&lt;CategoryNode&gt;()
+&nbsp;/**
+&nbsp; * Resolves which budget, if any, the monthly-cap control on the category form speaks for.
+&nbsp; *
+&nbsp; * Two kinds of budget are deliberately not treated as coverage:
+&nbsp; * - **archived** ones (`isActive = false`) limit nothing, so a cap set here is a fresh budget
+&nbsp; *   rather than the resurrection of an old one;
+&nbsp; * - the **all-categories** budget (empty `categoryIds`) is the global spending envelope, which by
+&nbsp; *   design sits above per-category budgets rather than competing with them — treating it as
+&nbsp; *   coverage would leave the shortcut permanently dead for anyone who keeps a general budget.
+&nbsp; *
+&nbsp; * Everything else that names this category counts. A budget naming it *alongside other
+&nbsp; * categories*, or several budgets naming it at once, both resolve to [CategoryCapCoverage.Managed].
+&nbsp; */
+&nbsp;fun resolveCategoryCapCoverage(
+&nbsp;    categoryId: CategoryId?,
+&nbsp;    budgets: List&lt;Budget&gt;,
+&nbsp;): CategoryCapCoverage {
+&nbsp;    // A category that does not exist yet cannot be covered by anything.
+&nbsp;    if (categoryId == null) return CategoryCapCoverage.Editable(budget = null)
 &nbsp;
-&nbsp;        // Real roots first; the nested pass then picks up only what no root reached, i.e. the
-&nbsp;        // members of a parent cycle. Everything else is already emitted and skipped.
-&nbsp;        (roots + nested).forEach { seed -&gt;
-&nbsp;            if (seed.id in emitted) return@forEach
-&nbsp;            stack.addLast(CategoryNode(seed, depth = 0))
-&nbsp;            while (stack.isNotEmpty()) {
-&nbsp;                val node = stack.removeLast()
-&nbsp;                if (!emitted.add(node.category.id)) continue
-&nbsp;                result += node
-&nbsp;                val childDepth = (node.depth + 1).coerceAtMost(MAX_DEPTH)
-&nbsp;                childrenByParent[node.category.id].orEmpty().asReversed().forEach { child -&gt;
-&nbsp;                    stack.addLast(CategoryNode(child, childDepth))
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;        return result
-&nbsp;    }
+&nbsp;    val covering = budgets
+&nbsp;        .filter { it.isActive &amp;&amp; categoryId in it.categoryIds }
+&nbsp;        // Stable order so the read-only notice always names the same budget across recompositions.
+&nbsp;        .sortedWith(compareBy({ it.createdAt }, { it.id.value }))
 &nbsp;
-&nbsp;    /** Direct children of [parentId], in the order [categories] arrived. */
-&nbsp;    fun childrenOf(categories: List&lt;Category&gt;, parentId: CategoryId): List&lt;Category&gt; =
-&nbsp;        categories.filter { it.parentId == parentId }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every category reachable downwards from [rootId].
-&nbsp;     *
-&nbsp;     * [rootId] itself is in the result only when it is reachable from itself — i.e. it sits in a
-&nbsp;     * parent cycle, which sync can deliver even though the UI refuses to create one. That is the
-&nbsp;     * useful answer rather than an edge case to paper over: the one caller, [eligibleParents],
-&nbsp;     * uses this to decide what a category may *not* be parented to, and a category inside a
-&nbsp;     * cycle must not be offered as its own parent either.
-&nbsp;     *
-&nbsp;     * The walk is iterative and keeps a visited set, so a cycle terminates instead of hanging.
-&nbsp;     */
-&nbsp;    fun descendantsOf(categories: List&lt;Category&gt;, rootId: CategoryId): Set&lt;CategoryId&gt; {
-&nbsp;        val childrenByParent = categories
-&nbsp;            .filter { it.parentId != null }
-&nbsp;            .groupBy { requireNotNull(it.parentId) }
-&nbsp;        val found = mutableSetOf&lt;CategoryId&gt;()
-&nbsp;        val queue = ArrayDeque(childrenByParent[rootId].orEmpty().map { it.id })
-&nbsp;        while (queue.isNotEmpty()) {
-&nbsp;            val next = queue.removeFirst()
-&nbsp;            if (!found.add(next)) continue
-&nbsp;            queue += childrenByParent[next].orEmpty().map { it.id }
-&nbsp;        }
-&nbsp;        return found
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Categories that may be picked as the parent of [categoryId] (null when creating).
-&nbsp;     *
-&nbsp;     * Excludes: a different type (an expense category under an income parent is meaningless),
-&nbsp;     * system categories, the category itself and everything below it (a category cannot be its
-&nbsp;     * own ancestor), and any category already nested [MAX_DEPTH] deep.
-&nbsp;     */
-&nbsp;    fun eligibleParents(
-&nbsp;        categories: List&lt;Category&gt;,
-&nbsp;        categoryId: CategoryId?,
-&nbsp;        type: CategoryType,
-&nbsp;    ): List&lt;Category&gt; {
-&nbsp;        val excluded = categoryId
-&nbsp;            ?.let { descendantsOf(categories, it) + it }
-&nbsp;            .orEmpty()
-&nbsp;        val byId = categories.associateBy { it.id }
-&nbsp;        return categories.filter { candidate -&gt;
-&nbsp;            candidate.type == type &amp;&amp;
-&nbsp;                candidate.systemKind == null &amp;&amp;
-&nbsp;                candidate.id !in excluded &amp;&amp;
-&nbsp;                depthOf(candidate, byId) &lt; MAX_DEPTH
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun depthOf(category: Category, byId: Map&lt;CategoryId, Category&gt;): Int {
-&nbsp;        var depth = 0
-&nbsp;        var parentId = category.parentId
-&nbsp;        val seen = mutableSetOf(category.id)
-&nbsp;        while (parentId != null &amp;&amp; seen.add(parentId)) {
-&nbsp;            depth++
-&nbsp;            parentId = byId[parentId]?.parentId
-&nbsp;        }
-&nbsp;        return depth
+&nbsp;    val only = covering.singleOrNull()
+&nbsp;    return when {
+&nbsp;        covering.isEmpty() -&gt; CategoryCapCoverage.Editable(budget = null)
+&nbsp;        only != null &amp;&amp; only.categoryIds.size == 1 -&gt; CategoryCapCoverage.Editable(budget = only)
+&nbsp;        else -&gt; CategoryCapCoverage.Managed(budget = covering.first())
 &nbsp;    }
 &nbsp;}
 </code>
@@ -249,7 +218,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>

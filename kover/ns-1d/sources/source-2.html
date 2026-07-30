@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (47/47)
+    (48/48)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.4%
   </span>
   <span class="absValue">
-    (470/473)
+    (482/485)
   </span>
 </td>
 </tr>
@@ -131,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (48/48)
+    (49/49)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.4%
   </span>
   <span class="absValue">
-    (471/474)
+    (483/486)
   </span>
 </td>
 </tr>
@@ -274,7 +274,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        /**
 &nbsp;         * Variant A from the design: the balance headline first, the quick actions under it, then
 &nbsp;         * safe-to-spend, the burn rate that explains it, the budgets both are read off, where
-&nbsp;         * the period&#39;s money went, the accounts strip, the generated
+&nbsp;         * the period&#39;s money went, the accounts strip, the same spend as a donut, the generated
 &nbsp;         * insights, goals, and the recent-transactions list. Every widget starts enabled and
 &nbsp;         * Hero-sized.
 &nbsp;         *
@@ -282,6 +282,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * beside the shortcuts, a row of three stat cards, the spend chart with the accounts rail
 &nbsp;         * next to it, insights and goals paired, and the activity list full width at the bottom.
 &nbsp;         * Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
+&nbsp;         *
+&nbsp;         * The donut takes a band of its own at [DashboardWidgetSpan.Full] — a card that is already
+&nbsp;         * a wide row (chart beside legend) reads fine at that width, and it is the only span that
+&nbsp;         * seats a new widget without renarrowing the cards around it, which would have changed the
+&nbsp;         * default dashboard of every user who never opened the customize screen.
 &nbsp;         */
 <b class="fc">&nbsp;        val DEFAULT = DashboardLayoutConfig(</b>
 <b class="fc">&nbsp;            items = listOf(</b>
@@ -292,6 +297,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.CategoriesDonut, span = DashboardWidgetSpan.Full),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),</b>
@@ -322,7 +328,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 20:34</div>
+    <div style="float:right;">generated on 2026-07-30 14:15</div>
 </div>
 </body>
 </html>
