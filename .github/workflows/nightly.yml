@@ -628,9 +628,19 @@ jobs:
     name: Aggregate + publish nightly to Pages
     needs: [decide, maestro-android, maestro-ios, maestro-ios-offline]
     # DISABLED (issue #297): this job only aggregates the Maestro Allure
-    # results; with every Maestro job off it would publish an empty report to
-    # gh-pages nightly. Re-enable alongside the Maestro jobs — flip back to
-    # `always() && needs.decide.outputs.run == 'true'`.
+    # results, and it was switched off while those jobs were.
+    #
+    # That rationale is now stale: maestro-android, maestro-ios and
+    # maestro-ios-offline all run again under the ordinary
+    # `needs.decide.outputs.run == 'true'` gate (quarantined and
+    # `continue-on-error`, but scheduled), so the aggregate would no longer be
+    # empty. Re-enabling is a judgement call about publishing a knowingly-red
+    # suite, not a blocked dependency — flip back to
+    # `always() && needs.decide.outputs.run == 'true'` when that call is made.
+    #
+    # Until then /nightly/allure/ on Pages stays frozen on the last published
+    # run, and the report_url fix below is dormant. README's Reports section
+    # flags the link as stale to match.
     if: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -747,7 +757,13 @@ jobs:
 
       - name: Ensure gh-pages dir exists
         shell: bash
-        run: mkdir -p gh-pages/nightly/allure
+        # ALLURE_REPORT_URL is derived here rather than from
+        # `github.event.repository.name`, which a `schedule` payload need not
+        # carry. See the report_url note below.
+        run: |
+          set -euo pipefail
+          mkdir -p gh-pages/nightly/allure
+          echo "ALLURE_REPORT_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY##*/}/nightly/allure" >> "$GITHUB_ENV"
 
       - name: Build Allure report (with history)
         uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
@@ -756,6 +772,10 @@ jobs:
           gh_pages: gh-pages/nightly/allure
           allure_report: allure-report
           allure_history: allure-history
+          # Same reason as ci.yml's publish job: without report_url the redirect
+          # stub and executor.json point at the Pages root instead of this
+          # subtree, so opening /nightly/allure/ lands on a 404.
+          report_url: ${{ env.ALLURE_REPORT_URL }}
           # Cap the generated history payload to the 20 most recent reports.
           # keep_files: true below never deletes already-published run-number
           # dirs, so the weekly gh-pages-prune.yml does the actual branch

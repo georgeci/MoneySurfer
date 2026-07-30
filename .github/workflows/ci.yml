@@ -828,7 +828,13 @@ jobs:
       - name: Ensure gh-pages dir exists
         if: steps.gate.outputs.publish == 'true'
         shell: bash
-        run: mkdir -p gh-pages/allure
+        # ALLURE_REPORT_URL is derived here rather than from
+        # `github.event.repository.name` so it also resolves on event payloads
+        # that carry no repository object. See the report_url note below.
+        run: |
+          set -euo pipefail
+          mkdir -p gh-pages/allure
+          echo "ALLURE_REPORT_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY##*/}/allure" >> "$GITHUB_ENV"
 
       - name: Build Allure report (with history)
         if: steps.gate.outputs.publish == 'true'
@@ -838,6 +844,13 @@ jobs:
           gh_pages: gh-pages/allure
           allure_report: allure-report
           allure_history: allure-history
+          # The action builds the redirect stub and executor.json `reportUrl`
+          # from `https://<owner>.github.io/<repo>` and assumes the history sits
+          # at the Pages root — but `Assemble Pages payload` below puts it under
+          # `allure/`, so both would 404. `subfolder` can't fix it: it also gets
+          # appended to gh_pages/allure_history and would break the layout.
+          # report_url overrides the URL only.
+          report_url: ${{ env.ALLURE_REPORT_URL }}
           # Cap the generated history payload to the 20 most recent reports.
           # This alone doesn't bound the gh-pages branch (keep_files: true below
           # never deletes already-published run-number dirs) — the weekly
