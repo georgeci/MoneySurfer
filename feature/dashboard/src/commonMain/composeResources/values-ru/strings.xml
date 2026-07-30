@@ -18,6 +18,7 @@
     <string name="dashboard_customize_widget_burn_rate">Темп трат</string>
     <string name="dashboard_customize_widget_budgets">Бюджеты</string>
     <string name="dashboard_customize_widget_spent_by_category">Траты по категориям</string>
+    <string name="dashboard_customize_widget_categories_donut">Кольцо категорий</string>
     <string name="dashboard_customize_widget_accounts">Счета</string>
     <string name="dashboard_customize_widget_goals">Цели</string>
     <string name="dashboard_customize_widget_recent">Последние транзакции</string>
@@ -55,6 +56,7 @@
     <string name="dashboard_customize_preview_transaction_salary">Зарплата</string>
     <string name="dashboard_customize_preview_transaction_coffee">Кофе</string>
     <string name="dashboard_customize_preview_transaction_rent">Аренда</string>
+    <string name="dashboard_customize_preview_transaction_transport">Транспорт</string>
     <string name="dashboard_add_transaction">Добавить транзакцию</string>
     <string name="dashboard_quick_action_transfer">Перевод</string>
     <string name="dashboard_balance_title">Общий баланс</string>
@@ -101,6 +103,9 @@
     <string name="dashboard_spent_by_category_over_cap">сверх %1$s</string>
     <string name="dashboard_spent_by_category_status_warn">У лимита</string>
     <string name="dashboard_spent_by_category_status_over">Превышен</string>
+    <string name="dashboard_categories_donut_center_label">Потрачено</string>
+    <string name="dashboard_categories_donut_empty_center">Нет трат</string>
+    <string name="dashboard_categories_donut_empty_legend">Расходы за этот период разойдутся здесь по категориям.</string>
     <string name="dashboard_budgets_title">Бюджеты</string>
     <string name="dashboard_budgets_see_all">Все</string>
     <string name="dashboard_budgets_empty_title">Бюджетов пока нет</string>

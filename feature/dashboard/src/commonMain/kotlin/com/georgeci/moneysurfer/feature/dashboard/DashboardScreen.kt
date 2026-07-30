@@ -105,6 +105,9 @@ object DashboardTestTags {
 
     /** The whole spent-by-category card, whichever of its five treatments is selected. */
     const val SpentByCategory = "dashboard:spentByCategory"
+
+    /** The whole categories-donut card — the chart and its legend sit inside one node. */
+    const val CategoriesDonut = "dashboard:categoriesDonut"
     const val Accounts = "dashboard:accounts"
 
     /**
@@ -272,6 +275,7 @@ internal fun DashboardWidget(
         DashboardWidgetType.BurnRate -> BurnRateWidget(state)
         DashboardWidgetType.Budgets -> BudgetsWidget(state, onEvent)
         DashboardWidgetType.SpentByCategory -> SpentByCategoryWidget(state, variant)
+        DashboardWidgetType.CategoriesDonut -> CategoriesDonutWidget(state)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Insights -> InsightsWidget(state, variant)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)

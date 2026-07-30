@@ -34,6 +34,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_wid
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_balance
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_budgets
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_burn_rate
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_categories_donut
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_insights
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
@@ -66,6 +67,7 @@ internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> 
     DashboardWidgetType.SafeToSpend,
     DashboardWidgetType.BurnRate,
     DashboardWidgetType.Budgets,
+    DashboardWidgetType.CategoriesDonut,
     DashboardWidgetType.Accounts,
     DashboardWidgetType.Goals,
     DashboardWidgetType.RecentTransactions,
@@ -180,6 +182,7 @@ internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.BurnRate -> Res.string.dashboard_customize_widget_burn_rate
     DashboardWidgetType.Budgets -> Res.string.dashboard_customize_widget_budgets
     DashboardWidgetType.SpentByCategory -> Res.string.dashboard_customize_widget_spent_by_category
+    DashboardWidgetType.CategoriesDonut -> Res.string.dashboard_customize_widget_categories_donut
     DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
     DashboardWidgetType.Insights -> Res.string.dashboard_customize_widget_insights
     DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals
