@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeSpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.fixtures.FixedClock
+import com.georgeci.moneysurfer.domain.fixtures.MutableClock
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.dollars
@@ -22,10 +23,16 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 private val ws = workspaceId("ws-1")
@@ -128,6 +135,34 @@ class GetMonthlyNetHistoryUseCaseTest : StringSpec({
                 history?.nets?.single()?.net shouldBe 200.dollars
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+    }
+
+    "the window follows the calendar instead of freezing at subscription time" {
+        runTest {
+            val clock = MutableClock(LocalDate(2026, 4, 30).atStartOfDayIn(TimeZone.UTC))
+            val spend = FakeSpendAnalyticsRepository()
+            val useCase = GetMonthlyNetHistoryUseCase(
+                spendAnalytics = spend,
+                workspaceRepository = FakeGoalWorkspaceRepository(
+                    listOf(aWorkspace(id = ws, baseCurrency = USD)),
+                ),
+                session = InMemorySessionPointers(currentWorkspaceId = ws),
+                clock = ClockUseCase(clock),
+            )
+
+            val collecting = launch { useCase(timeZone = TimeZone.UTC).collect() }
+            runCurrent()
+            // The month turns over; a dashboard left open must not keep calling April "this month".
+            clock.instant = LocalDate(2026, 5, 1).atStartOfDayIn(TimeZone.UTC)
+            advanceTimeBy(2.days)
+            runCurrent()
+            collecting.cancel()
+
+            spend.netByMonthScopes.map { it.window } shouldContainExactly listOf(
+                TransactionPeriodWindow(LocalDate(2025, 11, 1), LocalDate(2026, 4, 30)),
+                TransactionPeriodWindow(LocalDate(2025, 12, 1), LocalDate(2026, 5, 31)),
+            )
         }
     }
 

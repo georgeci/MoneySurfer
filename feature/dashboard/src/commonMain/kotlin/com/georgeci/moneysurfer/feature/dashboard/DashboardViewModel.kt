@@ -213,6 +213,7 @@ class DashboardViewModel(
      *
      * That fallback headline gets no trend: [history] is quoted in the base currency, and hanging
      * its curve off a total that is one currency's bucket would draw a shape belonging to neither.
+     * Neither does a headline that took a rate to assemble — see [coversWholeHeadline].
      */
     private fun ConvertedTotal.toBalanceUi(history: MonthlyNetHistory?): BalanceUi {
         val leftOver = unconverted.map { MoneyFormatter.format(it.amount, it.currencyCode) }
@@ -226,10 +227,28 @@ class DashboardViewModel(
                 headline = MoneyFormatter.format(converted, baseCurrency),
                 notConverted = leftOver,
                 asOf = asOf?.asIsoDate(),
-                trend = history?.toTrendUi(converted, baseCurrency),
+                trend = history?.takeIf { coversWholeHeadline }?.toTrendUi(converted, baseCurrency),
             )
         }
     }
+
+    /**
+     * Whether base-currency history can account for the whole headline, which is what it takes for a
+     * delta folded out of that history to be the movement of *this* figure.
+     *
+     * The aggregate behind the nets filters on the base currency and the app caches only today's
+     * rates, so a foreign account's movement is outside the fold no matter how it is anchored. It is
+     * inside the headline, though, the moment a rate could price it — and "+$0.00 this month" beside
+     * a balance that grew by a third of itself is the class of answer
+     * [ConvertedTotal] exists to prevent. So the trend stands down unless every balance in the
+     * workspace was already in the base currency: nothing left unconverted ([ConvertedTotal.isComplete])
+     * and no quote needed to build the total (a null `asOf`, which is exactly that signal).
+     *
+     * Costs multi-currency workspaces their trend until the day transactions carry a rate snapshot.
+     * A figure that silently omits money is worse than no figure.
+     */
+    private val ConvertedTotal.coversWholeHeadline: Boolean
+        get() = isComplete && asOf == null
 
     /**
      * This month's movement and the curve behind it, or null when there is nothing honest to draw:

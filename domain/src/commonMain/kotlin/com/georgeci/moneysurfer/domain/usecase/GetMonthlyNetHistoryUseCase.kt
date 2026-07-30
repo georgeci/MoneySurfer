@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.BalanceTrend
 import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
 import com.georgeci.moneysurfer.domain.model.SpendScope
+import com.georgeci.moneysurfer.domain.model.next
 import com.georgeci.moneysurfer.domain.model.trailingMonths
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
@@ -12,15 +13,22 @@ import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.yearMonth
 import org.koin.core.annotation.Single
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Income against spend per calendar month over the trailing [BalanceTrend.TREND_MONTHS], for the
@@ -54,27 +62,54 @@ class GetMonthlyNetHistoryUseCase(
         require(months > 0) { "months must be positive, was $months" }
         return session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId ?: return@flatMapLatest flowOf(null)
-            val window = trailingMonths(
-                anchor = clock.now().toLocalDateTime(timeZone).date.yearMonth,
-                count = months,
-            )
 
-            baseCurrency(workspaceId).flatMapLatest { currency ->
-                // The aggregate *filters* on the base currency, so a null one matches nothing.
-                // Reporting "no history" beats querying with it and drawing a curve from no rows.
-                currency ?: return@flatMapLatest flowOf(null)
-                val scope = SpendScope(
-                    workspaceId = workspaceId,
-                    baseCurrency = currency,
-                    window = TransactionPeriodWindow(
-                        from = window.first().firstDay,
-                        to = window.last().lastDay,
-                    ),
-                )
-                spendAnalytics.netByMonth(scope).map { nets ->
-                    MonthlyNetHistory(months = window, nets = nets, currency = currency)
+            combine(currentMonth(timeZone), baseCurrency(workspaceId), ::Pair)
+                .flatMapLatest { (anchor, currency) ->
+                    // The aggregate *filters* on the base currency, so a null one matches nothing.
+                    // Reporting "no history" beats querying with it and drawing a curve from no rows.
+                    currency ?: return@flatMapLatest flowOf(null)
+                    history(workspaceId, currency, trailingMonths(anchor, months))
                 }
-            }
+        }
+    }
+
+    private fun history(
+        workspaceId: WorkspaceId,
+        currency: CurrencyCode,
+        window: List<YearMonth>,
+    ): Flow<MonthlyNetHistory> {
+        val scope = SpendScope(
+            workspaceId = workspaceId,
+            baseCurrency = currency,
+            window = TransactionPeriodWindow(
+                from = window.first().firstDay,
+                to = window.last().lastDay,
+            ),
+        )
+        return spendAnalytics.netByMonth(scope).map { nets ->
+            MonthlyNetHistory(months = window, nets = nets, currency = currency)
+        }
+    }
+
+    /**
+     * The month the trend is anchored on, re-emitted when the calendar rolls into the next one.
+     *
+     * Read once, the window would freeze for the life of the subscription: the workspace pointer
+     * does not re-emit at midnight, so a session left open across a month boundary would keep
+     * printing the finished month's net under copy that says "this month", with the new month's
+     * transactions outside every queried month and no way to self-correct short of re-subscribing.
+     * [GenerateInsightsUseCase] sleeps to the next local midnight for the same reason; this one only
+     * has to wake on the first of a month, so it sleeps to the start of the next one.
+     */
+    private fun currentMonth(timeZone: TimeZone): Flow<YearMonth> = flow {
+        while (true) {
+            val now = clock.now()
+            val today = now.toLocalDateTime(timeZone).date
+            emit(today.yearMonth)
+            val nextMonth = today.yearMonth.next().firstDay.atStartOfDayIn(timeZone)
+            // Floored, like the insights engine's rollover: a clock that jumps backwards must cost a
+            // minute of staleness rather than re-running the aggregate as fast as the dispatcher can.
+            delay((nextMonth - now).coerceAtLeast(MIN_ROLLOVER_SLEEP))
         }
     }
 
@@ -89,3 +124,9 @@ class GetMonthlyNetHistoryUseCase(
             .map { workspaces -> workspaces.firstOrNull { it.id == workspaceId }?.baseCurrency }
             .distinctUntilChanged()
 }
+
+/**
+ * Floor on the rollover sleep, matching the insights engine's. A clock that jumps backwards costs a
+ * minute of staleness instead of a busy loop.
+ */
+private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes

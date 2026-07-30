@@ -157,6 +157,52 @@ class DashboardBalanceViewModelTest : StringSpec({
         content.balanceSeries.shouldBeEmpty()
     }
 
+    "a headline a rate helped build carries no trend rather than one that omits the foreign half" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(
+                listOf(
+                    anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 100.dollars),
+                    anAccount(id = accountId("a-2"), workspaceId = ws, currencyCode = EUR, balance = 50.dollars),
+                ),
+            ),
+            transactions = FakeTransactionRepository(emptyList()),
+            rates = FakeExchangeRateRepository(mapOf(USD to anExchangeRateTable())),
+            spendAnalytics = netsOf(monthNet(income = 300.dollars)),
+        )
+
+        // The EUR balance is inside the headline but its movements are outside the aggregate, which
+        // filters on the base currency — so a delta folded from those nets would report the USD half
+        // of the month as if it were all of it.
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.formattedTotalBalance shouldBe MoneyFormatter.format(200.dollars, USD)
+        content.formattedTrendDelta shouldBe null
+        content.balanceSeries.shouldBeEmpty()
+    }
+
+    "a currency left unconverted beside the headline also stands the trend down" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(
+                listOf(
+                    anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 100.dollars),
+                    anAccount(id = accountId("a-2"), workspaceId = ws, currencyCode = EUR, balance = 50.dollars),
+                ),
+            ),
+            transactions = FakeTransactionRepository(emptyList()),
+            // No rates cached, so the EUR balance is listed beside the headline instead of folded in.
+            rates = FakeExchangeRateRepository(),
+            spendAnalytics = netsOf(monthNet(income = 300.dollars)),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.otherCurrencyTotals shouldContainExactly listOf(MoneyFormatter.format(50.dollars, EUR))
+        content.formattedTrendDelta shouldBe null
+        content.balanceSeries.shouldBeEmpty()
+    }
+
     "a headline that fell back to an unconvertible bucket carries no trend" {
         val viewModel = newViewModel(
             ws = WS,
