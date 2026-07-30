@@ -40,6 +40,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -50,6 +51,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.LocalDate
 import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
 import moneysurfer.feature.transaction.generated.resources.transaction_details_deleted_snackbar
@@ -375,6 +377,149 @@ class TransactionDetailsViewModelTest : StringSpec({
                 }
             } finally {
                 vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "Back and Edit are pure navigation, carrying the transaction they were opened on" {
+        runTest {
+            val fixture = Fixture(ws)
+            fixture.seedAccounts(anAccount(id = accountId("a-1"), workspaceId = ws))
+            fixture.seedTransactions(
+                aTransaction(
+                    id = transactionId("t-1"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    categoryId = null,
+                ),
+            )
+            val vm = fixture.createViewModel(transactionId("t-1"))
+            try {
+                vm.awaitContent()
+
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(TransactionDetailsEvent.OnEditClick)
+                    awaitItem() shouldBe TransactionDetailsEffect.NavigateToEdit(transactionId("t-1"))
+
+                    vm.onEvent(TransactionDetailsEvent.OnBackClick)
+                    awaitItem() shouldBe TransactionDetailsEffect.NavigateBack
+                }
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "the delete confirmation opens and closes without touching the transaction" {
+        runTest {
+            val account = anAccount(id = accountId("a-1"), workspaceId = ws, balance = 500.dollars)
+            val transaction = aTransaction(
+                id = transactionId("t-1"),
+                workspaceId = ws,
+                accountId = account.id,
+                money = 80.dollars,
+                categoryId = null,
+            )
+            val fixture = Fixture(ws)
+            fixture.seed(account, transaction)
+            val vm = fixture.createViewModel(transaction.id)
+            try {
+                vm.awaitContent().showDeleteConfirmation shouldBe false
+
+                vm.onEvent(TransactionDetailsEvent.OnDeleteClick)
+                vm.awaitContent().showDeleteConfirmation shouldBe true
+
+                vm.onEvent(TransactionDetailsEvent.OnDeleteDismissed)
+                vm.awaitContent().showDeleteConfirmation shouldBe false
+                fixture.transactionRepository.getById(transaction.id) shouldBe transaction
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a transaction that is already gone leaves the screen loading rather than drawing a blank one" {
+        runTest {
+            val fixture = Fixture(ws)
+            val vm = fixture.createViewModel(transactionId("t-missing"))
+            try {
+                // Reachable from a stale deep link or a row deleted on another device: an empty
+                // Content would render as a €0.00 transaction with no account and no category.
+                vm.currentState.shouldBeInstanceOf<TransactionDetailsState.Loading>()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "an opening balance is unsigned and is not something to re-enter" {
+        runTest {
+            val fixture = Fixture(ws)
+            fixture.seedAccounts(anAccount(id = accountId("a-1"), workspaceId = ws))
+            fixture.seedTransactions(
+                aTransaction(
+                    id = transactionId("t-1"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    money = 500.dollars,
+                    categoryId = null,
+                    type = TransactionType.OPENING_BALANCE,
+                    operationDate = LocalDate(2025, 3, 7),
+                ),
+            )
+            val vm = fixture.createViewModel(transactionId("t-1"))
+            try {
+                val content = vm.awaitContent()
+
+                content.formattedAmount shouldBe "$500.00"
+                // An account artefact, not a transaction the user entered.
+                content.canDuplicate shouldBe false
+                content.isIncome shouldBe false
+                content.formattedDate shouldBe "07 Mar 2025"
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "neither leg of a pair can be duplicated on its own" {
+        runTest {
+            val fixture = Fixture(ws)
+            fixture.seedAccounts(anAccount(id = accountId("a-1"), workspaceId = ws))
+            // Duplicating this would write a transfer with one leg…
+            fixture.seedTransactions(
+                aTransaction(
+                    id = transactionId("t-transfer"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    categoryId = null,
+                    transferId = TransferId("tr-1"),
+                ),
+                // …and this, a fragment of a receipt belonging to no group.
+                aTransaction(
+                    id = transactionId("t-split-1"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    categoryId = null,
+                    splitId = SplitId("sp-1"),
+                ),
+                aTransaction(
+                    id = transactionId("t-split-2"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    categoryId = null,
+                    splitId = SplitId("sp-1"),
+                ),
+            )
+
+            val transferLeg = fixture.createViewModel(transactionId("t-transfer"))
+            val splitLeg = fixture.createViewModel(transactionId("t-split-1"))
+            try {
+                transferLeg.awaitContent().canDuplicate shouldBe false
+                splitLeg.awaitContent().canDuplicate shouldBe false
+            } finally {
+                transferLeg.viewModelScope.cancel()
+                splitLeg.viewModelScope.cancel()
             }
         }
     }

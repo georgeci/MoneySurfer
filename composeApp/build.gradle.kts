@@ -96,6 +96,9 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.compose.uiTest)
+            // The transaction screens' states carry `LocalDate` — day groups, week ranges and the
+            // filter screen's custom range.
+            implementation(libs.kotlinx.datetime)
             // KoinModuleVerificationTest lists the `parametersOf` types, some of
             // which are navigation-level (goal contribution mode) or owned by a
             // feature (the category picker's layout variant).

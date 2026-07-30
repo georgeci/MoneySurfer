@@ -107,8 +107,14 @@ private fun TransactionsByAccountLoading(onEvent: (TransactionsByAccountEvent) -
     }
 }
 
+/**
+ * The list, drawn from a state it is handed rather than one it resolves.
+ *
+ * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+ * own — see docs/testing/testing-strategy.md.
+ */
 @Composable
-internal fun TransactionsByAccountContent(
+fun TransactionsByAccountContent(
     state: TransactionsByAccountState.Content,
     onEvent: (TransactionsByAccountEvent) -> Unit,
 ) {

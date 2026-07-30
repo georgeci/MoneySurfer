@@ -43,6 +43,44 @@ internal suspend fun TransactionCreationViewModel.awaitContent(): TransactionCre
     first { it is TransactionCreationState.Content } as TransactionCreationState.Content
 
 /**
+ * A loaded form, built by hand.
+ *
+ * For the cases that are about what the state *derives* — which grid it offers, whether Save is
+ * enabled — rather than about how the ViewModel got there: those need no repository, and building
+ * the `Content` directly says what the case is about in one place.
+ */
+@Suppress("LongParameterList")
+internal fun aCreationContent(
+    amount: String = "",
+    type: TransactionTypeUi = TransactionTypeUi.Expense,
+    accounts: List<Account> = emptyList(),
+    categories: List<Category> = emptyList(),
+    selectedAccount: Account? = accounts.firstOrNull(),
+    selectedCategory: Category? = categories.firstOrNull(),
+    fromAccount: Account? = null,
+    toAccount: Account? = null,
+    toAmount: String = "",
+    splitLines: List<TransactionSplitLineUi> = emptyList(),
+): TransactionCreationState.Content = TransactionCreationState.Content(
+    amount = amount,
+    note = "",
+    type = type,
+    accounts = accounts,
+    categories = categories,
+    selectedAccount = selectedAccount,
+    selectedCategory = selectedCategory,
+    isEditMode = false,
+    editingTransactionId = null,
+    timestamp = 0L,
+    categoryUsageCounts = emptyMap(),
+    displayCategories = categories,
+    fromAccount = fromAccount,
+    toAccount = toAccount,
+    toAmount = toAmount,
+    splitLines = splitLines,
+)
+
+/**
  * Real use cases over in-memory repositories: tests stage accounts + categories so the VM's
  * `loadData()` resolves a default selection, then assert on what the fakes ended up holding.
  */
