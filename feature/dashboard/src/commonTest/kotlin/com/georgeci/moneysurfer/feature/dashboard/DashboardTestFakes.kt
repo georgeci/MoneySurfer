@@ -56,6 +56,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetUpcomingRecurringUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -169,6 +170,12 @@ internal fun newViewModel(
             clock = ClockUseCase(FixedClock(INSIGHTS_TODAY.atStartOfDayIn(TimeZone.UTC))),
         ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
+        getUpcomingRecurring = GetUpcomingRecurringUseCase(
+            recurringRuleRepository = recurringRules,
+            workspaceRepository = workspaces,
+            session = session,
+            clock = clock,
+        ),
         getMonthlyNetHistory = GetMonthlyNetHistoryUseCase(spendAnalytics, workspaces, session, clock),
         uiPreferences = uiPreferences,
         hostCapabilities = hostCapabilities,

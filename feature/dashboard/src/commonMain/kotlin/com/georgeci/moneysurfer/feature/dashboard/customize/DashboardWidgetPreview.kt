@@ -41,6 +41,8 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferRecurringItem
+import com.georgeci.moneysurfer.uikit.widgets.SurferRecurringWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
@@ -89,6 +91,9 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_titl
 import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_due_tomorrow
+import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_see_all
+import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
 import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
 import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
@@ -125,6 +130,9 @@ private val PREVIEW_CONTENT_WIDTH = 360.dp
  * The sample list is longer than a compact card shows on purpose — a size the user picks has to be
  * visibly different in the preview, and several widgets differ only in how many rows they keep.
  */
+// The "complexity" is the number of widgets the dashboard offers, not tangled logic — every branch
+// is one tile. Same call as `DashboardWidget`, the render half of the same registry.
+@Suppress("CyclomaticComplexMethod")
 @Composable
 internal fun DashboardWidgetPreview(
     type: DashboardWidgetType,
@@ -147,6 +155,7 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.CategoriesDonut -> CategoriesDonutPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
+            DashboardWidgetType.Recurring -> RecurringPreview(modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
             DashboardWidgetType.RecentTransactions -> RecentTransactionsPreview(modifier.then(content))
         }
@@ -323,6 +332,45 @@ private fun CategoriesDonutPreview(modifier: Modifier) {
         },
         centerLabel = stringResource(Res.string.dashboard_categories_donut_center_label),
         centerValue = SAMPLE_DONUT_TOTAL,
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample payments, for the same reason [SafeToSpendPreview] uses sample numbers: the tile is drawn
+ * for every widget in the picker, including the ones switched off, so it must not depend on the
+ * workspace keeping any recurring rules.
+ *
+ * Three rows, because the card keeps three at Hero and two at Compact — and the first is tinted,
+ * since the imminent treatment is half of what the two sizes are being compared on.
+ */
+@Composable
+private fun RecurringPreview(modifier: Modifier) {
+    SurferRecurringWidget(
+        items = listOf(
+            SurferRecurringItem(
+                id = "preview-recurring-1",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),
+                dueLabel = stringResource(Res.string.dashboard_recurring_due_tomorrow),
+                amountFormatted = SAMPLE_RECURRING_RENT,
+                isImminent = true,
+            ),
+            SurferRecurringItem(
+                id = "preview-recurring-2",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_transport),
+                dueLabel = SAMPLE_RECURRING_SECOND_DUE,
+                amountFormatted = SAMPLE_RECURRING_TRANSPORT,
+            ),
+            SurferRecurringItem(
+                id = "preview-recurring-3",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),
+                dueLabel = SAMPLE_RECURRING_THIRD_DUE,
+                amountFormatted = SAMPLE_RECURRING_COFFEE,
+            ),
+        ),
+        title = stringResource(Res.string.dashboard_recurring_title),
+        actionLabel = stringResource(Res.string.dashboard_recurring_see_all),
+        onActionClick = {},
         modifier = modifier,
     )
 }
@@ -600,3 +648,10 @@ private const val SAMPLE_CAP_PROGRESS = 0.95f
 /** Adds up to 1 exactly, so the sample donut closes rather than leaving a wedge of track showing. */
 private val SAMPLE_DONUT_SHARES = listOf(0.42f, 0.22f, 0.14f, 0.12f, 0.1f)
 private const val SAMPLE_DONUT_TOTAL = "€1,214.60"
+private const val SAMPLE_RECURRING_RENT = "€980.00"
+private const val SAMPLE_RECURRING_TRANSPORT = "€59.00"
+private const val SAMPLE_RECURRING_COFFEE = "€9.99"
+
+/** Sample due dates, ISO like the live card's — see `RecurringWidget.toWidgetItem`. */
+private const val SAMPLE_RECURRING_SECOND_DUE = "2026-04-30"
+private const val SAMPLE_RECURRING_THIRD_DUE = "2026-05-02"

@@ -425,6 +425,7 @@ private fun DashboardWidgetType.icon(): ImageVector = when (this) {
     DashboardWidgetType.CategoriesDonut -> SurferIcons.Category
     DashboardWidgetType.Accounts -> SurferIcons.Bank
     DashboardWidgetType.Insights -> SurferIcons.Sparkle
+    DashboardWidgetType.Recurring -> SurferIcons.Calendar
     DashboardWidgetType.Goals -> SurferIcons.Savings
     DashboardWidgetType.RecentTransactions -> SurferIcons.Receipt
 }

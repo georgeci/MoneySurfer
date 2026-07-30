@@ -19,6 +19,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.CategoriesDonut,
+            DashboardWidgetType.Recurring,
             DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
@@ -55,6 +56,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.CategoriesDonut,
+            DashboardWidgetType.Recurring,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
@@ -146,6 +148,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.CategoriesDonut,
+            DashboardWidgetType.Recurring,
             DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
@@ -170,6 +173,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.CategoriesDonut,
+            DashboardWidgetType.Recurring,
             DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
         )
