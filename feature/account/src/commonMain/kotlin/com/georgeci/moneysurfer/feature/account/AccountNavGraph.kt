@@ -77,8 +77,10 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
         AccountDetailsScreen(
             accountId = AccountId(key.accountId),
             onNavigateBack = { navigator.pop() },
+            // The Accounts-scoped creation route: the same form, presented as the design's inline
+            // add panel on a three-column window and as the usual full-screen route below it.
             onNavigateToTransactionCreation = { accountId ->
-                navigator.push(Route.TransactionCreation(accountId = accountId.value))
+                navigator.push(Route.AccountTransactionCreation(accountId = accountId.value))
             },
             onNavigateToTransactionDetails = { transactionId ->
                 navigator.push(Route.TransactionDetails(transactionId.value))
