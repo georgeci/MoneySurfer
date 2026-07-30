@@ -67,7 +67,41 @@ class DebugConfigScreenStateTest : StringSpec({
             onNodeWithTag(DebugConfigTestTags.row(FLAG_ROW.name)).assertIsDisplayed()
             onNodeWithTag(DebugConfigTestTags.LogsRow).assertIsDisplayed()
             onNodeWithTag(DebugConfigTestTags.ResetAllRow).assertIsDisplayed()
+            onNodeWithTag(DebugConfigTestTags.PrefillRow).assertIsDisplayed()
             onAllNodesWithTag(DebugConfigTestTags.Unavailable).assertCountEquals(0)
+        }
+    }
+
+    "the prefill row is clickable while idle and inert while a run is writing" {
+        // A settings row has no disabled state, so "busy" is expressed by dropping the click
+        // handler. Only the rendered tree shows whether that actually happened — from the view
+        // model's side a second tap looks identical either way.
+        runComposeUiTest {
+            val events = mutableListOf<DebugConfigEvent>()
+            setContent {
+                DebugConfigContent(
+                    state = DebugConfigState(isAvailable = true, rows = listOf(FLAG_ROW)),
+                    snackbarHostState = SnackbarHostState(),
+                    onEvent = { events += it },
+                )
+            }
+
+            onNodeWithTag(DebugConfigTestTags.PrefillRow).assertHasClickAction().performClick()
+            waitForIdle()
+
+            events shouldContainExactly listOf(DebugConfigEvent.OnPrefillClick)
+        }
+
+        runComposeUiTest {
+            setContent {
+                DebugConfigContent(
+                    state = DebugConfigState(isAvailable = true, rows = listOf(FLAG_ROW), inFlight = true),
+                    snackbarHostState = SnackbarHostState(),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DebugConfigTestTags.PrefillRow).assertHasNoClickAction()
         }
     }
 
@@ -88,6 +122,7 @@ class DebugConfigScreenStateTest : StringSpec({
             onNodeWithTag(DebugConfigTestTags.row(FLAG_ROW.name)).assertDoesNotExist()
             onAllNodesWithTag(DebugConfigTestTags.LogsRow).assertCountEquals(0)
             onAllNodesWithTag(DebugConfigTestTags.ResetAllRow).assertCountEquals(0)
+            onAllNodesWithTag(DebugConfigTestTags.PrefillRow).assertCountEquals(0)
         }
     }
 

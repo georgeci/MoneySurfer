@@ -143,49 +143,49 @@
 ## emulator-config
 - Title: Configuration
 - File: docs/testing/firebase-emulator.md
-- Lines: 112-138
+- Lines: 113-139
 - Tasks: testing, emulator, config
 
 ## emulator-fixtures
 - Title: Test fixtures and tagging
 - File: docs/testing/firebase-emulator.md
-- Lines: 199-264
+- Lines: 200-265
 - Tasks: testing, emulator, kotest, gradle
 
 ## emulator-install
 - Title: Install
 - File: docs/testing/firebase-emulator.md
-- Lines: 62-71
+- Lines: 63-72
 - Tasks: testing, emulator, setup
 
 ## emulator-jvm-bootstrap
 - Title: JVM Firebase bootstrap
 - File: docs/testing/firebase-emulator.md
-- Lines: 346-373
+- Lines: 347-374
 - Tasks: testing, emulator, jvm, gitlive
 
 ## emulator-maestro
 - Title: Maestro against the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 266-344
+- Lines: 267-345
 - Tasks: testing, emulator, maestro, android, ios
 
 ## emulator-run
 - Title: Run, reset, stop
 - File: docs/testing/firebase-emulator.md
-- Lines: 73-110
+- Lines: 74-111
 - Tasks: testing, emulator, scripts
 
 ## emulator-switch
 - Title: Switching the app to the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 140-197
+- Lines: 141-198
 - Tasks: testing, emulator, configuration, build
 
 ## emulator-troubleshooting
 - Title: Troubleshooting
 - File: docs/testing/firebase-emulator.md
-- Lines: 375-428
+- Lines: 376-449
 - Tasks: testing, emulator, troubleshooting
 
 ## invites-discovery
@@ -287,7 +287,7 @@
 ## qa-runbook
 - Title: Setup
 - File: docs/testing/qa-runbook.md
-- Lines: 48-343
+- Lines: 49-376
 - Tasks: testing, qa, reports, tooling
 
 ## rules-bug-1
