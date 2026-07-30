@@ -52,6 +52,14 @@ READ WHEN:
 <!-- AI:SECTION id=room-schema-versioning task=persistence,room,migration -->
 ## Room schema versioning
 
+Scope: this section governs **`MoneySurferDatabase`** only. The app's other Room
+database, `SyncDatabase` in `sync/default`, deliberately keeps an unconditional
+`fallbackToDestructiveMigration(dropAllTables = true)` — see the comment on its
+`@Database` annotation. That is a live gap, not an endorsement: the outbox is called
+transient, but `pending_mutations` holds local writes that have not reached Firestore
+yet, so a release-build schema bump there drops them silently. Bringing it under this
+policy needs its own migrations and is tracked separately.
+
 **Frozen release baseline: schema version 36.** That is the version of
 `MoneySurferDatabase` shipping with the first MVP release, recorded in code as
 `MONEY_SURFER_DB_RELEASE_BASELINE_VERSION`. It is a historical marker, not a moving

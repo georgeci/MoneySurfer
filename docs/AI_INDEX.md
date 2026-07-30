@@ -269,7 +269,7 @@
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 31-51
+- Lines: 30-50
 - Tasks: persistence, room, firestore, datastore
 
 ## pr-check-fan-out
@@ -293,7 +293,7 @@
 ## room-schema-versioning
 - Title: Room schema versioning
 - File: docs/architecture/persistence.md
-- Lines: 53-96
+- Lines: 52-103
 - Tasks: persistence, room, migration
 
 ## rules-bug-1
