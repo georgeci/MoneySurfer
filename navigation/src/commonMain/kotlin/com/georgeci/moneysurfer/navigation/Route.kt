@@ -90,6 +90,14 @@ sealed interface Route : NavKey {
     @Serializable
     data object CategoriesManage : TopLevel
 
+    /**
+     * Standalone spending analytics. Every other surface built on the spend aggregates is a
+     * dashboard *widget*; this is the screen where the whole picture lives, so it is a destination
+     * of its own rather than a detail of the dashboard.
+     */
+    @Serializable
+    data object Insights : TopLevel
+
     @Serializable
     data object Budgets : TopLevel
 

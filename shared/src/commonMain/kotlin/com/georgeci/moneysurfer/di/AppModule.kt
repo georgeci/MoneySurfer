@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.feature.budget.di.BudgetModule
 import com.georgeci.moneysurfer.feature.category.di.CategoryModule
 import com.georgeci.moneysurfer.feature.dashboard.di.DashboardModule
 import com.georgeci.moneysurfer.feature.goal.di.GoalModule
+import com.georgeci.moneysurfer.feature.insights.di.InsightsModule
 import com.georgeci.moneysurfer.feature.login.di.LoginModule
 import com.georgeci.moneysurfer.feature.settings.di.SettingsModule
 import com.georgeci.moneysurfer.feature.transaction.di.TransactionModule
@@ -37,6 +38,7 @@ import org.koin.core.annotation.Module
         AccountModule::class,
         BudgetModule::class,
         GoalModule::class,
+        InsightsModule::class,
     ],
 )
 @ComponentScan("com.georgeci.moneysurfer")

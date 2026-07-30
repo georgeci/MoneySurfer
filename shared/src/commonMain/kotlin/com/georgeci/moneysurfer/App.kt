@@ -18,6 +18,7 @@ import com.georgeci.moneysurfer.feature.budget.budgetNavGraph
 import com.georgeci.moneysurfer.feature.category.categoryNavGraph
 import com.georgeci.moneysurfer.feature.dashboard.dashboardNavGraph
 import com.georgeci.moneysurfer.feature.goal.goalNavGraph
+import com.georgeci.moneysurfer.feature.insights.insightsNavGraph
 import com.georgeci.moneysurfer.feature.login.loginNavGraph
 import com.georgeci.moneysurfer.feature.settings.settingsNavGraph
 import com.georgeci.moneysurfer.feature.transaction.transactionNavGraph
@@ -76,6 +77,7 @@ fun App(
                     categoryNavGraph,
                     budgetNavGraph,
                     goalNavGraph,
+                    insightsNavGraph,
                     transactionNavGraph,
                     settingsNavGraph,
                 ),

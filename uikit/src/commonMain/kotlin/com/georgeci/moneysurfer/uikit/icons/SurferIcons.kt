@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Savings
@@ -102,6 +103,9 @@ object SurferIcons {
 
     val Dashboard: ImageVector get() = Icons.Filled.Dashboard
     val SwapHoriz: ImageVector get() = Icons.Filled.SwapHoriz
+
+    /** Analytics surfaces — the pie glyph, matching the category donut those screens lead with. */
+    val Insights: ImageVector get() = Icons.Filled.PieChart
 
     val Cloud: ImageVector get() = Icons.Filled.Cloud
     val LightMode: ImageVector get() = Icons.Filled.LightMode

@@ -8,6 +8,7 @@ import moneysurfer.navigation.generated.resources.nav_budgets
 import moneysurfer.navigation.generated.resources.nav_categories
 import moneysurfer.navigation.generated.resources.nav_dashboard
 import moneysurfer.navigation.generated.resources.nav_goals
+import moneysurfer.navigation.generated.resources.nav_insights
 import moneysurfer.navigation.generated.resources.nav_section_manage
 import moneysurfer.navigation.generated.resources.nav_settings
 import moneysurfer.navigation.generated.resources.nav_transactions
@@ -55,6 +56,7 @@ internal enum class TopLevelDestination(
         icon = SurferIcons.SwapHoriz,
         label = Res.string.nav_transactions,
     ),
+    Insights(Route.Insights, SurferIcons.Insights, Res.string.nav_insights),
     Budgets(Route.Budgets, SurferIcons.Savings, Res.string.nav_budgets),
     Goals(Route.Goals, SurferIcons.Flag, Res.string.nav_goals),
     Categories(
@@ -75,6 +77,7 @@ internal enum class TopLevelDestination(
         Dashboard -> current is Route.Dashboard
         Accounts -> current is Route.AccountsManage
         Transactions -> current is Route.TransactionsByAccount
+        Insights -> current is Route.Insights
         Budgets -> current is Route.Budgets
         Goals -> current is Route.Goals
         Categories -> current is Route.CategoriesManage

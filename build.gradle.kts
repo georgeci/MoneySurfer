@@ -340,6 +340,7 @@ dependencies {
     kover(projects.feature.budget)
     kover(projects.feature.category)
     kover(projects.feature.dashboard)
+    kover(projects.feature.insights)
     kover(projects.feature.settings)
     kover(projects.feature.transaction)
     kover(projects.feature.workspace)

@@ -1,0 +1,62 @@
+<resources>
+    <string name="insights_title">Аналитика</string>
+
+    <string name="insights_period_previous">Предыдущий период</string>
+    <string name="insights_period_next">Следующий период</string>
+    <string name="insights_period_mode_month">Месяц</string>
+    <string name="insights_period_mode_week">Неделя</string>
+    <string name="insights_period_week">Неделя %1$d</string>
+
+    <string name="insights_categories_title">Куда ушли деньги</string>
+    <string name="insights_categories_total">Расходы</string>
+    <string name="insights_categories_empty_center">Нет расходов</string>
+    <string name="insights_categories_empty_legend">В этом периоде расходов не было.</string>
+    <string name="insights_uncategorized">Без категории</string>
+    <string name="insights_category_share">%1$d% расходов</string>
+
+    <string name="insights_trend_title">Доходы и расходы</string>
+    <string name="insights_trend_months">Последние %1$d месяцев</string>
+    <string name="insights_trend_income">Доходы</string>
+    <string name="insights_trend_expense">Расходы</string>
+    <string name="insights_trend_column_a11y">%1$s %2$d: доходы %3$s, расходы %4$s</string>
+
+    <string name="insights_merchants_title">Основные продавцы</string>
+    <string name="insights_merchants_empty">Ни в одном расходе периода не указан продавец.</string>
+
+    <string name="insights_empty_title">В этом периоде ничего нет</string>
+    <string name="insights_empty_subtitle">Здесь появятся расходы, которые вы добавите.</string>
+
+    <string name="insights_currency_filtered_title">Учитывается только %1$s</string>
+    <string name="insights_currency_filtered_subtitle">Расходы этого периода были в %1$s. Историческая сумма остаётся в базовой валюте рабочей области: сохраняются только сегодняшние курсы, поэтому графики не учитывают её, а не переписывают прошлое при каждом изменении курса.</string>
+    <string name="insights_currency_excluded">Не учтено: %1$s</string>
+
+    <string-array name="insights_months">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+
+    <string-array name="insights_months_short">
+        <item>янв</item>
+        <item>фев</item>
+        <item>мар</item>
+        <item>апр</item>
+        <item>май</item>
+        <item>июн</item>
+        <item>июл</item>
+        <item>авг</item>
+        <item>сен</item>
+        <item>окт</item>
+        <item>ноя</item>
+        <item>дек</item>
+    </string-array>
+</resources>

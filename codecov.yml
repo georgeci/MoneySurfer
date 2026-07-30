@@ -151,6 +151,11 @@ component_management:
       paths:
         - feature/goal/**
 
+    - component_id: feature_insights
+      name: feature:insights
+      paths:
+        - feature/insights/**
+
     - component_id: feature_login
       name: feature:login
       paths:
