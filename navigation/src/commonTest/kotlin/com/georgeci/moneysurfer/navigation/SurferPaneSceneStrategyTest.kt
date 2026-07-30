@@ -1,10 +1,12 @@
 package com.georgeci.moneysurfer.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import com.georgeci.moneysurfer.uikit.window.SurferPane
 import com.georgeci.moneysurfer.uikit.window.SurferPaneRole
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 
@@ -72,6 +74,53 @@ class SurferPaneSceneStrategyTest : StringSpec({
         panes.keys shouldBe setOf("categories", "category-1")
     }
 
+    // Issue #391: the panes used to take whatever the Material directive defaulted to (360 dp).
+    "the list and panel panes ask for the widths the design specifies" {
+        (SurferPaneSceneStrategy.ListPanePreferredWidth in 270.dp..320.dp) shouldBe true
+        (SurferPaneSceneStrategy.InlinePanelPreferredWidth in 300.dp..340.dp) shouldBe true
+
+        // The width reaches the scaffold as entry metadata, under a key the delegate keeps
+        // internal — assert the value is carried rather than the spelling of the key.
+        listEntry("accounts").metadata.values shouldContain
+            SurferPaneSceneStrategy.ListPanePreferredWidth
+        extraEntry("add-transaction").metadata.values shouldContain
+            SurferPaneSceneStrategy.InlinePanelPreferredWidth
+    }
+
+    "an inline panel is the extra pane and stays dismissable" {
+        val panes = listOf(
+            listEntry("accounts"),
+            detailEntry("account-1"),
+            extraEntry("add-transaction"),
+        ).calculateSurferPanes()
+
+        panes shouldBe mapOf(
+            "accounts" to SurferPane(role = SurferPaneRole.List),
+            // The panel does not displace the account it was opened from, so the account keeps no
+            // back affordance of its own — its list is still beside it.
+            "account-1" to SurferPane(role = SurferPaneRole.Detail),
+            "add-transaction" to SurferPane(role = SurferPaneRole.Extra, hasPaneBackStack = true),
+        )
+    }
+
+    "a list pushed above an inline panel still gives the detail its back affordance" {
+        val panes = listOf(
+            listEntry("accounts"),
+            detailEntry("account-1"),
+            extraEntry("add-transaction"),
+            listEntry("transactions"),
+        ).calculateSurferPanes()
+
+        panes["account-1"] shouldBe SurferPane(
+            role = SurferPaneRole.Detail,
+            hasPaneBackStack = true,
+        )
+    }
+
+    "the extra pane draws no section chrome" {
+        SurferPane(role = SurferPaneRole.Extra).ownsSectionChrome shouldBe false
+    }
+
     "an empty back stack has no panes" {
         emptyList<NavEntry<String>>().calculateSurferPanes().shouldBeEmpty()
     }
@@ -83,5 +132,9 @@ private fun listEntry(key: String): NavEntry<String> =
 
 private fun detailEntry(key: String): NavEntry<String> =
     NavEntry(key = key, metadata = SurferPaneSceneStrategy.detailPane(), content = {})
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+private fun extraEntry(key: String): NavEntry<String> =
+    NavEntry(key = key, metadata = SurferPaneSceneStrategy.extraPane(), content = {})
 
 private fun plainEntry(key: String): NavEntry<String> = NavEntry(key = key, content = {})

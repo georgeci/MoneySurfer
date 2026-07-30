@@ -6,6 +6,7 @@ import androidx.compose.ui.test.SkikoComposeUiTest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
@@ -39,6 +40,7 @@ import com.georgeci.moneysurfer.feature.dashboard.SpentMonthUi
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 
 /**
  * Desktop UI cover for the dashboard widgets whose behaviour lives on the screen rather than in
@@ -103,6 +105,57 @@ class DashboardScreenStateTest : StringSpec({
                 DashboardEvent.OnAddTransactionClick,
                 DashboardEvent.OnTransferClick,
             )
+        }
+    }
+
+    "the balance card states the month delta as a sentence" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        formattedTrendDelta = TREND_DELTA,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("$TREND_DELTA this month").assertIsDisplayed()
+        }
+    }
+
+    "a converted total shows both its trend and how old the rates behind it are" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        formattedTrendDelta = TREND_DELTA,
+                        ratesAsOf = RATES_DATE,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            // The two used to share one footnote slot, where the staleness note won and the trend
+            // was never drawn for a multi-currency workspace.
+            onNodeWithText("$TREND_DELTA this month").assertIsDisplayed()
+            onNodeWithText(RATES_NOTE).assertIsDisplayed()
+        }
+    }
+
+    "an empty balance drops the trend rather than pairing a delta with a dash" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 0, transferEnabled = true).copy(
+                        formattedTotalBalance = null,
+                        formattedTrendDelta = TREND_DELTA,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("$TREND_DELTA this month").assertDoesNotExist()
+            onNodeWithText(BALANCE_EMPTY).assertIsDisplayed()
         }
     }
 
@@ -266,6 +319,69 @@ class DashboardScreenStateTest : StringSpec({
             onNodeWithText("of $SPENT_MONTH_CAP budget").assertIsDisplayed()
             onNodeWithText("\u221218% vs last").assertIsDisplayed()
         }
+    }
+
+    "a month that outspent the last one is labelled as a rise" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = spentMonthUi(SpentMonthDeltaUi(trend = SpendTrend.Up, percent = 24)),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("+24% vs last").assertIsDisplayed()
+        }
+    }
+
+    "a month in line with the last one says so instead of printing a zero" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        spentMonth = spentMonthUi(SpentMonthDeltaUi(trend = SpendTrend.Flat, percent = 0)),
+                        layout = SPENT_MONTH_ONLY,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("In line with last").assertIsDisplayed()
+            onNodeWithText("+0% vs last").assertDoesNotExist()
+        }
+    }
+
+    "the compact spent-this-month card is shorter than the expanded one" {
+        var expandedHeight = 0f
+        var compactHeight = 0f
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true)
+                        .copy(spentMonth = spentMonthUi(), layout = SPENT_MONTH_ONLY),
+                    onEvent = {},
+                )
+            }
+            val bounds = onNodeWithTag(DashboardTestTags.SpentMonth).getUnclippedBoundsInRoot()
+            expandedHeight = (bounds.bottom - bounds.top).value
+        }
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true)
+                        .copy(spentMonth = spentMonthUi(), layout = SPENT_MONTH_ONLY_COMPACT),
+                    onEvent = {},
+                )
+            }
+            val bounds = onNodeWithTag(DashboardTestTags.SpentMonth).getUnclippedBoundsInRoot()
+            compactHeight = (bounds.bottom - bounds.top).value
+        }
+
+        // The size the user picked has to change the card's footprint, not only its typography.
+        (compactHeight < expandedHeight) shouldBe true
     }
 
     "with no budget the spent-this-month card says so rather than inventing a limit" {
@@ -510,6 +626,80 @@ class DashboardScreenStateTest : StringSpec({
             onNodeWithText("Uncategorized").assertIsDisplayed()
         }
     }
+
+    "the donut names its segments and states the period total in the middle" {
+        runPhoneUiTest {
+            setContent { DashboardContent(state = categoriesDonutState(), onEvent = {}) }
+
+            onNodeWithTag(DashboardTestTags.CategoriesDonut).assertIsDisplayed()
+            onNodeWithText("Groceries").assertIsDisplayed()
+            onNodeWithText("Rent").assertIsDisplayed()
+            // The centre is the period's own total, not the top segment repeated from the legend.
+            onNodeWithText("Spent").assertIsDisplayed()
+            onNodeWithText(DONUT_TOTAL).assertIsDisplayed()
+        }
+    }
+
+    "the hero donut legend keeps five rows and the compact one three" {
+        val segments = List(SIX_SEGMENTS) { index ->
+            categorySpendUi(categoryId = "c-$index", name = "Category $index", share = 1f / SIX_SEGMENTS)
+        }
+
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = categoriesDonutState(DashboardWidgetSize.Expanded).copy(spentByCategory = segments),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("Category 4").assertIsDisplayed()
+            onNodeWithText("Category 5").assertDoesNotExist()
+        }
+
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = categoriesDonutState(DashboardWidgetSize.Compact).copy(spentByCategory = segments),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("Category 2").assertIsDisplayed()
+            onNodeWithText("Category 3").assertDoesNotExist()
+        }
+    }
+
+    "spend with no category is a segment of the donut with a name, not a gap" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = categoriesDonutState().copy(
+                        spentByCategory = listOf(
+                            categorySpendUi(categoryId = null, name = null, hue = null, share = 1f),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("Uncategorized").assertIsDisplayed()
+        }
+    }
+
+    "a period with no spend keeps the donut and says so, rather than leaving a gap" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = categoriesDonutState().copy(spentByCategory = emptyList(), spentByCategoryTotal = null),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.CategoriesDonut).assertIsDisplayed()
+            onNodeWithText("No spend").assertIsDisplayed()
+        }
+    }
 })
 
 /**
@@ -531,6 +721,10 @@ private const val PHONE_HEIGHT_PX = 891f
 
 private const val ADD_TRANSACTION = "Add transaction"
 private const val TRANSFER = "Transfer"
+private const val TREND_DELTA = "+€412.00"
+private const val RATES_DATE = "2026-07-29"
+private const val RATES_NOTE = "Converted at rates from $RATES_DATE · exchangerate-api.com"
+private const val BALANCE_EMPTY = "Add your first account to see balance."
 private const val SAFE_TO_SPEND_REMAINDER = "€642.30"
 private const val SAFE_TO_SPEND_LIMIT = "€1,800.00"
 private const val SAFE_TO_SPEND_DAYS_LEFT = "12 days left"
@@ -560,6 +754,20 @@ private const val SPENT_MONTH_CAP = "\u20ac1,800.00"
 /** The spent-this-month card alone, for the same reason [BURN_RATE_ONLY] pins the burn rate. */
 private val SPENT_MONTH_ONLY = DashboardLayoutConfig(
     items = listOf(DashboardLayoutItem(type = DashboardWidgetType.SpentMonth)),
+)
+
+/** The same card at the other density, for the footprint comparison. */
+private val SPENT_MONTH_ONLY_COMPACT = DashboardLayoutConfig(
+    items = listOf(
+        DashboardLayoutItem(type = DashboardWidgetType.SpentMonth, cardStyle = DashboardCardStyle.COMPACT),
+    ),
+)
+
+private fun spentMonthUi(delta: SpentMonthDeltaUi? = null) = SpentMonthUi(
+    spentFormatted = SPENT_MONTH_AMOUNT,
+    capFormatted = SPENT_MONTH_CAP,
+    progress = 0.65f,
+    delta = delta,
 )
 
 /**
@@ -676,6 +884,32 @@ private fun spentByCategoryState(variant: SurferSpentByCategoryVariant) =
             ),
         ),
     )
+
+/**
+ * The donut alone, for the same reason [spentByCategoryState] draws its card alone: the whole
+ * default layout is taller than the test window, and a widget below the fold never composes.
+ */
+private fun categoriesDonutState(size: DashboardWidgetSize = DashboardWidgetSize.Expanded) =
+    contentWith(accounts = 2, transferEnabled = true).copy(
+        spentByCategory = listOf(
+            categorySpendUi(categoryId = "c-groceries", name = "Groceries", share = 0.4f),
+            categorySpendUi(categoryId = "c-rent", name = "Rent", hue = 258, spent = RENT_SPEND, share = 0.6f),
+        ),
+        spentByCategoryTotal = DONUT_TOTAL,
+        layout = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(
+                    type = DashboardWidgetType.CategoriesDonut,
+                    cardStyle = DashboardCardStyle(size = size),
+                ),
+            ),
+        ),
+    )
+
+private const val DONUT_TOTAL = "€902.10"
+
+/** One more than the hero legend keeps, so both row counts are a visible cut rather than the list. */
+private const val SIX_SEGMENTS = 6
 
 private fun contentWith(accounts: Int, transferEnabled: Boolean) = DashboardState.Content(
     accounts = List(accounts) { index ->

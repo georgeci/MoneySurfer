@@ -122,16 +122,21 @@ data class DashboardLayoutConfig(
         /**
          * Variant A from the design: the balance headline first, the quick actions under it, the
          * month's spend against its budget, then safe-to-spend, the burn rate that explains it, the
-         * budgets both are read off, where the period's money went, the accounts strip, the
-         * generated insights, goals, and the recent-transactions list. Every widget starts enabled
-         * and Hero-sized.
+         * budgets both are read off, where the period's money went, the accounts strip, the same
+         * spend as a donut, the generated insights, goals, and the recent-transactions list. Every
+         * widget starts enabled and Hero-sized.
          *
          * The spans are that same order read as the desktop mock's bands: a hero balance beside the
          * shortcuts, the spent-this-month band full width under them, a row of three stat cards, the
-         * spend chart with the accounts rail next to it, insights and goals paired, and the activity
-         * list full width at the bottom. Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so
-         * the default grid has no gaps — which is also why the new band takes a whole row rather
-         * than a share of an existing one.
+         * spend chart with the accounts rail next to it, the donut on a band of its own, insights and
+         * goals paired, and the activity list full width at the bottom. Each row sums to
+         * [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
+         *
+         * Both new bands take [DashboardWidgetSpan.Full] for the same reason: it is the only span
+         * that seats a widget without renarrowing the cards around it, which would have changed the
+         * default dashboard of every user who never opened the customize screen. The donut is also a
+         * wide row by nature (chart beside legend), and the spent-this-month card is the headline
+         * figure the rest of the spend band is read against.
          */
         val DEFAULT = DashboardLayoutConfig(
             items = listOf(
@@ -143,6 +148,7 @@ data class DashboardLayoutConfig(
                 DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),
                 DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),
                 DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.CategoriesDonut, span = DashboardWidgetSpan.Full),
                 DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),

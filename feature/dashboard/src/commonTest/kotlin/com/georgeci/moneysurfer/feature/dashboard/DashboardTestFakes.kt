@@ -52,6 +52,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetDailySpendSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
@@ -168,6 +169,7 @@ internal fun newViewModel(
             clock = ClockUseCase(FixedClock(INSIGHTS_TODAY.atStartOfDayIn(TimeZone.UTC))),
         ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
+        getMonthlyNetHistory = GetMonthlyNetHistoryUseCase(spendAnalytics, workspaces, session, clock),
         uiPreferences = uiPreferences,
         hostCapabilities = hostCapabilities,
     )

@@ -59,6 +59,7 @@ class RouteSerializationTest : FunSpec({
                 showTransferShortcut = true,
             ),
             Route.TransactionsByAccount(accountId = "a-1"),
+            Route.AccountTransactionCreation(accountId = "a-1"),
             Route.TransactionCreation(
                 transactionId = "t-1",
                 accountId = "a-1",

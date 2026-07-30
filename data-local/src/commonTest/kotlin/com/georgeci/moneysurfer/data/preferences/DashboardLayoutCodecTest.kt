@@ -34,6 +34,7 @@ class DashboardLayoutCodecTest : StringSpec({
                 DashboardLayoutItem(DashboardWidgetType.BurnRate),
                 DashboardLayoutItem(DashboardWidgetType.Budgets),
                 DashboardLayoutItem(DashboardWidgetType.SpentByCategory),
+                DashboardLayoutItem(DashboardWidgetType.CategoriesDonut),
                 DashboardLayoutItem(DashboardWidgetType.Insights),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),
             ),
@@ -79,6 +80,7 @@ class DashboardLayoutCodecTest : StringSpec({
             DashboardWidgetType.Budgets,
             DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.CategoriesDonut,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )

@@ -86,9 +86,11 @@ class DashboardGridScreenTest : StringSpec({
             val spentMonth = onNodeWithTag(DashboardTestTags.SpentMonth).getUnclippedBoundsInRoot()
             val quickActions = onNodeWithTag(DashboardTestTags.QuickActions).getUnclippedBoundsInRoot()
 
-            // Spent-this-month is the first Full-span widget in the default layout, so it starts the
-            // band under the hero row rather than joining it. Read against a neighbour near the top
-            // of the column: a widget far enough down the grid is never composed to be measured.
+            // Spent-this-month is the first Full-span widget in the default layout, so it starts
+            // the band under the hero row rather than joining it. Read against a neighbour near the
+            // top of the column rather than the last Full widget: the grid is lazy, and with the
+            // donut and the spent-month band added the bottom of the default layout is no longer
+            // composed at this window height.
             (spentMonth.top >= quickActions.bottom) shouldBe true
             (spentMonth.width > quickActions.width) shouldBe true
         }
@@ -113,7 +115,12 @@ private const val PHONE_WIDTH_PX = 411f
 /** The 1360 dp desktop window the design is drawn at. */
 private const val DESKTOP_WIDTH_PX = 1360f
 
-private const val WINDOW_HEIGHT_PX = 900f
+/**
+ * Tall enough for the whole default layout to be composed at once. The grid is lazy, so a widget
+ * below the fold has no node to read bounds off — and these tests are about where widgets land
+ * relative to each other, not about what fits a real window.
+ */
+private const val WINDOW_HEIGHT_PX = 1600f
 
 /** Column widths are integer pixels, so two "equal" cells can differ by a rounding step. */
 private val ROUNDING_SLACK = 2.dp

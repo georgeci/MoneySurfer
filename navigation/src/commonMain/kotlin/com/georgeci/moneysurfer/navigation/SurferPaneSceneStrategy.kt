@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
@@ -15,6 +17,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneStrategy
@@ -22,15 +26,37 @@ import androidx.navigation3.scene.SceneStrategyScope
 import com.georgeci.moneysurfer.uikit.window.LocalSurferPane
 import com.georgeci.moneysurfer.uikit.window.SurferPane
 import com.georgeci.moneysurfer.uikit.window.SurferPaneRole
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
+
+/** Horizontal partitions the scaffold is allowed when the inline panel is on screen. */
+private const val InlinePanelPartitions = 3
 
 /**
  * Creates and remembers the app's [SurferPaneSceneStrategy].
+ *
+ * Two delegates rather than one: the Material directive derived from the window caps the scaffold
+ * at two horizontal partitions (its default breakpoint set stops at Expanded, so the third
+ * partition it would grant a Large window never materialises), and raising that cap unconditionally
+ * would hand every section a third column it has nothing to put in. The wider directive is
+ * therefore used only for the scenes that actually carry an inline panel.
  */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun <T : Any> rememberSurferPaneSceneStrategy(): SurferPaneSceneStrategy<T> {
-    val delegate = rememberListDetailSceneStrategy<T>()
-    return remember(delegate) { SurferPaneSceneStrategy(delegate) }
+    val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
+    val delegate = rememberListDetailSceneStrategy<T>(directive = directive)
+    val inlinePanelDelegate = rememberListDetailSceneStrategy<T>(
+        directive = directive.copy(maxHorizontalPartitions = InlinePanelPartitions),
+    )
+    val inlinePanelSupported = currentSurferWindowSize() >= SurferWindowSize.Large
+    return remember(delegate, inlinePanelDelegate, inlinePanelSupported) {
+        SurferPaneSceneStrategy(
+            delegate = delegate,
+            inlinePanelDelegate = inlinePanelDelegate,
+            inlinePanelSupported = inlinePanelSupported,
+        )
+    }
 }
 
 /**
@@ -48,13 +74,31 @@ fun <T : Any> rememberSurferPaneSceneStrategy(): SurferPaneSceneStrategy<T> {
  * Below the two-pane breakpoint the delegate declines the scene (it is constructed with
  * `shouldHandleSinglePaneLayout = false`), this strategy declines with it, and nothing above is
  * applied — compact-width behaviour is untouched, down to the composition local's default.
+ *
+ * @param inlinePanelDelegate the delegate used for scenes carrying an [extraPane] entry, which
+ *   needs a third horizontal partition the plain [delegate] does not grant.
+ * @param inlinePanelSupported whether the window is wide enough for that third column. Below it an
+ *   [extraPane] entry makes this strategy decline the whole scene, so the panel falls through to
+ *   the next strategy and renders as the full-screen route it is on a phone.
  */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 class SurferPaneSceneStrategy<T : Any>(
     private val delegate: ListDetailSceneStrategy<T>,
+    private val inlinePanelDelegate: ListDetailSceneStrategy<T> = delegate,
+    private val inlinePanelSupported: Boolean = false,
 ) : SceneStrategy<T> {
 
     override fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>? {
+        val roles = entries.surferPaneGroup().mapNotNull { it.declaredPaneRole() }
+        val hasInlinePanel = SurferPaneRole.Extra in roles
+        // The panel is the third column of a list + detail + panel layout. Anything less — a
+        // narrow window, or a panel opened without both of the others behind it — has no place to
+        // put it, and it is better off as the full-screen form it already is everywhere else.
+        val panelFits = inlinePanelSupported &&
+            SurferPaneRole.List in roles &&
+            SurferPaneRole.Detail in roles
+        if (hasInlinePanel && !panelFits) return null
+
         val panes = entries.calculateSurferPanes()
         val decorated = entries.map { entry ->
             val pane = panes[entry.contentKey] ?: return@map entry
@@ -62,11 +106,21 @@ class SurferPaneSceneStrategy<T : Any>(
                 CompositionLocalProvider(LocalSurferPane provides pane) { entry.Content() }
             }
         }
-        val scene = calculateScene(delegate, decorated) ?: return null
+        val strategy = if (hasInlinePanel) inlinePanelDelegate else delegate
+        val scene = calculateScene(strategy, decorated) ?: return null
         return SurferPaneScene(delegate = scene, originals = entries.associateBy { it.contentKey })
     }
 
     companion object {
+        /**
+         * Preferred width of a list pane, pinned to the design's 270–320 dp range (wireframe 270,
+         * hi-fi 300, direction D 320) instead of the 360 dp the Material directive defaults to.
+         */
+        val ListPanePreferredWidth: Dp = 300.dp
+
+        /** Preferred width of an [extraPane], from the design's 300–340 dp add-panel column. */
+        val InlinePanelPreferredWidth: Dp = 340.dp
+
         /**
          * Marks a [NavEntry] as the list pane of a list-detail layout, showing [detailPlaceholder]
          * beside it while nothing is selected.
@@ -76,12 +130,26 @@ class SurferPaneSceneStrategy<T : Any>(
             detailPlaceholder: @Composable ThreePaneScaffoldScope.() -> Unit = {},
         ): Map<String, Any> =
             ListDetailSceneStrategy.listPane(detailPlaceholder = detailPlaceholder) +
+                ListDetailSceneStrategy.preferredPaneSize(width = ListPanePreferredWidth) +
                 (PaneRoleKey to SurferPaneRole.List)
 
         /** Marks a [NavEntry] as a detail pane of a list-detail layout. */
         @OptIn(ExperimentalMaterial3AdaptiveApi::class)
         fun detailPane(): Map<String, Any> =
             ListDetailSceneStrategy.detailPane() + (PaneRoleKey to SurferPaneRole.Detail)
+
+        /**
+         * Marks a [NavEntry] as the inline panel displayed beside the detail pane it was opened
+         * from — the design's "inline add panel (no modal)" (issue #391).
+         *
+         * Only honoured on a window wide enough for three columns, and only on top of a full list
+         * plus detail stack; everywhere else the entry is presented as an ordinary route.
+         */
+        @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+        fun extraPane(): Map<String, Any> =
+            ListDetailSceneStrategy.extraPane() +
+                ListDetailSceneStrategy.preferredPaneSize(width = InlinePanelPreferredWidth) +
+                (PaneRoleKey to SurferPaneRole.Extra)
 
         /**
          * Our own copy of the pane role. The delegate's metadata carries the same information, but
@@ -101,22 +169,36 @@ class SurferPaneSceneStrategy<T : Any>(
  * [SurferPane] — a detail pane with nothing beside it still needs its own chrome to be usable.
  */
 internal fun <T : Any> List<NavEntry<T>>.calculateSurferPanes(): Map<Any, SurferPane> {
-    val group = takeLastWhile { it.declaredPaneRole() != null }
+    val group = surferPaneGroup()
     if (group.none { it.declaredPaneRole() == SurferPaneRole.List }) return emptyMap()
     var detailSeen = false
     return group.mapIndexed { index, entry ->
         val role = requireNotNull(entry.declaredPaneRole())
-        // Only a detail pane ever gives up its back affordance, and only when popping would do
-        // nothing but swap it for the placeholder. It keeps one if there is an earlier detail to
-        // return to, or *any* entry stacked above it — a list route can be pushed from a detail
-        // (Accounts' "See all" pushes the transactions list), which leaves the detail displayed
-        // beside a list that is not its own, and that still needs a way out.
-        val hasBackStack =
-            role == SurferPaneRole.Detail && (detailSeen || index < group.lastIndex)
+        val hasBackStack = when (role) {
+            // Dismissing the panel leaves the list and the detail it was opened from on screen,
+            // so its affordance always goes somewhere.
+            SurferPaneRole.Extra -> true
+            // A detail pane gives up its back affordance when popping would do nothing but swap
+            // it for the placeholder. It keeps one if there is an earlier detail to return to, or
+            // an entry stacked above it that displaced its own list — a list route can be pushed
+            // from a detail (Accounts' "See all" pushes the transactions list), which leaves the
+            // detail beside a list that is not its own, and that still needs a way out. An inline
+            // panel stacked above it does not displace anything and does not count.
+            SurferPaneRole.Detail -> detailSeen || group.displacesFrom(index)
+            SurferPaneRole.List, SurferPaneRole.Single -> false
+        }
         if (role == SurferPaneRole.Detail) detailSeen = true
         entry.contentKey to SurferPane(role = role, hasPaneBackStack = hasBackStack)
     }.toMap()
 }
+
+/** The entries [ListDetailSceneStrategy] will group into one scaffold, oldest first. */
+private fun <T : Any> List<NavEntry<T>>.surferPaneGroup(): List<NavEntry<T>> =
+    takeLastWhile { it.declaredPaneRole() != null }
+
+/** Whether any entry above [index] takes the place of the pane at [index]. */
+private fun <T : Any> List<NavEntry<T>>.displacesFrom(index: Int): Boolean =
+    (index + 1..lastIndex).any { this[it].declaredPaneRole() != SurferPaneRole.Extra }
 
 private fun NavEntry<*>.declaredPaneRole(): SurferPaneRole? =
     metadata[SurferPaneSceneStrategy.PaneRoleKey] as? SurferPaneRole

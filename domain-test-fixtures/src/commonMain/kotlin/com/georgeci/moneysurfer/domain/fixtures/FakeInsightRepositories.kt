@@ -76,19 +76,22 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
 }
 
 /**
- * Canned spend rollups. The seeded queries are shaped by what their callers need to assert:
+ * Canned spend rollups. The three seeded queries are shaped by what their callers need to assert:
  *
  * - [byCategory] answers from [slicesByWindow], keyed by the scope's window, because the insight
  *   rules ask it twice with two different windows and the whole point of the assertion is that the
  *   two answers are compared. A window with no entry returns nothing, which is what an empty period
  *   looks like.
- * - [netByMonth] answers from [monthlyNetsByWindow], keyed the same way and for the same reason: the
- *   spent-this-month card asks it twice, once for the month to date and once for the same stretch of
- *   the month before, and the assertion is that the two are compared like with like.
  * - [daily] answers from one seeded list but applies the scope's window the way the SQL does, so a
  *   caller that asks for the wrong week sees the wrong days here too rather than being handed its
  *   seed back whole. The burn rate derives both its chart and its month-to-date from a single
  *   window, so getting that window wrong has to be visible.
+ * - [netByMonth] answers from two seeds, because its callers ask two different shapes of question.
+ *   [nets] keeps the months the scope's window covers, so a balance curve folded over the wrong
+ *   months is short here too. [monthlyNetsByWindow] is keyed by the exact window, which is what a
+ *   caller reading *part* of a month needs: the spent-this-month card compares 1..20 April against
+ *   1..20 March, and a month-granular seed cannot tell those two from the whole months. A window
+ *   the map does not carry falls through to [nets].
  *
  * All three record the scopes they were asked for; the remaining queries return nothing, since
  * nothing reads them yet.
@@ -96,6 +99,7 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
 class FakeSpendAnalyticsRepository(
     private val slicesByWindow: Map<TransactionPeriodWindow, List<CategorySpendSlice>> = emptyMap(),
     daily: List<DailySpendPoint> = emptyList(),
+    private val nets: List<MonthlyNet> = emptyList(),
     private val monthlyNetsByWindow: Map<TransactionPeriodWindow, List<MonthlyNet>> = emptyMap(),
 ) : SpendAnalyticsRepository {
 
@@ -107,7 +111,7 @@ class FakeSpendAnalyticsRepository(
     /** The same record for [daily]. */
     val dailyScopes: MutableList<SpendScope> = mutableListOf()
 
-    /** The same record for [netByMonth] — the two windows it is asked for are worth asserting on. */
+    /** The same record for [netByMonth] — the windows it is asked for are worth asserting on. */
     val netByMonthScopes: MutableList<SpendScope> = mutableListOf()
 
     fun setDaily(points: List<DailySpendPoint>) {
@@ -121,7 +125,11 @@ class FakeSpendAnalyticsRepository(
 
     override fun netByMonth(scope: SpendScope): Flow<List<MonthlyNet>> {
         netByMonthScopes += scope
-        return flowOf(monthlyNetsByWindow[scope.window].orEmpty())
+        // An exact-window seed wins where one was given; otherwise a month counts when its first
+        // day is inside the window — the all-or-nothing call the real query's month-boundary
+        // contract lets whole-month callers assume.
+        monthlyNetsByWindow[scope.window]?.let { return flowOf(it) }
+        return flowOf(nets.filter { it.month.firstDay in scope.window }.sortedBy { it.month })
     }
 
     override fun daily(scope: SpendScope): Flow<List<DailySpendPoint>> {

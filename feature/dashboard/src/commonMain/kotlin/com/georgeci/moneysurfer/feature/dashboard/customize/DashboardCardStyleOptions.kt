@@ -17,9 +17,11 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_spa
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_third
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_two_thirds
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_summary
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_chart
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_classic
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_inline
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_minimal
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_split
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_stacked
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_carousel
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_list
@@ -32,6 +34,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_wid
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_balance
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_budgets
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_burn_rate
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_categories_donut
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_insights
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
@@ -66,6 +69,7 @@ internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> 
     DashboardWidgetType.SafeToSpend,
     DashboardWidgetType.BurnRate,
     DashboardWidgetType.Budgets,
+    DashboardWidgetType.CategoriesDonut,
     DashboardWidgetType.Accounts,
     DashboardWidgetType.Goals,
     DashboardWidgetType.RecentTransactions,
@@ -96,6 +100,8 @@ private fun SurferBalanceVariant.labelResource(): StringResource = when (this) {
     SurferBalanceVariant.Stacked -> Res.string.dashboard_customize_variant_balance_stacked
     SurferBalanceVariant.Inline -> Res.string.dashboard_customize_variant_balance_inline
     SurferBalanceVariant.Minimal -> Res.string.dashboard_customize_variant_balance_minimal
+    SurferBalanceVariant.Split -> Res.string.dashboard_customize_variant_balance_split
+    SurferBalanceVariant.Chart -> Res.string.dashboard_customize_variant_balance_chart
 }
 
 /** Same deal as [BALANCE_VARIANTS]: built from the enum the widget itself switches on. */
@@ -179,6 +185,7 @@ internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.BurnRate -> Res.string.dashboard_customize_widget_burn_rate
     DashboardWidgetType.Budgets -> Res.string.dashboard_customize_widget_budgets
     DashboardWidgetType.SpentByCategory -> Res.string.dashboard_customize_widget_spent_by_category
+    DashboardWidgetType.CategoriesDonut -> Res.string.dashboard_customize_widget_categories_donut
     DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
     DashboardWidgetType.Insights -> Res.string.dashboard_customize_widget_insights
     DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals

@@ -18,7 +18,7 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
-import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceTrend
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
@@ -47,6 +47,18 @@ import org.robolectric.annotation.GraphicsMode
 /** The dashboard's minimum widget height — see `DASHBOARD_WIDGET_MIN_HEIGHT` in `:feature:dashboard`. */
 private val WidgetEmptyStateHeight = 180.dp
 
+/**
+ * Six months of balance, the way the dashboard feeds the card. How much room each treatment gives
+ * the curve is half of what tells the six of them apart, so every capture carries one.
+ */
+private val BalanceTrend = SurferBalanceTrend(
+    text = "+€412 this month",
+    series = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f),
+)
+
+/** Hero balance cards that fit in one capture. Three of the tallest treatment clear 891dp. */
+private const val VariantsPerCapture = 3
+
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [ScreenshotSdk], qualifiers = ScreenshotQualifiers)
@@ -64,26 +76,35 @@ class SurferWidgetScreenshotTest {
                     balance = "€11,575.32",
                     modifier = Modifier.fillMaxWidth(),
                     size = size,
-                    footnote = SurferBalanceFootnote.Trend("+€412 this month"),
+                    trend = BalanceTrend,
                 )
             }
         }
     }
 
+    /**
+     * Captured in chunks rather than as one gallery: a wrapping capture is still cropped to the
+     * device height, and six hero cards carrying a curve do not fit in one. Chunking keeps every
+     * treatment in a reference image — one gallery silently lost the last two.
+     */
     @Test
-    fun surferBalanceWidgetVariants() = captureLightAndDark("surfer_balance_widget_variants") {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SurferBalanceVariant.entries.forEach { variant ->
-                SurferBalanceWidget(
-                    title = "Total balance",
-                    balance = "€11,575.32",
-                    modifier = Modifier.fillMaxWidth(),
-                    variant = variant,
-                    footnote = SurferBalanceFootnote.Trend("+€412 this month"),
-                )
+    fun surferBalanceWidgetVariants() {
+        SurferBalanceVariant.entries.chunked(VariantsPerCapture).forEachIndexed { index, variants ->
+            captureLightAndDark("surfer_balance_widget_variants_${index + 1}") {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    variants.forEach { variant ->
+                        SurferBalanceWidget(
+                            title = "Total balance",
+                            balance = "€11,575.32",
+                            modifier = Modifier.fillMaxWidth(),
+                            variant = variant,
+                            trend = BalanceTrend,
+                        )
+                    }
+                }
             }
         }
     }
