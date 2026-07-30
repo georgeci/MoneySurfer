@@ -158,6 +158,19 @@ sealed interface Route : NavKey {
         val transfer: Boolean = false,
     ) : Route
 
+    /**
+     * Adding a transaction from an account's detail pane — the same screen and the same ViewModel
+     * as [TransactionCreation], reached through its own route only so the pane host can present it
+     * as the design's inline add panel beside the account (issue #391).
+     *
+     * It cannot simply be [TransactionCreation] with different metadata: a nav entry declares its
+     * pane once, for every caller, and the transactions list opens the very same form *as* its
+     * detail pane. Below the three-column breakpoint this route behaves exactly like
+     * [TransactionCreation] — same full-screen form, same state.
+     */
+    @Serializable
+    data class AccountTransactionCreation(val accountId: String) : Route
+
     @Serializable
     data class AccountDetails(val accountId: String) : Route
 
