@@ -65,7 +65,10 @@ data class SurferPaneAction(
  */
 object SurferPaneTestTags {
 
-    /** On the [SurferToolbar] branch of [SurferPaneTopBar] only — never on the pane header. */
+    /**
+     * On the [SurferToolbar] branch of [SurferPaneTopBar] only — never on the pane header. A
+     * caller that tags the top bar through its own `modifier` overrides this one.
+     */
     const val TopAppBar = "pane:topAppBar"
 
     /**
@@ -151,6 +154,9 @@ fun SurferPaneTopBar(
     if (pane.ownsSectionChrome) {
         SurferToolbar(
             title = title,
+            // Appended, not prepended: for one semantics key the *earlier* modifier in the chain
+            // wins, so a screen that tagged its own top bar keeps that tag and this is only the
+            // default — the same precedence [SurferPaneAction.testTag] gets over the FAB tag.
             modifier = modifier.testTag(SurferPaneTestTags.TopAppBar),
             onBack = onBack,
             colors = colors,

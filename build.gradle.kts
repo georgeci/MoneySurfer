@@ -195,6 +195,16 @@ val coverageExcludedProjects = setOf(
     ":detekt-rules",
 )
 
+// Process entry points, module-relative, excluded from coverage but not from analysis.
+//
+// `main()` hands control to the AWT event loop and never returns, so no unit test can execute a
+// line of it — Sonar would otherwise score every edit to the desktop host's startup at 0% on new
+// code. Scoped to the one file rather than the module: everything else in `:composeApp`, the
+// desktop UI tests included, stays measured.
+val entryPointSources = mapOf(
+    ":composeApp" to listOf("src/jvmMain/kotlin/com/georgeci/moneysurfer/main.kt"),
+)
+
 // Modules that compile the shared Roborazzi harness from `gradle/screenshot-harness/` into their
 // host-test source set (see gradle/screenshot-tests.gradle.kts). That directory sits outside every
 // module's `src/`, so detekt has to be pointed at it explicitly — once per module that actually
@@ -304,7 +314,8 @@ subprojects {
             // the day a module starts using one.
             val coverageExclusions = when {
                 path in coverageExcludedProjects -> listOf("**/*")
-                else -> mainDirs.filter { it.startsWith("src/ios") }.map { "$it/**/*" }
+                else -> mainDirs.filter { it.startsWith("src/ios") }.map { "$it/**/*" } +
+                    entryPointSources.getOrElse(path) { emptyList() }
             }
             if (coverageExclusions.isNotEmpty()) {
                 property("sonar.coverage.exclusions", coverageExclusions.joinToString(","))

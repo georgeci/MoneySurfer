@@ -353,7 +353,7 @@
 ## screenshot-tests
 - Title: Two kinds of capture
 - File: docs/testing/screenshot-tests.md
-- Lines: 35-245
+- Lines: 36-267
 - Tasks: testing, uikit, screenshot, roborazzi
 
 ## security-audit-2026-07

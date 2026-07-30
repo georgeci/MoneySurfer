@@ -2,6 +2,7 @@
 
 package com.georgeci.moneysurfer
 
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -26,10 +27,11 @@ fun main() {
             title = "MoneySurfer",
         ) {
             // Swing has no minimum-size concept in Compose's window state, so it is set on the
-            // AWT window itself. Below this the app is a phone layout in a desktop frame, which
+            // AWT window itself — from a `SideEffect`, which is where a composition is allowed to
+            // touch host objects. Below this the app is a phone layout in a desktop frame, which
             // is a valid thing to see but not a sane thing to open at, and the drawer plus two
             // panes stop fitting well before it.
-            window.minimumSize = MinimumWindowSize
+            SideEffect { window.minimumSize = MinimumWindowSize }
             App()
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.v2.runComposeUiTest
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTestTags
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.window.LocalSurferPane
 import com.georgeci.moneysurfer.uikit.window.SurferPane
@@ -63,8 +65,13 @@ class SurferPaneChromeTest : StringSpec({
             setContent {
                 ExpandedWindow {
                     TwoPaneSection {
-                        Pane(SurferPaneRole.Extra, "Add transaction") {
-                            Text("Panel content")
+                        // Sized like the real panel column: a `Row` measures its non-weighted
+                        // children first, so an unsized panel would eat every pixel the detail
+                        // pane's `weight` was supposed to get and lay it out at zero width.
+                        Row(modifier = Modifier.width(INLINE_PANEL_WIDTH.dp).fillMaxHeight()) {
+                            Pane(SurferPaneRole.Extra, "Add transaction") {
+                                Text("Panel content")
+                            }
                         }
                     }
                 }
@@ -87,6 +94,53 @@ class SurferPaneChromeTest : StringSpec({
 
             onAllNodesWithTag(SurferPaneTestTags.TopAppBar).fetchSemanticsNodes().size shouldBe 1
             onAllNodesWithTag(SurferPaneTestTags.Fab).fetchSemanticsNodes().size shouldBe 1
+        }
+    }
+
+    "a FAB the screen named itself keeps its own tag" {
+        runComposeUiTest {
+            setContent {
+                ExpandedWindow {
+                    CompositionLocalProvider(
+                        LocalSurferPane provides SurferPane(role = SurferPaneRole.Single),
+                    ) {
+                        SurferPaneScaffold(
+                            title = "Accounts",
+                            primaryAction = SurferPaneAction(
+                                label = "Add",
+                                onClick = {},
+                                testTag = SCREEN_FAB_TAG,
+                            ),
+                        ) { Text("Content") }
+                    }
+                }
+            }
+            waitForIdle()
+
+            onAllNodesWithTag(SCREEN_FAB_TAG).fetchSemanticsNodes().size shouldBe 1
+            onAllNodesWithTag(SurferPaneTestTags.Fab).fetchSemanticsNodes().size shouldBe 0
+        }
+    }
+
+    "a top bar the screen tagged through its modifier keeps that tag" {
+        runComposeUiTest {
+            setContent {
+                ExpandedWindow {
+                    CompositionLocalProvider(
+                        LocalSurferPane provides SurferPane(role = SurferPaneRole.Single),
+                    ) {
+                        SurferPaneTopBar(
+                            title = "Accounts",
+                            modifier = Modifier.testTag(SCREEN_TOP_BAR_TAG),
+                            onBack = {},
+                        )
+                    }
+                }
+            }
+            waitForIdle()
+
+            onAllNodesWithTag(SCREEN_TOP_BAR_TAG).fetchSemanticsNodes().size shouldBe 1
+            onAllNodesWithTag(SurferPaneTestTags.TopAppBar).fetchSemanticsNodes().size shouldBe 0
         }
     }
 
@@ -148,6 +202,13 @@ private const val WINDOW_HEIGHT_PX = 800
 
 /** `SurferPaneSceneStrategy.ListPanePreferredWidth`. */
 private const val LIST_PANE_WIDTH = 300
+
+/** `SurferPaneSceneStrategy.InlinePanelPreferredWidth`. */
+private const val INLINE_PANEL_WIDTH = 340
+
+/** Stand-ins for the tags a screen names itself, which must survive the defaults. */
+private const val SCREEN_FAB_TAG = "accounts:addFab"
+private const val SCREEN_TOP_BAR_TAG = "accounts:toolbar"
 
 /** Only [containerSize] matters here; `WindowInfo` defaults the rest. */
 private class FixedWindowInfo(override val containerSize: IntSize) : WindowInfo {
