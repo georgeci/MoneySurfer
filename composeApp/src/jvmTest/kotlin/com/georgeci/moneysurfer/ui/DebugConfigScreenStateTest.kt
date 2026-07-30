@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.ui
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -24,10 +25,13 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.domain.config.ConfigDebugLayerCell
 import com.georgeci.moneysurfer.domain.config.ConfigDebugRow
 import com.georgeci.moneysurfer.domain.config.ConfigDebugRowKind
+import com.georgeci.moneysurfer.domain.debug.DebugPrefillReport
 import com.georgeci.moneysurfer.feature.settings.debug.DebugConfigContent
 import com.georgeci.moneysurfer.feature.settings.debug.DebugConfigEvent
 import com.georgeci.moneysurfer.feature.settings.debug.DebugConfigState
 import com.georgeci.moneysurfer.feature.settings.debug.DebugConfigTestTags
+import com.georgeci.moneysurfer.feature.settings.debug.PrefillOutcome
+import com.georgeci.moneysurfer.feature.settings.debug.prefillMessage
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -67,7 +71,80 @@ class DebugConfigScreenStateTest : StringSpec({
             onNodeWithTag(DebugConfigTestTags.row(FLAG_ROW.name)).assertIsDisplayed()
             onNodeWithTag(DebugConfigTestTags.LogsRow).assertIsDisplayed()
             onNodeWithTag(DebugConfigTestTags.ResetAllRow).assertIsDisplayed()
+            onNodeWithTag(DebugConfigTestTags.PrefillRow).assertIsDisplayed()
             onAllNodesWithTag(DebugConfigTestTags.Unavailable).assertCountEquals(0)
+        }
+    }
+
+    "the prefill row is clickable while idle and inert while a run is writing" {
+        // A settings row has no disabled state, so "busy" is expressed by dropping the click
+        // handler. Only the rendered tree shows whether that actually happened — from the view
+        // model's side a second tap looks identical either way.
+        runComposeUiTest {
+            val events = mutableListOf<DebugConfigEvent>()
+            setContent {
+                DebugConfigContent(
+                    state = DebugConfigState(isAvailable = true, rows = listOf(FLAG_ROW)),
+                    snackbarHostState = SnackbarHostState(),
+                    onEvent = { events += it },
+                )
+            }
+
+            onNodeWithTag(DebugConfigTestTags.PrefillRow).assertHasClickAction().performClick()
+            waitForIdle()
+
+            events shouldContainExactly listOf(DebugConfigEvent.OnPrefillClick)
+        }
+
+        runComposeUiTest {
+            setContent {
+                DebugConfigContent(
+                    state = DebugConfigState(isAvailable = true, rows = listOf(FLAG_ROW), inFlight = true),
+                    snackbarHostState = SnackbarHostState(),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DebugConfigTestTags.PrefillRow).assertHasNoClickAction()
+        }
+    }
+
+    "the prefill result reads its counts off the right report fields" {
+        // The done message carries four positional placeholders. Swapping two of them produces a
+        // perfectly plausible sentence that no ViewModel assertion can tell apart from the right
+        // one — the rendered string is the only place the mapping is visible.
+        runComposeUiTest {
+            setContent {
+                Text(
+                    prefillMessage(
+                        PrefillOutcome.Done(
+                            DebugPrefillReport(
+                                accounts = 3,
+                                categories = 14,
+                                transactions = 303,
+                                budgets = 2,
+                                goals = 1,
+                            ),
+                        ),
+                    ),
+                )
+            }
+
+            onNodeWithText("Added 303 transactions, 3 accounts, 2 budgets, 1 goals").assertIsDisplayed()
+        }
+    }
+
+    "each prefill failure gets its own message, since they call for different actions" {
+        runComposeUiTest {
+            setContent { Text(prefillMessage(PrefillOutcome.NoWorkspace)) }
+
+            onNodeWithText("No workspace is open — sign in and pick one first").assertIsDisplayed()
+        }
+
+        runComposeUiTest {
+            setContent { Text(prefillMessage(PrefillOutcome.Failed)) }
+
+            onNodeWithText("Prefill failed — the reason is in Logs").assertIsDisplayed()
         }
     }
 
@@ -88,6 +165,7 @@ class DebugConfigScreenStateTest : StringSpec({
             onNodeWithTag(DebugConfigTestTags.row(FLAG_ROW.name)).assertDoesNotExist()
             onAllNodesWithTag(DebugConfigTestTags.LogsRow).assertCountEquals(0)
             onAllNodesWithTag(DebugConfigTestTags.ResetAllRow).assertCountEquals(0)
+            onAllNodesWithTag(DebugConfigTestTags.PrefillRow).assertCountEquals(0)
         }
     }
 

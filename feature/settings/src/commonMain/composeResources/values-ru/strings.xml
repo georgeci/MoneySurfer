@@ -383,6 +383,14 @@
     <string name="settings_debug_config_degraded_format">Не удалось прочитать: %1$s — значения ниже берутся из слоёв под ним</string>
     <string name="settings_debug_config_unavailable">В этой сборке переопределения недоступны — debug-слой пуст, сохранять здесь нечего.</string>
     <string name="settings_debug_config_host_owned">Идентичность сборки — переопределение не меняет уже скомпилированную сборку графа.</string>
+    <string name="settings_debug_prefill_section">Демо-данные</string>
+    <string name="settings_debug_prefill_title">Заполнить это пространство</string>
+    <string name="settings_debug_prefill_supporting">Счета, год транзакций, бюджеты и цели</string>
+    <string name="settings_debug_prefill_running">Записываем…</string>
+    <string name="settings_debug_prefill_footnote">Добавляет пачку данных в текущее пространство. У гостя строки остаются на устройстве; при входе в аккаунт они уезжают в облако как любое другое изменение. Повторный запуск углубляет историю.</string>
+    <string name="settings_debug_prefill_done_format">Добавлено: транзакций — %1$d, счетов — %2$d, бюджетов — %3$d, целей — %4$d</string>
+    <string name="settings_debug_prefill_no_workspace">Пространство не открыто — сначала войдите и выберите его</string>
+    <string name="settings_debug_prefill_failed">Не удалось заполнить — причина в логах</string>
     <string name="settings_debug_log_title">Логи</string>
     <string name="settings_debug_log_supporting">Недавние предупреждения и ошибки этой сессии</string>
     <string name="settings_debug_log_footnote">Последние 100 строк уровня warning и error, новые сверху. Хранятся только в памяти — после перезапуска приложения их не будет.</string>

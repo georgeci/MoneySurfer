@@ -7,6 +7,7 @@
 - [Setup](#setup)
   - [Dedicated AVD for Maestro](#dedicated-avd-for-maestro)
 - [Firebase bootstrap (emulator)](#firebase-bootstrap-emulator)
+- [Filling a debug build with data](#filling-a-debug-build-with-data)
 - [QA tasks](#qa-tasks)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
   - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
@@ -99,6 +100,38 @@ Every entry point shares one emulator namespace: the Gradle wrappers,
 resolve to `--project demo-moneysurfer`. Override with `FIREBASE_PROJECT_ID`
 only if you deliberately want a separate namespace — and then set it for *every*
 process in the run, or seeded state becomes invisible to whatever reads it.
+
+## Filling a debug build with data
+
+Settings → **Configuration (debug)** → **Demo data** → *Prefill this workspace*
+writes one batch into the workspace you are currently in: three accounts (Cash /
+Checking / Savings) with opening balances, ~300 transactions spread over the
+trailing twelve months, two budgets, two goals and their contributions. Default
+categories are seeded first if the workspace has none.
+
+The row is only reachable where the debug configuration layer is bound — i.e.
+never in a release build. Nothing about it is a Gradle flag: it is a runtime
+action, so the same installed APK can stay empty or be filled on demand.
+
+The session decides where the rows end up, because they are written through the
+ordinary repositories and land on the sync outbox like any user edit:
+
+| Session | Result |
+|---|---|
+| Guest ("Continue without an account") | Local only. There is no Firebase uid, so the run does not ask for a push — demo data must never reach Firestore (sync.md §2.11). |
+| Signed in | Same batch, plus a `LOCAL_CHANGE` sync request. The outbox drains it in batches of 100, so the full set reaches Firestore over the next few sync ticks. |
+
+Re-running adds another batch of transactions — a fresh one, since the generator
+seeds itself from the clock. Budgets, goals and *active* accounts are matched by
+name first, so the scaffolding around the history is not duplicated; an archived
+account frees its name again and never receives rows, because anything filed
+against one is hidden from lists and dropped from total and budget rollups. A run
+with no workspace pinned is refused rather than inventing one.
+
+To get a *remote* account with a lot of objects, sign in against the emulator
+(`e2e+owner@test.local` from `scripts/e2e-test-user.properties`), prefill, and
+let the outbox drain; a second install signing in as the same user then pulls
+the lot.
 
 ## QA tasks
 

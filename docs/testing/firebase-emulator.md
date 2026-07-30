@@ -35,6 +35,7 @@
   - [Port 8080 is not open on 0.0.0.0](#port-8080-is-not-open-on-0000)
   - [MSUSEEMULATOR=true does not work in Android Studio Run config](#msuseemulatortrue-does-not-work-in-android-studio-run-config)
   - [Could not reach Firestore emulator at 10.0.2.2:8080](#could-not-reach-firestore-emulator-at-100228080)
+  - [firebase-tools no longer supports Java version before 21](#firebase-tools-no-longer-supports-java-version-before-21)
   - [PERMISSIONDENIED: Missing or insufficient permissions locally](#permissiondenied-missing-or-insufficient-permissions-locally)
   - [Emulator re-downloads on every start](#emulator-re-downloads-on-every-start)
   - [CI: Connection refused](#ci-connection-refused)
@@ -396,8 +397,28 @@ AS does not inherit shell env vars. Options:
 
 The Android emulator cannot reach the host:
 
-- Confirm both the app emulator and Firebase emulator are running.
+- Confirm both the app emulator and Firebase emulator are running. `start.sh --background` reports a PID even when the CLI dies a second later — check `build/firebase-emulator.log`, and see the JDK entry below.
 - AVD uses `10.0.2.2`; Genymotion uses `10.0.3.2`; real device uses the LAN IP of the host.
+- Recent `firebase-tools` bind the emulators to `127.0.0.1`, which `10.0.2.2` does not reach. The app then fails every call with `Failed to connect to /10.0.2.2:9099` while `curl localhost:9099` from the host looks fine. Give each emulator a host in the config it is started with:
+
+  ```json
+  "emulators": {
+    "firestore": { "port": 8080, "host": "0.0.0.0" },
+    "auth": { "port": 9099, "host": "0.0.0.0" }
+  }
+  ```
+
+  `firebase.json` in the repo deliberately does **not** set this — it would publish the emulator on every interface of the machine. Keep the override in a scratch config and point the CLI at it: `firebase emulators:start --config /tmp/firebase.host.json` (paths inside that file must be absolute).
+
+### `firebase-tools no longer supports Java version before 21`
+
+The CLI exits immediately with this and nothing is listening. `scripts/firebase/start.sh --background` still writes a PID file, so the failure looks like a connectivity problem from the app's side. Put a 21+ JDK on `PATH` for the emulator process:
+
+```bash
+export JAVA_HOME="$(/usr/libexec/java_home -v 21)"; export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+Same requirement as `firestore-tests` — see [qa-runbook](qa-runbook.md).
 
 ### `PERMISSION_DENIED: Missing or insufficient permissions` locally
 

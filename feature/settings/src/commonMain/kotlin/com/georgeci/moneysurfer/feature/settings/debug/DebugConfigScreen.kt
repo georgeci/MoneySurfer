@@ -46,6 +46,14 @@ import moneysurfer.feature.settings.generated.resources.settings_debug_config_un
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_winner_format
 import moneysurfer.feature.settings.generated.resources.settings_debug_log_supporting
 import moneysurfer.feature.settings.generated.resources.settings_debug_log_title
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_done_format
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_failed
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_footnote
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_no_workspace
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_running
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_section
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_supporting
+import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -56,6 +64,8 @@ object DebugConfigTestTags {
     const val ResetAllRow = "debugConfig:resetAll"
     const val DegradedBanner = "debugConfig:degradedBanner"
     const val Unavailable = "debugConfig:unavailable"
+
+    const val PrefillRow = "debugConfig:prefill"
 
     fun row(name: String): String = "debugConfig:row:$name"
 
@@ -78,6 +88,7 @@ fun DebugConfigScreen(
     val state by viewModel.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingInvalid by remember { mutableStateOf<DebugConfigEffect.NotifyInvalidValue?>(null) }
+    var pendingPrefill by remember { mutableStateOf<PrefillOutcome?>(null) }
 
     // Resolved during composition so the positional placeholders go through Compose's own format
     // path and survive translator reordering; the effect below only feeds the snackbar.
@@ -90,11 +101,19 @@ fun DebugConfigScreen(
         pendingInvalid = null
     }
 
+    val prefillText: String? = pendingPrefill?.let { prefillMessage(it) }
+    LaunchedEffect(prefillText) {
+        val text = prefillText ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Long)
+        pendingPrefill = null
+    }
+
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             DebugConfigEffect.NavigateBack -> onNavigateBack()
             DebugConfigEffect.NavigateToLogs -> onNavigateToLogs()
             is DebugConfigEffect.NotifyInvalidValue -> pendingInvalid = effect
+            is DebugConfigEffect.NotifyPrefillResult -> pendingPrefill = effect.outcome
         }
     }
 
@@ -157,6 +176,25 @@ fun DebugConfigContent(
             state.rows.forEach { row -> ConfigKeyRow(row = row, onEvent = onEvent) }
         }
 
+        SurferSettingsGroup(
+            title = stringResource(Res.string.settings_debug_prefill_section),
+            footnote = stringResource(Res.string.settings_debug_prefill_footnote),
+        ) {
+            SurferSettingsRow(
+                icon = SurferIcons.Sparkle,
+                title = stringResource(Res.string.settings_debug_prefill_title),
+                supportingText = if (state.inFlight) {
+                    stringResource(Res.string.settings_debug_prefill_running)
+                } else {
+                    stringResource(Res.string.settings_debug_prefill_supporting)
+                },
+                // A run writes hundreds of rows. Dropping the click handler while it is going is
+                // what makes the row look busy — there is no disabled state on a settings row.
+                onClick = if (state.inFlight) null else ({ onEvent(DebugConfigEvent.OnPrefillClick) }),
+                modifier = Modifier.testTag(DebugConfigTestTags.PrefillRow),
+            )
+        }
+
         SurferSettingsGroup {
             // The other half of the debug panel: what the app logged, for hosts where reading
             // logcat or the desktop console is not an option.
@@ -182,6 +220,27 @@ fun DebugConfigContent(
 
         Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
     }
+}
+
+/**
+ * The snackbar line for a finished prefill run.
+ *
+ * Resolved during composition, like the invalid-value message above, so the indexed placeholders go
+ * through Compose's own format path rather than being assembled inside the effect. Public for the
+ * same reason [DebugConfigContent] is: the counts are positional, and only a rendered assertion
+ * catches them being read off the wrong report field.
+ */
+@Composable
+fun prefillMessage(outcome: PrefillOutcome): String = when (outcome) {
+    is PrefillOutcome.Done -> stringResource(
+        Res.string.settings_debug_prefill_done_format,
+        outcome.report.transactions,
+        outcome.report.accounts,
+        outcome.report.budgets,
+        outcome.report.goals,
+    )
+    PrefillOutcome.NoWorkspace -> stringResource(Res.string.settings_debug_prefill_no_workspace)
+    PrefillOutcome.Failed -> stringResource(Res.string.settings_debug_prefill_failed)
 }
 
 /**
