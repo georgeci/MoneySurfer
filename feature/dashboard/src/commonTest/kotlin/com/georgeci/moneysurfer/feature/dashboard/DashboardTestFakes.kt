@@ -55,6 +55,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -146,6 +147,13 @@ internal fun newViewModel(
         getBurnRate = GetBurnRateUseCase(
             getDailySpendSeries = GetDailySpendSeriesUseCase(spendAnalytics, workspaces, session, clock),
             getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
+        ),
+        getSpentMonth = GetSpentMonthUseCase(
+            spendAnalytics = spendAnalytics,
+            workspaceRepository = workspaces,
+            getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
+            session = session,
+            clock = clock,
         ),
         generateInsights = GenerateInsightsUseCase(
             spendAnalytics = spendAnalytics,

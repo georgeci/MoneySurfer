@@ -86,8 +86,12 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
  *   caller that asks for the wrong week sees the wrong days here too rather than being handed its
  *   seed back whole. The burn rate derives both its chart and its month-to-date from a single
  *   window, so getting that window wrong has to be visible.
- * - [netByMonth] answers from [nets] the same way, keeping only the months the scope's window
- *   covers, so a balance curve folded over the wrong months is short here too.
+ * - [netByMonth] answers from two seeds, because its callers ask two different shapes of question.
+ *   [nets] keeps the months the scope's window covers, so a balance curve folded over the wrong
+ *   months is short here too. [monthlyNetsByWindow] is keyed by the exact window, which is what a
+ *   caller reading *part* of a month needs: the spent-this-month card compares 1..20 April against
+ *   1..20 March, and a month-granular seed cannot tell those two from the whole months. A window
+ *   the map does not carry falls through to [nets].
  * - [topMerchants] and [excludedByCurrency] answer from one flat seed each and ignore the window:
  *   their callers assert on the recorded scope instead, which keeps a spec from having to spell out
  *   a window twice to say "these rows came back for it". [topMerchants] does honour the row limit,
@@ -99,6 +103,7 @@ class FakeSpendAnalyticsRepository(
     private val slicesByWindow: Map<TransactionPeriodWindow, List<CategorySpendSlice>> = emptyMap(),
     daily: List<DailySpendPoint> = emptyList(),
     private val nets: List<MonthlyNet> = emptyList(),
+    private val monthlyNetsByWindow: Map<TransactionPeriodWindow, List<MonthlyNet>> = emptyMap(),
     // Named apart from the queries they seed, as `nets` already is: a body reading
     // `flowOf(topMerchants)` inside `override fun topMerchants(...)` resolves to the seed, but
     // nobody should have to check.
@@ -114,7 +119,7 @@ class FakeSpendAnalyticsRepository(
     /** The same record for [daily]. */
     val dailyScopes: MutableList<SpendScope> = mutableListOf()
 
-    /** The same record for [netByMonth] — the one query whose window is not the caller's period. */
+    /** The same record for [netByMonth] — the windows it is asked for are worth asserting on. */
     val netByMonthScopes: MutableList<SpendScope> = mutableListOf()
 
     /** The same record for [topMerchants], paired with the row limit each call asked for. */
@@ -131,8 +136,10 @@ class FakeSpendAnalyticsRepository(
 
     override fun netByMonth(scope: SpendScope): Flow<List<MonthlyNet>> {
         netByMonthScopes += scope
-        // A month counts when its first day is inside the window — the same all-or-nothing call the
-        // real query's month-boundary contract lets callers assume.
+        // An exact-window seed wins where one was given; otherwise a month counts when its first
+        // day is inside the window — the all-or-nothing call the real query's month-boundary
+        // contract lets whole-month callers assume.
+        monthlyNetsByWindow[scope.window]?.let { return flowOf(it) }
         return flowOf(nets.filter { it.month.firstDay in scope.window }.sortedBy { it.month })
     }
 
