@@ -39,9 +39,6 @@ import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
-import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
-import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
-import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
@@ -54,10 +51,6 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_sect
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account_new
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
-import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
-import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_other_currencies
-import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_rates_as_of
-import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
@@ -286,20 +279,6 @@ internal fun DashboardWidget(
     }
 }
 
-@Composable
-private fun BalanceWidget(state: DashboardState.Content, variant: String?) {
-    SurferBalanceWidget(
-        title = stringResource(Res.string.dashboard_balance_title),
-        balance = state.formattedTotalBalance ?: "—",
-        variant = SurferBalanceVariant.fromKey(variant),
-        footnote = balanceFootnote(state),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .testTag(DashboardTestTags.Balance),
-    )
-}
-
 /**
  * The two shortcuts that skip the FAB: log a transaction, or move money between accounts.
  *
@@ -422,28 +401,6 @@ private fun RecentTransactionsWidget(
     )
 }
 
-/**
- * Line under the headline balance. No total at all wins over everything; after that come the two
- * things that qualify the headline — balances no rate could absorb, then how old the rates that
- * built it are — because a figure the reader might misread outranks the decorative trend.
- */
-@Composable
-private fun balanceFootnote(state: DashboardState.Content): SurferBalanceFootnote? = when {
-    state.formattedTotalBalance == null ->
-        SurferBalanceFootnote.Empty(stringResource(Res.string.dashboard_balance_empty_text))
-    state.otherCurrencyTotals.isNotEmpty() -> SurferBalanceFootnote.Note(
-        stringResource(
-            Res.string.dashboard_balance_other_currencies,
-            state.otherCurrencyTotals.joinToString(" · "),
-        ),
-    )
-    state.ratesAsOf != null -> SurferBalanceFootnote.Note(
-        stringResource(Res.string.dashboard_balance_rates_as_of, state.ratesAsOf),
-    )
-    state.formattedTrendDelta != null -> SurferBalanceFootnote.Trend(state.formattedTrendDelta)
-    else -> null
-}
-
 @Composable
 private fun SectionHeader(
     title: String,
@@ -561,7 +518,8 @@ private fun DashboardScreenPreview() {
                 workspaceName = null,
                 workspaceInitial = null,
                 greeting = null,
-                formattedTrendDelta = "+€412 this month",
+                formattedTrendDelta = "+€412",
+                balanceSeries = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f),
                 transferEnabled = true,
             ),
             onEvent = {},

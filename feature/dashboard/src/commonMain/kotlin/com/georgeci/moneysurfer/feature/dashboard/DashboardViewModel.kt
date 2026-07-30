@@ -16,10 +16,12 @@ import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.model.CategorySpend
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
+import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.SpentByCategory
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
+import com.georgeci.moneysurfer.domain.model.buildBalanceTrend
 import com.georgeci.moneysurfer.domain.model.safeToSpend
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -37,6 +39,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
@@ -69,6 +72,7 @@ class DashboardViewModel(
     private val getBurnRate: GetBurnRateUseCase,
     private val generateInsights: GenerateInsightsUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
+    private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
     uiPreferences: UiPreferences,
     hostCapabilities: HostCapabilities,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
@@ -133,17 +137,27 @@ class DashboardViewModel(
             getCategorySpend(period).onStart { emit(null) },
             ::WidgetSources,
         )
+        // The balance widget's two non-account inputs, folded for the same reason the chrome is: the
+        // cached FX table is what turns the account list into one figure, and the monthly nets are
+        // what shape the curve under it. Neither is read anywhere else, and together they leave the
+        // fifth `combine` slot below free.
+        val balanceSources = combine(
+            getExchangeRates().onStart { emit(null) },
+            getMonthlyNetHistory().onStart { emit(null) },
+            ::BalanceSources,
+        )
         launch {
             combine(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
-                getExchangeRates().onStart { emit(null) },
+                balanceSources,
                 widgetSources,
                 // Read by name rather than destructured: at five members the positional form is
                 // one reordered field away from a silent swap, and detekt caps it at three.
-            ) { accounts, transactions, goals, rates, widgets ->
-                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
+            ) { accounts, transactions, goals, balanceInputs, widgets ->
+                val balance = accounts.convertedTotal(balanceInputs.rates)
+                    ?.toBalanceUi(balanceInputs.netHistory)
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
                     transactions = transactions
@@ -156,7 +170,9 @@ class DashboardViewModel(
                     workspaceName = null,
                     workspaceInitial = null,
                     greeting = null,
-                    formattedTrendDelta = null,
+                    formattedTrendDelta = balance?.trend?.text,
+                    isTrendDeltaNegative = balance?.trend?.isNegative == true,
+                    balanceSeries = balance?.trend?.series.orEmpty(),
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     safeToSpend = widgets.safeToSpend?.toUi(),
                     spentByCategory = widgets.categorySpend?.toUi().orEmpty(),
@@ -194,8 +210,11 @@ class DashboardViewModel(
      * bucket instead of going empty. `formattedTotalBalance == null` is the screen's "no accounts
      * at all" signal, and letting an unconvertible balance trip it would tell a user who *has*
      * money to add their first account.
+     *
+     * That fallback headline gets no trend: [history] is quoted in the base currency, and hanging
+     * its curve off a total that is one currency's bucket would draw a shape belonging to neither.
      */
-    private fun ConvertedTotal.toBalanceUi(): BalanceUi {
+    private fun ConvertedTotal.toBalanceUi(history: MonthlyNetHistory?): BalanceUi {
         val leftOver = unconverted.map { MoneyFormatter.format(it.amount, it.currencyCode) }
         return when (val converted = total) {
             null -> BalanceUi(
@@ -207,8 +226,35 @@ class DashboardViewModel(
                 headline = MoneyFormatter.format(converted, baseCurrency),
                 notConverted = leftOver,
                 asOf = asOf?.asIsoDate(),
+                trend = history?.toTrendUi(converted, baseCurrency),
             )
         }
+    }
+
+    /**
+     * This month's movement and the curve behind it, or null when there is nothing honest to draw:
+     *
+     * - the nets are *filtered* to their own workspace's base currency, and the total is converted
+     *   into whatever the cached FX table is based on. The two agree except in the window between a
+     *   base-currency change and the next rate refresh, and in that window a fold would subtract
+     *   euros from dollars;
+     * - a window that booked nothing has no curve. The fold would still produce six points — the
+     *   present balance repeated — and a flat line across half a year is a claim about months the
+     *   aggregate cannot see, since opening balances are outside its monthly nets by construction.
+     */
+    private fun MonthlyNetHistory.toTrendUi(total: Money, base: CurrencyCode): BalanceTrendUi? {
+        if (currency != base || nets.isEmpty()) return null
+        val trend = buildBalanceTrend(currentBalance = total, nets = nets, months = months)
+        val formatted = MoneyFormatter.format(trend.delta, base)
+        return BalanceTrendUi(
+            // Locale formatting only signs negatives; a flat month reads as "+" too, since "no
+            // change" is not a loss. Same call as the account details chart's delta.
+            text = if (trend.delta.isNegative()) formatted else "+$formatted",
+            isNegative = trend.delta.isNegative(),
+            // Major units: the curve only needs its own shape, and minor units are a Long the
+            // chart would have to narrow anyway.
+            series = trend.points.map { (it.balance.minor / Money.MINOR_PER_MAJOR).toFloat() },
+        )
     }
 
     /** ISO date — the "as of" label has to be unambiguous, and the app ships no date locale rules. */
@@ -379,7 +425,18 @@ sealed interface DashboardState {
         val workspaceName: String?,
         val workspaceInitial: String?,
         val greeting: String?,
+        /**
+         * What the balance moved by this month, signed and formatted, or null when no window of
+         * base-currency history backs a figure — see `toTrendUi`.
+         */
         val formattedTrendDelta: String?,
+        /** Whether [formattedTrendDelta] went down. Picks the arrow the widget draws beside it. */
+        val isTrendDeltaNegative: Boolean = false,
+        /**
+         * The balance at the close of each of the charted months, oldest first, in major units.
+         * Empty when there is no curve to draw — the widget needs two points to draw one.
+         */
+        val balanceSeries: List<Float> = emptyList(),
         val goals: List<GoalUi> = emptyList(),
         /** What is still safe to spend this period, or null while no active budget backs a number. */
         val safeToSpend: SafeToSpendUi? = null,
@@ -475,11 +532,29 @@ private data class DashboardChrome(
     val period: DashboardPeriod,
 )
 
-/** The three strings the balance widget needs, already formatted. */
+/** Everything the balance widget draws, already formatted. */
 private data class BalanceUi(
     val headline: String?,
     val notConverted: List<String>,
     val asOf: String?,
+    /** Null when no base-currency history could be anchored on the headline. */
+    val trend: BalanceTrendUi? = null,
+)
+
+/** The balance card's movement half: the delta as a signed string, and the curve behind it. */
+private data class BalanceTrendUi(
+    val text: String,
+    val isNegative: Boolean,
+    val series: List<Float>,
+)
+
+/**
+ * The two flows behind the headline figure and its curve, folded into one so the screen's
+ * five-source `combine` still fits. See `observeDashboard`.
+ */
+private data class BalanceSources(
+    val rates: ExchangeRateSnapshot?,
+    val netHistory: MonthlyNetHistory?,
 )
 
 data class AccountUi(

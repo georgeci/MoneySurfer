@@ -6,35 +6,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.uikit.components.base.SurferSparkline
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
-import io.github.koalaplot.core.Symbol
-import io.github.koalaplot.core.line.AreaBaseline
-import io.github.koalaplot.core.line.AreaPlot2
-import io.github.koalaplot.core.style.AreaStyle
-import io.github.koalaplot.core.style.LineStyle
-import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
-import io.github.koalaplot.core.xygraph.AxisContent
-import io.github.koalaplot.core.xygraph.AxisStyle
-import io.github.koalaplot.core.xygraph.GridStyle
-import io.github.koalaplot.core.xygraph.Point
-import io.github.koalaplot.core.xygraph.TickPosition
-import io.github.koalaplot.core.xygraph.XYGraph
-import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 
 /**
  * Mini "balance over period" chart tile used on Account Details. Header has a label on the
@@ -93,7 +77,7 @@ fun SurferBalanceChartCard(
                     )
                 }
             }
-            Sparkline(
+            SurferSparkline(
                 color = chartColor,
                 points = points,
                 modifier = Modifier
@@ -103,75 +87,6 @@ fun SurferBalanceChartCard(
         }
     }
 }
-
-@OptIn(ExperimentalKoalaPlotApi::class)
-@Composable
-private fun Sparkline(
-    color: Color,
-    points: List<Pair<Float, Float>>,
-    modifier: Modifier = Modifier,
-) {
-    if (points.size < 2) return
-
-    val data = remember(points) { points.map { Point(it.first, it.second) } }
-    val xMin = points.minOf { it.first }
-    val xMax = points.maxOf { it.first }
-    val xRange = xMin..xMax
-    val yMin = points.minOf { it.second }
-    val yMax = points.maxOf { it.second }
-    val padding = ((yMax - yMin).takeIf { it > 0f } ?: 1f) * YPaddingFraction
-    val yRange = (yMin - padding)..(yMax + padding)
-
-    val transparentAxis = AxisContent<Float>(
-        labels = {},
-        title = {},
-        style = AxisStyle(
-            color = Color.Transparent,
-            majorTickSize = 0.dp,
-            minorTickSize = 0.dp,
-            tickPosition = TickPosition.None,
-            lineWidth = 0.dp,
-        ),
-    )
-    val emptyGrid = GridStyle(
-        horizontalMajorStyle = null,
-        horizontalMinorStyle = null,
-        verticalMajorStyle = null,
-        verticalMinorStyle = null,
-    )
-
-    XYGraph(
-        xAxisModel = rememberFloatLinearAxisModel(xRange),
-        yAxisModel = rememberFloatLinearAxisModel(yRange),
-        xAxisContent = transparentAxis,
-        yAxisContent = transparentAxis,
-        modifier = modifier,
-        gridStyle = emptyGrid,
-    ) {
-        val lastPoint = data.last()
-        AreaPlot2(
-            data = data,
-            areaBaseline = AreaBaseline.HorizontalLine(yRange.start),
-            areaStyle = AreaStyle(
-                brush = Brush.verticalGradient(
-                    colors = listOf(color.copy(alpha = 0.3f), color.copy(alpha = 0f)),
-                ),
-            ),
-            lineStyle = LineStyle(brush = SolidColor(color), strokeWidth = 2.dp),
-            symbol = { point ->
-                if (point === lastPoint) {
-                    Symbol(
-                        size = 8.dp,
-                        shape = CircleShape,
-                        fillBrush = SolidColor(color),
-                    )
-                }
-            },
-        )
-    }
-}
-
-private const val YPaddingFraction = 0.1f
 
 internal val DefaultBalanceChartPoints: List<Pair<Float, Float>> = listOf(
     0f to 0.75f,

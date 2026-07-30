@@ -17,7 +17,7 @@ import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
-import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceTrend
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
@@ -138,13 +138,18 @@ internal fun DashboardWidgetPreview(
     }
 }
 
+/**
+ * Sample curve as well as sample figures: half of what tells the six treatments apart is how much
+ * room each gives the trend, and a tile drawn from a workspace with no history would show none of
+ * that.
+ */
 @Composable
 private fun BalancePreview(variant: String?, modifier: Modifier) {
     SurferBalanceWidget(
         title = stringResource(Res.string.dashboard_balance_title),
         balance = SAMPLE_TOTAL,
         variant = SurferBalanceVariant.fromKey(variant),
-        footnote = SurferBalanceFootnote.Trend(SAMPLE_TREND),
+        trend = SurferBalanceTrend(text = SAMPLE_TREND, series = SAMPLE_BALANCE_SERIES),
         modifier = modifier,
     )
 }
@@ -469,6 +474,7 @@ private fun RecentTransactionsPreview(modifier: Modifier) {
 private const val SAMPLE_CURRENCY = "EUR"
 private const val SAMPLE_TOTAL = "€11,575.32"
 private const val SAMPLE_TREND = "+€412"
+private val SAMPLE_BALANCE_SERIES = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f)
 private const val SAMPLE_ACCOUNT_ONE = "€2,480.32"
 private const val SAMPLE_ACCOUNT_TWO = "€8,915.00"
 private const val SAMPLE_ACCOUNT_THREE = "€180.00"
