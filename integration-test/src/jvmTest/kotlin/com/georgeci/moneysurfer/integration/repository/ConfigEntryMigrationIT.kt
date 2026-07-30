@@ -11,9 +11,11 @@ import io.kotest.matchers.shouldBe
 /**
  * The v34 addition against a real SQLite.
  *
- * Worth pinning despite being a bare `CREATE TABLE`: the builder ends in
+ * Worth pinning despite being a bare `CREATE TABLE`: on debuggable hosts the builder still ends in
  * `fallbackToDestructiveMigration(dropAllTables = true)`, so a migration that fails to produce the
- * table Room expects does not fail loudly — it drops every table on the next launch. The columns
+ * table Room expects does not fail loudly — it drops every table on the next launch. Release builds
+ * opt out of that fallback and crash on open instead (see `docs/architecture/persistence.md` →
+ * "Room schema versioning"), which is louder but no less broken for the user. The columns
  * and their nullability are checked against what `ConfigEntryEntity` declares, because Room
  * validates the schema at open time and a mismatch is the same silent wipe.
  */

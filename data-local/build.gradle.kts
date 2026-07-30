@@ -132,6 +132,11 @@ val verifyRoomMigrations = tasks.register("verifyRoomMigrations") {
     doLast {
         val dbSource = dbSourceDir.file("MoneySurferDatabase.kt").asFile.readText()
         val builderSource = dbSourceDir.file("DatabaseBuilder.kt").asFile.readText()
+        // Only the `addMigrations(...)` argument list counts as registration — searching the whole
+        // file would let a leftover import or a KDoc mention satisfy the check. An absent or
+        // unparseable call yields an empty list, so this fails closed.
+        val registeredMigrations = Regex("""addMigrations\s*\(([^)]*)\)""")
+            .find(builderSource)?.groupValues?.get(1).orEmpty()
         val migrationSources = dbSourceDir.dir("migration").asFile
             .walkTopDown()
             .filter { it.isFile && it.extension == "kt" }
@@ -157,7 +162,7 @@ val verifyRoomMigrations = tasks.register("verifyRoomMigrations") {
             problems += "Highest exported schema is ${exported.max()} but MONEY_SURFER_DB_VERSION " +
                 "is $declaredVersion. Build the module so Room re-exports the schema, and commit it."
         }
-        if (declaredVersion !in exported) {
+        if (exported.isNotEmpty() && declaredVersion !in exported) {
             problems += "No exported schema `$declaredVersion.json` for the current " +
                 "MONEY_SURFER_DB_VERSION. Commit `schemas/**/$declaredVersion.json`."
         }
@@ -166,11 +171,12 @@ val verifyRoomMigrations = tasks.register("verifyRoomMigrations") {
         // declared *and* registered migration; a hole means a released install cannot upgrade.
         for (from in baseline until declaredVersion) {
             val name = "MIGRATION_${from}_${from + 1}"
-            if (!migrationSources.contains("val $name")) {
+            val declared = Regex("""\bval\s+$name\b""").containsMatchIn(migrationSources)
+            if (!declared) {
                 problems += "Missing migration `$name`: schema $from → ${from + 1} is at or above " +
                     "the frozen release baseline ($baseline) and needs a hand-written Migration in " +
                     "`data/db/migration/`."
-            } else if (!builderSource.contains(name)) {
+            } else if (!Regex("""\b$name\b""").containsMatchIn(registeredMigrations)) {
                 problems += "Migration `$name` exists but is not passed to `addMigrations(...)` in " +
                     "DatabaseBuilder.kt, so Room will never run it."
             }
