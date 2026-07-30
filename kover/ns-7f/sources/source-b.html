@@ -68,10 +68,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45.7%
+    51.5%
   </span>
   <span class="absValue">
-    (32/70)
+    (35/68)
   </span>
 </td>
 <td class="coverageStat">
@@ -84,10 +84,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.1%
+    91.3%
   </span>
   <span class="absValue">
-    (1133/1244)
+    (1128/1236)
   </span>
 </td>
 </tr>
@@ -156,6 +156,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;/**
+&nbsp; * Tags on the two pieces of chrome a section may draw exactly once, however many panes it is split
+&nbsp; * across (issue #388).
+&nbsp; *
+&nbsp; * They exist so a test can *count* them: &quot;the section renders one top app bar&quot; is not expressible
+&nbsp; * through a title or a label, because the detail pane&#39;s [SurferPaneHeader] carries the same title
+&nbsp; * and its header action carries the same label as the list pane&#39;s FAB. Matching on the tags instead
+&nbsp; * distinguishes the bar from the header and the FAB from the button.
+&nbsp; */
+&nbsp;object SurferPaneTestTags {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * On the [SurferToolbar] branch of [SurferPaneTopBar] only — never on the pane header. A
+&nbsp;     * caller that tags the top bar through its own `modifier` overrides this one.
+&nbsp;     */
+&nbsp;    const val TopAppBar = &quot;pane:topAppBar&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * On the [SurferPaneScaffold] FAB, unless the caller named its own tag through
+&nbsp;     * [SurferPaneAction.testTag] — a screen with a tagged FAB is reachable by that tag instead.
+&nbsp;     */
+&nbsp;    const val Fab = &quot;pane:fab&quot;
+&nbsp;}
+&nbsp;
+&nbsp;/**
 &nbsp; * A [Scaffold] whose chrome adapts to the pane the host put the screen in — see [SurferPane].
 &nbsp; *
 &nbsp; * As a whole screen or as a list pane it is exactly the `Scaffold` + [SurferToolbar] + FAB every
@@ -203,7 +227,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                    label = primaryAction.label,</b>
 <b class="fc">&nbsp;                    onClick = primaryAction.onClick,</b>
 <b class="fc">&nbsp;                    icon = primaryAction.icon,</b>
-<b class="pc">&nbsp;                    modifier = primaryAction.testTag?.let { Modifier.testTag(it) } ?: Modifier,</b>
+<b class="fc">&nbsp;                    modifier = Modifier.testTag(primaryAction.testTag ?: SurferPaneTestTags.Fab),</b>
 &nbsp;                )
 <b class="fc">&nbsp;            }</b>
 &nbsp;        },
@@ -231,7 +255,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    if (pane.ownsSectionChrome) {</b>
 <b class="fc">&nbsp;        SurferToolbar(</b>
 <b class="fc">&nbsp;            title = title,</b>
-<b class="fc">&nbsp;            modifier = modifier,</b>
+&nbsp;            // Appended, not prepended: for one semantics key the *earlier* modifier in the chain
+&nbsp;            // wins, so a screen that tagged its own top bar keeps that tag and this is only the
+&nbsp;            // default — the same precedence [SurferPaneAction.testTag] gets over the FAB tag.
+<b class="fc">&nbsp;            modifier = modifier.testTag(SurferPaneTestTags.TopAppBar),</b>
 <b class="fc">&nbsp;            onBack = onBack,</b>
 <b class="fc">&nbsp;            colors = colors,</b>
 <b class="fc">&nbsp;            actions = actions,</b>
@@ -382,7 +409,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 16:07</div>
+    <div style="float:right;">generated on 2026-07-30 22:54</div>
 </div>
 </body>
 </html>

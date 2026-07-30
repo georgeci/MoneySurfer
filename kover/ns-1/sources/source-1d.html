@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConfigCodec</title>
+  <title>MoneySurfer Coverage Report > Config</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
 </div>
 
-<h1>Coverage Summary for Class: ConfigCodec (com.georgeci.moneysurfer.appconfig)</h1>
+<h1>Coverage Summary for Class: Config (com.georgeci.moneysurfer.appconfig)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConfigCodec</td>
+  <td class="name">Config</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,75 +46,82 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
 &nbsp;
-&nbsp;/**
-&nbsp; * String ↔ value bridge for one configuration key.
-&nbsp; *
-&nbsp; * A string is the common denominator of every backing store — a DataStore preference, a
-&nbsp; * `config_entry.value` column, a Firestore field — so every layer except the in-memory Build
-&nbsp; * map holds encoded strings and the codec is what makes them typed again.
-&nbsp; *
-&nbsp; * Public API of `app-config/api` on purpose: key objects are `internal` to the module that owns
-&nbsp; * their facade, but a public key constructor cannot take an internal parameter type, so the
-&nbsp; * codecs those keys are built from have to be visible.
-&nbsp; */
-&nbsp;interface ConfigCodec&lt;T : Any&gt; {
-&nbsp;
-&nbsp;    fun encode(value: T): String
-&nbsp;
-&nbsp;    /**
-&nbsp;     * `null` means &quot;undecodable&quot;. The engine then treats the layer as **not holding this key**
-&nbsp;     * and resolution continues downwards — see [Config].
-&nbsp;     */
-&nbsp;    fun decode(raw: String): T?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Shape of the value, so the debug panel can render a real control instead of a free-text
-&nbsp;     * field. `PaletteSource`&#39;s `PRESET:&lt;seed&gt;` format makes typing raw strings a routine way to
-&nbsp;     * fail, which is what this hint exists to avoid.
-&nbsp;     */
-&nbsp;    val valueKind: ConfigValueKind
-&nbsp;}
-&nbsp;
-&nbsp;/** What kind of control can edit a key — derived from its codec, never from its name. */
-&nbsp;sealed interface ConfigValueKind {
-&nbsp;    data object Bool : ConfigValueKind
-&nbsp;
-&nbsp;    /** Closed set of accepted encodings, in declaration order. */
-&nbsp;    data class Choice(val choices: List&lt;String&gt;) : ConfigValueKind
-&nbsp;
-&nbsp;    data object FreeText : ConfigValueKind
-&nbsp;}
-&nbsp;
-&nbsp;/** Accepts `true`/`false` case-insensitively; anything else is undecodable, not `false`. */
-&nbsp;object BooleanConfigCodec : ConfigCodec&lt;Boolean&gt; {
-&nbsp;    override fun encode(value: Boolean): String = value.toString()
-&nbsp;
-&nbsp;    override fun decode(raw: String): Boolean? = when (raw.lowercase()) {
-&nbsp;        &quot;true&quot; -&gt; true
-&nbsp;        &quot;false&quot; -&gt; false
-&nbsp;        else -&gt; null
-&nbsp;    }
-&nbsp;
-&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.Bool
-&nbsp;}
-&nbsp;
-&nbsp;object StringConfigCodec : ConfigCodec&lt;String&gt; {
-&nbsp;    override fun encode(value: String): String = value
-&nbsp;    override fun decode(raw: String): String = raw
-&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
-&nbsp;}
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;/**
-&nbsp; * Enum name ↔ entry. Replaces the hand-rolled
-&nbsp; * `runCatching { Enum.valueOf(stored) }.getOrDefault(default)` blocks that were repeated per
-&nbsp; * field in `UiPreferencesImpl` — an unknown name now falls through to the layer below instead of
-&nbsp; * silently becoming the default.
+&nbsp; * The configuration engine: resolves every value from ordered layers.
+&nbsp; *
+&nbsp; * Infrastructure, not API. Features never see it — they inject typed domain facades
+&nbsp; * (`UiPreferences`, `SyncSettings`, `HostCapabilities`, `DebugConfigInspector`), and `Config` is
+&nbsp; * injected only into those facade implementations, never into a ViewModel. The fence is the
+&nbsp; * dependency graph: feature modules have no `app-config` on its classpath.
 &nbsp; */
-&nbsp;class EnumConfigCodec&lt;E : Enum&lt;E&gt;&gt;(private val entries: List&lt;E&gt;) : ConfigCodec&lt;E&gt; {
-&nbsp;    override fun encode(value: E): String = value.name
-&nbsp;    override fun decode(raw: String): E? = entries.firstOrNull { it.name == raw }
-&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.Choice(entries.map { it.name })
+&nbsp;interface Config {
+&nbsp;
+&nbsp;    /** First non-absent layer, re-resolved whenever any layer changes. Falls back to `key.default`. */
+&nbsp;    fun &lt;T : Any&gt; observe(key: ConfigKey&lt;T&gt;): Flow&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Synchronous resolution. Requires [hydrate] to have completed: called earlier it resolves the
+&nbsp;     * Build layer and defaults only, and throws in debug builds so the ordering mistake is not
+&nbsp;     * silently shipped.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; snapshot(key: ConfigKey&lt;T&gt;): T
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read/write handle for a user setting. Takes [SettingKey] only, so writing to a host- or
+&nbsp;     * server-owned flag fails to compile.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; handle(key: SettingKey&lt;T&gt;): Pref&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Per-layer detail for the debug panel. Layers stay honest here — nothing is clamped, including
+&nbsp;     * a RemoteGlobal value the `remoteOverridable` opt-in refuses: it is reported as held and simply
+&nbsp;     * never wins.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; resolve(key: ConfigKey&lt;T&gt;): ConfigResolution&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Emits once with the current state, then again whenever any layer changes.
+&nbsp;     *
+&nbsp;     * For consumers that re-resolve *many* keys at once — the debug panel — where per-key
+&nbsp;     * [observe] would need one subscription each and would dedupe away the ticks it needs.
+&nbsp;     */
+&nbsp;    val changes: Flow&lt;Unit&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Warms every layer&#39;s in-memory mirror. Awaited once at startup, before the first
+&nbsp;     * [snapshot]. Idempotent.
+&nbsp;     *
+&nbsp;     * Never throws: a layer whose store cannot be read is skipped and named in [degradedLayers],
+&nbsp;     * because this runs before a start route exists and a failure here would otherwise take the
+&nbsp;     * whole app down with it.
+&nbsp;     */
+&nbsp;    suspend fun hydrate()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Layers [hydrate] could not warm. Empty on the happy path.
+&nbsp;     *
+&nbsp;     * A degraded layer resolves as absent, so values fall through to the layers below and finally to
+&nbsp;     * `key.default` — correct, but not necessarily current. Kept observable so the debug panel can
+&nbsp;     * distinguish &quot;this layer holds nothing&quot; from &quot;this layer could not be read&quot;; the mirror refills
+&nbsp;     * on its own once the store is readable again.
+&nbsp;     */
+&nbsp;    val degradedLayers: Set&lt;ConfigLayer&gt;
 &nbsp;}
+&nbsp;
+&nbsp;data class ConfigResolution&lt;T : Any&gt;(
+&nbsp;    val value: T,
+&nbsp;    /** `null` when no layer holds the key and `key.default` won. */
+&nbsp;    val winner: ConfigLayer?,
+&nbsp;    /**
+&nbsp;     * What each layer holds, not what it was allowed to serve. Absent vs undecodable are distinct —
+&nbsp;     * the panel must show which — and a value present in a layer that did not win was either
+&nbsp;     * outranked or refused by the remote opt-in.
+&nbsp;     */
+&nbsp;    val perLayer: Map&lt;ConfigLayer, LayerValue&lt;T&gt;&gt;,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -138,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 16:07</div>
+    <div style="float:right;">generated on 2026-07-30 22:54</div>
 </div>
 </body>
 </html>
