@@ -55,6 +55,27 @@ data class SurferPaneAction(
 )
 
 /**
+ * Tags on the two pieces of chrome a section may draw exactly once, however many panes it is split
+ * across (issue #388).
+ *
+ * They exist so a test can *count* them: "the section renders one top app bar" is not expressible
+ * through a title or a label, because the detail pane's [SurferPaneHeader] carries the same title
+ * and its header action carries the same label as the list pane's FAB. Matching on the tags instead
+ * distinguishes the bar from the header and the FAB from the button.
+ */
+object SurferPaneTestTags {
+
+    /** On the [SurferToolbar] branch of [SurferPaneTopBar] only — never on the pane header. */
+    const val TopAppBar = "pane:topAppBar"
+
+    /**
+     * On the [SurferPaneScaffold] FAB, unless the caller named its own tag through
+     * [SurferPaneAction.testTag] — a screen with a tagged FAB is reachable by that tag instead.
+     */
+    const val Fab = "pane:fab"
+}
+
+/**
  * A [Scaffold] whose chrome adapts to the pane the host put the screen in — see [SurferPane].
  *
  * As a whole screen or as a list pane it is exactly the `Scaffold` + [SurferToolbar] + FAB every
@@ -102,7 +123,7 @@ fun SurferPaneScaffold(
                     label = primaryAction.label,
                     onClick = primaryAction.onClick,
                     icon = primaryAction.icon,
-                    modifier = primaryAction.testTag?.let { Modifier.testTag(it) } ?: Modifier,
+                    modifier = Modifier.testTag(primaryAction.testTag ?: SurferPaneTestTags.Fab),
                 )
             }
         },
@@ -130,7 +151,7 @@ fun SurferPaneTopBar(
     if (pane.ownsSectionChrome) {
         SurferToolbar(
             title = title,
-            modifier = modifier,
+            modifier = modifier.testTag(SurferPaneTestTags.TopAppBar),
             onBack = onBack,
             colors = colors,
             actions = actions,

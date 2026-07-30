@@ -20,8 +20,9 @@
 
 - Modules render their UI under Robolectric and diff it against PNGs committed
   in `<module>/screenshots/`.
-- Two capture shapes: **component galleries** (`:uikit`) and **full screens**
-  (`:feature:login` onboarding + sign-in).
+- Three capture shapes: **component galleries** (`:uikit`), **full screens**
+  (`:feature:login` onboarding + sign-in) and **full screens at three window
+  widths** (the app shell in `:uikit`, the dashboard in `:feature:dashboard`).
 - A visual change fails `./gradlew qaAndroidHost` — the same job that already
   gates every PR. There is no separate opt-in check.
 - If the change is intended, re-record and commit the new PNGs **in the same
@@ -52,8 +53,10 @@ offline onboarding, demo-only sign-in) rather than in every permutation.
 ## Where the reference images live
 
 ```
-uikit/screenshots/<name>_light.png            # component galleries
-feature/login/screenshots/<name>_light.png    # onboarding + sign-in
+uikit/screenshots/<name>_light.png                  # component galleries
+uikit/screenshots/<name>_<width>_light.png          # the app shell, per width
+feature/login/screenshots/<name>_light.png          # onboarding + sign-in
+feature/dashboard/screenshots/<name>_<width>_light.png   # the dashboard, per width
 ```
 
 Committed to git, one pair per capture. Every capture is taken in both themes
@@ -215,6 +218,25 @@ fun onboardingValueOffline() = captureFullScreen("onboarding_value_offline") {
     OnboardingContent(state = OnboardingState(isOffline = true), onEvent = {})
 }
 ```
+
+### …at three window widths
+
+A screen whose layout depends on the window is captured with
+`captureFullScreenAtWidths` instead, which repeats the capture once per
+`ScreenshotWidth` — Compact (411 dp), Expanded (1024 dp) and Large (1360 dp, the
+design's desktop canvas). Roborazzi resizes the Robolectric display itself, so
+`currentSurferWindowSize()` inside the screen reports the width being captured:
+
+```kotlin
+@Test
+fun dashboard() = captureFullScreenAtWidths("dashboard") {
+    DashboardContent(state = dashboardState(), onEvent = {})
+}
+```
+
+Six PNGs per capture, so use it only where a width actually changes the layout —
+the app shell and the dashboard today. Everything else stays on
+`captureFullScreen`.
 
 If the screen has no stateless body yet, extract one — `SignInContent` and
 `OnboardingContent` are the pattern. Pick the states that differ *structurally*
