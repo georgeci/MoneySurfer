@@ -37,6 +37,8 @@
     <string name="dashboard_customize_variant_balance_stacked">Стопкой</string>
     <string name="dashboard_customize_variant_balance_inline">В строку</string>
     <string name="dashboard_customize_variant_balance_minimal">Минимальный</string>
+    <string name="dashboard_customize_variant_balance_split">С делением</string>
+    <string name="dashboard_customize_variant_balance_chart">С графиком</string>
     <string name="dashboard_customize_variant_spent_bar">Полосы</string>
     <string name="dashboard_customize_variant_spent_ring">Кольцо</string>
     <string name="dashboard_customize_variant_spent_gauge">Шкала</string>
@@ -59,6 +61,7 @@
     <string name="dashboard_balance_empty_text">Добавьте счёт, чтобы увидеть баланс.</string>
     <string name="dashboard_balance_other_currencies">Плюс %1$s без курса конвертации</string>
     <string name="dashboard_balance_rates_as_of">По курсам от %1$s · exchangerate-api.com</string>
+    <string name="dashboard_balance_trend_month">%1$s за месяц</string>
     <string name="dashboard_accounts_section_title">Счета</string>
     <string name="dashboard_accounts_manage">Управление</string>
     <string name="dashboard_add_account">Добавить счёт</string>

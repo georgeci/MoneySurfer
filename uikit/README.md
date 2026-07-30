@@ -21,6 +21,10 @@ Public composables (pick the right atom + add ripple on click):
 - [SurferCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferCard.kt) — `SurferCard(selected, onClick?)`. Picks the variant based on `AppTheme.containerStyle` and `selected`. Optional `onClick` adds a ripple-bounded click area.
 - [SurferActionCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferActionCard.kt) — `SurferActionCard(onClick?)`. Wraps the dashed `SurferAddActionContainer`. Optional `onClick` adds ripple.
 
+Charts ([components/base](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base)):
+
+- [SurferSparkline.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base/SurferSparkline.kt) — `SurferSparkline(points, color)` plus `sparklinePoints(values)` for callers holding a bare series. A koalaplot line + gradient area with no axes, grid or labels: it states a shape, and the figures behind it are printed by the card it sits in. Height comes from the caller's `Modifier`; fewer than two points draws nothing. Shared by the account-details balance chart and the dashboard balance widget so the two curves cannot drift.
+
 Drag-to-reorder ([components/base](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base)):
 
 - [SurferDragHandle.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base/SurferDragHandle.kt) — the six-dot grip. Purely visual; pair it with the state below to make it drag.

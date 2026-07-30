@@ -103,6 +103,57 @@ class DashboardScreenStateTest : StringSpec({
         }
     }
 
+    "the balance card states the month delta as a sentence" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        formattedTrendDelta = TREND_DELTA,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("$TREND_DELTA this month").assertIsDisplayed()
+        }
+    }
+
+    "a converted total shows both its trend and how old the rates behind it are" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        formattedTrendDelta = TREND_DELTA,
+                        ratesAsOf = RATES_DATE,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            // The two used to share one footnote slot, where the staleness note won and the trend
+            // was never drawn for a multi-currency workspace.
+            onNodeWithText("$TREND_DELTA this month").assertIsDisplayed()
+            onNodeWithText(RATES_NOTE).assertIsDisplayed()
+        }
+    }
+
+    "an empty balance drops the trend rather than pairing a delta with a dash" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 0, transferEnabled = true).copy(
+                        formattedTotalBalance = null,
+                        formattedTrendDelta = TREND_DELTA,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("$TREND_DELTA this month").assertDoesNotExist()
+            onNodeWithText(BALANCE_EMPTY).assertIsDisplayed()
+        }
+    }
+
     "with no budget the safe-to-spend card still draws, offering the way out of its empty state" {
         runPhoneUiTest {
             val events = mutableListOf<DashboardEvent>()
@@ -463,6 +514,10 @@ private const val PHONE_HEIGHT_PX = 891f
 
 private const val ADD_TRANSACTION = "Add transaction"
 private const val TRANSFER = "Transfer"
+private const val TREND_DELTA = "+€412.00"
+private const val RATES_DATE = "2026-07-29"
+private const val RATES_NOTE = "Converted at rates from $RATES_DATE · exchangerate-api.com"
+private const val BALANCE_EMPTY = "Add your first account to see balance."
 private const val SAFE_TO_SPEND_REMAINDER = "€642.30"
 private const val SAFE_TO_SPEND_LIMIT = "€1,800.00"
 private const val SAFE_TO_SPEND_DAYS_LEFT = "12 days left"

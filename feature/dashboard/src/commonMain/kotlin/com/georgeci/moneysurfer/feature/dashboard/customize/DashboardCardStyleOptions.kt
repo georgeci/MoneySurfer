@@ -17,9 +17,11 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_spa
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_third
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_two_thirds
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_summary
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_chart
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_classic
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_inline
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_minimal
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_split
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_stacked
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_carousel
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_list
@@ -94,6 +96,8 @@ private fun SurferBalanceVariant.labelResource(): StringResource = when (this) {
     SurferBalanceVariant.Stacked -> Res.string.dashboard_customize_variant_balance_stacked
     SurferBalanceVariant.Inline -> Res.string.dashboard_customize_variant_balance_inline
     SurferBalanceVariant.Minimal -> Res.string.dashboard_customize_variant_balance_minimal
+    SurferBalanceVariant.Split -> Res.string.dashboard_customize_variant_balance_split
+    SurferBalanceVariant.Chart -> Res.string.dashboard_customize_variant_balance_chart
 }
 
 /** Same deal as [BALANCE_VARIANTS]: built from the enum the widget itself switches on. */

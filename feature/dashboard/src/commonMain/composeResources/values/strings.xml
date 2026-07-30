@@ -37,6 +37,8 @@
     <string name="dashboard_customize_variant_balance_stacked">Stacked</string>
     <string name="dashboard_customize_variant_balance_inline">Inline</string>
     <string name="dashboard_customize_variant_balance_minimal">Minimal</string>
+    <string name="dashboard_customize_variant_balance_split">Split</string>
+    <string name="dashboard_customize_variant_balance_chart">Chart</string>
     <string name="dashboard_customize_variant_spent_bar">Bars</string>
     <string name="dashboard_customize_variant_spent_ring">Ring</string>
     <string name="dashboard_customize_variant_spent_gauge">Gauge</string>
@@ -59,6 +61,7 @@
     <string name="dashboard_balance_empty_text">Add your first account to see balance.</string>
     <string name="dashboard_balance_other_currencies">Plus %1$s no rate could convert</string>
     <string name="dashboard_balance_rates_as_of">Converted at rates from %1$s · exchangerate-api.com</string>
+    <string name="dashboard_balance_trend_month">%1$s this month</string>
     <string name="dashboard_accounts_section_title">Accounts</string>
     <string name="dashboard_accounts_manage">Manage</string>
     <string name="dashboard_add_account">Add account</string>

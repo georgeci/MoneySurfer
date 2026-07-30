@@ -311,6 +311,21 @@ class DashboardCustomizeScreenStateTest : StringSpec({
         }
     }
 
+    "the balance sheet offers every treatment the widget can draw" {
+        runComposeUiTest {
+            setContent {
+                DashboardCardStyleSheetContent(item = BALANCE_ITEM, onSelect = {}, onSpanSelect = {})
+            }
+
+            // The picker's list is built from the widget's own enum, so this is the assertion that
+            // the A–F set is reachable rather than just declared. `assertExists` because the row
+            // scrolls: past the third tile they are composed but off-screen.
+            SurferBalanceVariant.entries.forEach { variant ->
+                onNodeWithTag(styleOption(variant.name)).assertExists()
+            }
+        }
+    }
+
     "a widget with no variants gets a size-only sheet" {
         runComposeUiTest {
             setContent {

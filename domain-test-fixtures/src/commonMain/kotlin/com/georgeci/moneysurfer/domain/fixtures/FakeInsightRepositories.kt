@@ -76,7 +76,7 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
 }
 
 /**
- * Canned spend rollups. The two seeded queries are shaped by what their callers need to assert:
+ * Canned spend rollups. The three seeded queries are shaped by what their callers need to assert:
  *
  * - [byCategory] answers from [slicesByWindow], keyed by the scope's window, because the insight
  *   rules ask it twice with two different windows and the whole point of the assertion is that the
@@ -86,13 +86,16 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
  *   caller that asks for the wrong week sees the wrong days here too rather than being handed its
  *   seed back whole. The burn rate derives both its chart and its month-to-date from a single
  *   window, so getting that window wrong has to be visible.
+ * - [netByMonth] answers from [nets] the same way, keeping only the months the scope's window
+ *   covers, so a balance curve folded over the wrong months is short here too.
  *
- * Both record the scopes they were asked for; the remaining queries return nothing, since nothing
- * reads them yet.
+ * All three record the scopes they were asked for; the remaining queries return nothing, since
+ * nothing reads them yet.
  */
 class FakeSpendAnalyticsRepository(
     private val slicesByWindow: Map<TransactionPeriodWindow, List<CategorySpendSlice>> = emptyMap(),
     daily: List<DailySpendPoint> = emptyList(),
+    private val nets: List<MonthlyNet> = emptyList(),
 ) : SpendAnalyticsRepository {
 
     private val dailyPoints = MutableStateFlow(daily)
@@ -103,6 +106,9 @@ class FakeSpendAnalyticsRepository(
     /** The same record for [daily]. */
     val dailyScopes: MutableList<SpendScope> = mutableListOf()
 
+    /** The same record for [netByMonth]. */
+    val netByMonthScopes: MutableList<SpendScope> = mutableListOf()
+
     fun setDaily(points: List<DailySpendPoint>) {
         dailyPoints.value = points
     }
@@ -112,7 +118,12 @@ class FakeSpendAnalyticsRepository(
         return flowOf(slicesByWindow[scope.window].orEmpty())
     }
 
-    override fun netByMonth(scope: SpendScope): Flow<List<MonthlyNet>> = flowOf(emptyList())
+    override fun netByMonth(scope: SpendScope): Flow<List<MonthlyNet>> {
+        netByMonthScopes += scope
+        // A month counts when its first day is inside the window — the same all-or-nothing call the
+        // real query's month-boundary contract lets callers assume.
+        return flowOf(nets.filter { it.month.firstDay in scope.window }.sortedBy { it.month })
+    }
 
     override fun daily(scope: SpendScope): Flow<List<DailySpendPoint>> {
         dailyScopes += scope
