@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.9%
+    89.5%
   </span>
   <span class="absValue">
-    (45/57)
+    (51/57)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.3%
+    100%
   </span>
   <span class="absValue">
-    (84/91)
+    (91/91)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.1%
+    98.7%
   </span>
   <span class="absValue">
-    (474/526)
+    (519/526)
   </span>
 </td>
 </tr>
@@ -506,26 +506,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.3%
+    90.2%
   </span>
   <span class="absValue">
-    (49/61)
+    (55/61)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95%
+    100%
   </span>
   <span class="absValue">
-    (134/141)
+    (141/141)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    93.6%
+    99.1%
   </span>
   <span class="absValue">
-    (756/808)
+    (801/808)
   </span>
 </td>
 </tr>
@@ -643,12 +643,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override fun onEvent(event: TransactionsByAccountEvent) {
 <b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            TransactionsByAccountEvent.OnBackClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(TransactionsByAccountEffect.NavigateBack)</b>
-<b class="pc">&nbsp;            TransactionsByAccountEvent.OnAddTransactionClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(TransactionsByAccountEffect.NavigateToTransactionCreation(currentState.accountId))</b>
-<b class="pc">&nbsp;            is TransactionsByAccountEvent.OnTransactionClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(TransactionsByAccountEffect.NavigateToTransactionDetails(event.transactionId))</b>
+<b class="fc">&nbsp;            TransactionsByAccountEvent.OnBackClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(TransactionsByAccountEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            TransactionsByAccountEvent.OnAddTransactionClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(TransactionsByAccountEffect.NavigateToTransactionCreation(currentState.accountId))</b>
+<b class="fc">&nbsp;            is TransactionsByAccountEvent.OnTransactionClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(TransactionsByAccountEffect.NavigateToTransactionDetails(event.transactionId))</b>
 <b class="fc">&nbsp;            is TransactionsByAccountEvent.OnSearchQueryChanged -&gt; filterStore.setQuery(event.query)</b>
 <b class="fc">&nbsp;            TransactionsByAccountEvent.OnClearFiltersClick -&gt; {</b>
 &nbsp;                // The search text goes too, unlike `clear()` on its own: this is the empty state&#39;s
@@ -657,18 +657,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                filterStore.clear()</b>
 <b class="fc">&nbsp;                filterStore.setQuery(&quot;&quot;)</b>
 &nbsp;            }
-<b class="pc">&nbsp;            TransactionsByAccountEvent.OnOpenFiltersClick -&gt;</b>
+<b class="fc">&nbsp;            TransactionsByAccountEvent.OnOpenFiltersClick -&gt;</b>
 &nbsp;                // Carry the anchor the list is paged to: the filter screen&#39;s live result count
 &nbsp;                // resolves the same window from it, so `Apply · N results` matches the list the
 &nbsp;                // user returns to rather than always counting today&#39;s period.
-<b class="nc">&nbsp;                postSideEffect(</b>
-<b class="nc">&nbsp;                    TransactionsByAccountEffect.NavigateToFilters(</b>
-<b class="nc">&nbsp;                        accountId = currentState.accountId,</b>
-<b class="nc">&nbsp;                        anchorEpochDay = anchorDate.value.toEpochDays(),</b>
+<b class="fc">&nbsp;                postSideEffect(</b>
+<b class="fc">&nbsp;                    TransactionsByAccountEffect.NavigateToFilters(</b>
+<b class="fc">&nbsp;                        accountId = currentState.accountId,</b>
+<b class="fc">&nbsp;                        anchorEpochDay = anchorDate.value.toEpochDays(),</b>
 &nbsp;                    ),
 &nbsp;                )
 <b class="fc">&nbsp;            TransactionsByAccountEvent.OnPreviousPeriodClick -&gt; shiftAnchor(by = -1)</b>
-<b class="pc">&nbsp;            TransactionsByAccountEvent.OnNextPeriodClick -&gt; shiftAnchor(by = 1)</b>
+<b class="fc">&nbsp;            TransactionsByAccountEvent.OnNextPeriodClick -&gt; shiftAnchor(by = 1)</b>
 <b class="fc">&nbsp;            is TransactionsByAccountEvent.OnPeriodModeChanged -&gt; launch {</b>
 <b class="fc">&nbsp;                uiPreferences.transactionsPeriodMode.set(event.mode)</b>
 &nbsp;            }
@@ -692,7 +692,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    private fun loadMore() {
 <b class="pc">&nbsp;        val content = currentState as? TransactionsByAccountState.Content ?: return</b>
-<b class="pc">&nbsp;        if (!content.canLoadMore) return</b>
+<b class="fc">&nbsp;        if (!content.canLoadMore) return</b>
 <b class="fc">&nbsp;        pageLimit.value += PAGE_SIZE</b>
 &nbsp;    }
 &nbsp;
@@ -895,7 +895,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionDetailsScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/8)
+    (4/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/68)
+    (17/68)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    73.7%
   </span>
   <span class="absValue">
-    (0/95)
+    (70/95)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    53.3%
   </span>
   <span class="absValue">
-    (0/1341)
+    (715/1341)
   </span>
 </td>
 </tr>
@@ -124,34 +124,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    40%
   </span>
   <span class="absValue">
-    (0/10)
+    (4/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/68)
+    (17/68)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    72.2%
   </span>
   <span class="absValue">
-    (0/97)
+    (70/97)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    53.3%
   </span>
   <span class="absValue">
-    (0/1341)
+    (715/1341)
   </span>
 </td>
 </tr>
@@ -258,95 +258,101 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
 &nbsp;
+&nbsp;/**
+&nbsp; * The details of one transaction, drawn from a state it is handed.
+&nbsp; *
+&nbsp; * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/testing-strategy.md.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;internal fun TransactionDetailsContent(
+&nbsp;fun TransactionDetailsContent(
 &nbsp;    state: TransactionDetailsState.Content,
 &nbsp;    onEvent: (TransactionDetailsEvent) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    if (state.showDeleteConfirmation) {</b>
-<b class="nc">&nbsp;        SurferDeleteTransactionDialog(</b>
-<b class="nc">&nbsp;            titleOrNull = state.note.ifBlank { null },</b>
-<b class="nc">&nbsp;            onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },</b>
-<b class="nc">&nbsp;            onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },</b>
-<b class="nc">&nbsp;            isTransfer = state.isTransfer,</b>
-<b class="nc">&nbsp;            isSplit = state.isSplit,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    if (state.showDeleteConfirmation) {</b>
+<b class="fc">&nbsp;        SurferDeleteTransactionDialog(</b>
+<b class="pc">&nbsp;            titleOrNull = state.note.ifBlank { null },</b>
+<b class="fc">&nbsp;            onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },</b>
+<b class="fc">&nbsp;            onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },</b>
+<b class="fc">&nbsp;            isTransfer = state.isTransfer,</b>
+<b class="fc">&nbsp;            isSplit = state.isSplit,</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;    }</b>
 &nbsp;
-<b class="nc">&nbsp;    SurferPaneScaffold(</b>
-<b class="nc">&nbsp;        title = stringResource(Res.string.transaction_details_title),</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .testTag(TransactionDetailsTestTags.Root)</b>
-<b class="nc">&nbsp;            .surferTestTagAsId(),</b>
-<b class="nc">&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },</b>
-<b class="nc">&nbsp;        actions = { DetailsActions(onEvent = onEvent) },</b>
-<b class="nc">&nbsp;    ) { padding -&gt;</b>
-<b class="nc">&nbsp;        Column(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxSize()</b>
-<b class="nc">&nbsp;                .surferContentContainer()</b>
-<b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding()),</b>
+<b class="fc">&nbsp;    SurferPaneScaffold(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.transaction_details_title),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .testTag(TransactionDetailsTestTags.Root)</b>
+<b class="fc">&nbsp;            .surferTestTagAsId(),</b>
+<b class="fc">&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },</b>
+<b class="fc">&nbsp;        actions = { DetailsActions(onEvent = onEvent) },</b>
+<b class="fc">&nbsp;    ) { padding -&gt;</b>
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxSize()</b>
+<b class="fc">&nbsp;                .surferContentContainer()</b>
+<b class="fc">&nbsp;                .padding(top = padding.calculateTopPadding()),</b>
 &nbsp;        ) {
-<b class="nc">&nbsp;            Column(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth()</b>
-<b class="nc">&nbsp;                    .verticalScroll(rememberScrollState())</b>
-<b class="nc">&nbsp;                    .weight(1f),</b>
+<b class="fc">&nbsp;            Column(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .fillMaxWidth()</b>
+<b class="fc">&nbsp;                    .verticalScroll(rememberScrollState())</b>
+<b class="fc">&nbsp;                    .weight(1f),</b>
 &nbsp;            ) {
-<b class="nc">&nbsp;                val heroVisual = heroVisualFor(state)</b>
-<b class="nc">&nbsp;                HeroCard(</b>
-<b class="nc">&nbsp;                    header = heroHeaderFor(state),</b>
-<b class="nc">&nbsp;                    headerColor = heroVisual.tint,</b>
-<b class="nc">&nbsp;                    visual = heroVisual,</b>
-<b class="nc">&nbsp;                    formattedAmount = state.formattedAmount,</b>
-<b class="nc">&nbsp;                    note = state.note,</b>
-<b class="nc">&nbsp;                    formattedDate = state.formattedDate,</b>
-<b class="nc">&nbsp;                    isPlanned = state.isPlanned,</b>
+<b class="fc">&nbsp;                val heroVisual = heroVisualFor(state)</b>
+<b class="fc">&nbsp;                HeroCard(</b>
+<b class="fc">&nbsp;                    header = heroHeaderFor(state),</b>
+<b class="fc">&nbsp;                    headerColor = heroVisual.tint,</b>
+<b class="fc">&nbsp;                    visual = heroVisual,</b>
+<b class="fc">&nbsp;                    formattedAmount = state.formattedAmount,</b>
+<b class="fc">&nbsp;                    note = state.note,</b>
+<b class="fc">&nbsp;                    formattedDate = state.formattedDate,</b>
+<b class="fc">&nbsp;                    isPlanned = state.isPlanned,</b>
 &nbsp;                )
 &nbsp;
-<b class="nc">&nbsp;                state.split?.let { SplitCard(split = it) }</b>
+<b class="fc">&nbsp;                state.split?.let { SplitCard(split = it) }</b>
 &nbsp;
-<b class="nc">&nbsp;                DetailsCard(state = state)</b>
+<b class="fc">&nbsp;                DetailsCard(state = state)</b>
 &nbsp;
-<b class="nc">&nbsp;                Spacer(Modifier.height(padding.calculateBottomPadding()))</b>
-<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;                Spacer(Modifier.height(padding.calculateBottomPadding()))</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;
-<b class="nc">&nbsp;            if (state.canDuplicate) {</b>
-<b class="nc">&nbsp;                DuplicateButton(onEvent = onEvent)</b>
-<b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;            if (state.canDuplicate) {</b>
+<b class="fc">&nbsp;                DuplicateButton(onEvent = onEvent)</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun DetailsActions(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
-<b class="nc">&nbsp;    SurferToolbarAction(</b>
-<b class="nc">&nbsp;        icon = SurferIcons.Edit,</b>
-<b class="nc">&nbsp;        contentDescription = stringResource(Res.string.transaction_details_edit_content_description),</b>
-<b class="nc">&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },</b>
-<b class="nc">&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),</b>
+<b class="pc">&nbsp;private fun DetailsActions(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
+<b class="fc">&nbsp;    SurferToolbarAction(</b>
+<b class="fc">&nbsp;        icon = SurferIcons.Edit,</b>
+<b class="fc">&nbsp;        contentDescription = stringResource(Res.string.transaction_details_edit_content_description),</b>
+<b class="fc">&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },</b>
+<b class="fc">&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),</b>
 &nbsp;    )
-<b class="nc">&nbsp;    SurferToolbarAction(</b>
-<b class="nc">&nbsp;        icon = SurferIcons.Delete,</b>
-<b class="nc">&nbsp;        contentDescription = stringResource(Res.string.transaction_details_delete_content_description),</b>
-<b class="nc">&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },</b>
-<b class="nc">&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),</b>
-<b class="nc">&nbsp;        tint = AppTheme.materialColors.error,</b>
+<b class="fc">&nbsp;    SurferToolbarAction(</b>
+<b class="fc">&nbsp;        icon = SurferIcons.Delete,</b>
+<b class="fc">&nbsp;        contentDescription = stringResource(Res.string.transaction_details_delete_content_description),</b>
+<b class="fc">&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },</b>
+<b class="fc">&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),</b>
+<b class="fc">&nbsp;        tint = AppTheme.materialColors.error,</b>
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun DuplicateButton(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
-<b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxWidth()</b>
-<b class="nc">&nbsp;            .padding(horizontal = 16.dp)</b>
-<b class="nc">&nbsp;            .padding(bottom = AppTheme.spacing.large),</b>
+<b class="pc">&nbsp;private fun DuplicateButton(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .padding(bottom = AppTheme.spacing.large),</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        FilledTonalButton(</b>
-<b class="nc">&nbsp;            onClick = { onEvent(TransactionDetailsEvent.OnDuplicateClick) },</b>
-<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;            shape = RoundedCornerShape(20.dp),</b>
+<b class="fc">&nbsp;        FilledTonalButton(</b>
+<b class="fc">&nbsp;            onClick = { onEvent(TransactionDetailsEvent.OnDuplicateClick) },</b>
+<b class="fc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;            shape = RoundedCornerShape(20.dp),</b>
 &nbsp;        ) {
 &nbsp;            Icon(
 &nbsp;                imageVector = SurferIcons.Copy,
@@ -356,8 +362,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
 &nbsp;            Text(stringResource(Res.string.transaction_details_duplicate))
 &nbsp;        }
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -381,7 +387,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionFiltersViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    64.3%
+    100%
   </span>
   <span class="absValue">
-    (9/14)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    72%
+    100%
   </span>
   <span class="absValue">
-    (36/50)
+    (50/50)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.5%
+    100%
   </span>
   <span class="absValue">
-    (47/55)
+    (55/55)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    70.2%
+    100%
   </span>
   <span class="absValue">
-    (407/580)
+    (580/580)
   </span>
 </td>
 </tr>
@@ -258,34 +258,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    70.8%
   </span>
   <span class="absValue">
-    (12/24)
+    (17/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    72.4%
+    96.6%
   </span>
   <span class="absValue">
-    (42/58)
+    (56/58)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89.3%
+    100%
   </span>
   <span class="absValue">
-    (67/75)
+    (75/75)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    76.2%
+    99.7%
   </span>
   <span class="absValue">
-    (559/734)
+    (732/734)
   </span>
 </td>
 </tr>
@@ -389,22 +389,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                postSideEffect(TransactionFiltersEffect.NavigateBack)</b>
 &nbsp;            }
 <b class="fc">&nbsp;            is TransactionFiltersEvent.OnDatePresetClick -&gt; edit { withPreset(event.preset) }</b>
-<b class="pc">&nbsp;            TransactionFiltersEvent.OnCustomDateClick -&gt; edit { withCustomRange() }</b>
+<b class="fc">&nbsp;            TransactionFiltersEvent.OnCustomDateClick -&gt; edit { withCustomRange() }</b>
 <b class="fc">&nbsp;            is TransactionFiltersEvent.OnCustomFromPicked -&gt; edit { withCustomFrom(event.date) }</b>
-<b class="pc">&nbsp;            is TransactionFiltersEvent.OnCustomToPicked -&gt; edit { withCustomTo(event.date) }</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnCustomToPicked -&gt; edit { withCustomTo(event.date) }</b>
 <b class="fc">&nbsp;            is TransactionFiltersEvent.OnTypeSelected -&gt; edit { copy(type = event.type) }</b>
-<b class="pc">&nbsp;            is TransactionFiltersEvent.OnAccountToggled -&gt; edit {</b>
-<b class="nc">&nbsp;                copy(accountIds = accountIds.toggle(event.accountId))</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnAccountToggled -&gt; edit {</b>
+<b class="fc">&nbsp;                copy(accountIds = accountIds.toggle(event.accountId))</b>
 &nbsp;            }
-<b class="pc">&nbsp;            is TransactionFiltersEvent.OnCategoryToggled -&gt; edit {</b>
-<b class="nc">&nbsp;                copy(categoryIds = categoryIds.toggle(event.categoryId))</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnCategoryToggled -&gt; edit {</b>
+<b class="fc">&nbsp;                copy(categoryIds = categoryIds.toggle(event.categoryId))</b>
 &nbsp;            }
-<b class="pc">&nbsp;            TransactionFiltersEvent.OnAllCategoriesClick -&gt; edit { copy(categoryIds = emptySet()) }</b>
-<b class="pc">&nbsp;            is TransactionFiltersEvent.OnMinAmountChanged -&gt; edit { copy(minAmount = event.text) }</b>
-<b class="pc">&nbsp;            is TransactionFiltersEvent.OnMaxAmountChanged -&gt; edit { copy(maxAmount = event.text) }</b>
+<b class="fc">&nbsp;            TransactionFiltersEvent.OnAllCategoriesClick -&gt; edit { copy(categoryIds = emptySet()) }</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnMinAmountChanged -&gt; edit { copy(minAmount = event.text) }</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnMaxAmountChanged -&gt; edit { copy(maxAmount = event.text) }</b>
 <b class="fc">&nbsp;            is TransactionFiltersEvent.OnRecurringOnlyChanged -&gt; edit { copy(recurringOnly = event.enabled) }</b>
-<b class="pc">&nbsp;            is TransactionFiltersEvent.OnPlannedOnlyChanged -&gt; edit { copy(plannedOnly = event.enabled) }</b>
-<b class="nc">&nbsp;            is TransactionFiltersEvent.OnSortSelected -&gt; edit { copy(sort = event.sort) }</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnPlannedOnlyChanged -&gt; edit { copy(plannedOnly = event.enabled) }</b>
+<b class="fc">&nbsp;            is TransactionFiltersEvent.OnSortSelected -&gt; edit { copy(sort = event.sort) }</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -425,24 +425,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun TransactionFilters.withCustomRange(): TransactionFilters =
-<b class="nc">&nbsp;        if (dateRange is TransactionDateRange.Custom) {</b>
-<b class="nc">&nbsp;            copy(dateRange = TransactionDateRange.FollowPeriod)</b>
+<b class="fc">&nbsp;        if (dateRange is TransactionDateRange.Custom) {</b>
+<b class="fc">&nbsp;            copy(dateRange = TransactionDateRange.FollowPeriod)</b>
 &nbsp;        } else {
-<b class="nc">&nbsp;            copy(dateRange = TransactionDateRange.Custom(from = null, to = null))</b>
+<b class="fc">&nbsp;            copy(dateRange = TransactionDateRange.Custom(from = null, to = null))</b>
 &nbsp;        }
 &nbsp;
 &nbsp;    private fun TransactionFilters.withCustomFrom(date: LocalDate?): TransactionFilters =
 <b class="fc">&nbsp;        copy(dateRange = customRange().copy(from = date))</b>
 &nbsp;
 &nbsp;    private fun TransactionFilters.withCustomTo(date: LocalDate?): TransactionFilters =
-<b class="nc">&nbsp;        copy(dateRange = customRange().copy(to = date))</b>
+<b class="fc">&nbsp;        copy(dateRange = customRange().copy(to = date))</b>
 &nbsp;
 &nbsp;    /** Picking a From/To date is itself the switch to a custom range. */
 &nbsp;    private fun TransactionFilters.customRange(): TransactionDateRange.Custom =
-<b class="pc">&nbsp;        dateRange as? TransactionDateRange.Custom ?: TransactionDateRange.Custom(null, null)</b>
+<b class="fc">&nbsp;        dateRange as? TransactionDateRange.Custom ?: TransactionDateRange.Custom(null, null)</b>
 &nbsp;
 &nbsp;    private fun &lt;T&gt; Set&lt;T&gt;.toggle(value: T): Set&lt;T&gt; =
-<b class="nc">&nbsp;        if (value in this) this - value else this + value</b>
+<b class="fc">&nbsp;        if (value in this) this - value else this + value</b>
 &nbsp;
 &nbsp;    @OptIn(ExperimentalCoroutinesApi::class)
 &nbsp;    private fun observeData() {
@@ -548,7 +548,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

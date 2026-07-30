@@ -140,8 +140,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * The details of one transaction, drawn from a state it is handed.
+&nbsp; *
+&nbsp; * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/testing-strategy.md.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;internal fun TransactionDetailsContent(
+&nbsp;fun TransactionDetailsContent(
 &nbsp;    state: TransactionDetailsState.Content,
 &nbsp;    onEvent: (TransactionDetailsEvent) -&gt; Unit,
 &nbsp;) {
@@ -263,7 +269,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

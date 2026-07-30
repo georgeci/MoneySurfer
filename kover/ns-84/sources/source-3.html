@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SurferSwipeToDeleteTransactionKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    62.5%
   </span>
   <span class="absValue">
-    (0/8)
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    33.3%
   </span>
   <span class="absValue">
-    (0/18)
+    (6/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75.8%
   </span>
   <span class="absValue">
-    (0/33)
+    (25/33)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    78%
   </span>
   <span class="absValue">
-    (0/496)
+    (387/496)
   </span>
 </td>
 </tr>
@@ -123,7 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Total swipe travel: one 72dp action button plus the reveal row&#39;s 6dp gutters. Narrower than the
 &nbsp; * manage screens&#39; two-action track, because a transaction row reveals only Delete.
 &nbsp; */
-<b class="nc">&nbsp;private val REVEAL_WIDTH = 84.dp</b>
+<b class="fc">&nbsp;private val REVEAL_WIDTH = 84.dp</b>
 &nbsp;
 &nbsp;/**
 &nbsp; * A transaction row that can be swiped left to delete, with the deletion routed through a
@@ -153,37 +153,37 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;fun SurferSwipeToDeleteTransaction(
 &nbsp;    transactionTitle: String,
 &nbsp;    onDelete: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    isTransfer: Boolean = false,</b>
-<b class="nc">&nbsp;    isSplit: Boolean = false,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    isTransfer: Boolean = false,</b>
+<b class="fc">&nbsp;    isSplit: Boolean = false,</b>
 &nbsp;    content: @Composable () -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
+<b class="pc">&nbsp;) {</b>
 &nbsp;    // Survives configuration changes and process death: the dialog is a question already put to
 &nbsp;    // the user, and re-asking it (or worse, dropping it) on rotation loses their place.
-<b class="nc">&nbsp;    var showConfirmation by rememberSaveable { mutableStateOf(false) }</b>
-<b class="nc">&nbsp;    val deleteLabel = stringResource(Res.string.uikit_transaction_delete)</b>
+<b class="fc">&nbsp;    var showConfirmation by rememberSaveable { mutableStateOf(false) }</b>
+<b class="fc">&nbsp;    val deleteLabel = stringResource(Res.string.uikit_transaction_delete)</b>
 &nbsp;
-<b class="nc">&nbsp;    SurferSwipeRevealRow(</b>
-<b class="nc">&nbsp;        revealWidth = REVEAL_WIDTH,</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;        accessibilityActions = listOf(</b>
-<b class="nc">&nbsp;            SurferSwipeAccessibilityAction(label = deleteLabel) { showConfirmation = true },</b>
+<b class="fc">&nbsp;    SurferSwipeRevealRow(</b>
+<b class="fc">&nbsp;        revealWidth = REVEAL_WIDTH,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        accessibilityActions = listOf(</b>
+<b class="fc">&nbsp;            SurferSwipeAccessibilityAction(label = deleteLabel) { showConfirmation = true },</b>
 &nbsp;        ),
-<b class="nc">&nbsp;        actions = {</b>
-<b class="nc">&nbsp;            SurferSwipeAction(</b>
-<b class="nc">&nbsp;                icon = SurferIcons.Delete,</b>
-<b class="nc">&nbsp;                label = deleteLabel,</b>
-<b class="nc">&nbsp;                onClick = { showConfirmation = true },</b>
-<b class="nc">&nbsp;                destructive = true,</b>
+<b class="fc">&nbsp;        actions = {</b>
+<b class="fc">&nbsp;            SurferSwipeAction(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Delete,</b>
+<b class="fc">&nbsp;                label = deleteLabel,</b>
+<b class="fc">&nbsp;                onClick = { showConfirmation = true },</b>
+<b class="fc">&nbsp;                destructive = true,</b>
 &nbsp;            )
 &nbsp;        },
-<b class="nc">&nbsp;    ) {</b>
-<b class="nc">&nbsp;        Box(modifier = Modifier.background(AppTheme.materialColors.surface)) {</b>
-<b class="nc">&nbsp;            content()</b>
-<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        Box(modifier = Modifier.background(AppTheme.materialColors.surface)) {</b>
+<b class="fc">&nbsp;            content()</b>
+<b class="fc">&nbsp;        }</b>
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    if (showConfirmation) {</b>
+<b class="pc">&nbsp;    if (showConfirmation) {</b>
 <b class="nc">&nbsp;        SurferDeleteTransactionDialog(</b>
 <b class="nc">&nbsp;            titleOrNull = transactionTitle.takeIf { it.isNotBlank() },</b>
 <b class="nc">&nbsp;            onConfirm = {</b>
@@ -194,8 +194,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            isTransfer = isTransfer,</b>
 <b class="nc">&nbsp;            isSplit = isSplit,</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -219,7 +219,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

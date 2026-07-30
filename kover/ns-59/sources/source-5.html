@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.4%
+    95.8%
   </span>
   <span class="absValue">
-    (41/48)
+    (46/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    100%
   </span>
   <span class="absValue">
-    (36/44)
+    (44/44)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.3%
+    99.4%
   </span>
   <span class="absValue">
-    (289/343)
+    (341/343)
   </span>
 </td>
 </tr>
@@ -96,26 +96,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.4%
+    95.8%
   </span>
   <span class="absValue">
-    (41/48)
+    (46/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    100%
   </span>
   <span class="absValue">
-    (36/44)
+    (44/44)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.3%
+    99.4%
   </span>
   <span class="absValue">
-    (289/343)
+    (341/343)
   </span>
 </td>
 </tr>
@@ -171,20 +171,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;private fun presetWindow(preset: TransactionDatePreset, today: LocalDate): TransactionPeriodWindow =
-<b class="pc">&nbsp;    when (preset) {</b>
+<b class="fc">&nbsp;    when (preset) {</b>
 <b class="fc">&nbsp;        TransactionDatePreset.Today -&gt; TransactionPeriodWindow(today, today)</b>
-<b class="nc">&nbsp;        TransactionDatePreset.Yesterday -&gt; today.minus(1, DateTimeUnit.DAY)</b>
-<b class="nc">&nbsp;            .let { TransactionPeriodWindow(it, it) }</b>
-<b class="nc">&nbsp;        TransactionDatePreset.ThisWeek -&gt; today.startOfIsoWeek()</b>
-<b class="nc">&nbsp;            .let { TransactionPeriodWindow(it, it.plus(DAYS_PER_WEEK - 1, DateTimeUnit.DAY)) }</b>
-<b class="nc">&nbsp;        TransactionDatePreset.ThisMonth -&gt; periodWindow(TransactionPeriodMode.Month, today)</b>
+<b class="fc">&nbsp;        TransactionDatePreset.Yesterday -&gt; today.minus(1, DateTimeUnit.DAY)</b>
+<b class="fc">&nbsp;            .let { TransactionPeriodWindow(it, it) }</b>
+<b class="fc">&nbsp;        TransactionDatePreset.ThisWeek -&gt; today.startOfIsoWeek()</b>
+<b class="fc">&nbsp;            .let { TransactionPeriodWindow(it, it.plus(DAYS_PER_WEEK - 1, DateTimeUnit.DAY)) }</b>
+<b class="fc">&nbsp;        TransactionDatePreset.ThisMonth -&gt; periodWindow(TransactionPeriodMode.Month, today)</b>
 <b class="fc">&nbsp;        TransactionDatePreset.LastMonth -&gt; periodWindow(</b>
 <b class="fc">&nbsp;            TransactionPeriodMode.Month,</b>
 <b class="fc">&nbsp;            LocalDate(today.year, today.month, 1).minus(1, DateTimeUnit.MONTH),</b>
 &nbsp;        )
-<b class="nc">&nbsp;        TransactionDatePreset.ThisYear -&gt; TransactionPeriodWindow(</b>
-<b class="nc">&nbsp;            from = LocalDate(today.year, 1, 1),</b>
-<b class="nc">&nbsp;            to = LocalDate(today.year, DECEMBER, DAYS_IN_DECEMBER),</b>
+<b class="fc">&nbsp;        TransactionDatePreset.ThisYear -&gt; TransactionPeriodWindow(</b>
+<b class="fc">&nbsp;            from = LocalDate(today.year, 1, 1),</b>
+<b class="fc">&nbsp;            to = LocalDate(today.year, DECEMBER, DAYS_IN_DECEMBER),</b>
 &nbsp;        )
 &nbsp;    }
 &nbsp;
@@ -326,7 +326,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    return CompiledFilters(</b>
 <b class="fc">&nbsp;        filters = this,</b>
 <b class="fc">&nbsp;        minMinor = parseAmountQuery(minAmount)?.fromMinor,</b>
-<b class="pc">&nbsp;        maxMinor = parseAmountQuery(maxAmount)?.toMinor,</b>
+<b class="fc">&nbsp;        maxMinor = parseAmountQuery(maxAmount)?.toMinor,</b>
 <b class="fc">&nbsp;        queryAmount = trimmed.takeIf { it.isNotEmpty() }?.let(::parseAmountQuery),</b>
 <b class="fc">&nbsp;        needle = trimmed,</b>
 &nbsp;    )
@@ -357,7 +357,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ZipStoredWriterKt</title>
+  <title>MoneySurfer Coverage Report > ZipStoredReaderKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.backup.zip</a>
 </div>
 
-<h1>Coverage Summary for Class: ZipStoredWriterKt (com.georgeci.moneysurfer.data.backup.zip)</h1>
+<h1>Coverage Summary for Class: ZipStoredReaderKt (com.georgeci.moneysurfer.data.backup.zip)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ZipStoredWriterKt</td>
+  <td class="name">ZipStoredReaderKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -52,157 +52,110 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import okio.BufferedSource
 &nbsp;
 &nbsp;/**
-&nbsp; * Minimal ZIP encoder using only the STORED (no compression) method.
+&nbsp; * Streaming reader for ZIPs produced by [ZipStoredWriter].
 &nbsp; *
-&nbsp; * SQLite databases and DataStore preference files do not compress meaningfully,
-&nbsp; * so STORED is the right trade-off — and it lets us keep the implementation
-&nbsp; * tiny and KMP-portable (no `java.util.zip` on iOS).
-&nbsp; *
-&nbsp; * Each entry is fully buffered in memory before its local-file-header is
-&nbsp; * written (so size + CRC are known up front and we avoid data-descriptors).
-&nbsp; * Files in this app are bounded — a personal-finance database is rarely above
-&nbsp; * tens of MB — so this is acceptable.
+&nbsp; * Reads local-file-headers in order and ignores the trailing central directory.
+&nbsp; * Only the STORED method is supported — a non-zero compression method is a
+&nbsp; * hard error.
 &nbsp; */
-&nbsp;internal class ZipStoredWriter(private val sink: BufferedSink) {
+&nbsp;internal class ZipStoredReader(private val source: BufferedSource) {
 &nbsp;
-&nbsp;    private val entries: MutableList&lt;CentralDirEntry&gt; = mutableListOf()
-&nbsp;    private var bytesWritten: Long = 0
-&nbsp;    private var closed: Boolean = false
+&nbsp;    /** Reads the next entry&#39;s name. Returns `null` once the central directory is reached. */
+&nbsp;    fun nextEntryName(): String? {
+&nbsp;        if (source.exhausted()) return null
+&nbsp;        val signature = source.readIntLe()
+&nbsp;        if (signature != LOCAL_FILE_HEADER_SIGNATURE) {
+&nbsp;            // Treat anything else (central directory, EOCD) as end of stream.
+&nbsp;            return null
+&nbsp;        }
+&nbsp;        currentHeader = readLocalFileHeader()
+&nbsp;        return currentHeader?.name
+&nbsp;    }
 &nbsp;
-&nbsp;    fun writeEntry(name: String, data: BufferedSource) {
-&nbsp;        check(!closed) { &quot;ZIP archive already finished&quot; }
+&nbsp;    /** Declared size of the most-recent entry, or `null` outside an entry. */
+&nbsp;    val currentEntrySize: Long?
+&nbsp;        get() = currentHeader?.size?.toLong()
 &nbsp;
-&nbsp;        val payload = Buffer()
+&nbsp;    /**
+&nbsp;     * Streams the body of the most-recent entry into [out] and verifies the CRC32.
+&nbsp;     * Throws [BackupError.CrcMismatch] on mismatch.
+&nbsp;     */
+&nbsp;    fun readCurrentEntryTo(out: BufferedSink) {
+&nbsp;        val header = currentHeader ?: error(&quot;nextEntryName() returned null or was not called&quot;)
 &nbsp;        val crc = Crc32()
+&nbsp;        var remaining = header.size
 &nbsp;        val readBuffer = ByteArray(COPY_BUFFER_SIZE)
-&nbsp;        while (true) {
-&nbsp;            val n = data.read(readBuffer)
-&nbsp;            if (n == -1) break
+&nbsp;        while (remaining &gt; 0) {
+&nbsp;            val toRead = minOf(remaining.toLong(), readBuffer.size.toLong()).toInt()
+&nbsp;            val n = source.read(readBuffer, 0, toRead)
+&nbsp;            if (n == -1) {
+&nbsp;                throw BackupError.InvalidArchive(&quot;Truncated entry: ${header.name}&quot;)
+&nbsp;            }
 &nbsp;            crc.update(readBuffer, length = n)
-&nbsp;            payload.write(readBuffer, 0, n)
+&nbsp;            out.write(readBuffer, 0, n)
+&nbsp;            remaining -= n
+&nbsp;        }
+&nbsp;        if (crc.getValue() != header.crc) {
+&nbsp;            throw BackupError.CrcMismatch(header.name)
+&nbsp;        }
+&nbsp;        currentHeader = null
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Reads the current entry into a fresh [Buffer]. */
+&nbsp;    fun readCurrentEntryToBuffer(): Buffer {
+&nbsp;        val buffer = Buffer()
+&nbsp;        readCurrentEntryTo(buffer)
+&nbsp;        return buffer
+&nbsp;    }
+&nbsp;
+&nbsp;    private var currentHeader: LocalEntry? = null
+&nbsp;
+&nbsp;    private fun readLocalFileHeader(): LocalEntry {
+&nbsp;        val versionNeeded = source.readShortLe().toInt() and MASK_U16
+&nbsp;        val flags = source.readShortLe().toInt() and MASK_U16
+&nbsp;        val method = source.readShortLe().toInt() and MASK_U16
+&nbsp;        source.readShortLe()
+&nbsp;        source.readShortLe()
+&nbsp;        val crc = source.readIntLe().toLong() and MASK_U32
+&nbsp;        val compressedSize = source.readIntLe().toLong() and MASK_U32
+&nbsp;        val uncompressedSize = source.readIntLe().toLong() and MASK_U32
+&nbsp;        val nameLength = source.readShortLe().toInt() and MASK_U16
+&nbsp;        val extraLength = source.readShortLe().toInt() and MASK_U16
+&nbsp;
+&nbsp;        val problem = when {
+&nbsp;            method != COMPRESSION_METHOD_STORED -&gt;
+&nbsp;                &quot;Unsupported compression method: $method&quot;
+&nbsp;            flags and GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG != 0 -&gt;
+&nbsp;                &quot;Data-descriptor entries are not supported&quot;
+&nbsp;            versionNeeded &gt; VERSION_NEEDED_TO_EXTRACT -&gt;
+&nbsp;                &quot;ZIP requires version $versionNeeded&quot;
+&nbsp;            compressedSize != uncompressedSize -&gt;
+&nbsp;                &quot;STORED entry has mismatched sizes&quot;
+&nbsp;            // The codec keeps each entry buffered as a single okio Segment chain,
+&nbsp;            // so anything above Int.MAX_VALUE bytes can&#39;t be addressed in the
+&nbsp;            // ByteArray copy loop and would silently overflow on the cast below.
+&nbsp;            // We don&#39;t ship multi-GB DBs, so reject up front.
+&nbsp;            uncompressedSize &gt; Int.MAX_VALUE.toLong() -&gt;
+&nbsp;                &quot;Entry too large: $uncompressedSize bytes&quot;
+&nbsp;            else -&gt; null
+&nbsp;        }
+&nbsp;        if (problem != null) {
+&nbsp;            throw BackupError.InvalidArchive(problem)
 &nbsp;        }
 &nbsp;
-&nbsp;        val nameBytes = name.encodeToByteArray()
-&nbsp;        val crcValue = crc.getValue()
-&nbsp;        val size = payload.size
-&nbsp;
-&nbsp;        // Plain ZIP (no Zip64) header fields are 32-bit. Symmetry with the
-&nbsp;        // reader: reject before we silently truncate via `toInt()`.
-&nbsp;        require32Bit(size, &quot;Entry size for $name&quot;)
-&nbsp;        require32Bit(bytesWritten, &quot;Local-header offset for $name&quot;)
-&nbsp;
-&nbsp;        val localHeaderOffset = bytesWritten
-&nbsp;        bytesWritten += writeLocalFileHeader(nameBytes, crcValue, size)
-&nbsp;        sink.writeAll(payload)
-&nbsp;        bytesWritten += size
-&nbsp;
-&nbsp;        entries += CentralDirEntry(
-&nbsp;            nameBytes = nameBytes,
-&nbsp;            crc = crcValue,
-&nbsp;            size = size,
-&nbsp;            localHeaderOffset = localHeaderOffset,
-&nbsp;        )
+&nbsp;        val nameBytes = source.readByteArray(nameLength.toLong())
+&nbsp;        val name = nameBytes.decodeToString()
+&nbsp;        if (extraLength &gt; 0) source.skip(extraLength.toLong())
+&nbsp;        return LocalEntry(name = name, size = uncompressedSize.toInt(), crc = crc)
 &nbsp;    }
 &nbsp;
-&nbsp;    fun finish() {
-&nbsp;        check(!closed) { &quot;ZIP archive already finished&quot; }
-&nbsp;        closed = true
-&nbsp;
-&nbsp;        val centralDirOffset = bytesWritten
-&nbsp;        require32Bit(centralDirOffset, &quot;Central-directory offset&quot;)
-&nbsp;        var centralDirSize = 0L
-&nbsp;        for (entry in entries) {
-&nbsp;            centralDirSize += writeCentralDirHeader(entry)
-&nbsp;        }
-&nbsp;        bytesWritten += centralDirSize
-&nbsp;        require32Bit(centralDirSize, &quot;Central-directory size&quot;)
-&nbsp;        writeEndOfCentralDir(centralDirOffset, centralDirSize)
-&nbsp;        sink.flush()
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun require32Bit(value: Long, what: String) {
-&nbsp;        if (value &gt; Int.MAX_VALUE.toLong()) {
-&nbsp;            throw BackupError.InvalidArchive(&quot;$what exceeds 32-bit ZIP limit: $value bytes&quot;)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun writeLocalFileHeader(nameBytes: ByteArray, crc: Long, size: Long): Long {
-&nbsp;        sink.writeIntLe(LOCAL_FILE_HEADER_SIGNATURE)
-&nbsp;        sink.writeShortLe(VERSION_NEEDED_TO_EXTRACT)
-&nbsp;        sink.writeShortLe(GENERAL_PURPOSE_BIT_FLAG)
-&nbsp;        sink.writeShortLe(COMPRESSION_METHOD_STORED)
-&nbsp;        sink.writeShortLe(MS_DOS_TIME)
-&nbsp;        sink.writeShortLe(MS_DOS_DATE)
-&nbsp;        sink.writeIntLe(crc.toInt())
-&nbsp;        sink.writeIntLe(size.toInt())
-&nbsp;        sink.writeIntLe(size.toInt())
-&nbsp;        sink.writeShortLe(nameBytes.size)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.write(nameBytes)
-&nbsp;        return LOCAL_FILE_HEADER_FIXED_SIZE + nameBytes.size.toLong()
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun writeCentralDirHeader(entry: CentralDirEntry): Long {
-&nbsp;        sink.writeIntLe(CENTRAL_DIR_HEADER_SIGNATURE)
-&nbsp;        sink.writeShortLe(VERSION_MADE_BY)
-&nbsp;        sink.writeShortLe(VERSION_NEEDED_TO_EXTRACT)
-&nbsp;        sink.writeShortLe(GENERAL_PURPOSE_BIT_FLAG)
-&nbsp;        sink.writeShortLe(COMPRESSION_METHOD_STORED)
-&nbsp;        sink.writeShortLe(MS_DOS_TIME)
-&nbsp;        sink.writeShortLe(MS_DOS_DATE)
-&nbsp;        sink.writeIntLe(entry.crc.toInt())
-&nbsp;        sink.writeIntLe(entry.size.toInt())
-&nbsp;        sink.writeIntLe(entry.size.toInt())
-&nbsp;        sink.writeShortLe(entry.nameBytes.size)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.writeIntLe(0)
-&nbsp;        sink.writeIntLe(entry.localHeaderOffset.toInt())
-&nbsp;        sink.write(entry.nameBytes)
-&nbsp;        return CENTRAL_DIR_HEADER_FIXED_SIZE + entry.nameBytes.size.toLong()
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun writeEndOfCentralDir(centralDirOffset: Long, centralDirSize: Long) {
-&nbsp;        sink.writeIntLe(END_OF_CENTRAL_DIR_SIGNATURE)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.writeShortLe(0)
-&nbsp;        sink.writeShortLe(entries.size)
-&nbsp;        sink.writeShortLe(entries.size)
-&nbsp;        sink.writeIntLe(centralDirSize.toInt())
-&nbsp;        sink.writeIntLe(centralDirOffset.toInt())
-&nbsp;        sink.writeShortLe(0)
-&nbsp;    }
-&nbsp;
-&nbsp;    private data class CentralDirEntry(
-&nbsp;        val nameBytes: ByteArray,
-&nbsp;        val crc: Long,
-&nbsp;        val size: Long,
-&nbsp;        val localHeaderOffset: Long,
-&nbsp;    )
+&nbsp;    private data class LocalEntry(val name: String, val size: Int, val crc: Long)
 &nbsp;}
 &nbsp;
-&nbsp;@Suppress(&quot;MagicNumber&quot;)
-&nbsp;internal const val LOCAL_FILE_HEADER_SIGNATURE: Int = 0x04034b50
-&nbsp;
-&nbsp;@Suppress(&quot;MagicNumber&quot;)
-&nbsp;internal const val CENTRAL_DIR_HEADER_SIGNATURE: Int = 0x02014b50
-&nbsp;
-&nbsp;@Suppress(&quot;MagicNumber&quot;)
-&nbsp;internal const val END_OF_CENTRAL_DIR_SIGNATURE: Int = 0x06054b50
-&nbsp;
-&nbsp;internal const val VERSION_NEEDED_TO_EXTRACT: Int = 20
-&nbsp;internal const val VERSION_MADE_BY: Int = 20
-&nbsp;internal const val GENERAL_PURPOSE_BIT_FLAG: Int = 0
-&nbsp;internal const val COMPRESSION_METHOD_STORED: Int = 0
-&nbsp;internal const val MS_DOS_TIME: Int = 0
-&nbsp;internal const val MS_DOS_DATE: Int = 0
-&nbsp;
-&nbsp;internal const val LOCAL_FILE_HEADER_FIXED_SIZE: Long = 30
-&nbsp;internal const val CENTRAL_DIR_HEADER_FIXED_SIZE: Long = 46
-&nbsp;
+&nbsp;private const val GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG: Int = 1 shl 3
 &nbsp;private const val COPY_BUFFER_SIZE: Int = 64 * 1024
+&nbsp;private const val MASK_U16: Int = 0xFFFF
+&nbsp;private const val MASK_U32: Long = 0xFFFFFFFFL
 </code>
 </pre>
 </div>
@@ -226,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionCreationTopBarKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    78.6%
   </span>
   <span class="absValue">
-    (0/14)
+    (11/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/43)
+    (43/43)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    99.6%
   </span>
   <span class="absValue">
-    (0/451)
+    (449/451)
   </span>
 </td>
 </tr>
@@ -139,63 +139,63 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;internal fun CreationTopBar(
 &nbsp;    state: TransactionCreationState.Content,
 &nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val title = if (state.isEditMode) {</b>
-<b class="nc">&nbsp;        stringResource(Res.string.transaction_creation_title_edit)</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        stringResource(Res.string.transaction_creation_title_create)</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val title = if (state.isEditMode) {</b>
+<b class="fc">&nbsp;        stringResource(Res.string.transaction_creation_title_edit)</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        stringResource(Res.string.transaction_creation_title_create)</b>
 &nbsp;    }
-<b class="nc">&nbsp;    val saveLabel = if (state.isEditMode) {</b>
-<b class="nc">&nbsp;        stringResource(Res.string.transaction_creation_update)</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        stringResource(Res.string.transaction_creation_save)</b>
+<b class="fc">&nbsp;    val saveLabel = if (state.isEditMode) {</b>
+<b class="fc">&nbsp;        stringResource(Res.string.transaction_creation_update)</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        stringResource(Res.string.transaction_creation_save)</b>
 &nbsp;    }
-<b class="nc">&nbsp;    TopAppBar(</b>
-<b class="nc">&nbsp;        title = { Text(title, style = AppTheme.typography.titleLarge) },</b>
-<b class="nc">&nbsp;        navigationIcon = {</b>
-<b class="nc">&nbsp;            Box(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .padding(start = 4.dp)</b>
-<b class="nc">&nbsp;                    .size(48.dp)</b>
-<b class="nc">&nbsp;                    .testTag(TransactionCreationTestTags.Close)</b>
-<b class="nc">&nbsp;                    .clickable { onEvent(TransactionCreationEvent.OnBackClick) },</b>
-<b class="nc">&nbsp;                contentAlignment = Alignment.Center,</b>
+<b class="fc">&nbsp;    TopAppBar(</b>
+<b class="fc">&nbsp;        title = { Text(title, style = AppTheme.typography.titleLarge) },</b>
+<b class="fc">&nbsp;        navigationIcon = {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .padding(start = 4.dp)</b>
+<b class="fc">&nbsp;                    .size(48.dp)</b>
+<b class="fc">&nbsp;                    .testTag(TransactionCreationTestTags.Close)</b>
+<b class="fc">&nbsp;                    .clickable { onEvent(TransactionCreationEvent.OnBackClick) },</b>
+<b class="fc">&nbsp;                contentAlignment = Alignment.Center,</b>
 &nbsp;            ) {
-<b class="nc">&nbsp;                Icon(</b>
-<b class="nc">&nbsp;                    imageVector = SurferIcons.Close,</b>
-<b class="nc">&nbsp;                    contentDescription = stringResource(</b>
-<b class="nc">&nbsp;                        Res.string.transaction_creation_close_content_description,</b>
+<b class="fc">&nbsp;                Icon(</b>
+<b class="fc">&nbsp;                    imageVector = SurferIcons.Close,</b>
+<b class="fc">&nbsp;                    contentDescription = stringResource(</b>
+<b class="fc">&nbsp;                        Res.string.transaction_creation_close_content_description,</b>
 &nbsp;                    ),
 &nbsp;                )
-<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;        },
-<b class="nc">&nbsp;        actions = {</b>
+<b class="fc">&nbsp;        actions = {</b>
 &nbsp;            // Destructive action sits before Save, never where the commit button was a moment ago
 &nbsp;            // on the create screen — a mis-tap here can only be taken back through the snackbar.
-<b class="nc">&nbsp;            if (state.isEditMode) {</b>
-<b class="nc">&nbsp;                SurferToolbarAction(</b>
-<b class="nc">&nbsp;                    icon = SurferIcons.Delete,</b>
-<b class="nc">&nbsp;                    contentDescription = stringResource(</b>
-<b class="nc">&nbsp;                        Res.string.transaction_details_delete_content_description,</b>
+<b class="fc">&nbsp;            if (state.isEditMode) {</b>
+<b class="fc">&nbsp;                SurferToolbarAction(</b>
+<b class="fc">&nbsp;                    icon = SurferIcons.Delete,</b>
+<b class="fc">&nbsp;                    contentDescription = stringResource(</b>
+<b class="fc">&nbsp;                        Res.string.transaction_details_delete_content_description,</b>
 &nbsp;                    ),
-<b class="nc">&nbsp;                    tint = AppTheme.materialColors.error,</b>
-<b class="nc">&nbsp;                    onClick = { onEvent(TransactionCreationEvent.OnDeleteClick) },</b>
-<b class="nc">&nbsp;                    modifier = Modifier.testTag(TransactionCreationTestTags.Delete),</b>
+<b class="fc">&nbsp;                    tint = AppTheme.materialColors.error,</b>
+<b class="fc">&nbsp;                    onClick = { onEvent(TransactionCreationEvent.OnDeleteClick) },</b>
+<b class="fc">&nbsp;                    modifier = Modifier.testTag(TransactionCreationTestTags.Delete),</b>
 &nbsp;                )
-<b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;            SurferToolbarButtonAction(</b>
-<b class="nc">&nbsp;                icon = SurferIcons.Check,</b>
-<b class="nc">&nbsp;                text = saveLabel,</b>
-<b class="nc">&nbsp;                onClick = { onEvent(TransactionCreationEvent.OnSaveClick) },</b>
-<b class="nc">&nbsp;                enabled = state.isSaveEnabled,</b>
-<b class="nc">&nbsp;                modifier = Modifier.testTag(TransactionCreationTestTags.Save),</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            SurferToolbarButtonAction(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Check,</b>
+<b class="fc">&nbsp;                text = saveLabel,</b>
+<b class="fc">&nbsp;                onClick = { onEvent(TransactionCreationEvent.OnSaveClick) },</b>
+<b class="fc">&nbsp;                enabled = state.isSaveEnabled,</b>
+<b class="fc">&nbsp;                modifier = Modifier.testTag(TransactionCreationTestTags.Save),</b>
 &nbsp;            )
 &nbsp;        },
-<b class="nc">&nbsp;        colors = TopAppBarDefaults.topAppBarColors(</b>
-<b class="nc">&nbsp;            containerColor = AppTheme.materialColors.surface,</b>
+<b class="fc">&nbsp;        colors = TopAppBarDefaults.topAppBarColors(</b>
+<b class="fc">&nbsp;            containerColor = AppTheme.materialColors.surface,</b>
 &nbsp;        ),
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -219,7 +219,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

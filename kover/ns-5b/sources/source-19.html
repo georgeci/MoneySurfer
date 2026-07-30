@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionsListSummaryStripKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/14)
+    (7/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    96.3%
   </span>
   <span class="absValue">
-    (0/54)
+    (52/54)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    96.5%
   </span>
   <span class="absValue">
-    (0/541)
+    (522/541)
   </span>
 </td>
 </tr>
@@ -127,76 +127,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@Composable
 &nbsp;internal fun SummaryStrip(
 &nbsp;    summary: TransactionSummaryUi,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = modifier</b>
-<b class="nc">&nbsp;            .clip(RoundedCornerShape(16.dp))</b>
-<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)</b>
-<b class="nc">&nbsp;            .padding(horizontal = 14.dp, vertical = 12.dp),</b>
-<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(16.dp))</b>
+<b class="fc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)</b>
+<b class="fc">&nbsp;            .padding(horizontal = 14.dp, vertical = 12.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        SummaryCell(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_income),</b>
-<b class="nc">&nbsp;            value = summary.incomeFormatted,</b>
-<b class="nc">&nbsp;            valueColor = AppTheme.semanticColors.income,</b>
-<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
+<b class="fc">&nbsp;        SummaryCell(</b>
+<b class="fc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_income),</b>
+<b class="fc">&nbsp;            value = summary.incomeFormatted,</b>
+<b class="fc">&nbsp;            valueColor = AppTheme.semanticColors.income,</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
 &nbsp;        )
-<b class="nc">&nbsp;        SummaryDivider()</b>
-<b class="nc">&nbsp;        SummaryCell(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_expenses),</b>
-<b class="nc">&nbsp;            value = summary.expenseFormatted,</b>
-<b class="nc">&nbsp;            valueColor = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
+<b class="fc">&nbsp;        SummaryDivider()</b>
+<b class="fc">&nbsp;        SummaryCell(</b>
+<b class="fc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_expenses),</b>
+<b class="fc">&nbsp;            value = summary.expenseFormatted,</b>
+<b class="fc">&nbsp;            valueColor = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
 &nbsp;        )
-<b class="nc">&nbsp;        SummaryDivider()</b>
-<b class="nc">&nbsp;        SummaryCell(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_net),</b>
-<b class="nc">&nbsp;            value = summary.netFormatted,</b>
-<b class="nc">&nbsp;            valueColor = if (summary.netPositive) {</b>
-<b class="nc">&nbsp;                AppTheme.semanticColors.income</b>
+<b class="fc">&nbsp;        SummaryDivider()</b>
+<b class="fc">&nbsp;        SummaryCell(</b>
+<b class="fc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_net),</b>
+<b class="fc">&nbsp;            value = summary.netFormatted,</b>
+<b class="pc">&nbsp;            valueColor = if (summary.netPositive) {</b>
+<b class="fc">&nbsp;                AppTheme.semanticColors.income</b>
 <b class="nc">&nbsp;            } else {</b>
 <b class="nc">&nbsp;                AppTheme.materialColors.onSurface</b>
 &nbsp;            },
-<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
 &nbsp;private fun SummaryCell(
 &nbsp;    label: String,
 &nbsp;    value: String,
 &nbsp;    valueColor: Color,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    Column(modifier = modifier) {</b>
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = label.uppercase(),</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.labelSmall,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="nc">&nbsp;            maxLines = 1,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Column(modifier = modifier) {</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = label.uppercase(),</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelSmall,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
 &nbsp;        )
-<b class="nc">&nbsp;        Spacer(Modifier.height(2.dp))</b>
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = value,</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.titleMedium,</b>
-<b class="nc">&nbsp;            color = valueColor,</b>
-<b class="nc">&nbsp;            maxLines = 1,</b>
+<b class="fc">&nbsp;        Spacer(Modifier.height(2.dp))</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = value,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;            color = valueColor,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SummaryDivider() {</b>
-<b class="nc">&nbsp;    Box(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .padding(horizontal = 8.dp)</b>
-<b class="nc">&nbsp;            .width(1.dp)</b>
-<b class="nc">&nbsp;            .height(28.dp)</b>
-<b class="nc">&nbsp;            .background(AppTheme.materialColors.outlineVariant),</b>
+<b class="fc">&nbsp;private fun SummaryDivider() {</b>
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .padding(horizontal = 8.dp)</b>
+<b class="fc">&nbsp;            .width(1.dp)</b>
+<b class="fc">&nbsp;            .height(28.dp)</b>
+<b class="fc">&nbsp;            .background(AppTheme.materialColors.outlineVariant),</b>
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -220,7 +220,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

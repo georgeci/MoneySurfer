@@ -127,8 +127,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    TransactionFiltersContent(state = state, onEvent = viewModel::onEvent)
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * The filter draft, drawn from a state it is handed.
+&nbsp; *
+&nbsp; * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/testing-strategy.md.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun TransactionFiltersContent(
+&nbsp;fun TransactionFiltersContent(
 &nbsp;    state: TransactionFiltersState,
 &nbsp;    onEvent: (TransactionFiltersEvent) -&gt; Unit,
 &nbsp;) {
@@ -272,7 +278,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>

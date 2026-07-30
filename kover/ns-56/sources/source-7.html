@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionCreationCategoryGridKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/48)
+    (32/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/120)
+    (120/120)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    96.6%
   </span>
   <span class="absValue">
-    (0/1148)
+    (1109/1148)
   </span>
 </td>
 </tr>
@@ -150,149 +150,149 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onSelect: (Category) -&gt; Unit,
 &nbsp;    onAllClick: () -&gt; Unit,
 &nbsp;    onMoreClick: () -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    Column {</b>
-<b class="nc">&nbsp;        Row(</b>
-<b class="nc">&nbsp;            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),</b>
-<b class="nc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Column {</b>
+<b class="fc">&nbsp;        Row(</b>
+<b class="fc">&nbsp;            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),</b>
+<b class="fc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
 &nbsp;        ) {
-<b class="nc">&nbsp;            Text(</b>
-<b class="nc">&nbsp;                text = stringResource(Res.string.transaction_creation_category_label),</b>
-<b class="nc">&nbsp;                style = AppTheme.typography.labelLarge,</b>
-<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="nc">&nbsp;                modifier = Modifier.weight(1f),</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = stringResource(Res.string.transaction_creation_category_label),</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelLarge,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                modifier = Modifier.weight(1f),</b>
 &nbsp;            )
-<b class="nc">&nbsp;            Text(</b>
-<b class="nc">&nbsp;                text = stringResource(Res.string.transaction_creation_category_all),</b>
-<b class="nc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;                color = AppTheme.materialColors.primary,</b>
-<b class="nc">&nbsp;                modifier = Modifier.clickable(onClick = onAllClick),</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = stringResource(Res.string.transaction_creation_category_all),</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.primary,</b>
+<b class="fc">&nbsp;                modifier = Modifier.clickable(onClick = onAllClick),</b>
 &nbsp;            )
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        Spacer(Modifier.height(8.dp))</b>
-<b class="nc">&nbsp;        val preview = categories.take(CATEGORY_PREVIEW_SIZE)</b>
-<b class="nc">&nbsp;        val rows = (preview + listOf&lt;Category?&gt;(null)).chunked(CATEGORY_GRID_COLUMNS)</b>
-<b class="nc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {</b>
-<b class="nc">&nbsp;            rows.forEach { row -&gt;</b>
-<b class="nc">&nbsp;                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {</b>
-<b class="nc">&nbsp;                    row.forEach { cat -&gt;</b>
-<b class="nc">&nbsp;                        Box(modifier = Modifier.weight(1f)) {</b>
-<b class="nc">&nbsp;                            if (cat != null) {</b>
-<b class="nc">&nbsp;                                CategoryTile(</b>
-<b class="nc">&nbsp;                                    category = cat,</b>
-<b class="nc">&nbsp;                                    selected = cat.id == selected?.id,</b>
-<b class="nc">&nbsp;                                    onClick = { onSelect(cat) },</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Spacer(Modifier.height(8.dp))</b>
+<b class="fc">&nbsp;        val preview = categories.take(CATEGORY_PREVIEW_SIZE)</b>
+<b class="fc">&nbsp;        val rows = (preview + listOf&lt;Category?&gt;(null)).chunked(CATEGORY_GRID_COLUMNS)</b>
+<b class="fc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {</b>
+<b class="fc">&nbsp;            rows.forEach { row -&gt;</b>
+<b class="fc">&nbsp;                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {</b>
+<b class="fc">&nbsp;                    row.forEach { cat -&gt;</b>
+<b class="fc">&nbsp;                        Box(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;                            if (cat != null) {</b>
+<b class="fc">&nbsp;                                CategoryTile(</b>
+<b class="fc">&nbsp;                                    category = cat,</b>
+<b class="pc">&nbsp;                                    selected = cat.id == selected?.id,</b>
+<b class="fc">&nbsp;                                    onClick = { onSelect(cat) },</b>
 &nbsp;                                )
-<b class="nc">&nbsp;                            } else {</b>
-<b class="nc">&nbsp;                                MoreTile(onClick = onMoreClick)</b>
+<b class="fc">&nbsp;                            } else {</b>
+<b class="fc">&nbsp;                                MoreTile(onClick = onMoreClick)</b>
 &nbsp;                            }
-<b class="nc">&nbsp;                        }</b>
-<b class="nc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                        }</b>
+<b class="fc">&nbsp;                    }</b>
 &nbsp;                    // Pad row if last row is shorter than the grid.
-<b class="nc">&nbsp;                    if (row.size &lt; CATEGORY_GRID_COLUMNS) {</b>
-<b class="nc">&nbsp;                        repeat(CATEGORY_GRID_COLUMNS - row.size) {</b>
-<b class="nc">&nbsp;                            Box(modifier = Modifier.weight(1f))</b>
-<b class="nc">&nbsp;                        }</b>
-<b class="nc">&nbsp;                    }</b>
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="pc">&nbsp;                    if (row.size &lt; CATEGORY_GRID_COLUMNS) {</b>
+<b class="fc">&nbsp;                        repeat(CATEGORY_GRID_COLUMNS - row.size) {</b>
+<b class="fc">&nbsp;                            Box(modifier = Modifier.weight(1f))</b>
+<b class="fc">&nbsp;                        }</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
 &nbsp;private fun CategoryTile(
 &nbsp;    category: Category,
 &nbsp;    selected: Boolean,
 &nbsp;    onClick: () -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent</b>
-<b class="nc">&nbsp;    val labelColor =</b>
-<b class="nc">&nbsp;        if (selected) AppTheme.materialColors.onSecondaryContainer else AppTheme.materialColors.onSurface</b>
-<b class="nc">&nbsp;    val visual = SurferCategoryPalette.visualFor(</b>
-<b class="nc">&nbsp;        id = category.id.value,</b>
-<b class="nc">&nbsp;        iconKey = category.iconKey,</b>
-<b class="nc">&nbsp;        hue = category.hue,</b>
-<b class="nc">&nbsp;        systemKind = category.systemKind?.name,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="pc">&nbsp;    val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent</b>
+<b class="fc">&nbsp;    val labelColor =</b>
+<b class="pc">&nbsp;        if (selected) AppTheme.materialColors.onSecondaryContainer else AppTheme.materialColors.onSurface</b>
+<b class="fc">&nbsp;    val visual = SurferCategoryPalette.visualFor(</b>
+<b class="fc">&nbsp;        id = category.id.value,</b>
+<b class="fc">&nbsp;        iconKey = category.iconKey,</b>
+<b class="fc">&nbsp;        hue = category.hue,</b>
+<b class="pc">&nbsp;        systemKind = category.systemKind?.name,</b>
 &nbsp;    )
-<b class="nc">&nbsp;    val tint = visual.tint</b>
-<b class="nc">&nbsp;    val icon: ImageVector = visual.icon</b>
-<b class="nc">&nbsp;    Column(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxWidth()</b>
-<b class="nc">&nbsp;            .clip(RoundedCornerShape(14.dp))</b>
-<b class="nc">&nbsp;            .background(bg)</b>
-<b class="nc">&nbsp;            .clickable(onClick = onClick)</b>
-<b class="nc">&nbsp;            .padding(vertical = 6.dp),</b>
-<b class="nc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="nc">&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),</b>
+<b class="fc">&nbsp;    val tint = visual.tint</b>
+<b class="fc">&nbsp;    val icon: ImageVector = visual.icon</b>
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(14.dp))</b>
+<b class="fc">&nbsp;            .background(bg)</b>
+<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(vertical = 6.dp),</b>
+<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        Box(contentAlignment = Alignment.Center) {</b>
-<b class="nc">&nbsp;            SurferCategoryBubble(icon = icon, tint = tint, size = 44.dp)</b>
-<b class="nc">&nbsp;            if (selected) {</b>
-<b class="nc">&nbsp;                Box(</b>
-<b class="nc">&nbsp;                    modifier = Modifier</b>
-<b class="nc">&nbsp;                        .align(Alignment.BottomEnd)</b>
-<b class="nc">&nbsp;                        .size(18.dp)</b>
-<b class="nc">&nbsp;                        .clip(CircleShape)</b>
-<b class="nc">&nbsp;                        .background(AppTheme.materialColors.primary)</b>
-<b class="nc">&nbsp;                        .border(2.dp, AppTheme.materialColors.surface, CircleShape),</b>
-<b class="nc">&nbsp;                    contentAlignment = Alignment.Center,</b>
+<b class="fc">&nbsp;        Box(contentAlignment = Alignment.Center) {</b>
+<b class="fc">&nbsp;            SurferCategoryBubble(icon = icon, tint = tint, size = 44.dp)</b>
+<b class="pc">&nbsp;            if (selected) {</b>
+<b class="fc">&nbsp;                Box(</b>
+<b class="fc">&nbsp;                    modifier = Modifier</b>
+<b class="fc">&nbsp;                        .align(Alignment.BottomEnd)</b>
+<b class="fc">&nbsp;                        .size(18.dp)</b>
+<b class="fc">&nbsp;                        .clip(CircleShape)</b>
+<b class="fc">&nbsp;                        .background(AppTheme.materialColors.primary)</b>
+<b class="fc">&nbsp;                        .border(2.dp, AppTheme.materialColors.surface, CircleShape),</b>
+<b class="fc">&nbsp;                    contentAlignment = Alignment.Center,</b>
 &nbsp;                ) {
-<b class="nc">&nbsp;                    Icon(</b>
-<b class="nc">&nbsp;                        imageVector = SurferIcons.Check,</b>
-<b class="nc">&nbsp;                        contentDescription = SurferSemantics.Decorative,</b>
-<b class="nc">&nbsp;                        tint = AppTheme.materialColors.onPrimary,</b>
-<b class="nc">&nbsp;                        modifier = Modifier.size(10.dp),</b>
+<b class="fc">&nbsp;                    Icon(</b>
+<b class="fc">&nbsp;                        imageVector = SurferIcons.Check,</b>
+<b class="fc">&nbsp;                        contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                        tint = AppTheme.materialColors.onPrimary,</b>
+<b class="fc">&nbsp;                        modifier = Modifier.size(10.dp),</b>
 &nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = category.name,</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;            color = labelColor,</b>
-<b class="nc">&nbsp;            textAlign = TextAlign.Center,</b>
-<b class="nc">&nbsp;            maxLines = 1,</b>
-<b class="nc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="nc">&nbsp;            modifier = Modifier.padding(horizontal = 2.dp),</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = category.name,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;            color = labelColor,</b>
+<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
+<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
+<b class="fc">&nbsp;            modifier = Modifier.padding(horizontal = 2.dp),</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun MoreTile(onClick: () -&gt; Unit) {</b>
-<b class="nc">&nbsp;    val outline = AppTheme.materialColors.outline</b>
-<b class="nc">&nbsp;    Column(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxWidth()</b>
-<b class="nc">&nbsp;            .clickable(onClick = onClick)</b>
-<b class="nc">&nbsp;            .padding(vertical = 6.dp),</b>
-<b class="nc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="nc">&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),</b>
+<b class="pc">&nbsp;private fun MoreTile(onClick: () -&gt; Unit) {</b>
+<b class="fc">&nbsp;    val outline = AppTheme.materialColors.outline</b>
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(vertical = 6.dp),</b>
+<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        Box(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .size(44.dp)</b>
-<b class="nc">&nbsp;                .clip(CircleShape)</b>
-<b class="nc">&nbsp;                .border(1.5.dp, outline, CircleShape),</b>
-<b class="nc">&nbsp;            contentAlignment = Alignment.Center,</b>
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(44.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .border(1.5.dp, outline, CircleShape),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
 &nbsp;        ) {
-<b class="nc">&nbsp;            Icon(</b>
-<b class="nc">&nbsp;                imageVector = SurferIcons.Add,</b>
-<b class="nc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
-<b class="nc">&nbsp;                tint = AppTheme.materialColors.primary,</b>
-<b class="nc">&nbsp;                modifier = Modifier.size(20.dp),</b>
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = SurferIcons.Add,</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = AppTheme.materialColors.primary,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(20.dp),</b>
 &nbsp;            )
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = stringResource(Res.string.transaction_creation_category_more),</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.primary,</b>
-<b class="nc">&nbsp;            textAlign = TextAlign.Center,</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = stringResource(Res.string.transaction_creation_category_more),</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.primary,</b>
+<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -316,7 +316,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 15:22</div>
+    <div style="float:right;">generated on 2026-07-30 16:07</div>
 </div>
 </body>
 </html>
