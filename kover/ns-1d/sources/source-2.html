@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (49/49)
+    (50/50)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.4%
   </span>
   <span class="absValue">
-    (494/497)
+    (506/509)
   </span>
 </td>
 </tr>
@@ -131,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (50/50)
+    (51/51)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.4%
   </span>
   <span class="absValue">
-    (495/498)
+    (507/510)
   </span>
 </td>
 </tr>
@@ -275,13 +275,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * Variant A from the design: the balance headline first, the quick actions under it, the
 &nbsp;         * month&#39;s spend against its budget, then safe-to-spend, the burn rate that explains it, the
 &nbsp;         * budgets both are read off, where the period&#39;s money went, the accounts strip, the same
-&nbsp;         * spend as a donut, the generated insights, goals, and the recent-transactions list. Every
-&nbsp;         * widget starts enabled and Hero-sized.
+&nbsp;         * spend as a donut, the payments still to come, the generated insights, goals, and the
+&nbsp;         * recent-transactions list. Every widget starts enabled and Hero-sized.
 &nbsp;         *
 &nbsp;         * The spans are that same order read as the desktop mock&#39;s bands: a hero balance beside the
 &nbsp;         * shortcuts, the spent-this-month band full width under them, a row of three stat cards, the
-&nbsp;         * spend chart with the accounts rail next to it, the donut on a band of its own, insights and
-&nbsp;         * goals paired, and the activity list full width at the bottom. Each row sums to
+&nbsp;         * spend chart with the accounts rail next to it, the donut and the upcoming payments on
+&nbsp;         * bands of their own, insights and goals paired, and the activity list full width at the bottom. Each row sums to
 &nbsp;         * [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
 &nbsp;         *
 &nbsp;         * Both new bands take [DashboardWidgetSpan.Full] for the same reason: it is the only span
@@ -301,6 +301,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.CategoriesDonut, span = DashboardWidgetSpan.Full),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Recurring, span = DashboardWidgetSpan.Full),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),</b>
@@ -331,7 +332,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

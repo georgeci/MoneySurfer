@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DebugLogBuffer</title>
+  <title>MoneySurfer Coverage Report > Insight</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.logging</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.insight</a>
 </div>
 
-<h1>Coverage Summary for Class: DebugLogBuffer (com.georgeci.moneysurfer.domain.logging)</h1>
+<h1>Coverage Summary for Class: Insight (com.georgeci.moneysurfer.domain.insight)</h1>
 
 <table class="coverageStats">
 
@@ -45,8 +45,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">DebugLogBuffer</td>
+  <tr>
+    <td class="name">Insight$ActiveSubscriptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -57,31 +66,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (23/23)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (32/32)
-  </span>
-</td>
-</tr>
+  </tr>
   <tr>
-    <td class="name">DebugLogBuffer$logWriter$1</td>
+    <td class="name">Insight$CategoryChange</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -103,7 +96,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,7 +104,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (41/41)
+    (52/52)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Insight$PeriodSpend</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
   </span>
 </td>
   </tr>
@@ -122,15 +143,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    83.3%
-  </span>
-  <span class="absValue">
-    (5/6)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -138,7 +151,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -146,7 +159,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (73/73)
+    (24/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (110/110)
   </span>
 </td>
 </tr>
@@ -157,113 +178,126 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.logging
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.insight
 &nbsp;
-&nbsp;import co.touchlab.kermit.LogWriter
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import co.touchlab.kermit.Severity
-&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
-&nbsp;import kotlinx.coroutines.flow.StateFlow
-&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;
 &nbsp;/**
-&nbsp; * One Warn-or-above line as the debug log panel renders it.
-&nbsp; *
-&nbsp; * @param id unique among the buffered entries and stable for as long as one is buffered. The panel
-&nbsp; *   keys its rows by it: entries are prepended, so without a key every row shifts position on each
-&nbsp; *   new line and Compose recomposes the whole list — including a `stackTraceToString()` per row.
-&nbsp; *   Two identical log lines are otherwise indistinguishable, so equality cannot serve as the key.
+&nbsp; * How an insight reads. Maps 1:1 onto `uikit.widgets.SurferInsightTone`, and is decided here
+&nbsp; * rather than in the widget so the rule that produced a sentence is what decides its colour.
 &nbsp; */
-&nbsp;data class DebugLogEntry(
-&nbsp;    val id: Long,
-&nbsp;    val severity: Severity,
-&nbsp;    val tag: String,
-&nbsp;    val message: String,
-&nbsp;    val throwable: Throwable?,
-&nbsp;)
+&nbsp;enum class InsightTone {
+&nbsp;    /** Something went the user&#39;s way. */
+&nbsp;    Good,
+&nbsp;
+&nbsp;    /** Something worth looking at. Never an error — no insight is a failure. */
+&nbsp;    Warn,
+&nbsp;
+&nbsp;    /** A fact, with no direction to it. */
+&nbsp;    Neutral,
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * In-memory ring buffer of the last [MaxEntries] Warn/Error lines, read by the debug log panel in
-&nbsp; * Settings.
+&nbsp; * Which way a spend figure moved against the period before it.
 &nbsp; *
-&nbsp; * Exists because only iOS had a way to see these without a cable: logcat and the desktop console
-&nbsp; * are not reachable from a device a tester is holding. The buffer is host-agnostic, so Android,
-&nbsp; * iOS and desktop — online and offline builds alike — all get the same panel from the single
-&nbsp; * install in [configureLogging].
-&nbsp; *
-&nbsp; * Debug builds only, installed once per process. Nothing here is a reporting path: Warn+ lines
-&nbsp; * reach Crashlytics through
-&nbsp; * [CrashReportingLogWriter][com.georgeci.moneysurfer.domain.telemetry.CrashReportingLogWriter]
-&nbsp; * regardless, and this buffer only decides what a tester can read on the device. The
-&nbsp; * [Severity.Warn] floor matches that writer&#39;s, and is the same floor release builds apply
-&nbsp; * globally — the severities that historically carried PII (issue #154) never reach here.
+&nbsp; * The tone follows from the direction rather than from the rule, because everything the engine
+&nbsp; * measures is spend: more is always [InsightTone.Warn] and less is always [InsightTone.Good].
+&nbsp; * Nothing here judges income.
 &nbsp; */
-&nbsp;object DebugLogBuffer {
+&nbsp;enum class SpendTrend {
+&nbsp;    Up,
+&nbsp;    Down,
 &nbsp;
-&nbsp;    private const val MaxEntries = 100
+&nbsp;    /** Moved, but not by enough to be worth a sentence about the change. */
+&nbsp;    Flat,
 &nbsp;
-&nbsp;    private var isInstalled = false
-<b class="fc">&nbsp;    private val mutableEntries = MutableStateFlow&lt;List&lt;DebugLogEntry&gt;&gt;(emptyList())</b>
+&nbsp;    ;
 &nbsp;
-&nbsp;    /** Newest first. Empty in release builds, where [install] is never called. */
-<b class="fc">&nbsp;    val entries: StateFlow&lt;List&lt;DebugLogEntry&gt;&gt; = mutableEntries</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Idempotent: a second call is a no-op, so repeated `initKoin` calls — instrumented tests,
-&nbsp;     * previews — do not stack duplicate writers.
-&nbsp;     */
-&nbsp;    fun install() {
-<b class="pc">&nbsp;        if (isInstalled) return</b>
-<b class="fc">&nbsp;        isInstalled = true</b>
-<b class="fc">&nbsp;        Logger.addLogWriter(logWriter)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clear() {
-<b class="fc">&nbsp;        mutableEntries.value = emptyList()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Test-only counterpart to [install], for a spec that restores Kermit&#39;s writer list itself —
-&nbsp;     * without this the latch would stay closed and claim an installation that is no longer there.
-&nbsp;     */
-&nbsp;    internal fun resetInstallLatchForTest() {
-<b class="fc">&nbsp;        isInstalled = false</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Internal rather than private so the buffer can be exercised without touching Kermit&#39;s global
-&nbsp;     * writer list, which no test can undo.
-&nbsp;     */
-<b class="fc">&nbsp;    internal val logWriter: LogWriter = object : LogWriter() {</b>
-&nbsp;
-<b class="fc">&nbsp;        override fun isLoggable(tag: String, severity: Severity): Boolean = severity &gt;= Severity.Warn</b>
-&nbsp;
-&nbsp;        override fun log(
-&nbsp;            severity: Severity,
-&nbsp;            message: String,
-&nbsp;            tag: String,
-&nbsp;            throwable: Throwable?,
-&nbsp;        ) {
-&nbsp;            // `update` rather than `value =`: log lines arrive from whichever thread the failing
-&nbsp;            // coroutine ran on (sync uploads on Dispatchers.Default, most of all), and a
-&nbsp;            // read-modify-write on `value` drops entries when two of them land at once.
-&nbsp;            //
-&nbsp;            // The id is derived from the current head inside the same block rather than from a
-&nbsp;            // counter of its own, so it inherits that atomicity instead of needing a second
-&nbsp;            // thread-safe primitive: whichever caller wins the CAS numbered its entry against the
-&nbsp;            // list it actually landed on.
-<b class="fc">&nbsp;            mutableEntries.update { current -&gt;</b>
-<b class="fc">&nbsp;                listOf(</b>
-<b class="fc">&nbsp;                    DebugLogEntry(</b>
-<b class="fc">&nbsp;                        id = (current.firstOrNull()?.id ?: 0L) + 1,</b>
-<b class="fc">&nbsp;                        severity = severity,</b>
-<b class="fc">&nbsp;                        tag = tag,</b>
-<b class="fc">&nbsp;                        message = message,</b>
-<b class="fc">&nbsp;                        throwable = throwable,</b>
-&nbsp;                    ),
-<b class="fc">&nbsp;                ) + current.take(MaxEntries - 1)</b>
-&nbsp;            }
+&nbsp;    val tone: InsightTone
+&nbsp;        get() = when (this) {
+&nbsp;            Up -&gt; InsightTone.Warn
+&nbsp;            Down -&gt; InsightTone.Good
+&nbsp;            Flat -&gt; InsightTone.Neutral
 &nbsp;        }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One generated sentence about the workspace&#39;s spending, as data rather than as text: the rules
+&nbsp; * live in `domain` and the copy lives in a feature module&#39;s string resources, so a rule can be
+&nbsp; * tested without a locale and translated without a rule change.
+&nbsp; */
+&nbsp;sealed interface Insight {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stable across recomputation: the same finding keeps the same id for as long as the period
+&nbsp;     * lasts. That is what lets a &quot;N new&quot; badge stop counting one insight forever, and what a
+&nbsp;     * future &quot;dismiss&quot; would be persisted against. Ids therefore name the rule, its subject and
+&nbsp;     * the period — never the numbers, which change with every transaction logged.
+&nbsp;     */
+&nbsp;    val id: String
+&nbsp;
+&nbsp;    val tone: InsightTone
+&nbsp;
+&nbsp;    /** The workspace base currency every [Money] on this insight is denominated in. */
+&nbsp;    val currency: CurrencyCode
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A category that moved against the previous period.
+&nbsp;     *
+&nbsp;     * Overspend and savings win are one finding read in two directions, so they are one type
+&nbsp;     * rather than two near-identical ones; [isIncrease] is the direction.
+&nbsp;     */
+<b class="fc">&nbsp;    data class CategoryChange(</b>
+<b class="fc">&nbsp;        override val id: String,</b>
+&nbsp;        /**
+&nbsp;         * `null` for the uncategorized bucket, which is a real slice rather than a missing one —
+&nbsp;         * see [com.georgeci.moneysurfer.domain.model.CategorySpendSlice].
+&nbsp;         */
+<b class="fc">&nbsp;        val categoryId: CategoryId?,</b>
+&nbsp;        /** `null` when the slice has no category, or names one this workspace no longer holds. */
+<b class="fc">&nbsp;        val categoryName: String?,</b>
+<b class="fc">&nbsp;        val current: Money,</b>
+<b class="fc">&nbsp;        val previous: Money,</b>
+&nbsp;        /** Magnitude of the move as whole percent of [previous]; always positive. */
+<b class="fc">&nbsp;        val changePercent: Int,</b>
+<b class="fc">&nbsp;        override val currency: CurrencyCode,</b>
+&nbsp;    ) : Insight {
+&nbsp;
+&nbsp;        /** A category is only worth a sentence for having moved, so there is no flat case here. */
+<b class="fc">&nbsp;        val isIncrease: Boolean get() = current &gt; previous</b>
+&nbsp;
+&nbsp;        override val tone: InsightTone
+<b class="fc">&nbsp;            get() = if (isIncrease) InsightTone.Warn else InsightTone.Good</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Total spend this period against the same stretch of the one before it. */
+<b class="fc">&nbsp;    data class PeriodSpend(</b>
+<b class="fc">&nbsp;        override val id: String,</b>
+<b class="fc">&nbsp;        val trend: SpendTrend,</b>
+<b class="fc">&nbsp;        val current: Money,</b>
+<b class="fc">&nbsp;        val previous: Money,</b>
+&nbsp;        /** Magnitude of the move as whole percent of [previous]; always positive. */
+<b class="fc">&nbsp;        val changePercent: Int,</b>
+<b class="fc">&nbsp;        override val currency: CurrencyCode,</b>
+&nbsp;    ) : Insight {
+<b class="fc">&nbsp;        override val tone: InsightTone get() = trend.tone</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * How many recurring charges are live, and what they come to in a month.
+&nbsp;     *
+&nbsp;     * Neutral on purpose: a subscription is not a problem, and the engine has no way to tell a
+&nbsp;     * forgotten one from a wanted one. The number is the insight.
+&nbsp;     */
+<b class="fc">&nbsp;    data class ActiveSubscriptions(</b>
+<b class="fc">&nbsp;        override val id: String,</b>
+<b class="fc">&nbsp;        val count: Int,</b>
+<b class="fc">&nbsp;        val monthlyTotal: Money,</b>
+<b class="fc">&nbsp;        override val currency: CurrencyCode,</b>
+&nbsp;    ) : Insight {
+<b class="fc">&nbsp;        override val tone: InsightTone get() = InsightTone.Neutral</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -289,7 +323,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

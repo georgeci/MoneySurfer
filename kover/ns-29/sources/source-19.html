@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteAccountUseCase</title>
+  <title>MoneySurfer Coverage Report > DeclineInviteUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteAccountUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: DeclineInviteUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,76 +46,80 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DeleteAccountUseCase</td>
+  <td class="name">DeclineInviteUseCase</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (8/8)
+    (0/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (163/163)
+    (0/674)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">DeleteAccountUseCase$invoke$1</td>
+    <td class="name">DeclineInviteUseCase$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">DeclineInviteUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (8/8)
+    (0/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (163/163)
+    (0/674)
   </span>
 </td>
 </tr>
@@ -130,24 +134,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import arrow.core.Either
 &nbsp;import arrow.core.raise.either
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
+&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
+&nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Hard delete — the row and its sync tombstone. The reversible &quot;get it out of my way&quot; path is
-&nbsp; * [ArchiveAccountUseCase], which keeps the account and its transactions.
+&nbsp; * Recipient declines a pending invitation. No member row created; invite transitions to DECLINED.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class DeleteAccountUseCase(
-<b class="fc">&nbsp;    private val accountRepository: AccountRepository,</b>
+<b class="nc">&nbsp;@Single</b>
+&nbsp;class DeclineInviteUseCase(
+<b class="nc">&nbsp;    private val inviteRepository: WorkspaceInviteRepository,</b>
+<b class="nc">&nbsp;    private val userRepository: UserRepository,</b>
+<b class="nc">&nbsp;    private val userRemoteRepository: UserRemoteRepository,</b>
+<b class="nc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    suspend operator fun invoke(id: AccountId): Either&lt;AccountActionError, Unit&gt; = either {</b>
-<b class="fc">&nbsp;        accountRepository.getById(id) ?: raise(AccountActionError.AccountNotFound)</b>
-<b class="fc">&nbsp;        Either.catch { accountRepository.delete(id) }</b>
-<b class="fc">&nbsp;            .mapLeft { AccountActionError.LocalWriteFailed(it) }</b>
-<b class="fc">&nbsp;            .bind()</b>
-<b class="fc">&nbsp;    }</b>
+<b class="nc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+<b class="nc">&nbsp;    suspend operator fun invoke(id: WorkspaceInviteId): Either&lt;InviteError, Unit&gt; = either {</b>
+<b class="nc">&nbsp;        val callerId = session.currentUserId.first()</b>
+<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
+<b class="nc">&nbsp;        val caller = userRepository.getById(callerId)</b>
+<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
+&nbsp;
+<b class="nc">&nbsp;        val invite = inviteRepository.getById(id)</b>
+<b class="nc">&nbsp;            ?: raise(InviteError.InviteNotFound)</b>
+<b class="nc">&nbsp;        ensure(invite.status == InviteStatus.PENDING) { InviteError.InviteNotPending }</b>
+&nbsp;
+<b class="nc">&nbsp;        val emailMatches = caller.email?.lowercase() == invite.email.lowercase()</b>
+<b class="nc">&nbsp;        val uidMatches = invite.targetUserId == callerId</b>
+<b class="nc">&nbsp;        ensure(emailMatches || uidMatches) { InviteError.InviteNotFound }</b>
+&nbsp;
+<b class="nc">&nbsp;        Either.catch { inviteRepository.markDeclined(id) }</b>
+<b class="nc">&nbsp;            .onLeft { log.e(it) { &quot;[local] markDeclined failed id=${id.value}&quot; } }</b>
+<b class="nc">&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }</b>
+<b class="nc">&nbsp;            .bind()</b>
+&nbsp;
+<b class="nc">&nbsp;        val firebaseUid = session.currentFirebaseUid.first()</b>
+<b class="nc">&nbsp;        if (!firebaseUid.isNullOrBlank()) {</b>
+<b class="nc">&nbsp;            Either.catch {</b>
+<b class="nc">&nbsp;                userRemoteRepository.removeInvitedWorkspaceRef(firebaseUid, invite.workspaceId)</b>
+<b class="nc">&nbsp;            }.onLeft {</b>
+<b class="nc">&nbsp;                log.w(it) { &quot;[remote] removeInvitedWorkspaceRef failed — non-fatal&quot; }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        log.i { &quot;[done] uid=${callerId.value.redactUid()} id=${id.value}&quot; }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;DeclineInvite&quot;
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -172,7 +216,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

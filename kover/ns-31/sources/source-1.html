@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetCategoryUi</title>
+  <title>MoneySurfer Coverage Report > AccountChooserBottomSheetKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.budget</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetCategoryUi (com.georgeci.moneysurfer.feature.budget)</h1>
+<h1>Coverage Summary for Class: AccountChooserBottomSheetKt (com.georgeci.moneysurfer.feature.account.picker)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,103 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BudgetCategoryUi</td>
+  <td class="name">AccountChooserBottomSheetKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/96)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/871)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AccountChooserBottomSheetKt$AccountChooserBottomSheet$5$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (6/6)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (27/27)
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/96)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/880)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,139 +150,96 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.picker
 &nbsp;
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetProgress
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
-&nbsp;import kotlinx.datetime.DateTimeUnit
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.daysUntil
-&nbsp;import kotlinx.datetime.minus
-&nbsp;
-&nbsp;/** A category as a budget screen needs it: enough to draw a bubble and name it. */
-<b class="fc">&nbsp;data class BudgetCategoryUi(</b>
-<b class="fc">&nbsp;    val id: String,</b>
-<b class="fc">&nbsp;    val name: String,</b>
-<b class="fc">&nbsp;    val iconKey: String,</b>
-<b class="fc">&nbsp;    val hue: Int,</b>
-<b class="fc">&nbsp;    val systemKind: String?,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/** One budget, pre-formatted for the list and the details header. */
-&nbsp;data class BudgetUi(
-&nbsp;    val id: BudgetId,
-&nbsp;    val name: String,
-&nbsp;    val status: BudgetStatus,
-&nbsp;    val spentFormatted: String,
-&nbsp;    val limitFormatted: String,
-&nbsp;    /** Always positive — the sign lives in [isOver], which picks the wording. */
-&nbsp;    val remainderFormatted: String,
-&nbsp;    val isOver: Boolean,
-&nbsp;    val progress: Float,
-&nbsp;    val alertFraction: Float,
-&nbsp;    val alertPercent: Int,
-&nbsp;    val percent: Int,
-&nbsp;    val period: BudgetPeriod,
-&nbsp;    val windowLabel: String,
-&nbsp;    val daysLeft: Int,
-&nbsp;    val elapsedDays: Int,
-&nbsp;    val categories: List&lt;BudgetCategoryUi&gt;,
-&nbsp;    val isActive: Boolean,
-&nbsp;    val hasMixedCurrency: Boolean,
-&nbsp;    val rolloverCarryFormatted: String?,
-&nbsp;    val dailyAverageFormatted: String,
-&nbsp;    val projectedTotalFormatted: String,
-&nbsp;    val perDayRemainingFormatted: String,
-&nbsp;    val overspendFormatted: String,
-&nbsp;)
-&nbsp;
-&nbsp;fun BudgetStatus.toUi(): SurferBudgetStatus = when (this) {
-&nbsp;    BudgetStatus.OK -&gt; SurferBudgetStatus.Ok
-&nbsp;    BudgetStatus.WARN -&gt; SurferBudgetStatus.Warn
-&nbsp;    BudgetStatus.OVER -&gt; SurferBudgetStatus.Over
-&nbsp;}
-&nbsp;
-&nbsp;private const val PERCENT = 100f
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_transfer_instead
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_add_new
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_add_new_subtitle
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_sheet_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_summary
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_summary_empty
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
 &nbsp;/**
-&nbsp; * Turns domain progress into the strings the screens render.
-&nbsp; *
-&nbsp; * [categoriesById] is the whole workspace map; a budget naming a category that has since been
-&nbsp; * deleted simply drops that bubble instead of failing to render.
+&nbsp; * Bottom-sheet entry composable for picking an account. Hosted as a navigation entry; the
+&nbsp; * surrounding [androidx.compose.material3.ModalBottomSheet] is provided by
+&nbsp; * [com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy]. Visual layout lives
+&nbsp; * in [AccountChooserContent] — this composable just maps the ViewModel&#39;s state and effects.
 &nbsp; */
-&nbsp;fun BudgetProgress.toUi(categoriesById: Map&lt;String, Category&gt;): BudgetUi {
-&nbsp;    val currency = currency ?: CurrencyCode(&quot;&quot;)
-&nbsp;    val limit = effectiveLimit
-&nbsp;    return BudgetUi(
-&nbsp;        id = budget.id,
-&nbsp;        name = budget.name,
-&nbsp;        status = status,
-&nbsp;        spentFormatted = MoneyFormatter.format(spent, currency),
-&nbsp;        limitFormatted = MoneyFormatter.format(limit, currency),
-&nbsp;        remainderFormatted = MoneyFormatter.format(remaining.abs(), currency),
-&nbsp;        isOver = status == BudgetStatus.OVER,
-&nbsp;        progress = if (limit.minor &lt;= 0L) 0f else spent.minor.toFloat() / limit.minor.toFloat(),
-&nbsp;        alertFraction = budget.alertPercent / PERCENT,
-&nbsp;        alertPercent = budget.alertPercent,
-&nbsp;        percent = percent,
-&nbsp;        period = budget.period,
-&nbsp;        windowLabel = formatWindow(window.startInclusive, window.endExclusive),
-&nbsp;        daysLeft = daysLeft,
-&nbsp;        elapsedDays = elapsedDaysOf(this),
-&nbsp;        categories = budget.categoryIds.mapNotNull { categoriesById[it.value]?.toUi() },
-&nbsp;        isActive = budget.isActive,
-&nbsp;        hasMixedCurrency = hasMixedCurrency,
-&nbsp;        rolloverCarryFormatted = rolloverCarry
-&nbsp;            .takeIf { budget.rollover &amp;&amp; it.isPositive() }
-&nbsp;            ?.let { MoneyFormatter.format(it, currency) },
-&nbsp;        dailyAverageFormatted = MoneyFormatter.format(dailyAverage, currency),
-&nbsp;        projectedTotalFormatted = MoneyFormatter.format(projectedTotal, currency),
-&nbsp;        perDayRemainingFormatted = MoneyFormatter.format(perDayRemaining, currency),
-&nbsp;        overspendFormatted = MoneyFormatter.format(
-&nbsp;            if (remaining.isNegative()) remaining.abs() else Money.zero(),
-&nbsp;            currency,
-&nbsp;        ),
+&nbsp;@Composable
+<b class="nc">&nbsp;fun AccountChooserBottomSheet(</b>
+&nbsp;    selectedAccountId: AccountId?,
+<b class="nc">&nbsp;    excludeAccountId: AccountId? = null,</b>
+<b class="nc">&nbsp;    showTransferShortcut: Boolean = false,</b>
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;    onNavigateToAccountCreation: () -&gt; Unit,
+&nbsp;    onAccountPicked: (AccountId) -&gt; Unit,
+<b class="nc">&nbsp;    onTransferRequested: () -&gt; Unit = {},</b>
+<b class="nc">&nbsp;    viewModel: AccountChooserViewModel = koinViewModel(</b>
+<b class="nc">&nbsp;        key = &quot;${selectedAccountId?.value.orEmpty()}|${excludeAccountId?.value.orEmpty()}&quot;,</b>
+<b class="nc">&nbsp;    ) { parametersOf(selectedAccountId, excludeAccountId) },</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+&nbsp;
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            AccountChooserEffect.Dismiss -&gt; onDismiss()</b>
+<b class="nc">&nbsp;            AccountChooserEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()</b>
+<b class="nc">&nbsp;            is AccountChooserEffect.PublishResult -&gt; onAccountPicked(effect.id)</b>
+<b class="nc">&nbsp;            AccountChooserEffect.RequestTransfer -&gt; onTransferRequested()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    val content = state as? AccountChooserState.Content</b>
+<b class="nc">&nbsp;    val accounts = content?.accounts.orEmpty()</b>
+<b class="nc">&nbsp;    val totalsFormatted = content?.totalsFormatted.orEmpty()</b>
+&nbsp;
+<b class="nc">&nbsp;    val summary = if (accounts.isEmpty() || totalsFormatted.isEmpty()) {</b>
+<b class="nc">&nbsp;        stringResource(Res.string.transaction_creation_account_summary_empty)</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;        pluralStringResource(</b>
+<b class="nc">&nbsp;            Res.plurals.transaction_creation_account_summary,</b>
+<b class="nc">&nbsp;            accounts.size,</b>
+<b class="nc">&nbsp;            accounts.size,</b>
+&nbsp;            // One figure per currency; with a single currency this reads exactly as before.
+<b class="nc">&nbsp;            totalsFormatted.joinToString(&quot; · &quot;),</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    AccountChooserContent(</b>
+<b class="nc">&nbsp;        title = stringResource(Res.string.transaction_creation_account_sheet_title),</b>
+<b class="nc">&nbsp;        summary = summary,</b>
+<b class="nc">&nbsp;        accounts = accounts.map { account -&gt;</b>
+<b class="nc">&nbsp;            AccountPickerRow(</b>
+<b class="nc">&nbsp;                id = account.id,</b>
+<b class="nc">&nbsp;                name = account.name,</b>
+<b class="nc">&nbsp;                subtitle = account.currencyCode.value,</b>
+<b class="nc">&nbsp;                formattedBalance = MoneyFormatter.format(account.balance, account.currencyCode),</b>
+<b class="nc">&nbsp;                icon = SurferIcons.CreditCard,</b>
+<b class="nc">&nbsp;            )</b>
+&nbsp;        },
+<b class="nc">&nbsp;        selectedId = state.selectedId,</b>
+<b class="nc">&nbsp;        addNewLabel = stringResource(Res.string.transaction_creation_account_add_new),</b>
+<b class="nc">&nbsp;        addNewSubtitle = stringResource(Res.string.transaction_creation_account_add_new_subtitle),</b>
+<b class="nc">&nbsp;        onSelect = { id -&gt; viewModel.onEvent(AccountChooserEvent.OnAccountSelected(id)) },</b>
+<b class="nc">&nbsp;        onAddNew = { viewModel.onEvent(AccountChooserEvent.OnAddNewAccountClick) },</b>
+<b class="nc">&nbsp;        onClose = { viewModel.onEvent(AccountChooserEvent.OnDismiss) },</b>
+<b class="nc">&nbsp;        transferInsteadLabel = stringResource(Res.string.accounts_manage_transfer_instead)</b>
+<b class="nc">&nbsp;            .takeIf { showTransferShortcut },</b>
+<b class="nc">&nbsp;        onTransferInstead = { viewModel.onEvent(AccountChooserEvent.OnTransferInsteadClick) },</b>
 &nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;private fun Category.toUi() = BudgetCategoryUi(
-&nbsp;    id = id.value,
-&nbsp;    name = name,
-&nbsp;    iconKey = iconKey,
-&nbsp;    hue = hue,
-&nbsp;    systemKind = systemKind?.name,
-&nbsp;)
-&nbsp;
-&nbsp;/** Days of the window already behind us, counting today — the denominator of the daily average. */
-&nbsp;private fun elapsedDaysOf(progress: BudgetProgress): Int {
-&nbsp;    val windowDays = progress.window.startInclusive.daysUntil(progress.window.endExclusive)
-&nbsp;    return (windowDays - progress.daysLeft + 1).coerceIn(1, windowDays)
-&nbsp;}
-&nbsp;
-&nbsp;private const val MONTH_ABBREVIATION_LENGTH = 3
-&nbsp;
-&nbsp;/**
-&nbsp; * &quot;1 Apr – 30 Apr&quot;. The end is exclusive in the model but inclusive to a reader, so the label
-&nbsp; * shows the last day that still counts.
-&nbsp; */
-&nbsp;fun formatWindow(startInclusive: LocalDate, endExclusive: LocalDate): String {
-&nbsp;    val lastDay = endExclusive.minus(1, DateTimeUnit.DAY)
-&nbsp;    return &quot;${formatShortDate(startInclusive)} – ${formatShortDate(lastDay)}&quot;
-&nbsp;}
-&nbsp;
-&nbsp;fun formatShortDate(date: LocalDate): String {
-&nbsp;    val month = date.month.name.lowercase()
-&nbsp;        .replaceFirstChar { it.uppercase() }
-&nbsp;        .take(MONTH_ABBREVIATION_LENGTH)
-&nbsp;    return &quot;${date.day} $month&quot;
-&nbsp;}
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -248,7 +263,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

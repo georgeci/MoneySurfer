@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SplitId</title>
+  <title>MoneySurfer Coverage Report > UiPreferences</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,116 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: SplitId (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: UiPreferences (com.georgeci.moneysurfer.domain.preferences)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">SplitId</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">UiPreferences</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
 </tr>
-  <tr>
-    <td class="name">SplitId$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (15/15)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,25 +44,91 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlin.jvm.JvmInline
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Shared id of the sibling rows one receipt was split across — the same grouping technique
-&nbsp; * [TransferId] uses, and deliberately not a foreign key to a child table: every leg stays a
-&nbsp; * self-contained transaction, which is what keeps per-entity LWW sync correct for it.
-&nbsp; */
-&nbsp;@JvmInline
-&nbsp;@Serializable
-<b class="fc">&nbsp;value class SplitId(val value: String) {</b>
-&nbsp;    companion object {
-&nbsp;        @OptIn(ExperimentalUuidApi::class)
-<b class="fc">&nbsp;        fun uuid(): SplitId = SplitId(Uuid.random().toString())</b>
-&nbsp;    }
+&nbsp;interface UiPreferences {
+&nbsp;    val isDynamicColorAvailable: Boolean
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `false` until the first-launch onboarding screen is finished. Device-scoped — survives
+&nbsp;     * logout, reset only by reinstall / clear-data.
+&nbsp;     */
+&nbsp;    val onboardingCompleted: Pref&lt;Boolean&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The stored choice, exactly as written — including [PaletteSource.Dynamic] on a platform with
+&nbsp;     * no Material You. The picker binds here and simply omits the Dynamic option where it is
+&nbsp;     * unavailable: nothing is highlighted, and no write happens unless the user picks something.
+&nbsp;     * Theming reads [effectivePaletteSource] instead.
+&nbsp;     */
+&nbsp;    val paletteSource: Pref&lt;PaletteSource&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * [paletteSource] clamped to what this platform can render.
+&nbsp;     *
+&nbsp;     * Kept separate from the stored value rather than clamping the `Pref` itself: on a desktop a
+&nbsp;     * clamped `Pref` would render `Brand` as the current selection, and the first tap would write
+&nbsp;     * `Brand` over the `Dynamic` the user set on their phone.
+&nbsp;     */
+&nbsp;    val effectivePaletteSource: Flow&lt;PaletteSource&gt;
+&nbsp;
+&nbsp;    val themeMode: Pref&lt;ThemeMode&gt;
+&nbsp;    val containerStyle: Pref&lt;ContainerStyle&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Date window the transactions list opens on. Persisted rather than held in the screen&#39;s
+&nbsp;     * state so the choice survives process death and app restarts; the position *inside* that
+&nbsp;     * period is deliberately not persisted — the list always reopens on the current one.
+&nbsp;     */
+&nbsp;    val transactionsPeriodMode: Pref&lt;TransactionPeriodMode&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Order, visibility and card style of the dashboard widgets. Device-local in v1: the layout
+&nbsp;     * describes the screen in the user&#39;s hand, so it is deliberately not synced through Firestore
+&nbsp;     * (a phone layout would be wrong on a tablet). Migrating it to the workspace later is a
+&nbsp;     * matter of swapping the binding behind this `Pref`.
+&nbsp;     */
+&nbsp;    val dashboardLayout: Pref&lt;DashboardLayoutConfig&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Everything below backs the Preferences screen (issue #370). The screen stores the choices and
+&nbsp;     * renders them back; nothing else reads them yet — the locale, calendar and behaviour features
+&nbsp;     * they describe are not built. They are declared here rather than kept in the ViewModel so the
+&nbsp;     * choice survives process death, and so the consumers, when they arrive, have one place to read
+&nbsp;     * from.
+&nbsp;     *
+&nbsp;     * All of them are device-local (`sync = false`). Replication of user settings is its own
+&nbsp;     * concern (#334) and none of these has a consumer to disagree about yet, so nothing is gained
+&nbsp;     * by putting a half-built key on the wire.
+&nbsp;     */
+&nbsp;    val appLanguage: Pref&lt;AppLanguage&gt;
+&nbsp;
+&nbsp;    val appRegion: Pref&lt;AppRegion&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Currency new accounts and cross-account totals should default to. Defaults to the platform
+&nbsp;     * locale&#39;s currency, so a fresh install is already right for most users without a first-run
+&nbsp;     * question.
+&nbsp;     */
+&nbsp;    val defaultCurrency: Pref&lt;CurrencyCode&gt;
+&nbsp;
+&nbsp;    val numberFormat: Pref&lt;NumberFormatStyle&gt;
+&nbsp;    val weekStart: Pref&lt;WeekStart&gt;
+&nbsp;    val hourFormat: Pref&lt;HourFormat&gt;
+&nbsp;    val defaultTransactionType: Pref&lt;DefaultTransactionType&gt;
+&nbsp;
+&nbsp;    /** Blur balances on the dashboard until tapped. */
+&nbsp;    val hideAmounts: Pref&lt;Boolean&gt;
+&nbsp;
+&nbsp;    /** Suggest a category from the merchant when a transaction is created. */
+&nbsp;    val autoCategorize: Pref&lt;Boolean&gt;
+&nbsp;
+&nbsp;    /** Round purchases up and move the difference to savings. */
+&nbsp;    val roundUpSavings: Pref&lt;Boolean&gt;
 &nbsp;}
 </code>
 </pre>
@@ -179,7 +153,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

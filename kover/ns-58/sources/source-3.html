@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SplitBreakdown</title>
+  <title>MoneySurfer Coverage Report > SplitLegUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
 </div>
 
-<h1>Coverage Summary for Class: SplitBreakdown (com.georgeci.moneysurfer.feature.transaction.details)</h1>
+<h1>Coverage Summary for Class: SplitLegUi (com.georgeci.moneysurfer.feature.transaction.details)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SplitBreakdown</td>
+  <td class="name">SplitLegUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (22/22)
   </span>
 </td>
 </tr>
@@ -283,18 +283,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Present only when the group really has several legs; [SplitLegUi.isCurrent] marks the one the
 &nbsp; * screen was opened on, so the reader can see which slice of the receipt they navigated to.
 &nbsp; */
-<b class="fc">&nbsp;data class SplitBreakdown(</b>
-<b class="fc">&nbsp;    val formattedTotal: String,</b>
-<b class="fc">&nbsp;    val legs: List&lt;SplitLegUi&gt;,</b>
+&nbsp;data class SplitBreakdown(
+&nbsp;    val formattedTotal: String,
+&nbsp;    val legs: List&lt;SplitLegUi&gt;,
 &nbsp;)
 &nbsp;
 &nbsp;/** One leg of a split: where it was filed, how much of the receipt it took. */
-&nbsp;data class SplitLegUi(
-&nbsp;    val transactionId: TransactionId,
+<b class="fc">&nbsp;data class SplitLegUi(</b>
+<b class="fc">&nbsp;    val transactionId: TransactionId,</b>
 &nbsp;    /** Blank when the leg is uncategorized — the screen substitutes its own label. */
-&nbsp;    val categoryName: String,
-&nbsp;    val formattedAmount: String,
-&nbsp;    val isCurrent: Boolean,
+<b class="fc">&nbsp;    val categoryName: String,</b>
+<b class="fc">&nbsp;    val formattedAmount: String,</b>
+<b class="fc">&nbsp;    val isCurrent: Boolean,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -408,7 +408,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

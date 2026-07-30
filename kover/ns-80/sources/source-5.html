@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferBudgetCategoryVisual</title>
+  <title>MoneySurfer Coverage Report > SurferDrawerSection</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferBudgetCategoryVisual (com.georgeci.moneysurfer.uikit.components.budget)</h1>
+<h1>Coverage Summary for Class: SurferDrawerSection (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferBudgetCategoryVisual</td>
+  <td class="name">SurferDrawerSection</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (14/14)
   </span>
 </td>
 </tr>
@@ -92,230 +92,334 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
+&nbsp;import androidx.compose.foundation.Image
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.WindowInsets
+&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
+&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.offset
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.only
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.safeDrawing
 &nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.selection.selectable
+&nbsp;import androidx.compose.foundation.selection.selectableGroup
 &nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.HorizontalDivider
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.VerticalDivider
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.Immutable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.semantics.Role
 &nbsp;import androidx.compose.ui.text.font.FontWeight
 &nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.uikit.generated.resources.Res
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_app_icon
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_brand
+&nbsp;import org.jetbrains.compose.resources.painterResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/** One category&#39;s mark on a budget card. */
-<b class="nc">&nbsp;data class SurferBudgetCategoryVisual(</b>
-<b class="nc">&nbsp;    val icon: ImageVector,</b>
-<b class="nc">&nbsp;    val tint: Color,</b>
+&nbsp;/** One destination row of [SurferNavigationDrawer]. */
+&nbsp;@Immutable
+&nbsp;data class SurferDrawerItem(
+&nbsp;    val label: String,
+&nbsp;    val icon: ImageVector,
+&nbsp;    val selected: Boolean,
+&nbsp;    val onClick: () -&gt; Unit,
 &nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * The pre-formatted numbers on a budget card. Grouped so the card stays a slot component with a
-&nbsp; * short parameter list — uikit knows nothing about `Money` or currencies, only these strings.
+&nbsp; * A group of [items] under an optional caption.
+&nbsp; *
+&nbsp; * [label] is rendered uppercase by the drawer, so pass it in its natural case (&quot;Manage&quot;) — the
+&nbsp; * same string is what a screen reader announces and what a rail would show if it ever grew
+&nbsp; * grouping.
 &nbsp; */
-&nbsp;data class SurferBudgetCardMetrics(
-&nbsp;    val spentOfLimit: String,
-&nbsp;    val remaining: String,
-&nbsp;    val progress: Float,
-&nbsp;    val footer: String,
-&nbsp;    val alertFraction: Float? = null,
+<b class="fc">&nbsp;@Immutable</b>
+&nbsp;data class SurferDrawerSection(
+<b class="fc">&nbsp;    val items: List&lt;SurferDrawerItem&gt;,</b>
+<b class="fc">&nbsp;    val label: String? = null,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * A budget row on the list screen. Everything numeric arrives pre-formatted via [metrics].
+&nbsp; * The permanent navigation drawer for wide windows: brand header, grouped destinations, and a
+&nbsp; * user/workspace block pinned to the bottom.
+&nbsp; *
+&nbsp; * `NavigationSuiteScaffold`&#39;s own drawer models none of those three (issue #389, gap G5) — it
+&nbsp; * takes a flat item list and nothing else — which is why this is a component rather than a
+&nbsp; * configuration of it. It is deliberately presentational: it knows nothing about routes, so the
+&nbsp; * caller maps its destinations onto [sections] and keeps the selection rule.
+&nbsp; *
+&nbsp; * Sized to the design&#39;s 210 dp sidebar. The destination list scrolls if the window is too short
+&nbsp; * to hold every group, so the footer stays reachable rather than being pushed off the bottom.
+&nbsp; *
+&nbsp; * @param userName primary line of the footer — a display name, an email, or a placeholder.
+&nbsp; * @param workspaceName secondary line; omitted when no workspace is selected yet.
+&nbsp; * @param onUserClick makes the footer a button (the workspace switcher). Null leaves it inert.
+&nbsp; * @param windowInsets the insets the drawer keeps its content clear of. Owned here rather than by
+&nbsp; *   the host for the same reason `NavigationRail` owns its own: the surface has to paint edge to
+&nbsp; *   edge — under the status bar and any start-edge cutout — while the brand header and the user
+&nbsp; *   footer stay out from under them. The default matches `NavigationRailDefaults.windowInsets`.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferBudgetCard(
-&nbsp;    name: String,
-&nbsp;    statusLabel: String,
-&nbsp;    status: SurferBudgetStatus,
-&nbsp;    metrics: SurferBudgetCardMetrics,
+&nbsp;fun SurferNavigationDrawer(
+&nbsp;    sections: List&lt;SurferDrawerSection&gt;,
+&nbsp;    userName: String,
 &nbsp;    modifier: Modifier = Modifier,
-&nbsp;    categories: List&lt;SurferBudgetCategoryVisual&gt; = emptyList(),
-&nbsp;    onClick: (() -&gt; Unit)? = null,
+&nbsp;    brand: String = stringResource(Res.string.uikit_brand),
+&nbsp;    workspaceName: String? = null,
+&nbsp;    onUserClick: (() -&gt; Unit)? = null,
+&nbsp;    windowInsets: WindowInsets =
+&nbsp;        WindowInsets.safeDrawing.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical),
 &nbsp;) {
-&nbsp;    SurferCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
-&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;                if (categories.isNotEmpty()) {
-&nbsp;                    SurferStackedCategoryBubbles(categories)
-&nbsp;                    Spacer(Modifier.size(10.dp))
-&nbsp;                }
+&nbsp;    Row(modifier = modifier.fillMaxHeight().width(DrawerWidth)) {
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .weight(1f)
+&nbsp;                .fillMaxHeight()
+&nbsp;                .background(AppTheme.materialColors.surfaceContainerLow)
+&nbsp;                // Inside the background, so the surface still reaches the window edge.
+&nbsp;                .windowInsetsPadding(windowInsets)
+&nbsp;                .testTag(SurferNavigationDrawerTestTags.Root),
+&nbsp;        ) {
+&nbsp;            BrandHeader(brand = brand)
+&nbsp;            Column(
+&nbsp;                modifier = Modifier
+&nbsp;                    .weight(1f)
+&nbsp;                    .verticalScroll(rememberScrollState())
+&nbsp;                    .selectableGroup(),
+&nbsp;            ) {
+&nbsp;                sections.forEach { section -&gt; DrawerSection(section = section) }
+&nbsp;            }
+&nbsp;            UserFooter(
+&nbsp;                userName = userName,
+&nbsp;                workspaceName = workspaceName,
+&nbsp;                onClick = onUserClick,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        VerticalDivider(color = AppTheme.materialColors.outlineVariant)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Stable selectors for [SurferNavigationDrawer] — see docs/testing/testing-strategy.md. */
+&nbsp;object SurferNavigationDrawerTestTags {
+&nbsp;    const val Root = &quot;drawer:root&quot;
+&nbsp;    const val User = &quot;drawer:user&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BrandHeader(brand: String) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = HorizontalInset, vertical = AppTheme.spacing.default),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;    ) {
+&nbsp;        Image(
+&nbsp;            painter = painterResource(Res.drawable.uikit_app_icon),
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            modifier = Modifier
+&nbsp;                .size(BrandLogoSize)
+&nbsp;                .clip(RoundedCornerShape(BrandLogoCorner)),
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = brand,
+&nbsp;            style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DrawerSection(section: SurferDrawerSection) {
+&nbsp;    if (section.label != null) {
+&nbsp;        Text(
+&nbsp;            // Uppercased here rather than by the caller so the label stays readable at its
+&nbsp;            // source and in the accessibility tree.
+&nbsp;            text = section.label.uppercase(),
+&nbsp;            style = AppTheme.typography.labelSmall,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
+&nbsp;            modifier = Modifier.padding(
+&nbsp;                start = HorizontalInset + ItemInset,
+&nbsp;                end = HorizontalInset,
+&nbsp;                top = AppTheme.spacing.default,
+&nbsp;                bottom = AppTheme.spacing.xSmall,
+&nbsp;            ),
+&nbsp;        )
+&nbsp;    }
+&nbsp;    section.items.forEach { item -&gt; DrawerItemRow(item = item) }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DrawerItemRow(item: SurferDrawerItem) {
+&nbsp;    val contentColor = if (item.selected) {
+&nbsp;        AppTheme.materialColors.onSecondaryContainer
+&nbsp;    } else {
+&nbsp;        AppTheme.materialColors.onSurfaceVariant
+&nbsp;    }
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = HorizontalInset, vertical = ItemGap)
+&nbsp;            .clip(RoundedCornerShape(ItemCorner))
+&nbsp;            .background(
+&nbsp;                if (item.selected) AppTheme.materialColors.secondaryContainer else Color.Transparent,
+&nbsp;            )
+&nbsp;            .selectable(
+&nbsp;                selected = item.selected,
+&nbsp;                role = Role.Tab,
+&nbsp;                onClick = item.onClick,
+&nbsp;            )
+&nbsp;            .height(ItemHeight)
+&nbsp;            .padding(horizontal = ItemInset),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;    ) {
+&nbsp;        Icon(
+&nbsp;            imageVector = item.icon,
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            tint = contentColor,
+&nbsp;            modifier = Modifier.size(ItemIconSize),
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = item.label,
+&nbsp;            style = AppTheme.typography.labelLarge,
+&nbsp;            color = contentColor,
+&nbsp;            maxLines = 1,
+&nbsp;            overflow = TextOverflow.Ellipsis,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun UserFooter(
+&nbsp;    userName: String,
+&nbsp;    workspaceName: String?,
+&nbsp;    onClick: (() -&gt; Unit)?,
+&nbsp;) {
+&nbsp;    HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+&nbsp;            .padding(horizontal = HorizontalInset, vertical = AppTheme.spacing.medium)
+&nbsp;            .testTag(SurferNavigationDrawerTestTags.User),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(AvatarSize)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(AppTheme.materialColors.primaryContainer),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Text(
+&nbsp;                text = userName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),
+&nbsp;                style = AppTheme.typography.labelLarge,
+&nbsp;                color = AppTheme.materialColors.onPrimaryContainer,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = userName,
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                maxLines = 1,
+&nbsp;                overflow = TextOverflow.Ellipsis,
+&nbsp;            )
+&nbsp;            if (workspaceName != null) {
 &nbsp;                Text(
-&nbsp;                    text = name,
-&nbsp;                    style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
-&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                    text = workspaceName,
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
 &nbsp;                    maxLines = 1,
 &nbsp;                    overflow = TextOverflow.Ellipsis,
-&nbsp;                    modifier = Modifier.weight(1f, fill = false),
-&nbsp;                )
-&nbsp;                Spacer(Modifier.weight(1f))
-&nbsp;                SurferBudgetStatusPill(label = statusLabel, status = status)
-&nbsp;            }
-&nbsp;
-&nbsp;            Row(verticalAlignment = Alignment.Bottom) {
-&nbsp;                Text(
-&nbsp;                    text = metrics.spentOfLimit,
-&nbsp;                    style = AppTheme.typography.bodyMedium,
-&nbsp;                    color = AppTheme.materialColors.onSurface,
-&nbsp;                )
-&nbsp;                Spacer(Modifier.weight(1f))
-&nbsp;                Text(
-&nbsp;                    text = metrics.remaining,
-&nbsp;                    style = AppTheme.typography.bodySmall,
-&nbsp;                    color = if (status == SurferBudgetStatus.Over) {
-&nbsp;                        AppTheme.materialColors.error
-&nbsp;                    } else {
-&nbsp;                        AppTheme.materialColors.onSurfaceVariant
-&nbsp;                    },
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferBudgetProgressBar(
-&nbsp;                progress = metrics.progress,
-&nbsp;                status = status,
-&nbsp;                tickFraction = metrics.alertFraction,
-&nbsp;            )
-&nbsp;
-&nbsp;            Text(
-&nbsp;                text = metrics.footer,
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Up to [MAX_BUBBLES] overlapping category bubbles, then a `+N` counter. Overlapping keeps a
-&nbsp; * five-category budget the same width as a one-category budget, so the rows stay aligned.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;private fun SurferStackedCategoryBubbles(categories: List&lt;SurferBudgetCategoryVisual&gt;) {
-&nbsp;    val visible = categories.take(MAX_BUBBLES)
-&nbsp;    val overflow = categories.size - visible.size
-&nbsp;    val border = AppTheme.materialColors.surface
-&nbsp;    Row(horizontalArrangement = Arrangement.spacedBy(BUBBLE_OVERLAP)) {
-&nbsp;        visible.forEach { visual -&gt;
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .size(BUBBLE_SIZE)
-&nbsp;                    .clip(CircleShape)
-&nbsp;                    .background(visual.tint.copy(alpha = 0.18f))
-&nbsp;                    .border(1.5.dp, border, CircleShape),
-&nbsp;                contentAlignment = Alignment.Center,
-&nbsp;            ) {
-&nbsp;                Icon(
-&nbsp;                    imageVector = visual.icon,
-&nbsp;                    contentDescription = SurferSemantics.Decorative,
-&nbsp;                    tint = visual.tint,
-&nbsp;                    modifier = Modifier.size(BUBBLE_SIZE / 2),
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;        if (overflow &gt; 0) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .size(BUBBLE_SIZE)
-&nbsp;                    .clip(CircleShape)
-&nbsp;                    .background(AppTheme.materialColors.surfaceContainerHighest)
-&nbsp;                    .border(1.5.dp, border, CircleShape),
-&nbsp;                contentAlignment = Alignment.Center,
-&nbsp;            ) {
-&nbsp;                Text(
-&nbsp;                    text = &quot;+$overflow&quot;,
-&nbsp;                    style = AppTheme.typography.labelSmall,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                    modifier = Modifier.offset(y = (-1).dp),
 &nbsp;                )
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;private const val MAX_BUBBLES = 3
-&nbsp;private val BUBBLE_SIZE = 28.dp
+&nbsp;/** The design&#39;s 210 dp sidebar, divider included. */
+&nbsp;private val DrawerWidth: Dp = 210.dp
+&nbsp;private val BrandLogoSize: Dp = 34.dp
+&nbsp;private val BrandLogoCorner: Dp = 10.dp
+&nbsp;private val HorizontalInset: Dp = 10.dp
+&nbsp;private val ItemInset: Dp = 10.dp
+&nbsp;private val ItemGap: Dp = 2.dp
 &nbsp;
-&nbsp;/** Negative spacing — each bubble sits partly on top of the one before it. */
-&nbsp;private val BUBBLE_OVERLAP = (-8).dp
+&nbsp;/** The 48 dp minimum touch target — `Modifier.selectable` does not expand one of its own. */
+&nbsp;private val ItemHeight: Dp = 48.dp
+&nbsp;private val ItemCorner: Dp = 10.dp
+&nbsp;private val ItemIconSize: Dp = 20.dp
+&nbsp;private val AvatarSize: Dp = 32.dp
+&nbsp;
+&nbsp;private fun previewItem(
+&nbsp;    label: String,
+&nbsp;    icon: ImageVector,
+&nbsp;    selected: Boolean = false,
+&nbsp;) = SurferDrawerItem(label = label, icon = icon, selected = selected, onClick = {})
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferBudgetCardPreview() {
+&nbsp;private fun SurferNavigationDrawerPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;        ) {
-&nbsp;            SurferBudgetCard(
-&nbsp;                name = &quot;Groceries&quot;,
-&nbsp;                statusLabel = &quot;Near limit&quot;,
-&nbsp;                status = SurferBudgetStatus.Warn,
-&nbsp;                metrics = SurferBudgetCardMetrics(
-&nbsp;                    spentOfLimit = &quot;€312.40 of €400.00&quot;,
-&nbsp;                    remaining = &quot;€87.60 left&quot;,
-&nbsp;                    progress = 0.78f,
-&nbsp;                    footer = &quot;Monthly · Apr 1 – Apr 30 · 12 days left&quot;,
-&nbsp;                    alertFraction = 0.8f,
+&nbsp;        Box(modifier = Modifier.height(520.dp)) {
+&nbsp;            SurferNavigationDrawer(
+&nbsp;                sections = listOf(
+&nbsp;                    SurferDrawerSection(
+&nbsp;                        items = listOf(
+&nbsp;                            previewItem(&quot;Dashboard&quot;, SurferIcons.Dashboard, selected = true),
+&nbsp;                            previewItem(&quot;Accounts&quot;, SurferIcons.Wallet),
+&nbsp;                            previewItem(&quot;Transactions&quot;, SurferIcons.SwapHoriz),
+&nbsp;                            previewItem(&quot;Budgets&quot;, SurferIcons.Savings),
+&nbsp;                            previewItem(&quot;Goals&quot;, SurferIcons.Flag),
+&nbsp;                        ),
+&nbsp;                    ),
+&nbsp;                    SurferDrawerSection(
+&nbsp;                        label = &quot;Manage&quot;,
+&nbsp;                        items = listOf(
+&nbsp;                            previewItem(&quot;Categories&quot;, SurferIcons.Category),
+&nbsp;                            previewItem(&quot;Settings&quot;, SurferIcons.Settings),
+&nbsp;                        ),
+&nbsp;                    ),
 &nbsp;                ),
-&nbsp;                categories = listOf(
-&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Receipt, SurferCategoryPalette.tints[0]),
-&nbsp;                ),
-&nbsp;                onClick = {},
-&nbsp;            )
-&nbsp;            SurferBudgetCard(
-&nbsp;                name = &quot;Transport &amp; fuel&quot;,
-&nbsp;                statusLabel = &quot;Over&quot;,
-&nbsp;                status = SurferBudgetStatus.Over,
-&nbsp;                metrics = SurferBudgetCardMetrics(
-&nbsp;                    spentOfLimit = &quot;€245.10 of €220.00&quot;,
-&nbsp;                    remaining = &quot;€25.10 over&quot;,
-&nbsp;                    progress = 1.11f,
-&nbsp;                    footer = &quot;Monthly · Apr 1 – Apr 30 · 12 days left&quot;,
-&nbsp;                    alertFraction = 0.75f,
-&nbsp;                ),
-&nbsp;                categories = listOf(
-&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Cash, SurferCategoryPalette.tints[1]),
-&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Wallet, SurferCategoryPalette.tints[2]),
-&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Tag, SurferCategoryPalette.tints[3]),
-&nbsp;                    SurferBudgetCategoryVisual(SurferIcons.Event, SurferCategoryPalette.tints[4]),
-&nbsp;                ),
-&nbsp;                onClick = {},
-&nbsp;            )
-&nbsp;            SurferBudgetCard(
-&nbsp;                name = &quot;Total monthly cap&quot;,
-&nbsp;                statusLabel = &quot;On track&quot;,
-&nbsp;                status = SurferBudgetStatus.Ok,
-&nbsp;                metrics = SurferBudgetCardMetrics(
-&nbsp;                    spentOfLimit = &quot;€1,408.30 of €2,200.00&quot;,
-&nbsp;                    remaining = &quot;€791.70 left&quot;,
-&nbsp;                    progress = 0.64f,
-&nbsp;                    footer = &quot;Monthly · all categories · 12 days left&quot;,
-&nbsp;                    alertFraction = 0.8f,
-&nbsp;                ),
-&nbsp;                onClick = {},
+&nbsp;                userName = &quot;Georgy&quot;,
+&nbsp;                workspaceName = &quot;Household budget&quot;,
+&nbsp;                onUserClick = {},
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
@@ -343,7 +447,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

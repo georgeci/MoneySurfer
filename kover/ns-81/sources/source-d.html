@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferPeriodArrow</title>
+  <title>MoneySurfer Coverage Report > SurferStatTileKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferPeriodArrow (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferStatTileKt (com.georgeci.moneysurfer.uikit.components.budget)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferPeriodArrow</td>
+  <td class="name">SurferStatTileKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    62.5%
   </span>
   <span class="absValue">
-    (0/19)
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (28/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (356/364)
   </span>
 </td>
 </tr>
@@ -92,163 +99,88 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;private val PagerHeight = 40.dp
-&nbsp;private val PagerShape = RoundedCornerShape(20.dp)
-&nbsp;private val ArrowSize = 32.dp
-&nbsp;private val ArrowIconSize = 18.dp
-&nbsp;
-&nbsp;/** Alpha the arrows fade to when there is nothing to page to — from the design&#39;s `PeriodPager`. */
-&nbsp;private const val DISABLED_ARROW_ALPHA = 0.4f
-&nbsp;
 &nbsp;/**
-&nbsp; * One pager arrow&#39;s behaviour: what tapping it does, whether it is live, and its a11y label.
-&nbsp; * Bundling the three keeps [SurferPeriodPager]&#39;s own parameter list readable rather than fanning
-&nbsp; * every arrow property out into a `previousX` / `nextX` pair.
-&nbsp; */
-&nbsp;data class SurferPeriodArrow(
-<b class="nc">&nbsp;    val onClick: () -&gt; Unit,</b>
-<b class="nc">&nbsp;    val enabled: Boolean = true,</b>
-<b class="nc">&nbsp;    val contentDescription: String? = null,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Compact pager pill for stepping through a period: `‹ March 2025 ›`.
-&nbsp; *
-&nbsp; * Stateless — the caller advances via [previous] / [next]. [sublabel] is the smaller trailing
-&nbsp; * caption (the year, an ISO week, &quot;No date filter&quot;); [onLabelClick] makes the centre tappable for
-&nbsp; * callers that hang a period-mode menu off it.
+&nbsp; * Label / value / caption tile used for the budget forecast row (daily average, projected
+&nbsp; * total, per-day remaining). Values arrive pre-formatted; [valueColor] lets a tile pick up the
+&nbsp; * status colour when the number itself is the warning.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferPeriodPager(
+&nbsp;fun SurferStatTile(
 &nbsp;    label: String,
-&nbsp;    previous: SurferPeriodArrow,
-&nbsp;    next: SurferPeriodArrow,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    sublabel: String? = null,
-&nbsp;    onLabelClick: (() -&gt; Unit)? = null,
-&nbsp;) {
-&nbsp;    Row(
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .height(PagerHeight)
-&nbsp;            .clip(PagerShape)
-&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)
-&nbsp;            .padding(horizontal = 6.dp),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.SpaceBetween,
-&nbsp;    ) {
-&nbsp;        PagerArrow(
-&nbsp;            icon = SurferIcons.ChevronLeft,
-&nbsp;            contentDescription = previous.contentDescription,
-&nbsp;            enabled = previous.enabled,
-&nbsp;            onClick = previous.onClick,
-&nbsp;        )
-&nbsp;        Row(
-&nbsp;            modifier = Modifier
-&nbsp;                .clip(PagerShape)
-&nbsp;                .then(if (onLabelClick != null) Modifier.clickable(onClick = onLabelClick) else Modifier)
-&nbsp;                .padding(horizontal = 8.dp, vertical = 4.dp),
-&nbsp;            verticalAlignment = Alignment.Bottom,
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(6.dp),
-&nbsp;        ) {
-&nbsp;            Text(
-&nbsp;                text = label,
-&nbsp;                style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-&nbsp;                color = AppTheme.materialColors.onSurface,
-&nbsp;                maxLines = 1,
+&nbsp;    value: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    caption: String? = null,</b>
+<b class="fc">&nbsp;    valueColor: Color? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferCard(modifier = modifier) {</b>
+<b class="fc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = label,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
 &nbsp;            )
-&nbsp;            if (sublabel != null) {
-&nbsp;                Text(
-&nbsp;                    text = sublabel,
-&nbsp;                    style = AppTheme.typography.labelSmall,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                    maxLines = 1,
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = value,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="pc">&nbsp;                color = valueColor ?: AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            if (caption != null) {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = caption,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                    maxLines = 1,</b>
+<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
 &nbsp;                )
-&nbsp;            }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferStatTilePreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            SurferStatTile(
+&nbsp;                label = &quot;Daily average&quot;,
+&nbsp;                value = &quot;€17.35&quot;,
+&nbsp;                caption = &quot;18 days in&quot;,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
+&nbsp;            SurferStatTile(
+&nbsp;                label = &quot;Projected&quot;,
+&nbsp;                value = &quot;€520.50&quot;,
+&nbsp;                caption = &quot;over by €120.50&quot;,
+&nbsp;                valueColor = AppTheme.materialColors.error,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
 &nbsp;        }
-&nbsp;        PagerArrow(
-&nbsp;            icon = SurferIcons.ChevronRight,
-&nbsp;            contentDescription = next.contentDescription,
-&nbsp;            enabled = next.enabled,
-&nbsp;            onClick = next.onClick,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun PagerArrow(
-&nbsp;    icon: ImageVector,
-&nbsp;    contentDescription: String?,
-&nbsp;    enabled: Boolean,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;) {
-&nbsp;    IconButton(
-&nbsp;        onClick = onClick,
-&nbsp;        enabled = enabled,
-&nbsp;        modifier = Modifier.size(ArrowSize),
-&nbsp;    ) {
-&nbsp;        Icon(
-&nbsp;            imageVector = icon,
-&nbsp;            contentDescription = contentDescription,
-&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant.copy(
-&nbsp;                alpha = if (enabled) 1f else DISABLED_ARROW_ALPHA,
-&nbsp;            ),
-&nbsp;            modifier = Modifier.size(ArrowIconSize),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferPeriodPagerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferPeriodPager(
-&nbsp;            modifier = Modifier.padding(all = 16.dp),
-&nbsp;            label = &quot;March&quot;,
-&nbsp;            sublabel = &quot;2025&quot;,
-&nbsp;            previous = SurferPeriodArrow(onClick = {}),
-&nbsp;            next = SurferPeriodArrow(onClick = {}),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferPeriodPagerAllTimePreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferPeriodPager(
-&nbsp;            modifier = Modifier.padding(all = 16.dp),
-&nbsp;            label = &quot;All time&quot;,
-&nbsp;            sublabel = &quot;No date filter&quot;,
-&nbsp;            previous = SurferPeriodArrow(onClick = {}, enabled = false),
-&nbsp;            next = SurferPeriodArrow(onClick = {}, enabled = false),
-&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -274,7 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

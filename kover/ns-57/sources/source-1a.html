@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionEditIdentity</title>
+  <title>MoneySurfer Coverage Report > TransactionSplitLineUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionEditIdentity (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionSplitLineUi (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionEditIdentity</td>
+  <td class="name">TransactionSplitLineUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (42/42)
+    (19/19)
   </span>
 </td>
 </tr>
@@ -150,9 +150,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * than by asking the user to make them.
 &nbsp; */
 &nbsp;data class TransactionSplitLineUi(
-&nbsp;    val key: Int,
-&nbsp;    val category: Category? = null,
-&nbsp;    val amount: String = &quot;&quot;,
+<b class="fc">&nbsp;    val key: Int,</b>
+<b class="fc">&nbsp;    val category: Category? = null,</b>
+<b class="fc">&nbsp;    val amount: String = &quot;&quot;,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -182,19 +182,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * A snapshot, not a view of the form: it is taken once when the transaction is loaded and never
 &nbsp; * follows the fields the user is editing.
 &nbsp; */
-<b class="fc">&nbsp;data class TransactionEditIdentity(</b>
+&nbsp;data class TransactionEditIdentity(
 &nbsp;    /** Short human-readable id, e.g. `TX-8213`. */
-<b class="fc">&nbsp;    val reference: String,</b>
-<b class="fc">&nbsp;    val type: TransactionTypeUi,</b>
+&nbsp;    val reference: String,
+&nbsp;    val type: TransactionTypeUi,
 &nbsp;    /** The note, falling back to the merchant when there is none; may still be blank. */
-<b class="fc">&nbsp;    val note: String,</b>
+&nbsp;    val note: String,
 &nbsp;    /** Signed for income and expense, unsigned for a transfer leg. */
-<b class="fc">&nbsp;    val formattedAmount: String,</b>
+&nbsp;    val formattedAmount: String,
 &nbsp;    /** The category&#39;s stored appearance, fed to the shared bubble resolver. */
-<b class="fc">&nbsp;    val categoryId: String,</b>
-<b class="fc">&nbsp;    val categoryIconKey: String,</b>
-<b class="fc">&nbsp;    val categoryHue: Int,</b>
-<b class="fc">&nbsp;    val categorySystemKind: String?,</b>
+&nbsp;    val categoryId: String,
+&nbsp;    val categoryIconKey: String,
+&nbsp;    val categoryHue: Int,
+&nbsp;    val categorySystemKind: String?,
 &nbsp;)
 </code>
 </pre>
@@ -219,7 +219,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

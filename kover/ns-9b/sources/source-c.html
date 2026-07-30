@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Koin_hints_com_georgeci_moneysurfer_feature_login_di_LoginModuleKt</title>
+  <title>MoneySurfer Coverage Report > TransactionRetentionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: Koin_hints_com_georgeci_moneysurfer_feature_login_di_LoginModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: TransactionRetentionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Koin_hints_com_georgeci_moneysurfer_feature_login_di_LoginModuleKt</td>
+  <td class="name">TransactionRetentionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * Storage side of the tombstone retention policy (issue #346).
+&nbsp; *
+&nbsp; * Split off [TransactionRepository] rather than added to it because purging is maintenance, not
+&nbsp; * a transaction operation: it has no domain model to map, no caller on any screen, and every
+&nbsp; * test double of the transaction store would otherwise have to answer a question none of them
+&nbsp; * ask. See `PurgeDeletedTransactionsUseCase` for the policy that drives it.
+&nbsp; */
+&nbsp;fun interface TransactionRetentionRepository {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the rows tombstoned strictly before [threshold] for good, and returns how many
+&nbsp;     * went. Live rows are never touched.
+&nbsp;     */
+&nbsp;    suspend fun purgeDeletedBefore(threshold: Instant): Int
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

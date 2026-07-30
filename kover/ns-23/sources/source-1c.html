@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorySpendBreakdown</title>
+  <title>MoneySurfer Coverage Report > CategoryMonthlyTotal</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorySpendBreakdown (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategoryMonthlyTotal (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorySpendBreakdown</td>
+  <td class="name">CategoryMonthlyTotal</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (17/17)
+    (22/22)
   </span>
 </td>
 </tr>
@@ -96,127 +96,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import kotlinx.datetime.DateTimeUnit
 &nbsp;import kotlinx.datetime.YearMonth
-&nbsp;import kotlinx.datetime.minus
-&nbsp;import kotlinx.datetime.plus
 &nbsp;
-&nbsp;/** One column of the spend trend. [total] is zero for a month the category booked nothing in. */
-&nbsp;data class CategorySpendMonth(
-&nbsp;    val month: YearMonth,
-&nbsp;    val total: Money,
-&nbsp;)
-&nbsp;
-&nbsp;/** One row of the subcategory breakdown — a direct child, with its own subtree rolled in. */
-<b class="fc">&nbsp;data class CategorySpendBreakdown(</b>
+&nbsp;/**
+&nbsp; * What one category booked in one month, straight off the aggregate query.
+&nbsp; *
+&nbsp; * Deliberately flat and un-rolled-up: a row exists per *stored* `categoryId`, so a parent and
+&nbsp; * each of its children arrive separately and the caller decides how to combine them. Rolling
+&nbsp; * up in SQL would force a second query the moment a screen wants the per-child split, which
+&nbsp; * the subcategory breakdown does.
+&nbsp; *
+&nbsp; * [total] is a magnitude — the query sums `ABS(amount)` over a single transaction type, so an
+&nbsp; * expense category reads as a positive number rather than a negative one.
+&nbsp; */
+<b class="fc">&nbsp;data class CategoryMonthlyTotal(</b>
 <b class="fc">&nbsp;    val categoryId: CategoryId,</b>
+<b class="fc">&nbsp;    val month: YearMonth,</b>
 <b class="fc">&nbsp;    val total: Money,</b>
 <b class="fc">&nbsp;    val transactionCount: Int,</b>
 &nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Everything the category detail screen needs in numbers, for one category over a fixed window.
-&nbsp; *
-&nbsp; * Totals here are *rolled up*: a parent&#39;s figure includes its whole subtree, matching the
-&nbsp; * promise the manage screen makes (&quot;subcategories roll up into their parent&quot;). [subcategories]
-&nbsp; * is empty for a leaf, which is what drives the leaf empty state — a leaf is not an error case,
-&nbsp; * it is the common shape.
-&nbsp; */
-&nbsp;data class CategorySpendHistory(
-&nbsp;    val months: List&lt;CategorySpendMonth&gt;,
-&nbsp;    val currentMonth: Money,
-&nbsp;    val transactionCount: Int,
-&nbsp;    val subcategories: List&lt;CategorySpendBreakdown&gt;,
-&nbsp;) {
-&nbsp;    /** Mean over the whole window, including months with nothing in them. */
-&nbsp;    val monthlyAverage: Money
-&nbsp;        get() = if (months.isEmpty()) {
-&nbsp;            Money.zero()
-&nbsp;        } else {
-&nbsp;            months.fold(Money.zero()) { acc, m -&gt;
-&nbsp;                acc + m.total
-&nbsp;            } / months.size
-&nbsp;        }
-&nbsp;
-&nbsp;    /** Mean per transaction this month, or null when nothing was booked. */
-&nbsp;    val perTransaction: Money?
-&nbsp;        get() = if (transactionCount &lt;= 0) null else currentMonth / transactionCount
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Columns the trend draws. Six fits the mockup&#39;s bar row without crowding on a phone. */
-&nbsp;        const val TREND_MONTHS: Int = 6
-&nbsp;
-&nbsp;        val Empty = CategorySpendHistory(
-&nbsp;            months = emptyList(),
-&nbsp;            currentMonth = Money.zero(),
-&nbsp;            transactionCount = 0,
-&nbsp;            subcategories = emptyList(),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** [count] months ending at [anchor] inclusive, oldest first. */
-&nbsp;fun trailingMonths(anchor: YearMonth, count: Int): List&lt;YearMonth&gt; =
-&nbsp;    (count - 1 downTo 0).map { anchor.minus(it, DateTimeUnit.MONTH) }
-&nbsp;
-&nbsp;/**
-&nbsp; * Folds raw per-category-per-month rows into the shape the detail screen renders.
-&nbsp; *
-&nbsp; * Pure, and deliberately tolerant of a sparse [totals]: the aggregate query only returns months
-&nbsp; * a category actually booked something in, so every month in [months] is emitted here whether or
-&nbsp; * not a row backs it. Without that the trend would silently shrink to however many months had
-&nbsp; * spend, and a quiet category would draw a two-bar chart labelled &quot;last 6 months&quot;.
-&nbsp; *
-&nbsp; * Rows for categories outside [rootId]&#39;s subtree are ignored rather than trusted, so a caller
-&nbsp; * passing a wider query result cannot inflate the total.
-&nbsp; */
-&nbsp;fun buildCategorySpendHistory(
-&nbsp;    categories: List&lt;Category&gt;,
-&nbsp;    rootId: CategoryId,
-&nbsp;    totals: List&lt;CategoryMonthlyTotal&gt;,
-&nbsp;    months: List&lt;YearMonth&gt;,
-&nbsp;): CategorySpendHistory {
-&nbsp;    val subtree = CategoryTree.descendantsOf(categories, rootId) + rootId
-&nbsp;    val currentMonth = months.lastOrNull()
-&nbsp;
-&nbsp;    val byCategory = totals.groupBy { it.categoryId }
-&nbsp;    fun rollUp(ids: Set&lt;CategoryId&gt;, month: YearMonth?): Pair&lt;Money, Int&gt; {
-&nbsp;        var total = Money.zero()
-&nbsp;        var count = 0
-&nbsp;        ids.forEach { id -&gt;
-&nbsp;            byCategory[id].orEmpty().forEach { row -&gt;
-&nbsp;                if (month == null || row.month == month) {
-&nbsp;                    total += row.total
-&nbsp;                    count += row.transactionCount
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;        return total to count
-&nbsp;    }
-&nbsp;
-&nbsp;    val trend = months.map { month -&gt;
-&nbsp;        CategorySpendMonth(month = month, total = rollUp(subtree, month).first)
-&nbsp;    }
-&nbsp;    val (thisMonth, thisMonthCount) = rollUp(subtree, currentMonth)
-&nbsp;
-&nbsp;    val breakdown = CategoryTree.childrenOf(categories, rootId).map { child -&gt;
-&nbsp;        // A child may itself have children — the mockup shows one flat row per direct child, so
-&nbsp;        // a grandchild&#39;s spend belongs on its parent&#39;s row rather than vanishing from the split.
-&nbsp;        val childSubtree = CategoryTree.descendantsOf(categories, child.id) + child.id
-&nbsp;        val (total, count) = rollUp(childSubtree, currentMonth)
-&nbsp;        CategorySpendBreakdown(categoryId = child.id, total = total, transactionCount = count)
-&nbsp;    }
-&nbsp;
-&nbsp;    return CategorySpendHistory(
-&nbsp;        months = trend,
-&nbsp;        currentMonth = thisMonth,
-&nbsp;        transactionCount = thisMonthCount,
-&nbsp;        subcategories = breakdown,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;/** The month after this one — the exclusive upper bound of a window ending at it. */
-&nbsp;fun YearMonth.next(): YearMonth = plus(1, DateTimeUnit.MONTH)
 </code>
 </pre>
 </div>
@@ -240,7 +138,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

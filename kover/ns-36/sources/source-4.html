@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/20)
+    (0/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/70)
+    (0/56)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/127)
+    (0/78)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1526)
+    (0/956)
   </span>
 </td>
 </tr>
@@ -351,7 +351,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/34)
+    (0/22)
   </span>
 </td>
 <td class="coverageStat">
@@ -359,7 +359,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/70)
+    (0/56)
   </span>
 </td>
 <td class="coverageStat">
@@ -367,7 +367,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/133)
+    (0/84)
   </span>
 </td>
 <td class="coverageStat">
@@ -375,7 +375,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1592)
+    (0/1022)
   </span>
 </td>
 </tr>
@@ -492,58 +492,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            .surferTestTagAsId(),</b>
 <b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
 <b class="nc">&nbsp;        topBar = {</b>
-<b class="nc">&nbsp;            SurferToolbar(</b>
-<b class="nc">&nbsp;                title = stringResource(Res.string.budgets_title),</b>
-<b class="nc">&nbsp;                onBack = { onEvent(BudgetsEvent.OnBackClick) },</b>
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.budgets_title),
+&nbsp;                onBack = { onEvent(BudgetsEvent.OnBackClick) },
 &nbsp;            )
 &nbsp;        },
 <b class="nc">&nbsp;        floatingActionButton = {</b>
-<b class="nc">&nbsp;            val addLabel = stringResource(Res.string.budgets_add)</b>
-<b class="nc">&nbsp;            SurferAddFab(</b>
-<b class="nc">&nbsp;                label = addLabel,</b>
-<b class="nc">&nbsp;                onClick = { onEvent(BudgetsEvent.OnAddBudgetClick) },</b>
-<b class="nc">&nbsp;                modifier = Modifier.testTag(BudgetsTestTags.AddButton),</b>
+&nbsp;            val addLabel = stringResource(Res.string.budgets_add)
+&nbsp;            SurferAddFab(
+&nbsp;                label = addLabel,
+&nbsp;                onClick = { onEvent(BudgetsEvent.OnAddBudgetClick) },
+&nbsp;                modifier = Modifier.testTag(BudgetsTestTags.AddButton),
 &nbsp;            )
 &nbsp;        },
 <b class="nc">&nbsp;    ) { padding -&gt;</b>
-<b class="nc">&nbsp;        val content = state as? BudgetsState.Content</b>
-<b class="nc">&nbsp;        if (content == null) {</b>
-<b class="nc">&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))</b>
+&nbsp;        val content = state as? BudgetsState.Content
+&nbsp;        if (content == null) {
+&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
 &nbsp;            return@Scaffold
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        if (content.active.isEmpty() &amp;&amp; content.archived.isEmpty()) {</b>
-<b class="nc">&nbsp;            Box(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxSize()</b>
-<b class="nc">&nbsp;                    .surferContentContainer()</b>
-<b class="nc">&nbsp;                    .padding(padding)</b>
-<b class="nc">&nbsp;                    .padding(horizontal = AppTheme.spacing.large),</b>
-<b class="nc">&nbsp;                contentAlignment = Alignment.Center,</b>
+&nbsp;        }
+&nbsp;        if (content.active.isEmpty() &amp;&amp; content.archived.isEmpty()) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .surferContentContainer()
+&nbsp;                    .padding(padding)
+&nbsp;                    .padding(horizontal = AppTheme.spacing.large),
+&nbsp;                contentAlignment = Alignment.Center,
 &nbsp;            ) {
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = stringResource(Res.string.budgets_empty),</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.bodyLarge,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="nc">&nbsp;                    textAlign = TextAlign.Center,</b>
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budgets_empty),
+&nbsp;                    style = AppTheme.typography.bodyLarge,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    textAlign = TextAlign.Center,
 &nbsp;                )
-<b class="nc">&nbsp;            }</b>
+&nbsp;            }
 &nbsp;            return@Scaffold
-<b class="nc">&nbsp;        }</b>
+&nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;        LazyColumn(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxSize()</b>
-<b class="nc">&nbsp;                .surferContentContainer()</b>
-<b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding())</b>
-<b class="nc">&nbsp;                .testTag(BudgetsTestTags.List),</b>
-<b class="nc">&nbsp;            contentPadding = PaddingValues(</b>
-<b class="nc">&nbsp;                top = AppTheme.spacing.small,</b>
-<b class="nc">&nbsp;                bottom = padding.calculateBottomPadding() +</b>
-<b class="nc">&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,</b>
+&nbsp;        LazyColumn(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .testTag(BudgetsTestTags.List),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                top = AppTheme.spacing.small,
+&nbsp;                bottom = padding.calculateBottomPadding() +
+&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
 &nbsp;            ),
-<b class="nc">&nbsp;        ) {</b>
-<b class="nc">&nbsp;            if (content.active.isNotEmpty() &amp;&amp; content.archived.isNotEmpty()) {</b>
-<b class="nc">&nbsp;                item(key = &quot;header:active&quot;) {</b>
+&nbsp;        ) {
+&nbsp;            if (content.active.isNotEmpty() &amp;&amp; content.archived.isNotEmpty()) {
+&nbsp;                item(key = &quot;header:active&quot;) {
 &nbsp;                    SurferSectionHeader(
 &nbsp;                        title = stringResource(Res.string.budgets_active_header),
 &nbsp;                        modifier = Modifier.padding(
@@ -555,7 +555,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    )
 &nbsp;                }
 &nbsp;            }
-<b class="nc">&nbsp;            items(content.active, key = { it.id.value }) { budget -&gt;</b>
+&nbsp;            items(content.active, key = { it.id.value }) { budget -&gt;
 &nbsp;                BudgetRow(
 &nbsp;                    budget = budget,
 &nbsp;                    archiveLabel = stringResource(Res.string.budgets_archive),
@@ -565,8 +565,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;                    onDeleteClick = { onEvent(BudgetsEvent.OnDeleteClick(budget.id)) },</b>
 &nbsp;                )
 &nbsp;            }
-<b class="nc">&nbsp;            if (content.archived.isNotEmpty()) {</b>
-<b class="nc">&nbsp;                item(key = &quot;header:archived&quot;) {</b>
+&nbsp;            if (content.archived.isNotEmpty()) {
+&nbsp;                item(key = &quot;header:archived&quot;) {
 &nbsp;                    SurferSectionHeader(
 &nbsp;                        title = stringResource(Res.string.budgets_archived_header),
 &nbsp;                        modifier = Modifier.padding(
@@ -577,7 +577,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                        ),
 &nbsp;                    )
 &nbsp;                }
-<b class="nc">&nbsp;                items(content.archived, key = { it.id.value }) { budget -&gt;</b>
+&nbsp;                items(content.archived, key = { it.id.value }) { budget -&gt;
 &nbsp;                    BudgetRow(
 &nbsp;                        budget = budget,
 &nbsp;                        archiveLabel = stringResource(Res.string.budgets_restore),
@@ -597,12 +597,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            title = { Text(stringResource(Res.string.budgets_delete_title)) },
 <b class="nc">&nbsp;            text = { Text(stringResource(Res.string.budgets_delete_message, pending.name)) },</b>
 <b class="nc">&nbsp;            confirmButton = {</b>
-<b class="nc">&nbsp;                TextButton(onClick = { onEvent(BudgetsEvent.OnDeleteConfirm) }) {</b>
+&nbsp;                TextButton(onClick = { onEvent(BudgetsEvent.OnDeleteConfirm) }) {
 &nbsp;                    Text(stringResource(Res.string.budgets_delete))
 &nbsp;                }
 &nbsp;            },
 <b class="nc">&nbsp;            dismissButton = {</b>
-<b class="nc">&nbsp;                TextButton(onClick = { onEvent(BudgetsEvent.OnDeleteCancel) }) {</b>
+&nbsp;                TextButton(onClick = { onEvent(BudgetsEvent.OnDeleteCancel) }) {
 &nbsp;                    Text(stringResource(Res.string.budgets_delete_cancel))
 &nbsp;                }
 &nbsp;            },
@@ -678,8 +678,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun BudgetsContentPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;private fun BudgetsContentPreview() {
+&nbsp;    AppTheme {
 &nbsp;        BudgetsContent(
 &nbsp;            state = BudgetsState.Content(
 &nbsp;                active = listOf(previewBudget()),
@@ -688,7 +688,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -712,7 +712,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferIconBubbleKt</title>
+  <title>MoneySurfer Coverage Report > SurferCategoryPalette</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.atom</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferIconBubbleKt (com.georgeci.moneysurfer.uikit.atom)</h1>
+<h1>Coverage Summary for Class: SurferCategoryPalette (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferIconBubbleKt</td>
+  <td class="name">SurferCategoryPalette</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,18 +60,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    100%
   </span>
   <span class="absValue">
-    (2/3)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    37.5%
+    64.3%
   </span>
   <span class="absValue">
-    (9/24)
+    (18/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (47/47)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     86.2%
   </span>
   <span class="absValue">
-    (25/29)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    74.9%
-  </span>
-  <span class="absValue">
-    (310/414)
+    (489/567)
   </span>
 </td>
 </tr>
@@ -99,17 +99,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.atom
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.ReadOnlyComposable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
@@ -124,62 +126,226 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/**
-&nbsp; * Circular icon medallion used as the leading element of a row — a filled container by default,
-&nbsp; * or an outlined ring when [outlined] is set, which is how the &quot;add new&quot; rows distinguish
-&nbsp; * themselves from real entries.
-&nbsp; *
-&nbsp; * The icon scales with the bubble rather than taking a size of its own: every hand-written copy
-&nbsp; * of this had picked its own pair (40/22, 36/18, 40/20) with no reason behind the difference.
-&nbsp; *
-&nbsp; * For a category bubble, whose tint comes from the palette, use `SurferCategoryBubble` instead.
+&nbsp; * Circular bubble used to represent a category across the app (dashboard rows, transaction
+&nbsp; * details, pickers, creation preview). Foreground keeps the full category tint; background
+&nbsp; * is a low-alpha wash of the same tint, so light/dark themes both read correctly.
 &nbsp; */
 &nbsp;@Composable
-<b class="nc">&nbsp;fun SurferIconBubble(</b>
+&nbsp;fun SurferCategoryBubble(
 &nbsp;    icon: ImageVector,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    size: Dp = DefaultSize,</b>
-<b class="fc">&nbsp;    outlined: Boolean = false,</b>
-<b class="fc">&nbsp;    containerColor: Color = AppTheme.materialColors.primaryContainer,</b>
-<b class="fc">&nbsp;    contentColor: Color = AppTheme.materialColors.onPrimaryContainer,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val shell = if (outlined) {</b>
-<b class="fc">&nbsp;        Modifier.border(1.dp, AppTheme.materialColors.outline, CircleShape)</b>
-<b class="fc">&nbsp;    } else {</b>
-<b class="fc">&nbsp;        Modifier.background(containerColor)</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .size(size)</b>
-<b class="fc">&nbsp;            .clip(CircleShape)</b>
-<b class="fc">&nbsp;            .then(shell),</b>
-<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    tint: Color,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    size: Dp = 44.dp,
+&nbsp;) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .size(size)
+&nbsp;            .clip(CircleShape)
+&nbsp;            .background(tint.copy(alpha = 0.18f)),
+&nbsp;        contentAlignment = Alignment.Center,
 &nbsp;    ) {
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = icon,</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            tint = if (outlined) AppTheme.materialColors.primary else contentColor,</b>
-<b class="fc">&nbsp;            modifier = Modifier.size(size * ICON_RATIO),</b>
+&nbsp;        Icon(
+&nbsp;            imageVector = icon,
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            tint = tint,
+&nbsp;            modifier = Modifier.size(size * 0.5f),
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
-<b class="fc">&nbsp;private val DefaultSize = 40.dp</b>
-&nbsp;private const val ICON_RATIO = 0.5f
+&nbsp;/** A category&#39;s resolved appearance: what [SurferCategoryBubble] needs and nothing else. */
+&nbsp;data class SurferCategoryVisual(
+&nbsp;    val icon: ImageVector,
+&nbsp;    val tint: Color,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Catalogue of category tints + icons, and the single resolver every category bubble goes
+&nbsp; * through. [visualFor] maps a category&#39;s *stored* `iconKey` + `hue` onto this palette; the
+&nbsp; * `…For(id)` helpers behind it stay as the fallback for rows that carry no stored appearance
+&nbsp; * and for call sites that only have a name to hash (transaction rows, previews).
+&nbsp; *
+&nbsp; * [iconKeys] and [hues] are positionally paired with [icons] and [tints] and must stay in
+&nbsp; * lockstep with `CategoryAppearance` in the domain module — uikit deliberately does not depend
+&nbsp; * on domain, so `CategoryPaletteParityTest` in feature/category asserts the two agree.
+&nbsp; *
+&nbsp; * Tints are theme-dependent, so everything that resolves to a [Color] is `@Composable` and reads
+&nbsp; * the current theme; the index-level resolvers ([tintIndexForHue] and friends) stay pure, which
+&nbsp; * is also what the parity test asserts against.
+&nbsp; */
+&nbsp;object SurferCategoryPalette {
+&nbsp;    /**
+&nbsp;     * Palette tints for the current theme, in the order [hues] describes. Light and dark
+&nbsp;     * variants live in `AppColors.CategoryTints` / `AppColors.Dark.CategoryTints`.
+&nbsp;     */
+&nbsp;    val tints: List&lt;Color&gt;
+&nbsp;        @Composable
+&nbsp;        @ReadOnlyComposable
+<b class="fc">&nbsp;        get() = AppTheme.semanticColors.categoryTints</b>
+&nbsp;
+<b class="fc">&nbsp;    val icons: List&lt;ImageVector&gt; = listOf(</b>
+<b class="fc">&nbsp;        SurferIcons.Category,</b>
+<b class="fc">&nbsp;        SurferIcons.CreditCard,</b>
+<b class="fc">&nbsp;        SurferIcons.Savings,</b>
+<b class="fc">&nbsp;        SurferIcons.Cash,</b>
+<b class="fc">&nbsp;        SurferIcons.Wallet,</b>
+<b class="fc">&nbsp;        SurferIcons.Receipt,</b>
+<b class="fc">&nbsp;        SurferIcons.Event,</b>
+<b class="fc">&nbsp;        SurferIcons.Tag,</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    /** Hues in degrees behind [tints], in the same order. */
+<b class="fc">&nbsp;    val hues: List&lt;Int&gt; = listOf(162, 35, 258, 68, 303, 340, 8, 90)</b>
+&nbsp;
+&nbsp;    /** Semantic keys behind [icons], in the same order. Stored on the category, unlike an index. */
+<b class="fc">&nbsp;    val iconKeys: List&lt;String&gt; = listOf(</b>
+<b class="fc">&nbsp;        &quot;category&quot;,</b>
+<b class="fc">&nbsp;        &quot;card&quot;,</b>
+<b class="fc">&nbsp;        &quot;savings&quot;,</b>
+<b class="fc">&nbsp;        &quot;cash&quot;,</b>
+<b class="fc">&nbsp;        &quot;wallet&quot;,</b>
+<b class="fc">&nbsp;        &quot;receipt&quot;,</b>
+<b class="fc">&nbsp;        &quot;event&quot;,</b>
+<b class="fc">&nbsp;        &quot;tag&quot;,</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    /** Marker for the seeded system Transfer category — matches `CategorySystemKind.TRANSFER.name`. */
+&nbsp;    const val SYSTEM_KIND_TRANSFER: String = &quot;TRANSFER&quot;
+&nbsp;
+&nbsp;    /** Icon key of the system Transfer category — matches `CategoryAppearance.TRANSFER_ICON_KEY`. */
+&nbsp;    const val TRANSFER_ICON_KEY: String = &quot;transfer&quot;
+&nbsp;
+&nbsp;    /** Tint for the system Transfer category. Kept fixed (not hashed) so it&#39;s always recognisable. */
+&nbsp;    val TransferTint: Color
+&nbsp;        @Composable
+&nbsp;        @ReadOnlyComposable
+<b class="fc">&nbsp;        get() = AppTheme.semanticColors.transfer</b>
+&nbsp;
+<b class="fc">&nbsp;    val TransferIcon: ImageVector = SurferIcons.SwapHoriz</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The one resolver every [SurferCategoryBubble] call site goes through.
+&nbsp;     *
+&nbsp;     * [iconKey] and [hue] are the category&#39;s stored choice; [id] is only the fallback seed for
+&nbsp;     * a category that has none (an older client&#39;s row), so a bubble is never blank or uniformly
+&nbsp;     * grey. A stored value that names nothing in this palette — a key from a newer build, a hue
+&nbsp;     * off the wheel — degrades to that same fallback rather than throwing.
+&nbsp;     */
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+&nbsp;    fun visualFor(
+&nbsp;        id: String,
+&nbsp;        iconKey: String,
+&nbsp;        hue: Int,
+<b class="fc">&nbsp;        systemKind: String? = null,</b>
+<b class="pc">&nbsp;    ): SurferCategoryVisual = SurferCategoryVisual(</b>
+<b class="fc">&nbsp;        icon = iconForKey(iconKey, systemKind) ?: iconFor(id, systemKind),</b>
+<b class="pc">&nbsp;        tint = tintForHue(hue, systemKind) ?: tintFor(id, systemKind),</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    /** Icon for a stored key, or null when the key is blank or unknown to this build. */
+<b class="fc">&nbsp;    fun iconForKey(iconKey: String, systemKind: String? = null): ImageVector? {</b>
+<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER || iconKey == TRANSFER_ICON_KEY) return TransferIcon</b>
+<b class="fc">&nbsp;        return icons.getOrNull(iconKeys.indexOf(iconKey))</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tint for a stored hue, snapped to the nearest palette hue around the colour wheel, or null
+&nbsp;     * when the hue is off the wheel entirely (the &quot;never stored&quot; sentinel).
+&nbsp;     */
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+<b class="fc">&nbsp;    fun tintForHue(hue: Int, systemKind: String? = null): Color? {</b>
+<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
+<b class="fc">&nbsp;        return tintIndexForHue(hue)?.let { tints[it] }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+<b class="pc">&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {</b>
+<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
+<b class="fc">&nbsp;        return tints[tintIndexFor(id)]</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    fun iconFor(id: String, systemKind: String? = null): ImageVector {</b>
+<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferIcon</b>
+<b class="fc">&nbsp;        return icons[nonNegativeMod(stringHash(id), icons.size)]</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Index into [tints] for a stored hue, snapped to the nearest palette hue around the colour
+&nbsp;     * wheel, or null when the hue is off the wheel entirely (the &quot;never stored&quot; sentinel).
+&nbsp;     * Theme-free half of [tintForHue].
+&nbsp;     */
+&nbsp;    fun tintIndexForHue(hue: Int): Int? {
+<b class="pc">&nbsp;        if (hue &lt; 0 || hue &gt;= HUE_DEGREES) return null</b>
+<b class="fc">&nbsp;        return hues.indices.minBy { circularHueDistance(hues[it], hue) }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Index into [tints] for a category that stored no hue. Theme-free half of [tintFor]. */
+<b class="fc">&nbsp;    fun tintIndexFor(id: String): Int = nonNegativeMod(stringHash(id), hues.size)</b>
+&nbsp;
+&nbsp;    private fun circularHueDistance(a: Int, b: Int): Int {
+<b class="fc">&nbsp;        val diff = kotlin.math.abs(a - b)</b>
+<b class="fc">&nbsp;        return minOf(diff, HUE_DEGREES - diff)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private const val HUE_DEGREES = 360
+&nbsp;
+&nbsp;    private fun nonNegativeMod(value: Long, size: Int): Int {
+<b class="fc">&nbsp;        val s = size.toLong()</b>
+<b class="fc">&nbsp;        val r = value % s</b>
+<b class="pc">&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun stringHash(value: String): Long =
+<b class="fc">&nbsp;        value.fold(0L) { acc, c -&gt; acc * 31 + c.code }</b>
+&nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferIconBubblePreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
+&nbsp;private fun SurferCategoryBubblePreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
 &nbsp;        ) {
-&nbsp;            SurferIconBubble(icon = SurferIcons.Wallet)
-&nbsp;            SurferIconBubble(icon = SurferIcons.Add, outlined = true)
-&nbsp;            SurferIconBubble(icon = SurferIcons.Savings, size = 36.dp)
+&nbsp;            Row(
+&nbsp;                horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;                verticalAlignment = Alignment.CenterVertically,
+&nbsp;            ) {
+&nbsp;                SurferCategoryPalette.tints.zip(SurferCategoryPalette.icons).forEach { (tint, icon) -&gt;
+&nbsp;                    SurferCategoryBubble(icon = icon, tint = tint)
+&nbsp;                }
+&nbsp;            }
+&nbsp;            Row(
+&nbsp;                horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;                verticalAlignment = Alignment.CenterVertically,
+&nbsp;            ) {
+&nbsp;                SurferCategoryBubble(
+&nbsp;                    icon = SurferIcons.Category,
+&nbsp;                    tint = SurferCategoryPalette.tints[0],
+&nbsp;                    size = 32.dp,
+&nbsp;                )
+&nbsp;                SurferCategoryBubble(
+&nbsp;                    icon = SurferIcons.Category,
+&nbsp;                    tint = SurferCategoryPalette.tints[0],
+&nbsp;                    size = 44.dp,
+&nbsp;                )
+&nbsp;                SurferCategoryBubble(
+&nbsp;                    icon = SurferIcons.Category,
+&nbsp;                    tint = SurferCategoryPalette.tints[0],
+&nbsp;                    size = 56.dp,
+&nbsp;                )
+&nbsp;                SurferCategoryBubble(
+&nbsp;                    icon = SurferIcons.Category,
+&nbsp;                    tint = SurferCategoryPalette.tints[0],
+&nbsp;                    size = 72.dp,
+&nbsp;                )
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -203,7 +369,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

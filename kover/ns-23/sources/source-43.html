@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionSplitGroup</title>
+  <title>MoneySurfer Coverage Report > SpentMonthKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionSplitGroup (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SpentMonthKt (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionSplitGroup</td>
+  <td class="name">SpentMonthKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    100%
   </span>
   <span class="absValue">
-    (5/6)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (77/77)
+    (66/66)
   </span>
 </td>
 </tr>
@@ -101,54 +101,151 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.insight.SpendTrend
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
+&nbsp;import kotlin.math.abs
+&nbsp;import kotlin.math.roundToInt
 &nbsp;
 &nbsp;/**
-&nbsp; * One receipt: either an ordinary transaction on its own, or the legs it was split across.
+&nbsp; * What the current month has cost so far, against the cap it was given and against the month
+&nbsp; * before it.
 &nbsp; *
-&nbsp; * A group is what the transaction list, the recent-activity widget and search results render as a
-&nbsp; * single row — a payment the user made once should be one line, whatever number of categories it
-&nbsp; * was filed under. Everything that reasons about categories (budgets, monthly totals, spend
-&nbsp; * history, CSV) keeps working on the legs and never sees this type.
+&nbsp; * All three numbers are magnitudes in [currency] — the base currency the aggregates were filtered
+&nbsp; * on, so nothing here mixes two currencies the way the old period-totals use case did.
+&nbsp; *
+&nbsp; * [previousSpent] is the *same stretch* of the previous month, not the whole of it: comparing 15
+&nbsp; * elapsed days against 30 would report a fall every month and a rise on no month at all. That is
+&nbsp; * the comparison [com.georgeci.moneysurfer.domain.insight] already makes (&quot;against %s by the same
+&nbsp; * day last month&quot;), and [previousSpentMonthWindow] is the window that produces it.
 &nbsp; */
-<b class="fc">&nbsp;data class TransactionSplitGroup(val legs: List&lt;Transaction&gt;) {</b>
+&nbsp;data class SpentMonth(
+&nbsp;    /**
+&nbsp;     * The day the figures were read on. Carried rather than derived so the elapsed-day guard under
+&nbsp;     * [delta] and the window the spend was queried for can never disagree about which day it is.
+&nbsp;     */
+&nbsp;    val today: LocalDate,
+&nbsp;    /** Spend booked from the 1st of [today]&#39;s month through [today] inclusive. */
+&nbsp;    val spent: Money,
+&nbsp;    /** Spend booked over the same stretch of the previous month. Zero when it booked nothing. */
+&nbsp;    val previousSpent: Money,
+&nbsp;    /**
+&nbsp;     * The monthly cap the spend is measured against, or null when no budget sets one — the
+&nbsp;     * widget&#39;s &quot;no budget set&quot; state. See [monthlySpendCap] for which budgets qualify.
+&nbsp;     */
+&nbsp;    val cap: Money?,
+&nbsp;    val currency: CurrencyCode,
+&nbsp;) {
 &nbsp;
-<b class="fc">&nbsp;    init {</b>
-<b class="pc">&nbsp;        require(legs.isNotEmpty()) { &quot;A split group needs at least one leg&quot; }</b>
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    /** The row that stands for the group: its id is what opening the group navigates to. */
-<b class="fc">&nbsp;    val primary: Transaction get() = legs.first()</b>
-&nbsp;
-<b class="fc">&nbsp;    val isSplit: Boolean get() = legs.size &gt; 1</b>
-&nbsp;
-&nbsp;    /** Magnitude of the whole receipt — the legs share a currency, so a plain sum is sound. */
-<b class="fc">&nbsp;    val total: Money = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.money.abs() }</b>
+&nbsp;    /** Days of the month gone, counting [today] — what [delta] holds its comparison against. */
+&nbsp;    val elapsedDays: Int get() = today.day
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Distinct categories the receipt was filed under. Legs left uncategorized count once between
-&nbsp;     * them, which is what the &quot;N categories&quot; badge should say for a half-filled split.
+&nbsp;     * Spend against [cap] — what a progress bar is drawn from — or null while nothing caps the
+&nbsp;     * month, which is a bar the widget leaves empty rather than one it fills to an invented limit.
+&nbsp;     *
+&nbsp;     * Can exceed 1, which the bar clamps rather than overdrawing. A zero or negative cap reads as
+&nbsp;     * 0 instead of a NaN or an infinity, the same guard [BudgetProgress.spentFraction] applies.
 &nbsp;     */
-<b class="fc">&nbsp;    val categoryCount: Int = legs.map { it.categoryId }.distinct().size</b>
+&nbsp;    val capFraction: Float?
+&nbsp;        get() = cap?.let {
+&nbsp;            if (it.minor &lt;= 0L) 0f else spent.minor.toFloat() / it.minor.toFloat()
+&nbsp;        }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * How this month is running against the last one, or null when the comparison would not be
+&nbsp;     * honest:
+&nbsp;     *
+&nbsp;     * - **Before [MIN_COMPARISON_DAYS] have elapsed.** On the 2nd the stretch being compared is two
+&nbsp;     *   days, and one bill landing a day either side of the month boundary swings the answer by
+&nbsp;     *   100%. The insights engine stands its comparison rules down for exactly this reason, and
+&nbsp;     *   #428 landed because a shorter-than-the-window baseline is worse than no baseline.
+&nbsp;     * - **When [previousSpent] is not positive.** A month that booked nothing is not a baseline a
+&nbsp;     *   percentage can be read against, and &quot;up ∞%&quot; is not a number to put on a card.
+&nbsp;     */
+&nbsp;    val delta: SpentMonthDelta?
+&nbsp;        get() {
+&nbsp;            if (elapsedDays &lt; MIN_COMPARISON_DAYS || !previousSpent.isPositive()) return null
+&nbsp;            val ratio = (spent - previousSpent).minor.toDouble() / previousSpent.minor.toDouble()
+&nbsp;            return SpentMonthDelta(
+&nbsp;                trend = when {
+&nbsp;                    ratio &gt;= SPENT_MONTH_CHANGE_RATIO -&gt; SpendTrend.Up
+&nbsp;                    ratio &lt;= -SPENT_MONTH_CHANGE_RATIO -&gt; SpendTrend.Down
+&nbsp;                    else -&gt; SpendTrend.Flat
+&nbsp;                },
+&nbsp;                changePercent = (abs(ratio) * PERCENT_SCALE).roundToInt(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /**
+&nbsp;         * Elapsed days the month needs before the delta says anything. Mirrors the insights
+&nbsp;         * engine&#39;s own guard — see [delta] for why a shorter stretch is dominated by the timing of
+&nbsp;         * a single charge.
+&nbsp;         */
+&nbsp;        const val MIN_COMPARISON_DAYS: Int = 7
+&nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Collapses split legs into groups, preserving the order the rows arrived in: a group takes the
-&nbsp; * position of its topmost leg, so a list sorted newest-first stays sorted.
-&nbsp; *
-&nbsp; * Legs are matched across the whole list rather than only between neighbours — two legs of one
-&nbsp; * receipt sort adjacently in practice but nothing guarantees another row cannot land between them.
+&nbsp; * Which way the month is running and by how much. [changePercent] is a magnitude — the direction
+&nbsp; * is [trend], so the widget picks one sentence rather than printing a sign into another.
 &nbsp; */
-&nbsp;fun List&lt;Transaction&gt;.groupSplitLegs(): List&lt;TransactionSplitGroup&gt; {
-&nbsp;    val bySplit = filter { it.splitId != null }.groupBy { it.splitId }
-&nbsp;    val seen = mutableSetOf&lt;Any&gt;()
-&nbsp;    return mapNotNull { transaction -&gt;
-&nbsp;        val splitId = transaction.splitId
-&nbsp;            ?: return@mapNotNull TransactionSplitGroup(listOf(transaction))
-&nbsp;        if (!seen.add(splitId)) return@mapNotNull null
-&nbsp;        TransactionSplitGroup(bySplit.getValue(splitId))
-&nbsp;    }
+&nbsp;data class SpentMonthDelta(
+&nbsp;    val trend: SpendTrend,
+&nbsp;    val changePercent: Int,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The 1st of [today]&#39;s month through [today] — the window [SpentMonth.spent] is read over.
+&nbsp; *
+&nbsp; * Deliberately month-to-date rather than the whole calendar month: the figure is the answer to
+&nbsp; * &quot;what has this month cost&quot;, and a month&#39;s remaining days have not cost anything yet. It is also
+&nbsp; * what makes [previousSpentMonthWindow] a like-for-like baseline.
+&nbsp; */
+&nbsp;fun spentMonthWindow(today: LocalDate): TransactionPeriodWindow =
+<b class="fc">&nbsp;    TransactionPeriodWindow(from = firstOfMonth(today), to = today)</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The same stretch of the previous month: its 1st through its [today]-th day.
+&nbsp; *
+&nbsp; * Clamped to the previous month&#39;s length, so the 31st of March compares against the whole of
+&nbsp; * February rather than overflowing into March — the closest same-stretch window a short month has.
+&nbsp; */
+&nbsp;fun previousSpentMonthWindow(today: LocalDate): TransactionPeriodWindow {
+<b class="fc">&nbsp;    val start = firstOfMonth(today).minus(1, DateTimeUnit.MONTH)</b>
+<b class="fc">&nbsp;    val lastDay = start.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)</b>
+<b class="fc">&nbsp;    return TransactionPeriodWindow(</b>
+<b class="fc">&nbsp;        from = start,</b>
+<b class="fc">&nbsp;        to = if (today.day &gt;= lastDay.day) lastDay else LocalDate(start.year, start.month, today.day),</b>
+&nbsp;    )
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Expense across [this], as a magnitude.
+&nbsp; *
+&nbsp; * Folded rather than taking the single row each spent-month window returns: `netByMonth` omits a
+&nbsp; * month it has nothing for, so an empty list has to read as zero spend, and a fold covers both
+&nbsp; * shapes without a null check that would then have to mean &quot;no data&quot; somewhere else.
+&nbsp; */
+&nbsp;fun List&lt;MonthlyNet&gt;.expenseTotal(): Money =
+<b class="fc">&nbsp;    fold(Money.zero()) { running, month -&gt; running + month.expense }</b>
+&nbsp;
+<b class="fc">&nbsp;private fun firstOfMonth(date: LocalDate): LocalDate = LocalDate(date.year, date.month, 1)</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * How far the month has to have moved before the change is worth a label. A whole month&#39;s spend is
+&nbsp; * a steady number, so a tenth of it is already notable — the same call the insights engine&#39;s
+&nbsp; * period rule makes.
+&nbsp; */
+&nbsp;private const val SPENT_MONTH_CHANGE_RATIO = 0.10
+&nbsp;
+&nbsp;private const val PERCENT_SCALE = 100
 </code>
 </pre>
 </div>
@@ -172,7 +269,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

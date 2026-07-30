@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryCap</title>
+  <title>MoneySurfer Coverage Report > CategorizedTransaction</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryCap (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategorizedTransaction (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryCap</td>
+  <td class="name">CategorizedTransaction</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -94,133 +94,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
-&nbsp;
-&nbsp;/**
-&nbsp; * The cap a single-category budget puts on one category, as the spend breakdown reads it.
-&nbsp; *
-&nbsp; * [limit] is the budget&#39;s nominal amount rather than a `BudgetProgress.effectiveLimit`: computing
-&nbsp; * the effective one means folding the whole workspace transaction list per budget, which is the
-&nbsp; * pattern [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository] exists to
-&nbsp; * replace. A rollover carry is therefore not in [limit] — see [buildSpentByCategory] for
-&nbsp; * what else that costs.
-&nbsp; */
-<b class="fc">&nbsp;data class CategoryCap(</b>
-<b class="fc">&nbsp;    val limit: Money,</b>
-<b class="fc">&nbsp;    val status: BudgetStatus,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * One category&#39;s spend inside the breakdown&#39;s window.
-&nbsp; *
-&nbsp; * [category] is null for the uncategorized bucket — a real slice rather than a missing one, so the
-&nbsp; * entries still add up to what was spent. Naming it is the UI&#39;s job: `domain` owns no copy.
-&nbsp; */
-&nbsp;data class CategorySpend(
-&nbsp;    val category: Category?,
-&nbsp;    val spent: Money,
-&nbsp;    /** Share of the window&#39;s total spend, `0f..1f`. Zero when nothing was spent at all. */
-&nbsp;    val share: Float,
-&nbsp;    /** The cap on this category, or null while nothing caps it. */
-&nbsp;    val cap: CategoryCap?,
-&nbsp;) {
-&nbsp;
+&nbsp;data class CategorizedTransaction(
+<b class="fc">&nbsp;    val transaction: Transaction,</b>
+<b class="fc">&nbsp;    val categoryName: String?,</b>
 &nbsp;    /**
-&nbsp;     * Spend against [CategoryCap.limit]; can exceed 1, which every meter caps rather than
-&nbsp;     * overdrawing. Null when there is no cap — a meter then falls back to [share].
+&nbsp;     * How many legs the row&#39;s split group has in storage, or `0` when the row is not a split leg.
+&nbsp;     *
+&nbsp;     * Counted by the window query rather than stored, and compared against the legs actually
+&nbsp;     * present in a page: a collapsed row is only drawn when the two agree, so a group the paging
+&nbsp;     * limit or a filter cut in half is rendered as its individual legs instead of as a total that
+&nbsp;     * silently changes on the next &quot;load more&quot;.
 &nbsp;     */
-&nbsp;    val capFraction: Float?
-&nbsp;        get() = cap?.let { if (it.limit.minor &lt;= 0L) 0f else spent.minor.toFloat() / it.limit.minor.toFloat() }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Where a period&#39;s money went, category by category — the dashboard&#39;s spent-by-category widget.
-&nbsp; *
-&nbsp; * [currency] is non-null by construction: a figure nobody can format is not a figure, and
-&nbsp; * `MoneyFormatter` is backed by `java.util.Currency`, which throws on anything that is not a
-&nbsp; * three-letter ISO code. A workspace whose base currency cannot be read yields no breakdown at
-&nbsp; * all rather than one the UI has to invent a currency for — the same rule [SafeToSpend] follows.
-&nbsp; */
-&nbsp;data class SpentByCategory(
-&nbsp;    /** Largest spender first. */
-&nbsp;    val entries: List&lt;CategorySpend&gt;,
-&nbsp;    val total: Money,
-&nbsp;    val currency: CurrencyCode,
-&nbsp;    val window: TransactionPeriodWindow,
+<b class="fc">&nbsp;    val splitLegCount: Int = 0,</b>
 &nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Joins the window&#39;s per-category spend to the categories that name it and the budgets that cap it.
-&nbsp; *
-&nbsp; * Pure, so the maths is testable without a repository: [slices] is what
-&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.byCategory] answered for
-&nbsp; * the same window, and [categories] and [budgets] are the workspace&#39;s own.
-&nbsp; *
-&nbsp; * **Which budget caps a category.** Only a budget naming *exactly* that one category does —
-&nbsp; * resolved through [resolveCategoryCapCoverage], the same rule the category form&#39;s monthly-cap
-&nbsp; * shortcut writes through, so the two can never disagree about which budget speaks for a category.
-&nbsp; * A budget spanning several categories caps the group, not any single member, and overlaying its
-&nbsp; * limit on one member&#39;s spend would read as headroom the group does not have. The general
-&nbsp; * (all-categories) budget is the spending envelope above per-category caps, and
-&nbsp; * [resolveCategoryCapCoverage] already excludes both it and archived budgets.
-&nbsp; *
-&nbsp; * **Only caps on [capPeriod]&#39;s cadence count.** [slices] covers [window], so a budget of any other
-&nbsp; * cadence is not a figure for it: measuring a week of spend against a monthly cap reads as
-&nbsp; * comfortable headroom right up to the point the month is blown. Dividing one into a pro-rata limit
-&nbsp; * would invent a cap the user never set, so a category whose only budget runs on another cadence
-&nbsp; * simply shows no overlay — the spend is still drawn, without a state it cannot honestly claim.
-&nbsp; *
-&nbsp; * **The cap&#39;s own window is not this one.** Budget windows are anchored on `Budget.startDate`, so a
-&nbsp; * cap created mid-month runs 15th-to-15th while this breakdown runs a calendar span. Every number
-&nbsp; * *here* is measured over [window] — spend, limit and status alike, so the widget is internally
-&nbsp; * consistent — but a status shown here can differ from the same budget&#39;s status on the Budgets
-&nbsp; * screen, which reads the budget&#39;s own window and includes its rollover carry.
-&nbsp; */
-&nbsp;fun buildSpentByCategory(
-&nbsp;    slices: List&lt;CategorySpendSlice&gt;,
-&nbsp;    categories: List&lt;Category&gt;,
-&nbsp;    budgets: List&lt;Budget&gt;,
-&nbsp;    currency: CurrencyCode,
-&nbsp;    window: TransactionPeriodWindow,
-&nbsp;    capPeriod: BudgetPeriod,
-&nbsp;): SpentByCategory {
-&nbsp;    val total = slices.fold(Money.zero()) { acc, slice -&gt; acc + slice.total }
-&nbsp;    val byId = categories.associateBy { it.id }
-&nbsp;    // Sorted here rather than trusted from the query: `sortedByDescending` is stable, so the
-&nbsp;    // repository&#39;s own largest-first order survives for ties, and a caller that forgot to sort
-&nbsp;    // cannot leave the widget drawing its rows in an arbitrary order.
-&nbsp;    val entries = slices
-&nbsp;        .sortedByDescending { it.total.minor }
-&nbsp;        .map { slice -&gt;
-&nbsp;            CategorySpend(
-&nbsp;                category = slice.categoryId?.let(byId::get),
-&nbsp;                spent = slice.total,
-&nbsp;                share = shareOf(slice.total, total),
-&nbsp;                cap = capFor(slice, budgets, capPeriod),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    return SpentByCategory(entries = entries, total = total, currency = currency, window = window)
-&nbsp;}
-&nbsp;
-&nbsp;/** A zero total reads as no share at all, never as a NaN. */
-&nbsp;private fun shareOf(spent: Money, total: Money): Float =
-&nbsp;    if (total.minor &lt;= 0L) 0f else (spent.minor.toFloat() / total.minor.toFloat()).coerceIn(0f, 1f)
-&nbsp;
-&nbsp;private fun capFor(
-&nbsp;    slice: CategorySpendSlice,
-&nbsp;    budgets: List&lt;Budget&gt;,
-&nbsp;    capPeriod: BudgetPeriod,
-&nbsp;): CategoryCap? {
-&nbsp;    val coverage = resolveCategoryCapCoverage(slice.categoryId, budgets)
-&nbsp;    val budget = (coverage as? CategoryCapCoverage.Editable)?.budget ?: return null
-&nbsp;    if (budget.period != capPeriod) return null
-&nbsp;    return CategoryCap(
-&nbsp;        limit = budget.amount,
-&nbsp;        status = budgetStatusOf(slice.total, budget.amount, budget.alertPercent),
-&nbsp;    )
-&nbsp;}
 </code>
 </pre>
 </div>
@@ -244,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

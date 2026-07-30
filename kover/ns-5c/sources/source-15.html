@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionsListDateHeaderKt</title>
+  <title>MoneySurfer Coverage Report > TransactionsListMappingKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionsListDateHeaderKt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: TransactionsListMappingKt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionsListDateHeaderKt</td>
+  <td class="name">TransactionsListMappingKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    82.3%
   </span>
   <span class="absValue">
-    (0/10)
+    (51/62)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/26)
+    (67/67)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    95.7%
   </span>
   <span class="absValue">
-    (0/346)
+    (509/532)
   </span>
 </td>
 </tr>
@@ -101,59 +101,185 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import kotlinx.datetime.number
-&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_date_full
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_date_today
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_date_yesterday
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_months_genitive
-&nbsp;import org.jetbrains.compose.resources.stringArrayResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
+&nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;internal fun DateHeader(group: TransactionGroupUi) {</b>
-<b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxWidth()</b>
-<b class="nc">&nbsp;            .padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 6.dp),</b>
-<b class="nc">&nbsp;        verticalAlignment = Alignment.Bottom,</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = group.dateLabel.label(),</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = group.netFormatted,</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;/**
+&nbsp; * The chip rail&#39;s values. Names are resolved from the account and category lists rather than in
+&nbsp; * the screen, which has neither; a single selection shows its name, several show their count, and
+&nbsp; * nothing selected leaves the chip in its bare &quot;Account&quot; state.
+&nbsp; */
+&nbsp;internal fun chips(
+&nbsp;    filters: TransactionFilters,
+&nbsp;    accounts: List&lt;Account&gt;,
+&nbsp;    categories: List&lt;Category&gt;,
+<b class="fc">&nbsp;): TransactionFilterChipsUi = TransactionFilterChipsUi(</b>
+<b class="fc">&nbsp;    dateRange = filters.dateRange,</b>
+<b class="fc">&nbsp;    type = filters.type,</b>
+<b class="fc">&nbsp;    accountCount = filters.accountIds.size,</b>
+<b class="fc">&nbsp;    accountName = filters.accountIds.singleOrNull()</b>
+<b class="fc">&nbsp;        ?.let { id -&gt; accounts.firstOrNull { it.id == id }?.name },</b>
+<b class="fc">&nbsp;    categoryCount = filters.categoryIds.size,</b>
+<b class="fc">&nbsp;    categoryName = filters.categoryIds.singleOrNull()</b>
+<b class="pc">&nbsp;        ?.let { id -&gt; categories.firstOrNull { it.id == id }?.name },</b>
+<b class="fc">&nbsp;    sort = filters.sort,</b>
+&nbsp;)
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionDateUi.label(): String = when (this) {</b>
-<b class="nc">&nbsp;    TransactionDateUi.Today -&gt; stringResource(Res.string.transactions_list_date_today)</b>
-<b class="nc">&nbsp;    TransactionDateUi.Yesterday -&gt; stringResource(Res.string.transactions_list_date_yesterday)</b>
-&nbsp;    // Genitive, not the pager&#39;s nominative: Russian reads &quot;25 марта&quot;, never &quot;25 Март&quot;.
-<b class="nc">&nbsp;    is TransactionDateUi.Exact -&gt; stringResource(</b>
-<b class="nc">&nbsp;        Res.string.transactions_list_date_full,</b>
-<b class="nc">&nbsp;        date.day,</b>
-<b class="nc">&nbsp;        stringArrayResource(Res.array.transactions_list_months_genitive)[date.month.number - 1],</b>
-<b class="nc">&nbsp;        date.year,</b>
+&nbsp;internal fun groupByDate(
+&nbsp;    rows: List&lt;CategorizedTransaction&gt;,
+&nbsp;    accountNames: Map&lt;AccountId, String&gt;,
+&nbsp;    dateLabel: (LocalDate) -&gt; TransactionDateUi,
+&nbsp;): List&lt;TransactionGroupUi&gt; =
+<b class="fc">&nbsp;    collapseSplitLegs(rows)</b>
+<b class="fc">&nbsp;        .groupBy { it.primary.transaction.operationDate }</b>
+<b class="fc">&nbsp;        .map { (date, receipts) -&gt;</b>
+<b class="fc">&nbsp;            val net = receipts.fold(Money.zero()) { acc, receipt -&gt; acc + receipt.signedMoney() }</b>
+<b class="fc">&nbsp;            TransactionGroupUi(</b>
+<b class="fc">&nbsp;                date = date,</b>
+<b class="fc">&nbsp;                dateLabel = dateLabel(date),</b>
+<b class="fc">&nbsp;                netFormatted = MoneyFormatter.format(</b>
+<b class="fc">&nbsp;                    net,</b>
+<b class="fc">&nbsp;                    receipts.first().primary.transaction.currencyCode,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                netPositive = !net.isNegative(),</b>
+<b class="fc">&nbsp;                transactions = receipts.map { it.toRow(accountNames) },</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        }
+&nbsp;
+&nbsp;/**
+&nbsp; * One line of the list: an ordinary transaction, or every leg of a split the page holds in full.
+&nbsp; *
+&nbsp; * The legs of a split share account, date and type by construction (see
+&nbsp; * `CreateSplitTransactionUseCase`), so a receipt has one date to group under and one currency to
+&nbsp; * format in.
+&nbsp; */
+&nbsp;internal data class ListReceipt(val legs: List&lt;CategorizedTransaction&gt;) {
+&nbsp;    val primary: CategorizedTransaction get() = legs.first()
+&nbsp;    val isSplit: Boolean get() = legs.size &gt; 1
+&nbsp;
+&nbsp;    /** Distinct categories the receipt was filed under — what the collapsed row&#39;s badge counts. */
+&nbsp;    val categoryCount: Int get() = legs.map { it.transaction.categoryId }.distinct().size
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Collapses the legs of a split into a single receipt — a supermarket run paid for once should be
+&nbsp; * one row, not one row per category it was filed under.
+&nbsp; *
+&nbsp; * **Only a group present in full collapses.** A page is a `LIMIT` window and may be narrowed
+&nbsp; * further by an in-memory filter, so a group can easily be here in part: cut by the paging
+&nbsp; * boundary, or thinned down to the one leg a category filter matched. Collapsing those would render
+&nbsp; * a total quietly missing money — a figure that changes on its own when the user taps &quot;load more&quot;.
+&nbsp; * Rendering the legs it actually has instead is honest at every window size, and it is also what
+&nbsp; * the account- and category-scoped lists want, where a leg genuinely is its own row.
+&nbsp; *
+&nbsp; * [CategorizedTransaction.splitLegCount] is the group&#39;s size in storage, counted by the window
+&nbsp; * query, which is what makes &quot;present in full&quot; answerable without a second round trip.
+&nbsp; */
+&nbsp;internal fun collapseSplitLegs(rows: List&lt;CategorizedTransaction&gt;): List&lt;ListReceipt&gt; {
+<b class="fc">&nbsp;    val presentLegs = rows</b>
+<b class="fc">&nbsp;        .filter { it.transaction.splitId != null }</b>
+<b class="pc">&nbsp;        .groupBy { it.transaction.splitId }</b>
+<b class="fc">&nbsp;    val collapsed = mutableSetOf&lt;SplitId&gt;()</b>
+<b class="fc">&nbsp;    return rows.mapNotNull { row -&gt;</b>
+<b class="fc">&nbsp;        val splitId = row.transaction.splitId ?: return@mapNotNull ListReceipt(listOf(row))</b>
+<b class="pc">&nbsp;        val legs = presentLegs[splitId].orEmpty()</b>
+<b class="fc">&nbsp;        if (legs.size &lt; row.splitLegCount) return@mapNotNull ListReceipt(listOf(row))</b>
+<b class="fc">&nbsp;        if (!collapsed.add(splitId)) return@mapNotNull null</b>
+<b class="fc">&nbsp;        ListReceipt(legs)</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private fun ListReceipt.toRow(accountNames: Map&lt;AccountId, String&gt;): TransactionRowUi {
+<b class="fc">&nbsp;    val transaction = primary.transaction</b>
+<b class="fc">&nbsp;    val isTransferLeg = transaction.transferId != null</b>
+<b class="fc">&nbsp;    val total = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.transaction.money.abs() }</b>
+<b class="fc">&nbsp;    return TransactionRowUi(</b>
+<b class="fc">&nbsp;        id = transaction.id,</b>
+&nbsp;        // Merchant first: &quot;Starbucks&quot; identifies the row better than whatever was jotted next
+&nbsp;        // to it, and the note still shows when there is no merchant.
+<b class="fc">&nbsp;        title = transaction.merchant.ifBlank { transaction.note }</b>
+<b class="pc">&nbsp;            .ifBlank { primary.categoryName.orEmpty() },</b>
+&nbsp;        // A collapsed receipt names no single category — the screen replaces this with the
+&nbsp;        // category count, which is the one thing the row can say truthfully about all of them.
+<b class="pc">&nbsp;        subtitle = primary.categoryName.orEmpty(),</b>
+<b class="fc">&nbsp;        splitCategoryCount = if (isSplit) categoryCount else 0,</b>
+<b class="fc">&nbsp;        isSplitLeg = transaction.splitId != null,</b>
+<b class="pc">&nbsp;        accountName = accountNames[transaction.accountId].orEmpty(),</b>
+<b class="fc">&nbsp;        formattedAmount = MoneyFormatter.format(total, transaction.currencyCode),</b>
+<b class="fc">&nbsp;        isExpense = transaction.type == TransactionType.EXPENSE,</b>
+<b class="fc">&nbsp;        isTransfer = isTransferLeg,</b>
+&nbsp;        // A transfer leg is drawn from the shared transfer palette instead of its category&#39;s
+&nbsp;        // hue, so it carries no seed — see how the screen renders it.
+<b class="fc">&nbsp;        categoryHueSeed = if (isTransferLeg) {</b>
+<b class="fc">&nbsp;            &quot;&quot;</b>
+&nbsp;        } else {
+<b class="pc">&nbsp;            primary.categoryName ?: transaction.categoryId?.value.orEmpty()</b>
+&nbsp;        },
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+&nbsp;}
+&nbsp;
+&nbsp;/** The receipt&#39;s contribution to the day&#39;s net — every leg of it, signed by its type. */
+&nbsp;private fun ListReceipt.signedMoney(): Money =
+<b class="fc">&nbsp;    legs.fold(Money.zero()) { acc, leg -&gt;</b>
+<b class="fc">&nbsp;        val magnitude = leg.transaction.money.abs()</b>
+<b class="fc">&nbsp;        acc + if (leg.transaction.type == TransactionType.EXPENSE) -magnitude else magnitude</b>
+&nbsp;    }
+&nbsp;
+&nbsp;/**
+&nbsp; * The single currency the summary strip renders in.
+&nbsp; *
+&nbsp; * Scoped to an account it is simply that account&#39;s currency. In the all-accounts view there is
+&nbsp; * no one right answer, so the currency with the largest total magnitude is chosen — a
+&nbsp; * deterministic, recency-independent pick, so a newly-added transaction in another currency
+&nbsp; * cannot flip the strip the way keying off the newest visible row did. Amounts in the other
+&nbsp; * currencies are still excluded from the total (see [buildSummary]); a per-currency summary
+&nbsp; * would be a larger design change than this screen owns.
+&nbsp; */
+&nbsp;internal fun summaryCurrency(account: Account?, totals: List&lt;TransactionTotal&gt;): CurrencyCode =
+<b class="fc">&nbsp;    account?.currencyCode</b>
+<b class="fc">&nbsp;        ?: totals.maxByOrNull { it.total.minor }?.currencyCode</b>
+<b class="fc">&nbsp;        ?: CurrencyCode(&quot;USD&quot;)</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Summary of the whole period, not of the loaded page: [totals] come straight from the
+&nbsp; * database aggregation, so paging cannot change these numbers.
+&nbsp; *
+&nbsp; * It also deliberately ignores the filters. The strip answers &quot;what happened in this period&quot;,
+&nbsp; * which stays true while the user narrows the list below it; recomputing it from the matched
+&nbsp; * page would instead answer &quot;what is on screen&quot;, and would drift as pages load.
+&nbsp; *
+&nbsp; * Rows in other currencies are dropped rather than added to the displayed one — mixing minor
+&nbsp; * units across currencies would produce a confidently wrong number.
+&nbsp; */
+&nbsp;internal fun buildSummary(
+&nbsp;    totals: List&lt;TransactionTotal&gt;,
+&nbsp;    currency: CurrencyCode,
+&nbsp;): TransactionSummaryUi {
+<b class="fc">&nbsp;    val inCurrency = totals.filter { it.currencyCode == currency }</b>
+<b class="fc">&nbsp;    val income = inCurrency.sumOfMoney { it.type == TransactionType.INCOME }</b>
+<b class="fc">&nbsp;    val expense = inCurrency.sumOfMoney { it.type == TransactionType.EXPENSE }</b>
+<b class="fc">&nbsp;    val net = income - expense</b>
+<b class="fc">&nbsp;    return TransactionSummaryUi(</b>
+<b class="fc">&nbsp;        incomeFormatted = &quot;+&quot; + MoneyFormatter.format(income, currency),</b>
+<b class="fc">&nbsp;        expenseFormatted = &quot;−&quot; + MoneyFormatter.format(expense, currency),</b>
+<b class="fc">&nbsp;        netFormatted = (if (net.isNegative()) &quot;−&quot; else &quot;+&quot;) +</b>
+<b class="fc">&nbsp;            MoneyFormatter.format(net.abs(), currency),</b>
+<b class="fc">&nbsp;        netPositive = !net.isNegative(),</b>
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private fun List&lt;TransactionTotal&gt;.sumOfMoney(predicate: (TransactionTotal) -&gt; Boolean): Money =
+<b class="fc">&nbsp;    filter(predicate).fold(Money.zero()) { acc, total -&gt; acc + total.total }</b>
 </code>
 </pre>
 </div>
@@ -177,7 +303,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

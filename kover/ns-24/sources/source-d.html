@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleId</title>
+  <title>MoneySurfer Coverage Report > WeekStart</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleId (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: WeekStart (com.georgeci.moneysurfer.domain.preferences)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleId</td>
+  <td class="name">WeekStart</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -61,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,35 +69,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (31/31)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">RecurringRuleId$Companion</td>
+    <td class="name">WeekStart$Companion</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (1/1)
   </span>
 </td>
   </tr>
@@ -105,27 +105,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    73.3%
+    100%
   </span>
   <span class="absValue">
-    (11/15)
+    (32/32)
   </span>
 </td>
 </tr>
@@ -136,19 +136,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlin.jvm.JvmInline
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
+&nbsp;/**
+&nbsp; * First day of the week for calendar views and week-scoped periods.
+&nbsp; *
+&nbsp; * No `System` entry: neither `kotlinx-datetime` nor the common source set exposes the locale&#39;s
+&nbsp; * first day of week, so a `System` option would have nothing to resolve against and would show the
+&nbsp; * user a value the app cannot name.
+&nbsp; */
+&nbsp;enum class WeekStart {
+<b class="fc">&nbsp;    Monday,</b>
+<b class="fc">&nbsp;    Saturday,</b>
+<b class="fc">&nbsp;    Sunday,</b>
 &nbsp;
-&nbsp;@JvmInline
-&nbsp;@Serializable
-<b class="fc">&nbsp;value class RecurringRuleId(val value: String) {</b>
+&nbsp;    ;
+&nbsp;
 &nbsp;    companion object {
-&nbsp;        @OptIn(ExperimentalUuidApi::class)
-<b class="nc">&nbsp;        fun uuid(): RecurringRuleId = RecurringRuleId(Uuid.random().toString())</b>
+<b class="fc">&nbsp;        val DEFAULT: WeekStart = Monday</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -174,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

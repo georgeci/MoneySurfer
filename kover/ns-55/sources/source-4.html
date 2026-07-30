@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncScreenKt</title>
+  <title>MoneySurfer Coverage Report > SyncState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncScreenKt (com.georgeci.moneysurfer.feature.settings.sync)</h1>
+<h1>Coverage Summary for Class: SyncState (com.georgeci.moneysurfer.feature.settings.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncScreenKt</td>
+  <td class="name">SyncState</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89.3%
+    100%
   </span>
   <span class="absValue">
-    (25/28)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71%
+    100%
   </span>
   <span class="absValue">
-    (115/162)
+    (20/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.3%
+    100%
   </span>
   <span class="absValue">
-    (282/296)
+    (21/21)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.2%
+    100%
   </span>
   <span class="absValue">
-    (3348/3633)
+    (197/197)
   </span>
 </td>
 </tr>
@@ -101,572 +101,247 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.sync
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TopAppBarDefaults
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.config.SyncSettings
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import com.georgeci.moneysurfer.sync.api.LastSyncOutcome
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncStep
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 &nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
 &nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMeta
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferConfirmDialog
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferStatusHeroCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferStatusHeroTone
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import kotlinx.datetime.TimeZone
-&nbsp;import kotlinx.datetime.toLocalDateTime
-&nbsp;import moneysurfer.feature.settings.generated.resources.Res
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_action_force
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_action_force_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_action_reset_cursors
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_action_reset_cursors_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_actions_disabled_footnote
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_cursor_attempt
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_cursor_pulled
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_cursor_success
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_cursors_empty_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_cursors_empty_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_cursors_footnote
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_done
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_error_auth
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_error_cancelled
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_error_network
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_error_permission
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_error_storage
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_error_unknown
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_failed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hero_idle_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hero_progress_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_in_progress_with_step
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_at
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_cancelled_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_counts
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_failed_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_none_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_none_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_last_success_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_idle_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_idle_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_queued_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_queued_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_reasons
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_request
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_running_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_scope
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_live_step
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_no_workspace
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_attempts
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_empty_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_empty_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_error
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_footnote
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_row_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_scope
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_scope_root
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_truncated
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_unknown_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_outbox_unknown_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_reset_cursors_confirm_cancel
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_reset_cursors_confirm_confirm
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_reset_cursors_confirm_detail
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_reset_cursors_confirm_message
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_reset_cursors_confirm_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_section_actions
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_section_cursors
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_section_last
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_section_live
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_section_outbox
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_section_outbox_unknown
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_cancelled
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_completed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_failed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_pulling
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_pulling_collection
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_recalculating
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_started
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_uploading
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_uploading_entity
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_step_waiting_network
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_value_never
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_workspace_scope
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.collect
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.onEach
+&nbsp;import kotlinx.coroutines.withTimeoutOrNull
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;import kotlin.time.Instant
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncState as LiveSyncState
 &nbsp;
-&nbsp;/** Stable selectors for the sync panel — see docs/testing/testing-strategy.md. */
-&nbsp;object SyncTestTags {
-&nbsp;    const val Hero = &quot;sync:hero&quot;
-&nbsp;    const val Live = &quot;sync:live&quot;
-&nbsp;    const val LastOutcome = &quot;sync:lastOutcome&quot;
-&nbsp;    const val Outbox = &quot;sync:outbox&quot;
-&nbsp;    const val OutboxEmpty = &quot;sync:outbox:empty&quot;
-&nbsp;    const val OutboxUnknown = &quot;sync:outbox:unknown&quot;
-&nbsp;    const val Cursors = &quot;sync:cursors&quot;
-&nbsp;    const val CursorsEmpty = &quot;sync:cursors:empty&quot;
-&nbsp;    const val ForceSyncRow = &quot;sync:action:force&quot;
-&nbsp;    const val ResetCursorsRow = &quot;sync:action:resetCursors&quot;
-&nbsp;    const val ResetCursorsDialog = &quot;sync:dialog:resetCursors&quot;
+&nbsp;/**
+&nbsp; * Read model for the sync diagnostics screen.
+&nbsp; *
+&nbsp; * Every piece was already exposed as a flow somewhere — live coordinator state, the persisted last
+&nbsp; * outcome, the outbox, the per-collection cursors — but nothing put them on one screen, so the
+&nbsp; * question &quot;why did the pull bring nothing back&quot; had to be answered from logs. The cursors answer
+&nbsp; * it directly (see docs/architecture/cloud-login-hydration.md and issue #356), which is why they
+&nbsp; * are here rather than in a debug-only panel.
+&nbsp; *
+&nbsp; * The screen only reads and re-renders; the two write actions are a manual sync and a cursor reset.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;@KoinViewModel
+&nbsp;class SyncViewModel(
+&nbsp;    private val syncCoordinator: SyncCoordinator,
+&nbsp;    private val syncSettings: SyncSettings,
+&nbsp;    private val pendingMutationQueue: PendingMutationQueue,
+&nbsp;    private val syncMetaRepository: SyncMetaRepository,
+&nbsp;    private val session: SessionPointers,
+&nbsp;) : MviViewModel&lt;SyncState, SyncEvent, SyncEffect&gt;(
+&nbsp;    initialState = SyncState(),
+&nbsp;) {
 &nbsp;
-&nbsp;    fun outboxRow(id: String): String = &quot;sync:outbox:row:$id&quot;
-&nbsp;    fun cursorRow(collection: String): String = &quot;sync:cursors:row:$collection&quot;
+&nbsp;    private val log = Logger.withTag(TAG)
+&nbsp;
+&nbsp;    init {
+&nbsp;        observeCoordinator()
+&nbsp;        observeOutbox()
+&nbsp;        observeCursors()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onEvent(event: SyncEvent) {
+&nbsp;        when (event) {
+&nbsp;            SyncEvent.OnBackClick -&gt; postSideEffect(SyncEffect.NavigateBack)
+&nbsp;            SyncEvent.OnSyncClick -&gt; sync()
+&nbsp;            SyncEvent.OnResetCursorsClick -&gt; updateState { copy(showResetCursorsConfirm = true) }
+&nbsp;            SyncEvent.OnResetCursorsDismissed -&gt; updateState { copy(showResetCursorsConfirm = false) }
+&nbsp;            SyncEvent.OnResetCursorsConfirmed -&gt; {
+&nbsp;                updateState { copy(showResetCursorsConfirm = false) }
+&nbsp;                resetCursors()
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeCoordinator() {
+&nbsp;        launch {
+&nbsp;            combine(syncCoordinator.state, syncCoordinator.lastOutcome, ::Pair)
+&nbsp;                .onEach { (live, outcome) -&gt; updateState { copy(live = live, lastOutcome = outcome) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeOutbox() {
+&nbsp;        // Sync off → the outbox can&#39;t drain and nothing on this screen can act on it, so don&#39;t hold
+&nbsp;        // the Flow open. `flatMapLatest` rather than an early return because the server kill switch
+&nbsp;        // can retract mid-session — same shape as SettingsViewModel&#39;s badge. The screen renders the
+&nbsp;        // resulting empty list as &quot;not read&quot; rather than &quot;nothing queued&quot;: rows survive the switch
+&nbsp;        // flipping, so reporting an empty outbox here would be reporting a fact nobody checked.
+&nbsp;        launch {
+&nbsp;            syncSettings.isEnabled
+&nbsp;                .onEach { enabled -&gt; updateState { copy(syncEnabled = enabled) } }
+&nbsp;                .flatMapLatest { enabled -&gt;
+&nbsp;                    // One row past the render limit, so &quot;there are more&quot; is something the screen
+&nbsp;                    // observes rather than infers from a full page.
+&nbsp;                    if (enabled) pendingMutationQueue.observeOutbox(OUTBOX_QUERY_LIMIT) else flowOf(emptyList())
+&nbsp;                }
+&nbsp;                .onEach { rows -&gt; updateState { copy(outbox = rows) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeCursors() {
+&nbsp;        launch {
+&nbsp;            session.currentWorkspaceId
+&nbsp;                .onEach { workspaceId -&gt; updateState { copy(workspaceId = workspaceId) } }
+&nbsp;                .flatMapLatest { workspaceId -&gt;
+&nbsp;                    if (workspaceId == null) flowOf(emptyList()) else syncMetaRepository.observe(workspaceId.value)
+&nbsp;                }
+&nbsp;                .onEach { rows -&gt; updateState { copy(cursors = rows.sortedBy { it.collection }) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun sync() {
+&nbsp;        launch {
+&nbsp;            // Defensive: SettingsScreen no longer surfaces a way here when sync is off, but the
+&nbsp;            // navigation entry stays registered — bail out so a deep link or a stale back stack
+&nbsp;            // can&#39;t trigger an actual sync against Firestore.
+&nbsp;            if (!syncSettings.isEnabled.first()) {
+&nbsp;                log.i { &quot;[sync] disabled — ignoring manual sync request&quot; }
+&nbsp;                return@launch
+&nbsp;            }
+&nbsp;            log.i { &quot;[sync] requesting MANUAL sync via coordinator&quot; }
+&nbsp;            // Fire and forget: the coordinator&#39;s own `state` / `lastOutcome` flows are what this
+&nbsp;            // screen renders, so awaiting the handle here would only duplicate them — and would
+&nbsp;            // drop the result if the screen left composition mid-sync.
+&nbsp;            syncCoordinator.requestSync(reason = SyncReason.MANUAL)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Drops every `lastPulledAt` for the active workspace and immediately re-syncs. Without the
+&nbsp;     * sync the reset looks like a no-op — the cursors are only re-read on the next pull, and it is
+&nbsp;     * that full re-pull, not the empty cursor table, that the user came here for.
+&nbsp;     *
+&nbsp;     * The wipe has to wait for the coordinator to go idle first. A pull in flight writes
+&nbsp;     * `setCursor(now)` per collection as it finishes each one, and a request made now would queue
+&nbsp;     * *behind* that pull rather than merge into it — so clearing immediately would have the running
+&nbsp;     * sync restore fresh cursors and the queued &quot;full&quot; re-pull would then filter on them and bring
+&nbsp;     * nothing back. Cancelling and waiting is what makes the action mean what it says.
+&nbsp;     */
+&nbsp;    private fun resetCursors() {
+&nbsp;        val workspaceId = currentState.workspaceId
+&nbsp;        if (workspaceId == null) {
+&nbsp;            log.w { &quot;[sync] no active workspace — ignoring cursor reset&quot; }
+&nbsp;            return
+&nbsp;        }
+&nbsp;        launch {
+&nbsp;            syncCoordinator.cancelAll()
+&nbsp;            val idle = withTimeoutOrNull(IDLE_WAIT_MS) {
+&nbsp;                syncCoordinator.state.first { it is LiveSyncState.Idle }
+&nbsp;            }
+&nbsp;            if (idle == null) {
+&nbsp;                // Cancellation is cooperative: an SDK call already in flight finishes first. Going
+&nbsp;                // ahead is still better than dropping the user&#39;s action — worst case the reset is
+&nbsp;                // partly overwritten, which is exactly the state they will retry from.
+&nbsp;                log.w { &quot;[sync] coordinator still busy after ${IDLE_WAIT_MS}ms — clearing cursors anyway&quot; }
+&nbsp;            }
+&nbsp;            log.i { &quot;[sync] clearing pull cursors for workspace ${workspaceId.value}&quot; }
+&nbsp;            syncMetaRepository.clearScope(workspaceId.value)
+&nbsp;            if (syncSettings.isEnabled.first()) {
+&nbsp;                syncCoordinator.requestSync(reason = SyncReason.MANUAL)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;SyncVM&quot;
+&nbsp;
+&nbsp;        /** How long a cursor reset waits for a cancelled sync to actually stop. */
+&nbsp;        const val IDLE_WAIT_MS = 5_000L
+&nbsp;
+&nbsp;        /** One past what the screen renders — the extra row is how truncation is detected. */
+&nbsp;        const val OUTBOX_QUERY_LIMIT = PendingMutationQueue.DEFAULT_OUTBOX_LIMIT + 1
+&nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SyncScreen(</b>
-&nbsp;    onNavigateBack: () -&gt; Unit,
-<b class="nc">&nbsp;    viewModel: SyncViewModel = koinViewModel(),</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+<b class="fc">&nbsp;data class SyncState(</b>
+<b class="fc">&nbsp;    val live: LiveSyncState = LiveSyncState.Idle,</b>
+<b class="fc">&nbsp;    val lastOutcome: LastSyncOutcome = LastSyncOutcome.None,</b>
+<b class="fc">&nbsp;    val outbox: List&lt;PendingMutation&gt; = emptyList(),</b>
+<b class="fc">&nbsp;    val cursors: List&lt;SyncMeta&gt; = emptyList(),</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId? = null,</b>
+<b class="fc">&nbsp;    val syncEnabled: Boolean = false,</b>
+<b class="fc">&nbsp;    val showResetCursorsConfirm: Boolean = false,</b>
+&nbsp;) {
 &nbsp;
-<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
-<b class="nc">&nbsp;        when (effect) {</b>
-<b class="nc">&nbsp;            SyncEffect.NavigateBack -&gt; onNavigateBack()</b>
+&nbsp;    /**
+&nbsp;     * Hero summary, derived rather than stored. Precedence is live activity, then a missing
+&nbsp;     * workspace, then the last terminal outcome: a sync in flight is the most useful thing to say,
+&nbsp;     * but once nothing is running, &quot;no active workspace&quot; outranks any earlier result — the actions
+&nbsp;     * below are inert without one, and a hero reading &quot;Up to date&quot; from a sync that happened before
+&nbsp;     * the workspace went away would leave that unexplained.
+&nbsp;     *
+&nbsp;     * Cancelled reads as [SyncStatus.Idle] on purpose: the user cancelled, so there is no result to
+&nbsp;     * report back to them.
+&nbsp;     */
+&nbsp;    val syncStatus: SyncStatus
+<b class="fc">&nbsp;        get() = when (val current = live) {</b>
+<b class="fc">&nbsp;            is LiveSyncState.Running -&gt; SyncStatus.Running(current.currentStep)</b>
+<b class="fc">&nbsp;            is LiveSyncState.Queued -&gt; SyncStatus.Queued(current.count)</b>
+<b class="fc">&nbsp;            LiveSyncState.Idle -&gt; when {</b>
+<b class="fc">&nbsp;                workspaceId == null -&gt; SyncStatus.NoWorkspace</b>
+<b class="fc">&nbsp;                else -&gt; when (val outcome = lastOutcome) {</b>
+<b class="fc">&nbsp;                    LastSyncOutcome.None -&gt; SyncStatus.Idle</b>
+<b class="fc">&nbsp;                    is LastSyncOutcome.Success -&gt; SyncStatus.Done(outcome.summary, outcome.at)</b>
+<b class="fc">&nbsp;                    is LastSyncOutcome.Failed -&gt; SyncStatus.Failed(outcome.error, outcome.at)</b>
+<b class="fc">&nbsp;                    is LastSyncOutcome.Cancelled -&gt; SyncStatus.Idle</b>
+&nbsp;                }
+&nbsp;            }
 &nbsp;        }
-&nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    SyncContent(state = state, onEvent = viewModel::onEvent)</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;    /** The cursor reset needs a workspace to scope the wipe to; a manual sync does not. */
+<b class="fc">&nbsp;    val canResetCursors: Boolean get() = workspaceId != null</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * Stateless content, public so `:composeApp`&#39;s desktop UI tests can mount it — as with the other
-&nbsp; * screens.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun SyncContent(
-&nbsp;    state: SyncState,
-&nbsp;    onEvent: (SyncEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Scaffold(</b>
-<b class="fc">&nbsp;        modifier = Modifier.surferSafeInsets(),</b>
-<b class="fc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
-<b class="fc">&nbsp;        topBar = {</b>
-<b class="fc">&nbsp;            SurferPaneTopBar(</b>
-<b class="fc">&nbsp;                title = stringResource(Res.string.settings_sync_title),</b>
-<b class="fc">&nbsp;                onBack = { onEvent(SyncEvent.OnBackClick) },</b>
-<b class="fc">&nbsp;                colors = TopAppBarDefaults.topAppBarColors(</b>
-<b class="fc">&nbsp;                    containerColor = AppTheme.materialColors.surface,</b>
-<b class="fc">&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,</b>
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        },
-<b class="fc">&nbsp;    ) { padding -&gt;</b>
-<b class="fc">&nbsp;        Column(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .fillMaxSize()</b>
-<b class="fc">&nbsp;                .surferContentContainer()</b>
-<b class="fc">&nbsp;                .padding(top = padding.calculateTopPadding())</b>
-<b class="fc">&nbsp;                .verticalScroll(rememberScrollState()),</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {</b>
-<b class="fc">&nbsp;                SyncStatusHero(state.syncStatus)</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;    /** Rows the outbox section renders; anything past this is reported as truncated. */
+&nbsp;    val visibleOutbox: List&lt;PendingMutation&gt;
+<b class="fc">&nbsp;        get() = outbox.take(PendingMutationQueue.DEFAULT_OUTBOX_LIMIT)</b>
 &nbsp;
-<b class="fc">&nbsp;            LiveStateSection(state)</b>
-<b class="fc">&nbsp;            LastOutcomeSection(state.lastOutcome)</b>
-<b class="fc">&nbsp;            OutboxSection(state)</b>
-<b class="fc">&nbsp;            CursorsSection(state.cursors)</b>
-<b class="fc">&nbsp;            ActionsSection(state = state, onEvent = onEvent)</b>
+&nbsp;    /** True only when the queue actually held more rows than [visibleOutbox] shows. */
+&nbsp;    val outboxTruncated: Boolean
+<b class="fc">&nbsp;        get() = outbox.size &gt; PendingMutationQueue.DEFAULT_OUTBOX_LIMIT</b>
+&nbsp;}
 &nbsp;
-<b class="fc">&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))</b>
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
+&nbsp;sealed interface SyncStatus {
+&nbsp;    data object Idle : SyncStatus
+&nbsp;    data object NoWorkspace : SyncStatus
+&nbsp;    data class Queued(val count: Int) : SyncStatus
+&nbsp;    data class Running(val step: SyncStep) : SyncStatus
+&nbsp;    data class Done(val summary: SyncSummary, val at: Instant) : SyncStatus
+&nbsp;    data class Failed(val error: SyncError, val at: Instant) : SyncStatus
+&nbsp;}
 &nbsp;
-<b class="fc">&nbsp;    if (state.showResetCursorsConfirm) {</b>
-<b class="fc">&nbsp;        SurferConfirmDialog(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_reset_cursors_confirm_title),</b>
-<b class="fc">&nbsp;            message = stringResource(Res.string.settings_sync_reset_cursors_confirm_message),</b>
-<b class="fc">&nbsp;            detail = stringResource(Res.string.settings_sync_reset_cursors_confirm_detail),</b>
-<b class="fc">&nbsp;            confirmLabel = stringResource(Res.string.settings_sync_reset_cursors_confirm_confirm),</b>
-<b class="fc">&nbsp;            cancelLabel = stringResource(Res.string.settings_sync_reset_cursors_confirm_cancel),</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Restore,</b>
-<b class="fc">&nbsp;            destructive = true,</b>
-<b class="fc">&nbsp;            onConfirm = { onEvent(SyncEvent.OnResetCursorsConfirmed) },</b>
-<b class="fc">&nbsp;            onDismiss = { onEvent(SyncEvent.OnResetCursorsDismissed) },</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.ResetCursorsDialog),</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;sealed interface SyncEvent {
+&nbsp;    data object OnBackClick : SyncEvent
+&nbsp;    data object OnSyncClick : SyncEvent
+&nbsp;    data object OnResetCursorsClick : SyncEvent
+&nbsp;    data object OnResetCursorsDismissed : SyncEvent
+&nbsp;    data object OnResetCursorsConfirmed : SyncEvent
+&nbsp;}
 &nbsp;
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun SyncStatusHero(status: SyncStatus) {</b>
-<b class="fc">&nbsp;    when (status) {</b>
-<b class="fc">&nbsp;        SyncStatus.Idle -&gt; SurferStatusHeroCard(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_hero_idle_title),</b>
-<b class="fc">&nbsp;            supporting = stringResource(Res.string.settings_sync_live_idle_supporting),</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            tone = SurferStatusHeroTone.Tertiary,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Hero),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        SyncStatus.NoWorkspace -&gt; SurferStatusHeroCard(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_no_workspace),</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Cloud,</b>
-<b class="fc">&nbsp;            tone = SurferStatusHeroTone.Secondary,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Hero),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        is SyncStatus.Queued -&gt; SurferStatusHeroCard(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_hero_progress_title),</b>
-<b class="fc">&nbsp;            supporting = stringResource(Res.string.settings_sync_live_queued_supporting, status.count),</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            tone = SurferStatusHeroTone.Primary,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Hero),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        is SyncStatus.Running -&gt; SurferStatusHeroCard(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_hero_progress_title),</b>
-<b class="fc">&nbsp;            supporting = stringResource(Res.string.settings_sync_in_progress_with_step, syncStepLabel(status.step)),</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            tone = SurferStatusHeroTone.Primary,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Hero),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        is SyncStatus.Done -&gt; SurferStatusHeroCard(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_hero_idle_title),</b>
-<b class="fc">&nbsp;            supporting = stringResource(</b>
-<b class="fc">&nbsp;                Res.string.settings_sync_done,</b>
-<b class="fc">&nbsp;                status.summary.uploadedCount,</b>
-<b class="fc">&nbsp;                status.summary.downloadedCount,</b>
-&nbsp;            ),
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            tone = SurferStatusHeroTone.Tertiary,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Hero),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        is SyncStatus.Failed -&gt; SurferStatusHeroCard(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_failed, syncErrorMessage(status.error)),</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            tone = SurferStatusHeroTone.Secondary,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Hero),</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * The coordinator&#39;s own `state` — live activity only. `Running` spells out the merged request
-&nbsp; * (id, reasons, scope) because a sync the user did not ask for is the usual explanation for a
-&nbsp; * &quot;Force sync&quot; that appears to do nothing: it was merged into the one already in flight.
-&nbsp; */
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun LiveStateSection(state: SyncState) {</b>
-<b class="fc">&nbsp;    val title: String</b>
-<b class="fc">&nbsp;    val details: List&lt;String&gt;</b>
-<b class="fc">&nbsp;    when (val live = state.live) {</b>
-<b class="fc">&nbsp;        is LiveSyncState.Queued -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_live_queued_title)</b>
-<b class="fc">&nbsp;            details = listOf(stringResource(Res.string.settings_sync_live_queued_supporting, live.count))</b>
-&nbsp;        }
-<b class="fc">&nbsp;        is LiveSyncState.Running -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_live_running_title)</b>
-<b class="fc">&nbsp;            details = listOf(</b>
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_live_request, live.requestId.value),</b>
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_live_reasons, live.reasons.joinToString { it.name }),</b>
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_live_scope, live.scope.name),</b>
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_live_step, syncStepLabel(live.currentStep)),</b>
-&nbsp;            )
-&nbsp;        }
-<b class="fc">&nbsp;        LiveSyncState.Idle -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_live_idle_title)</b>
-<b class="fc">&nbsp;            details = listOf(stringResource(Res.string.settings_sync_live_idle_supporting))</b>
-&nbsp;        }
-<b class="nc">&nbsp;    }</b>
-<b class="fc">&nbsp;    val workspaceId = state.workspaceId?.value</b>
-&nbsp;
-<b class="fc">&nbsp;    SurferSettingsGroup(title = stringResource(Res.string.settings_sync_section_live)) {</b>
-<b class="fc">&nbsp;        SurferSettingsRow(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            title = title,</b>
-<b class="fc">&nbsp;            supporting = {</b>
-<b class="fc">&nbsp;                DetailLines(</b>
-<b class="fc">&nbsp;                    if (workspaceId == null) {</b>
-<b class="fc">&nbsp;                        details</b>
-<b class="fc">&nbsp;                    } else {</b>
-<b class="fc">&nbsp;                        details + stringResource(Res.string.settings_sync_workspace_scope, workspaceId)</b>
-&nbsp;                    },
-&nbsp;                )
-&nbsp;            },
-<b class="fc">&nbsp;            multiline = true,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Live),</b>
-&nbsp;        )
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * The persisted terminal outcome, which the live state deliberately does not carry (FAQ №10).
-&nbsp; * Conflicts and recalculations are shown next to the transfer counts because a pull that
-&nbsp; * &quot;downloaded 40&quot; and resolved 40 conflicts kept none of them.
-&nbsp; */
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun LastOutcomeSection(outcome: LastSyncOutcome) {</b>
-<b class="fc">&nbsp;    val title: String</b>
-<b class="fc">&nbsp;    val details: List&lt;String&gt;</b>
-<b class="fc">&nbsp;    when (outcome) {</b>
-<b class="fc">&nbsp;        LastSyncOutcome.None -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_last_none_title)</b>
-<b class="fc">&nbsp;            details = listOf(stringResource(Res.string.settings_sync_last_none_supporting))</b>
-&nbsp;        }
-<b class="fc">&nbsp;        is LastSyncOutcome.Success -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_last_success_title)</b>
-<b class="fc">&nbsp;            details = listOf(</b>
-<b class="fc">&nbsp;                stringResource(</b>
-<b class="fc">&nbsp;                    Res.string.settings_sync_last_counts,</b>
-<b class="fc">&nbsp;                    outcome.summary.uploadedCount,</b>
-<b class="fc">&nbsp;                    outcome.summary.downloadedCount,</b>
-<b class="fc">&nbsp;                    outcome.summary.conflictCount,</b>
-<b class="fc">&nbsp;                    outcome.summary.recalculatedCount,</b>
-&nbsp;                ),
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_last_at, outcome.at.asLabel()),</b>
-&nbsp;            )
-&nbsp;        }
-<b class="fc">&nbsp;        is LastSyncOutcome.Failed -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_last_failed_title)</b>
-<b class="fc">&nbsp;            details = listOf(</b>
-<b class="fc">&nbsp;                syncErrorMessage(outcome.error),</b>
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_last_at, outcome.at.asLabel()),</b>
-&nbsp;            )
-&nbsp;        }
-<b class="fc">&nbsp;        is LastSyncOutcome.Cancelled -&gt; {</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_last_cancelled_title)</b>
-<b class="fc">&nbsp;            details = listOf(stringResource(Res.string.settings_sync_last_at, outcome.at.asLabel()))</b>
-&nbsp;        }
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="fc">&nbsp;    SurferSettingsGroup(title = stringResource(Res.string.settings_sync_section_last)) {</b>
-<b class="fc">&nbsp;        SurferSettingsRow(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Clock,</b>
-<b class="fc">&nbsp;            title = title,</b>
-<b class="fc">&nbsp;            supporting = { DetailLines(details) },</b>
-<b class="fc">&nbsp;            multiline = true,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.LastOutcome),</b>
-&nbsp;        )
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Sync being off is not the same answer as an empty queue: the view model stops reading the outbox
-&nbsp; * then, while the rows stay in Room waiting for the switch to come back. Saying &quot;nothing queued&quot;
-&nbsp; * there would report a fact nobody checked, so the disabled case gets its own row and the header
-&nbsp; * drops the count.
-&nbsp; */
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun OutboxSection(state: SyncState) {</b>
-<b class="fc">&nbsp;    if (!state.syncEnabled) {</b>
-<b class="fc">&nbsp;        SurferSettingsGroup(</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.Outbox),</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_section_outbox_unknown),</b>
-&nbsp;        ) {
-&nbsp;            SurferSettingsRow(
-&nbsp;                icon = SurferIcons.Cloud,
-&nbsp;                title = stringResource(Res.string.settings_sync_outbox_unknown_title),
-&nbsp;                supportingText = stringResource(Res.string.settings_sync_outbox_unknown_supporting),
-&nbsp;                multiline = true,
-&nbsp;                modifier = Modifier.testTag(SyncTestTags.OutboxUnknown),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        return
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-<b class="fc">&nbsp;    val rows = state.visibleOutbox</b>
-<b class="fc">&nbsp;    SurferSettingsGroup(</b>
-<b class="fc">&nbsp;        modifier = Modifier.testTag(SyncTestTags.Outbox),</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.settings_sync_section_outbox, rows.size),</b>
-<b class="fc">&nbsp;        footnote = when {</b>
-<b class="fc">&nbsp;            rows.isEmpty() -&gt; null</b>
-<b class="fc">&nbsp;            state.outboxTruncated -&gt; stringResource(Res.string.settings_sync_outbox_footnote) + &quot; &quot; +</b>
-<b class="fc">&nbsp;                stringResource(Res.string.settings_sync_outbox_truncated, rows.size)</b>
-<b class="fc">&nbsp;            else -&gt; stringResource(Res.string.settings_sync_outbox_footnote)</b>
-&nbsp;        },
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        if (rows.isEmpty()) {</b>
-<b class="fc">&nbsp;            SurferSettingsRow(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.Check,</b>
-<b class="fc">&nbsp;                title = stringResource(Res.string.settings_sync_outbox_empty_title),</b>
-<b class="fc">&nbsp;                supportingText = stringResource(Res.string.settings_sync_outbox_empty_supporting),</b>
-<b class="fc">&nbsp;                modifier = Modifier.testTag(SyncTestTags.OutboxEmpty),</b>
-&nbsp;            )
-&nbsp;            return@SurferSettingsGroup
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        rows.forEach { row -&gt; OutboxRow(row) }</b>
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun OutboxRow(row: PendingMutation) {</b>
-<b class="fc">&nbsp;    val scope = row.scopeKey ?: stringResource(Res.string.settings_sync_outbox_scope_root)</b>
-<b class="fc">&nbsp;    val details = buildList {</b>
-<b class="fc">&nbsp;        add(row.entityId)</b>
-<b class="fc">&nbsp;        add(stringResource(Res.string.settings_sync_outbox_scope, scope))</b>
-<b class="fc">&nbsp;        add(stringResource(Res.string.settings_sync_outbox_attempts, row.attempts))</b>
-<b class="fc">&nbsp;        row.lastError?.let { add(stringResource(Res.string.settings_sync_outbox_error, it)) }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;    SurferSettingsRow(</b>
-<b class="fc">&nbsp;        icon = SurferIcons.ArrowUp,</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.settings_sync_outbox_row_title, row.operation.name, row.entityType),</b>
-<b class="fc">&nbsp;        supporting = { DetailLines(details, highlightLast = row.lastError != null) },</b>
-<b class="fc">&nbsp;        multiline = true,</b>
-<b class="fc">&nbsp;        modifier = Modifier.testTag(SyncTestTags.outboxRow(row.id)),</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Per-collection pull cursors. This section is the reason the screen exists: `lastPulledAt` is the
-&nbsp; * `updatedAt &gt;` filter of the next pull, so a cursor sitting ahead of a remote write is why that
-&nbsp; * write never arrives — the failure mode behind issue #356 and the cloud-login hydration bug.
-&nbsp; */
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun CursorsSection(cursors: List&lt;SyncMeta&gt;) {</b>
-<b class="fc">&nbsp;    SurferSettingsGroup(</b>
-<b class="fc">&nbsp;        modifier = Modifier.testTag(SyncTestTags.Cursors),</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.settings_sync_section_cursors),</b>
-<b class="fc">&nbsp;        footnote = stringResource(Res.string.settings_sync_cursors_footnote),</b>
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        if (cursors.isEmpty()) {</b>
-<b class="fc">&nbsp;            SurferSettingsRow(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.Download,</b>
-<b class="fc">&nbsp;                title = stringResource(Res.string.settings_sync_cursors_empty_title),</b>
-<b class="fc">&nbsp;                supportingText = stringResource(Res.string.settings_sync_cursors_empty_supporting),</b>
-<b class="fc">&nbsp;                modifier = Modifier.testTag(SyncTestTags.CursorsEmpty),</b>
-&nbsp;            )
-&nbsp;            return@SurferSettingsGroup
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        cursors.forEach { meta -&gt;</b>
-<b class="fc">&nbsp;            SurferSettingsRow(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.Download,</b>
-<b class="fc">&nbsp;                title = meta.collection,</b>
-<b class="fc">&nbsp;                supporting = {</b>
-<b class="fc">&nbsp;                    DetailLines(</b>
-<b class="fc">&nbsp;                        listOf(</b>
-<b class="fc">&nbsp;                            stringResource(Res.string.settings_sync_cursor_pulled, meta.lastPulledAt.asLabel()),</b>
-<b class="fc">&nbsp;                            stringResource(Res.string.settings_sync_cursor_success, meta.lastSyncSuccessAt.asLabel()),</b>
-<b class="fc">&nbsp;                            stringResource(Res.string.settings_sync_cursor_attempt, meta.lastSyncAttemptAt.asLabel()),</b>
-&nbsp;                        ),
-&nbsp;                    )
-&nbsp;                },
-<b class="fc">&nbsp;                multiline = true,</b>
-<b class="fc">&nbsp;                modifier = Modifier.testTag(SyncTestTags.cursorRow(meta.collection)),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ActionsSection(
-&nbsp;    state: SyncState,
-&nbsp;    onEvent: (SyncEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    SurferSettingsGroup(</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.settings_sync_section_actions),</b>
-<b class="fc">&nbsp;        footnote = if (state.syncEnabled) {</b>
-<b class="fc">&nbsp;            null</b>
-<b class="fc">&nbsp;        } else {</b>
-<b class="fc">&nbsp;            stringResource(Res.string.settings_sync_actions_disabled_footnote)</b>
-&nbsp;        },
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        SurferSettingsRow(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Sync,</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_action_force),</b>
-<b class="fc">&nbsp;            supportingText = stringResource(Res.string.settings_sync_action_force_supporting),</b>
-<b class="fc">&nbsp;            iconBackground = AppTheme.materialColors.primaryContainer,</b>
-<b class="fc">&nbsp;            iconTint = AppTheme.materialColors.onPrimaryContainer,</b>
-<b class="fc">&nbsp;            onClick = { onEvent(SyncEvent.OnSyncClick) },</b>
-&nbsp;            trailing = { SurferSettingsChevron() },
-<b class="fc">&nbsp;            multiline = true,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.ForceSyncRow),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        SurferSettingsRow(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.Restore,</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.settings_sync_action_reset_cursors),</b>
-<b class="fc">&nbsp;            supportingText = stringResource(Res.string.settings_sync_action_reset_cursors_supporting),</b>
-<b class="fc">&nbsp;            danger = true,</b>
-&nbsp;            // No workspace means no scope to clear; leaving the row inert beats clearing nothing
-&nbsp;            // and reporting it as done.
-<b class="fc">&nbsp;            onClick = if (state.canResetCursors) ({ onEvent(SyncEvent.OnResetCursorsClick) }) else null,</b>
-<b class="fc">&nbsp;            multiline = true,</b>
-<b class="fc">&nbsp;            modifier = Modifier.testTag(SyncTestTags.ResetCursorsRow),</b>
-&nbsp;        )
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Stacked diagnostic lines; [highlightLast] paints a trailing error line in the error tint. */
-&nbsp;@Composable
-&nbsp;private fun DetailLines(
-&nbsp;    lines: List&lt;String&gt;,
-<b class="fc">&nbsp;    highlightLast: Boolean = false,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {</b>
-<b class="fc">&nbsp;        lines.forEachIndexed { index, line -&gt;</b>
-<b class="fc">&nbsp;            val isError = highlightLast &amp;&amp; index == lines.lastIndex</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = line,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.labelSmall,</b>
-<b class="fc">&nbsp;                color = if (isError) AppTheme.materialColors.error else AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
-<b class="fc">&nbsp;private fun syncStepLabel(step: SyncStep): String = when (step) {</b>
-<b class="fc">&nbsp;    SyncStep.WaitingForNetwork -&gt; stringResource(Res.string.settings_sync_step_waiting_network)</b>
-<b class="fc">&nbsp;    SyncStep.Started -&gt; stringResource(Res.string.settings_sync_step_started)</b>
-<b class="fc">&nbsp;    SyncStep.UploadingPendingChanges -&gt; stringResource(Res.string.settings_sync_step_uploading)</b>
-<b class="fc">&nbsp;    is SyncStep.UploadingEntity -&gt; stringResource(</b>
-<b class="fc">&nbsp;        Res.string.settings_sync_step_uploading_entity,</b>
-<b class="fc">&nbsp;        step.entityType,</b>
-<b class="fc">&nbsp;        step.current,</b>
-<b class="fc">&nbsp;        step.total,</b>
-&nbsp;    )
-<b class="fc">&nbsp;    SyncStep.PullingRemoteChanges -&gt; stringResource(Res.string.settings_sync_step_pulling)</b>
-<b class="fc">&nbsp;    is SyncStep.PullingCollection -&gt;</b>
-<b class="fc">&nbsp;        stringResource(Res.string.settings_sync_step_pulling_collection, step.collection)</b>
-<b class="fc">&nbsp;    SyncStep.RecalculatingProjections -&gt; stringResource(Res.string.settings_sync_step_recalculating)</b>
-<b class="fc">&nbsp;    is SyncStep.Completed -&gt; stringResource(Res.string.settings_sync_step_completed)</b>
-<b class="fc">&nbsp;    is SyncStep.Cancelled -&gt; stringResource(Res.string.settings_sync_step_cancelled)</b>
-<b class="fc">&nbsp;    is SyncStep.Failed -&gt; stringResource(Res.string.settings_sync_step_failed)</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="fc">&nbsp;private fun syncErrorMessage(error: SyncError): String = when (error) {</b>
-<b class="fc">&nbsp;    SyncError.Cancelled -&gt; stringResource(Res.string.settings_sync_error_cancelled)</b>
-<b class="fc">&nbsp;    SyncError.NetworkUnavailable -&gt; stringResource(Res.string.settings_sync_error_network)</b>
-<b class="fc">&nbsp;    SyncError.AuthRequired -&gt; stringResource(Res.string.settings_sync_error_auth)</b>
-<b class="fc">&nbsp;    SyncError.PermissionDenied -&gt; stringResource(Res.string.settings_sync_error_permission)</b>
-&nbsp;    // Server-authored copy naming the required version — showing it beats a generic line.
-<b class="fc">&nbsp;    is SyncError.UnsupportedAppVersion -&gt; error.message</b>
-<b class="fc">&nbsp;    is SyncError.StorageError -&gt; stringResource(Res.string.settings_sync_error_storage)</b>
-<b class="pc">&nbsp;    is SyncError.Unknown -&gt; error.cause.message ?: stringResource(Res.string.settings_sync_error_unknown)</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Local wall-clock stamp; [Res.string.settings_sync_value_never] stands in for an absent one. */
-&nbsp;@Composable
-<b class="fc">&nbsp;private fun Instant?.asLabel(): String {</b>
-<b class="fc">&nbsp;    val instant = this ?: return stringResource(Res.string.settings_sync_value_never)</b>
-<b class="fc">&nbsp;    val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())</b>
-<b class="fc">&nbsp;    val time = listOf(local.hour, local.minute, local.second)</b>
-<b class="fc">&nbsp;        .joinToString(&quot;:&quot;) { it.toString().padStart(2, &#39;0&#39;) }</b>
-<b class="fc">&nbsp;    return &quot;${local.date} $time&quot;</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;sealed interface SyncEffect {
+&nbsp;    data object NavigateBack : SyncEffect
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -690,7 +365,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEntityTypes</title>
+  <title>MoneySurfer Coverage Report > UploadPendingChangesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEntityTypes (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: UploadPendingChangesUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncEntityTypes</td>
+  <td class="name">UploadPendingChangesUseCase</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,31 +46,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.sync
 &nbsp;
-&nbsp;/**
-&nbsp; * Opaque entity-type strings that flow through the sync outbox.
-&nbsp; * Values are stable — they are persisted in the local database as [PendingMutation.entityType].
-&nbsp; */
-&nbsp;object SyncEntityTypes {
-&nbsp;    const val USER = &quot;USER&quot;
-&nbsp;    const val WORKSPACE = &quot;WORKSPACE&quot;
-&nbsp;    const val WORKSPACE_MEMBER = &quot;WORKSPACE_MEMBER&quot;
-&nbsp;    const val WORKSPACE_INVITE = &quot;WORKSPACE_INVITE&quot;
-&nbsp;    const val WORKSPACE_REF = &quot;WORKSPACE_REF&quot;
-&nbsp;    const val ACCOUNT = &quot;ACCOUNT&quot;
-&nbsp;    const val CATEGORY = &quot;CATEGORY&quot;
-&nbsp;    const val TRANSACTION = &quot;TRANSACTION&quot;
-&nbsp;    const val BUDGET = &quot;BUDGET&quot;
-&nbsp;    const val RECURRING_RULE = &quot;RECURRING_RULE&quot;
-&nbsp;    const val GOAL = &quot;GOAL&quot;
-&nbsp;    const val GOAL_CONTRIBUTION = &quot;GOAL_CONTRIBUTION&quot;
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
 &nbsp;
-&nbsp;    /**
-&nbsp;     * One synced setting. Unlike every other type here the entity id is not a UUID but the
-&nbsp;     * configuration key name (`ui.theme_mode`), and `scopeKey` is null — settings belong to the
-&nbsp;     * user, not to a workspace.
-&nbsp;     */
-&nbsp;    const val USER_CONFIG = &quot;USER_CONFIG&quot;
+&nbsp;/**
+&nbsp; * Pushes pending mutations from the outbox to the remote backend.
+&nbsp; *
+&nbsp; * Implementations must classify SDK exceptions into [com.georgeci.moneysurfer.sync.api.SyncError]
+&nbsp; * and return them via `Either.Left` — never throw typed errors out of here.
+&nbsp; * See SyncCoordinatorFAQ.md №11, §4.2.
+&nbsp; */
+&nbsp;interface UploadPendingChangesUseCase {
+&nbsp;    suspend operator fun invoke(
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (UploadProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): SyncResult&lt;UploadSummary&gt;
 &nbsp;}
+&nbsp;
+&nbsp;data class UploadProgress(
+&nbsp;    val entityType: String,
+&nbsp;    val current: Int,
+&nbsp;    val total: Int,
+&nbsp;)
+&nbsp;
+&nbsp;data class UploadSummary(val uploadedCount: Int)
 </code>
 </pre>
 </div>
@@ -94,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

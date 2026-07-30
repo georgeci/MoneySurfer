@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteUserAccountViewModel</title>
+  <title>MoneySurfer Coverage Report > DeleteUserAccountTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,134 +22,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteUserAccountViewModel (com.georgeci.moneysurfer.feature.settings.account)</h1>
+<h1>Coverage Summary for Class: DeleteUserAccountTestTags (com.georgeci.moneysurfer.feature.settings.account)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">DeleteUserAccountViewModel</td>
-<td class="coverageStat">
-  <span class="percent">
-    71.4%
-  </span>
-  <span class="absValue">
-    (5/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    72.7%
-  </span>
-  <span class="absValue">
-    (16/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    85.7%
-  </span>
-  <span class="absValue">
-    (24/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    76.8%
-  </span>
-  <span class="absValue">
-    (152/198)
-  </span>
-</td>
+  <td class="name">DeleteUserAccountTestTags</td>
+    <td class="coverageStat"/>
 </tr>
-  <tr>
-    <td class="name">DeleteUserAccountViewModel$deleteAccount$3</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (62/62)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    75%
-  </span>
-  <span class="absValue">
-    (6/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    75%
-  </span>
-  <span class="absValue">
-    (18/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.2%
-  </span>
-  <span class="absValue">
-    (30/34)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    82.3%
-  </span>
-  <span class="absValue">
-    (214/260)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -159,115 +46,281 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.DeleteUserAccountUseCase
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.material3.ButtonDefaults
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.SnackbarDuration
+&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_button
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_cancel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_message
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_memberships
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_sync
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_workspaces
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_intro
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_local
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_shared
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_auth_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_cleanup_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_generic
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_recent_login
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_wrong_password
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_label
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_missing
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/**
-&nbsp; * User-account deletion flow (issue #213), online builds only — the Settings entry point is
-&nbsp; * hidden offline. Email/password sessions must retype their password (doubles as the Firebase
-&nbsp; * re-auth credential); anonymous sessions go straight to the confirmation dialog.
-&nbsp; *
-&nbsp; * On success no navigation is posted: the use case clears the session user pointer and
-&nbsp; * AppLaunchViewModel bounces the whole app to SignIn.
-&nbsp; */
-<b class="fc">&nbsp;@KoinViewModel</b>
-&nbsp;class DeleteUserAccountViewModel(
-<b class="fc">&nbsp;    private val deleteUserAccount: DeleteUserAccountUseCase,</b>
-&nbsp;    authRemoteRepository: AuthRemoteRepository,
-&nbsp;) : MviViewModel&lt;DeleteUserAccountState, DeleteUserAccountEvent, DeleteUserAccountEffect&gt;(
-<b class="fc">&nbsp;    initialState = DeleteUserAccountState(</b>
-<b class="fc">&nbsp;        isAnonymousUser = authRemoteRepository.isCurrentUserAnonymous(),</b>
-<b class="fc">&nbsp;        userEmail = authRemoteRepository.currentEmail(),</b>
-&nbsp;    ),
+&nbsp;/** Stable selectors — see docs/testing/testing-strategy.md. */
+&nbsp;object DeleteUserAccountTestTags {
+&nbsp;    const val PasswordField = &quot;deleteAccount:passwordField&quot;
+&nbsp;    const val DeleteButton = &quot;deleteAccount:deleteButton&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun DeleteUserAccountScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    viewModel: DeleteUserAccountViewModel = koinViewModel(),
 &nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;    val snackbarHostState = remember { SnackbarHostState() }
+&nbsp;    var pendingNotice by remember { mutableStateOf&lt;DeleteUserAccountNotice?&gt;(null) }
 &nbsp;
-&nbsp;    override fun onEvent(event: DeleteUserAccountEvent) {
-<b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            DeleteUserAccountEvent.OnBackClick -&gt; postSideEffect(DeleteUserAccountEffect.NavigateBack)</b>
-<b class="fc">&nbsp;            is DeleteUserAccountEvent.OnPasswordChange -&gt;</b>
-<b class="fc">&nbsp;                updateState { copy(password = event.value, passwordMissing = false) }</b>
-<b class="fc">&nbsp;            DeleteUserAccountEvent.OnDeleteClick -&gt; requestConfirmation()</b>
-<b class="pc">&nbsp;            DeleteUserAccountEvent.OnConfirmDismissed -&gt;</b>
-<b class="nc">&nbsp;                updateState { copy(showConfirmDialog = false) }</b>
-<b class="fc">&nbsp;            DeleteUserAccountEvent.OnConfirmAccepted -&gt; deleteAccount()</b>
+&nbsp;    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }
+&nbsp;    LaunchedEffect(pendingNoticeText) {
+&nbsp;        val text = pendingNoticeText ?: return@LaunchedEffect
+&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
+&nbsp;        pendingNotice = null
+&nbsp;    }
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            DeleteUserAccountEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is DeleteUserAccountEffect.Notify -&gt; pendingNotice = effect.notice
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun requestConfirmation() {
-<b class="fc">&nbsp;        val state = currentState</b>
-<b class="fc">&nbsp;        if (!state.isAnonymousUser &amp;&amp; state.password.isBlank()) {</b>
-<b class="fc">&nbsp;            updateState { copy(passwordMissing = true) }</b>
-&nbsp;            return
-&nbsp;        }
-<b class="fc">&nbsp;        updateState { copy(showConfirmDialog = true) }</b>
+&nbsp;    DeleteUserAccountContent(
+&nbsp;        state = state,
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun noticeText(notice: DeleteUserAccountNotice): String = when (notice) {
+&nbsp;    DeleteUserAccountNotice.WrongPassword -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_wrong_password)
+&nbsp;    DeleteUserAccountNotice.RequiresRecentLogin -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_recent_login)
+&nbsp;    DeleteUserAccountNotice.CleanupFailed -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_cleanup_failed)
+&nbsp;    DeleteUserAccountNotice.AuthDeletionFailed -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_auth_failed)
+&nbsp;    DeleteUserAccountNotice.Generic -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_generic)
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DeleteUserAccountContent(
+&nbsp;    state: DeleteUserAccountState,
+&nbsp;    snackbarHostState: SnackbarHostState,
+&nbsp;    onEvent: (DeleteUserAccountEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    if (state.showConfirmDialog) {
+&nbsp;        ConfirmDeleteUserAccountDialog(
+&nbsp;            onConfirm = { onEvent(DeleteUserAccountEvent.OnConfirmAccepted) },
+&nbsp;            onDismiss = { onEvent(DeleteUserAccountEvent.OnConfirmDismissed) },
+&nbsp;        )
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun deleteAccount() {
-<b class="fc">&nbsp;        updateState { copy(showConfirmDialog = false, isDeleting = true) }</b>
-<b class="fc">&nbsp;        launch(</b>
-&nbsp;            onError = {
-<b class="nc">&nbsp;                updateState { copy(isDeleting = false) }</b>
-<b class="nc">&nbsp;                postSideEffect(DeleteUserAccountEffect.Notify(DeleteUserAccountNotice.Generic))</b>
-&nbsp;            },
+&nbsp;    SettingsSubScreenScaffold(
+&nbsp;        title = stringResource(Res.string.settings_delete_account_title),
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onBack = { onEvent(DeleteUserAccountEvent.OnBackClick) },
+&nbsp;        showProgressOverlay = state.isDeleting,
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(horizontal = 16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
 &nbsp;        ) {
-<b class="fc">&nbsp;            val password = currentState.password.takeIf { !currentState.isAnonymousUser }</b>
-<b class="fc">&nbsp;            deleteUserAccount(password = password).fold(</b>
-&nbsp;                ifLeft = { error -&gt;
-<b class="fc">&nbsp;                    updateState { copy(isDeleting = false) }</b>
-<b class="fc">&nbsp;                    postSideEffect(DeleteUserAccountEffect.Notify(error.toNotice()))</b>
-<b class="fc">&nbsp;                },</b>
-&nbsp;                ifRight = {
-&nbsp;                    // Session user pointer is already null — AppLaunchViewModel navigates
-&nbsp;                    // to SignIn; keep the overlay up so the screen can&#39;t be re-submitted.
-<b class="fc">&nbsp;                },</b>
+&nbsp;            Spacer(Modifier.height(4.dp))
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_intro),
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
 &nbsp;            )
+&nbsp;
+&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_deleted_section))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_workspaces))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_memberships))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_sync))
+&nbsp;
+&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_kept_section))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_shared))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_local))
+&nbsp;
+&nbsp;            if (state.showPasswordField) {
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                OutlinedTextField(
+&nbsp;                    value = state.password,
+&nbsp;                    onValueChange = { onEvent(DeleteUserAccountEvent.OnPasswordChange(it)) },
+&nbsp;                    label = { Text(stringResource(Res.string.settings_delete_account_password_label)) },
+&nbsp;                    singleLine = true,
+&nbsp;                    visualTransformation = PasswordVisualTransformation(),
+&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+&nbsp;                    isError = state.passwordMissing,
+&nbsp;                    supportingText = {
+&nbsp;                        if (state.passwordMissing) {
+&nbsp;                            Text(stringResource(Res.string.settings_delete_account_password_missing))
+&nbsp;                        }
+&nbsp;                    },
+&nbsp;                    enabled = !state.isDeleting,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .testTag(DeleteUserAccountTestTags.PasswordField),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;            Button(
+&nbsp;                onClick = { onEvent(DeleteUserAccountEvent.OnDeleteClick) },
+&nbsp;                enabled = !state.isDeleting,
+&nbsp;                colors = ButtonDefaults.buttonColors(
+&nbsp;                    containerColor = AppTheme.materialColors.error,
+&nbsp;                    contentColor = AppTheme.materialColors.onError,
+&nbsp;                ),
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .testTag(DeleteUserAccountTestTags.DeleteButton),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_button))
+&nbsp;            }
+&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
 &nbsp;        }
 &nbsp;    }
+&nbsp;}
 &nbsp;
-<b class="fc">&nbsp;    private fun AccountDeletionError.toNotice(): DeleteUserAccountNotice = when (this) {</b>
-<b class="pc">&nbsp;        AccountDeletionError.NotSignedIn -&gt; DeleteUserAccountNotice.Generic</b>
-<b class="fc">&nbsp;        AccountDeletionError.InvalidCredentials -&gt; DeleteUserAccountNotice.WrongPassword</b>
-<b class="pc">&nbsp;        is AccountDeletionError.ReauthenticationFailed -&gt; DeleteUserAccountNotice.Generic</b>
-<b class="pc">&nbsp;        AccountDeletionError.RequiresRecentLogin -&gt; DeleteUserAccountNotice.RequiresRecentLogin</b>
-<b class="pc">&nbsp;        is AccountDeletionError.RemoteDataCleanupFailed -&gt; DeleteUserAccountNotice.CleanupFailed</b>
-<b class="nc">&nbsp;        is AccountDeletionError.AuthDeletionFailed -&gt; DeleteUserAccountNotice.AuthDeletionFailed</b>
+&nbsp;@Composable
+&nbsp;private fun SectionTitle(text: String) {
+&nbsp;    Text(
+&nbsp;        text = text,
+&nbsp;        style = AppTheme.typography.titleSmall,
+&nbsp;        color = AppTheme.materialColors.onSurface,
+&nbsp;        modifier = Modifier.padding(top = AppTheme.spacing.small),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BulletLine(text: String) {
+&nbsp;    Row {
+&nbsp;        Text(
+&nbsp;            text = &quot;•&quot;,
+&nbsp;            style = AppTheme.typography.bodyMedium,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        Spacer(Modifier.width(8.dp))
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            style = AppTheme.typography.bodyMedium,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;data class DeleteUserAccountState(
-&nbsp;    val isAnonymousUser: Boolean = false,
-&nbsp;    val userEmail: String? = null,
-&nbsp;    val password: String = &quot;&quot;,
-&nbsp;    val passwordMissing: Boolean = false,
-&nbsp;    val showConfirmDialog: Boolean = false,
-&nbsp;    val isDeleting: Boolean = false,
+&nbsp;/** Final confirmation — mirrors the M3 dialog shape used by the financial-account delete. */
+&nbsp;@Composable
+&nbsp;private fun ConfirmDeleteUserAccountDialog(
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
 &nbsp;) {
-&nbsp;    val showPasswordField: Boolean get() = !isAnonymousUser
+&nbsp;    AlertDialog(
+&nbsp;        onDismissRequest = onDismiss,
+&nbsp;        icon = {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Delete,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                tint = AppTheme.materialColors.error,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        title = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_title),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        text = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_message),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        confirmButton = {
+&nbsp;            Button(
+&nbsp;                onClick = onConfirm,
+&nbsp;                colors = ButtonDefaults.buttonColors(
+&nbsp;                    containerColor = AppTheme.materialColors.error,
+&nbsp;                    contentColor = AppTheme.materialColors.onError,
+&nbsp;                ),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_confirm))
+&nbsp;            }
+&nbsp;        },
+&nbsp;        dismissButton = {
+&nbsp;            TextButton(onClick = onDismiss) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface DeleteUserAccountEvent {
-&nbsp;    data object OnBackClick : DeleteUserAccountEvent
-&nbsp;    data class OnPasswordChange(val value: String) : DeleteUserAccountEvent
-&nbsp;    data object OnDeleteClick : DeleteUserAccountEvent
-&nbsp;    data object OnConfirmDismissed : DeleteUserAccountEvent
-&nbsp;    data object OnConfirmAccepted : DeleteUserAccountEvent
-&nbsp;}
-&nbsp;
-&nbsp;/** Localised in the screen layer — the ViewModel stays free of platform string APIs. */
-&nbsp;enum class DeleteUserAccountNotice {
-&nbsp;    WrongPassword,
-&nbsp;    RequiresRecentLogin,
-&nbsp;    CleanupFailed,
-&nbsp;    AuthDeletionFailed,
-&nbsp;    Generic,
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface DeleteUserAccountEffect {
-&nbsp;    data object NavigateBack : DeleteUserAccountEffect
-&nbsp;    data class Notify(val notice: DeleteUserAccountNotice) : DeleteUserAccountEffect
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun DeleteUserAccountScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        DeleteUserAccountContent(
+&nbsp;            state = DeleteUserAccountState(userEmail = &quot;kasia@georgeci.com&quot;),
+&nbsp;            snackbarHostState = SnackbarHostState(),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -292,7 +345,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

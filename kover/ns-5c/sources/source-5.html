@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDateUi</title>
+  <title>MoneySurfer Coverage Report > TransactionFilterChipsUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDateUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: TransactionFilterChipsUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,98 +48,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">TransactionDateUi$Exact</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">TransactionDateUi$Today</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">TransactionDateUi$Yesterday</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">TransactionFilterChipsUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -145,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -153,10 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (37/37)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -182,9 +110,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;/** Day-header label, resolved to text by the screen. */
 &nbsp;sealed interface TransactionDateUi {
-<b class="fc">&nbsp;    data object Today : TransactionDateUi</b>
-<b class="fc">&nbsp;    data object Yesterday : TransactionDateUi</b>
-<b class="fc">&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi</b>
+&nbsp;    data object Today : TransactionDateUi
+&nbsp;    data object Yesterday : TransactionDateUi
+&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi
 &nbsp;}
 &nbsp;
 &nbsp;/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
@@ -204,14 +132,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * The filter chip rail&#39;s contents. Every chip is a shortcut into the filter screen, so these carry
 &nbsp; * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
 &nbsp; */
-&nbsp;data class TransactionFilterChipsUi(
-&nbsp;    val dateRange: TransactionDateRange,
-&nbsp;    val type: TransactionTypeFilter,
-&nbsp;    val accountCount: Int,
-&nbsp;    val accountName: String?,
-&nbsp;    val categoryCount: Int,
-&nbsp;    val categoryName: String?,
-&nbsp;    val sort: TransactionSort,
+<b class="fc">&nbsp;data class TransactionFilterChipsUi(</b>
+<b class="fc">&nbsp;    val dateRange: TransactionDateRange,</b>
+<b class="fc">&nbsp;    val type: TransactionTypeFilter,</b>
+<b class="fc">&nbsp;    val accountCount: Int,</b>
+<b class="fc">&nbsp;    val accountName: String?,</b>
+<b class="fc">&nbsp;    val categoryCount: Int,</b>
+<b class="fc">&nbsp;    val categoryName: String?,</b>
+<b class="fc">&nbsp;    val sort: TransactionSort,</b>
 &nbsp;)
 &nbsp;
 &nbsp;data class TransactionRowUi(
@@ -274,7 +202,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardCustomizeEffect</title>
+  <title>MoneySurfer Coverage Report > DashboardCustomizeEvent</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard.customize</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardCustomizeEffect (com.georgeci.moneysurfer.feature.dashboard.customize)</h1>
+<h1>Coverage Summary for Class: DashboardCustomizeEvent (com.georgeci.moneysurfer.feature.dashboard.customize)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">DashboardCustomizeEffect$NavigateBack</td>
+    <td class="name">DashboardCustomizeEvent$OnBackClick</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -73,8 +73,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
   </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
+  <tr>
+    <td class="name">DashboardCustomizeEvent$OnCardStyleChange</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DashboardCustomizeEvent$OnSpanChange</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DashboardCustomizeEvent$OnWidgetEnabledChange</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -97,7 +153,63 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DashboardCustomizeEvent$OnWidgetMove</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (50/50)
   </span>
 </td>
 </tr>
@@ -113,6 +225,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.utils.AsyncState
@@ -161,6 +274,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                edit { it.withWidgetMoved(from = event.from, to = event.to) }
 &nbsp;            is DashboardCustomizeEvent.OnCardStyleChange -&gt;
 &nbsp;                edit { it.withCardStyle(event.type, event.cardStyle) }
+&nbsp;            is DashboardCustomizeEvent.OnSpanChange -&gt;
+&nbsp;                edit { it.withSpan(event.type, event.span) }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -190,21 +305,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardCustomizeEvent {
-&nbsp;    data object OnBackClick : DashboardCustomizeEvent
-&nbsp;    data class OnWidgetEnabledChange(val type: DashboardWidgetType, val enabled: Boolean) : DashboardCustomizeEvent
+<b class="fc">&nbsp;    data object OnBackClick : DashboardCustomizeEvent</b>
+<b class="fc">&nbsp;    data class OnWidgetEnabledChange(val type: DashboardWidgetType, val enabled: Boolean) : DashboardCustomizeEvent</b>
 &nbsp;
 &nbsp;    /** [from] was dragged onto the dashboard slot [to] holds right now. */
-&nbsp;    data class OnWidgetMove(val from: DashboardWidgetType, val to: DashboardWidgetType) : DashboardCustomizeEvent
+<b class="fc">&nbsp;    data class OnWidgetMove(val from: DashboardWidgetType, val to: DashboardWidgetType) : DashboardCustomizeEvent</b>
 &nbsp;
 &nbsp;    /** A size or variant was picked for [type] in the card-style sheet. */
-&nbsp;    data class OnCardStyleChange(
-&nbsp;        val type: DashboardWidgetType,
-&nbsp;        val cardStyle: DashboardCardStyle,
+<b class="fc">&nbsp;    data class OnCardStyleChange(</b>
+<b class="fc">&nbsp;        val type: DashboardWidgetType,</b>
+<b class="fc">&nbsp;        val cardStyle: DashboardCardStyle,</b>
+&nbsp;    ) : DashboardCustomizeEvent
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A grid width was picked for [type]. Separate from [OnCardStyleChange] because a span is
+&nbsp;     * placement rather than styling — see [com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem].
+&nbsp;     */
+<b class="fc">&nbsp;    data class OnSpanChange(</b>
+<b class="fc">&nbsp;        val type: DashboardWidgetType,</b>
+<b class="fc">&nbsp;        val span: DashboardWidgetSpan,</b>
 &nbsp;    ) : DashboardCustomizeEvent
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardCustomizeEffect {
-<b class="fc">&nbsp;    data object NavigateBack : DashboardCustomizeEffect</b>
+&nbsp;    data object NavigateBack : DashboardCustomizeEffect
 &nbsp;}
 </code>
 </pre>
@@ -229,7 +353,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

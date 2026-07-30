@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardCategoriesDonutWidgetKt</title>
+  <title>MoneySurfer Coverage Report > CategoryPickerTreeKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardCategoriesDonutWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: CategoryPickerTreeKt (com.georgeci.moneysurfer.feature.category.picker)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,123 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardCategoriesDonutWidgetKt</td>
+  <td class="name">CategoryPickerTreeKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/88)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71.4%
+    0%
   </span>
   <span class="absValue">
-    (10/14)
+    (0/221)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (25/25)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    97.4%
-  </span>
-  <span class="absValue">
-    (225/231)
+    (0/2035)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">CategoryPickerTreeKt$CategoryPickerTree$lambda$0$0$$inlined$items$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryPickerTreeKt$CategoryPickerTree$lambda$0$0$$inlined$items$default$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryPickerTreeKt$CategoryPickerTree$lambda$0$0$$inlined$items$default$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryPickerTreeKt$CategoryPickerTree$lambda$0$0$$inlined$items$default$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/221)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2035)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,84 +170,371 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.picker
 &nbsp;
+&nbsp;import androidx.compose.animation.core.animateFloatAsState
+&nbsp;import androidx.compose.animation.core.tween
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.heightIn
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.foundation.selection.selectable
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.drawBehind
+&nbsp;import androidx.compose.ui.draw.rotate
+&nbsp;import androidx.compose.ui.geometry.Offset
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
+&nbsp;import androidx.compose.ui.semantics.Role
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_center_label
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_empty_center
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_empty_legend
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.category.generated.resources.Res
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_hide_children
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_new_category
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_show_children
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_subcategories
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
+<b class="nc">&nbsp;private val TreeMinHeight = 200.dp</b>
+<b class="nc">&nbsp;private val TreeMaxHeight = 420.dp</b>
+<b class="nc">&nbsp;private val CardRadius = 18.dp</b>
+<b class="nc">&nbsp;private val CardSpacing = 8.dp</b>
+<b class="nc">&nbsp;private val ParentBubbleSize = 40.dp</b>
+<b class="nc">&nbsp;private val ChildBubbleSize = 28.dp</b>
+<b class="nc">&nbsp;private val RowVerticalPadding = 12.dp</b>
+<b class="nc">&nbsp;private val RowHorizontalPadding = 12.dp</b>
+<b class="nc">&nbsp;private val BubbleSpacing = 12.dp</b>
+&nbsp;
+&nbsp;/** Where the L-connector&#39;s rules sit, measured from the card&#39;s leading edge. */
+<b class="nc">&nbsp;private val ConnectorX = 33.dp</b>
+<b class="nc">&nbsp;private val ConnectorArm = 11.dp</b>
+<b class="nc">&nbsp;private val ConnectorStroke = 1.5.dp</b>
+<b class="nc">&nbsp;private val ChildContentStart = 48.dp</b>
+&nbsp;
+<b class="nc">&nbsp;private val RadioSize = 22.dp</b>
+<b class="nc">&nbsp;private val RadioStroke = 2.dp</b>
+<b class="nc">&nbsp;private val RadioCheckSize = 14.dp</b>
+<b class="nc">&nbsp;private val HairlineHeight = 1.dp</b>
+&nbsp;private const val ChevronExpandedDegrees = 180f
+&nbsp;private const val ChevronRotationMillis = 140
+&nbsp;
 &nbsp;/**
-&nbsp; * The selected period&#39;s spend as a donut: one arc per category, largest first, with the legend
-&nbsp; * beside it and the period&#39;s total in the middle.
+&nbsp; * Variant B of the picker: one card per top-level category, with its children folded away behind
+&nbsp; * a chevron until asked for. Built for someone browsing rather than searching — the grid answers
+&nbsp; * &quot;where is Groceries&quot;, this answers &quot;what is under Food&quot;.
 &nbsp; *
-&nbsp; * Reads the same [DashboardState.Content.spentByCategory] rows the spent-by-category card does, so
-&nbsp; * the two can never disagree about what the period holds — including the uncategorized bucket,
-&nbsp; * which arrives as a real slice and is drawn as one rather than being folded away.
-&nbsp; *
-&nbsp; * How many legend rows fit is the widget&#39;s own call (Hero 5 / Compact 3, from the size the layout
-&nbsp; * provides), so every segment is still handed over: trimming the list here would shrink the *chart*
-&nbsp; * to what the legend could name, and the arcs would stop adding up to the centre figure.
+&nbsp; * A parent is selectable in its own right even when it has children: the row selects, the chevron
+&nbsp; * expands, and they are separate hit targets so neither steals the other&#39;s tap.
 &nbsp; */
 &nbsp;@Composable
-<b class="pc">&nbsp;internal fun CategoriesDonutWidget(state: DashboardState.Content) {</b>
-<b class="fc">&nbsp;    val segments = state.spentByCategory.toDonutSegments()</b>
-<b class="fc">&nbsp;    SurferCategoriesDonutWidget(</b>
-<b class="fc">&nbsp;        segments = segments,</b>
-<b class="fc">&nbsp;        centerLabel = stringResource(Res.string.dashboard_categories_donut_center_label),</b>
-<b class="fc">&nbsp;        centerValue = state.spentByCategoryTotal,</b>
-<b class="fc">&nbsp;        emptyCenterText = stringResource(Res.string.dashboard_categories_donut_empty_center),</b>
-<b class="fc">&nbsp;        emptyLegendText = stringResource(Res.string.dashboard_categories_donut_empty_legend),</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
-<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
-<b class="fc">&nbsp;            .testTag(DashboardTestTags.CategoriesDonut),</b>
+&nbsp;internal fun CategoryPickerTree(
+&nbsp;    groups: List&lt;CategoryTreeGroup&gt;,
+&nbsp;    onSelect: (CategoryId) -&gt; Unit,
+&nbsp;    onToggleExpand: (CategoryId) -&gt; Unit,
+&nbsp;    onCreateNew: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    LazyColumn(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .heightIn(min = TreeMinHeight, max = TreeMaxHeight),</b>
+<b class="nc">&nbsp;        contentPadding = PaddingValues(horizontal = SheetBodyPadding),</b>
+<b class="nc">&nbsp;        verticalArrangement = Arrangement.spacedBy(CardSpacing),</b>
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        items(groups, key = { it.parent.id.value }) { group -&gt;</b>
+&nbsp;            CategoryTreeCard(
+&nbsp;                group = group,
+&nbsp;                onSelect = onSelect,
+&nbsp;                onToggleExpand = onToggleExpand,
+&nbsp;            )
+&nbsp;        }
+<b class="nc">&nbsp;        item(key = &quot;create-new&quot;) {</b>
+<b class="nc">&nbsp;            NewCategoryRow(onClick = onCreateNew)</b>
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun CategoryTreeCard(
+&nbsp;    group: CategoryTreeGroup,
+&nbsp;    onSelect: (CategoryId) -&gt; Unit,
+&nbsp;    onToggleExpand: (CategoryId) -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .clip(RoundedCornerShape(CardRadius))</b>
+<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerLowest)</b>
+<b class="nc">&nbsp;            .border(</b>
+<b class="nc">&nbsp;                width = HairlineHeight,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.outlineVariant,</b>
+<b class="nc">&nbsp;                shape = RoundedCornerShape(CardRadius),</b>
+&nbsp;            ),
+&nbsp;    ) {
+<b class="nc">&nbsp;        ParentRow(</b>
+<b class="nc">&nbsp;            group = group,</b>
+<b class="nc">&nbsp;            onSelect = { onSelect(group.parent.id) },</b>
+<b class="nc">&nbsp;            onToggleExpand = { onToggleExpand(group.parent.id) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;        if (group.children.isNotEmpty()) {</b>
+<b class="nc">&nbsp;            Box(</b>
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .fillMaxWidth()</b>
+<b class="nc">&nbsp;                    .height(HairlineHeight)</b>
+<b class="nc">&nbsp;                    .background(AppTheme.materialColors.outlineVariant),</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Column(modifier = Modifier.background(AppTheme.materialColors.surfaceContainerLow)) {</b>
+<b class="nc">&nbsp;                group.children.forEachIndexed { index, child -&gt;</b>
+<b class="nc">&nbsp;                    ChildRow(</b>
+<b class="nc">&nbsp;                        child = child,</b>
+<b class="nc">&nbsp;                        isLast = index == group.children.lastIndex,</b>
+<b class="nc">&nbsp;                        onSelect = { onSelect(child.id) },</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ParentRow(
+&nbsp;    group: CategoryTreeGroup,
+&nbsp;    onSelect: () -&gt; Unit,
+&nbsp;    onToggleExpand: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val parent = group.parent</b>
+<b class="nc">&nbsp;    val visual = SurferCategoryPalette.visualFor(</b>
+<b class="nc">&nbsp;        id = parent.id.value,</b>
+<b class="nc">&nbsp;        iconKey = parent.iconKey,</b>
+<b class="nc">&nbsp;        hue = parent.hue,</b>
+<b class="nc">&nbsp;        systemKind = parent.systemKind,</b>
 &nbsp;    )
-<b class="fc">&nbsp;}</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .background(selectionBackground(parent.selected))</b>
+<b class="nc">&nbsp;            .selectable(</b>
+<b class="nc">&nbsp;                selected = parent.selected,</b>
+<b class="nc">&nbsp;                role = Role.RadioButton,</b>
+<b class="nc">&nbsp;                onClick = onSelect,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            .padding(horizontal = RowHorizontalPadding, vertical = RowVerticalPadding),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        SurferCategoryBubble(</b>
+<b class="nc">&nbsp;            icon = visual.icon,</b>
+<b class="nc">&nbsp;            tint = visual.tint,</b>
+<b class="nc">&nbsp;            size = ParentBubbleSize,</b>
+<b class="nc">&nbsp;            modifier = Modifier.padding(end = BubbleSpacing),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = parent.name,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.titleSmall,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                maxLines = 1,</b>
+<b class="nc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            if (group.childCount &gt; 0) {</b>
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = pluralStringResource(</b>
+<b class="nc">&nbsp;                        Res.plurals.category_picker_subcategories,</b>
+<b class="nc">&nbsp;                        group.childCount,</b>
+<b class="nc">&nbsp;                        group.childCount,</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        SelectionRadio(selected = parent.selected)</b>
+<b class="nc">&nbsp;        if (group.childCount &gt; 0) {</b>
+<b class="nc">&nbsp;            val rotation by animateFloatAsState(</b>
+<b class="nc">&nbsp;                targetValue = if (group.expanded) ChevronExpandedDegrees else 0f,</b>
+<b class="nc">&nbsp;                animationSpec = tween(ChevronRotationMillis),</b>
+<b class="nc">&nbsp;                label = &quot;chevron&quot;,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            IconButton(onClick = onToggleExpand) {</b>
+<b class="nc">&nbsp;                Icon(</b>
+<b class="nc">&nbsp;                    imageVector = SurferIcons.DropDown,</b>
+<b class="nc">&nbsp;                    contentDescription = stringResource(</b>
+<b class="nc">&nbsp;                        if (group.expanded) {</b>
+<b class="nc">&nbsp;                            Res.string.category_picker_hide_children</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            Res.string.category_picker_show_children</b>
+&nbsp;                        },
+&nbsp;                    ),
+<b class="nc">&nbsp;                    tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                    modifier = Modifier.rotate(rotation),</b>
+&nbsp;                )
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * The rows as arcs. Colour comes from the stored hue through the one resolver every category bubble
-&nbsp; * goes through, so a category keeps the same colour here, in the spend rows, and on the screens
-&nbsp; * that own it.
-&nbsp; *
-&nbsp; * The uncategorized bucket has no stored appearance, so — exactly as the spend rows do — its tint is
-&nbsp; * hashed from the fixed [DONUT_UNCATEGORIZED_ID] rather than from the label beside it: the label is
-&nbsp; * translated, and a wedge that changed colour with the app language would read as another category.
-&nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;private fun List&lt;CategorySpendUi&gt;.toDonutSegments(): List&lt;SurferDonutSegment&gt; {</b>
-<b class="fc">&nbsp;    val fallbackName = stringResource(Res.string.dashboard_spent_by_category_uncategorized)</b>
-<b class="fc">&nbsp;    return map { row -&gt;</b>
-<b class="fc">&nbsp;        val id = row.categoryId ?: DONUT_UNCATEGORIZED_ID</b>
-<b class="fc">&nbsp;        SurferDonutSegment(</b>
-<b class="fc">&nbsp;            label = row.name ?: fallbackName,</b>
-<b class="fc">&nbsp;            percent = row.share,</b>
-<b class="fc">&nbsp;            color = SurferCategoryPalette.tintForHue(row.hue ?: DONUT_NO_STORED_HUE)</b>
-<b class="fc">&nbsp;                ?: SurferCategoryPalette.tintFor(id),</b>
-<b class="fc">&nbsp;        )</b>
-<b class="fc">&nbsp;    }</b>
-&nbsp;}
+&nbsp;private fun ChildRow(
+&nbsp;    child: CategoryPickerItem,
+&nbsp;    isLast: Boolean,
+&nbsp;    onSelect: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val visual = SurferCategoryPalette.visualFor(</b>
+<b class="nc">&nbsp;        id = child.id.value,</b>
+<b class="nc">&nbsp;        iconKey = child.iconKey,</b>
+<b class="nc">&nbsp;        hue = child.hue,</b>
+<b class="nc">&nbsp;        systemKind = child.systemKind,</b>
+&nbsp;    )
+<b class="nc">&nbsp;    val connector = AppTheme.materialColors.outlineVariant</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .background(selectionBackground(child.selected))</b>
+<b class="nc">&nbsp;            .selectable(</b>
+<b class="nc">&nbsp;                selected = child.selected,</b>
+<b class="nc">&nbsp;                role = Role.RadioButton,</b>
+<b class="nc">&nbsp;                onClick = onSelect,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            .drawBehind {</b>
+<b class="nc">&nbsp;                val stroke = ConnectorStroke.toPx()</b>
+<b class="nc">&nbsp;                val x = ConnectorX.toPx()</b>
+<b class="nc">&nbsp;                val midY = size.height / 2f</b>
+&nbsp;                // The last child ends the run, so its vertical rule stops at the elbow instead
+&nbsp;                // of carrying on into empty space.
+<b class="nc">&nbsp;                drawLine(</b>
+<b class="nc">&nbsp;                    color = connector,</b>
+<b class="nc">&nbsp;                    start = Offset(x, 0f),</b>
+<b class="nc">&nbsp;                    end = Offset(x, if (isLast) midY else size.height),</b>
+<b class="nc">&nbsp;                    strokeWidth = stroke,</b>
+&nbsp;                )
+<b class="nc">&nbsp;                drawLine(</b>
+<b class="nc">&nbsp;                    color = connector,</b>
+<b class="nc">&nbsp;                    start = Offset(x, midY),</b>
+<b class="nc">&nbsp;                    end = Offset(x + ConnectorArm.toPx(), midY),</b>
+<b class="nc">&nbsp;                    strokeWidth = stroke,</b>
+&nbsp;                )
+&nbsp;            }
+<b class="nc">&nbsp;            .padding(</b>
+<b class="nc">&nbsp;                start = ChildContentStart,</b>
+<b class="nc">&nbsp;                end = RowHorizontalPadding,</b>
+<b class="nc">&nbsp;                top = RowVerticalPadding,</b>
+<b class="nc">&nbsp;                bottom = RowVerticalPadding,</b>
+&nbsp;            ),
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        SurferCategoryBubble(</b>
+<b class="nc">&nbsp;            icon = visual.icon,</b>
+<b class="nc">&nbsp;            tint = visual.tint,</b>
+<b class="nc">&nbsp;            size = ChildBubbleSize,</b>
+<b class="nc">&nbsp;            modifier = Modifier.padding(end = BubbleSpacing),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = child.name,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodyLarge,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;            maxLines = 1,</b>
+<b class="nc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
+<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        SelectionRadio(selected = child.selected)</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/** Tint seed for the uncategorized bucket, which has no category id to be hashed from. */
-&nbsp;private const val DONUT_UNCATEGORIZED_ID = &quot;uncategorized&quot;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SelectionRadio(selected: Boolean) {</b>
+<b class="nc">&nbsp;    val primary = AppTheme.materialColors.primary</b>
+<b class="nc">&nbsp;    val outline = AppTheme.materialColors.outline</b>
+<b class="nc">&nbsp;    Box(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .size(RadioSize)</b>
+<b class="nc">&nbsp;            .clip(CircleShape)</b>
+<b class="nc">&nbsp;            .background(if (selected) primary else Color.Transparent)</b>
+<b class="nc">&nbsp;            .drawBehind {</b>
+<b class="nc">&nbsp;                if (selected) return@drawBehind</b>
+<b class="nc">&nbsp;                val stroke = RadioStroke.toPx()</b>
+<b class="nc">&nbsp;                drawCircle(</b>
+<b class="nc">&nbsp;                    color = outline,</b>
+<b class="nc">&nbsp;                    radius = (size.minDimension - stroke) / 2f,</b>
+<b class="nc">&nbsp;                    style = Stroke(width = stroke),</b>
+&nbsp;                )
+&nbsp;            },
+<b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (selected) {</b>
+<b class="nc">&nbsp;            Icon(</b>
+<b class="nc">&nbsp;                imageVector = SurferIcons.Check,</b>
+<b class="nc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;                tint = AppTheme.materialColors.onPrimary,</b>
+<b class="nc">&nbsp;                modifier = Modifier.size(RadioCheckSize),</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * The &quot;never stored&quot; hue sentinel — `SurferCategoryPalette.tintForHue` reads anything off the
-&nbsp; * colour wheel as absent and falls back to hashing the id.
-&nbsp; */
-&nbsp;private const val DONUT_NO_STORED_HUE = -1
+&nbsp;@Composable
+&nbsp;private fun NewCategoryRow(
+&nbsp;    onClick: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val outline = AppTheme.materialColors.outline</b>
+<b class="nc">&nbsp;    val shape = RoundedCornerShape(CardRadius)</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(top = CardSpacing)</b>
+<b class="nc">&nbsp;            .clip(shape)</b>
+<b class="nc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="nc">&nbsp;            .surferDashedBorder(color = outline, shape = shape)</b>
+<b class="nc">&nbsp;            .padding(horizontal = RowHorizontalPadding, vertical = RowVerticalPadding),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Icon(</b>
+<b class="nc">&nbsp;            imageVector = SurferIcons.Add,</b>
+<b class="nc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;            tint = AppTheme.materialColors.primary,</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .padding(end = BubbleSpacing)</b>
+<b class="nc">&nbsp;                .size(ParentBubbleSize / 2),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = stringResource(Res.string.category_picker_new_category),</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.labelLarge,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.primary,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun selectionBackground(selected: Boolean): Color =
+<b class="nc">&nbsp;    if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent</b>
 </code>
 </pre>
 </div>
@@ -200,7 +558,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

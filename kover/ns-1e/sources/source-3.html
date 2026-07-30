@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardLayoutItem</title>
+  <title>MoneySurfer Coverage Report > DebugDataPrefillerImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.debug</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardLayoutItem (com.georgeci.moneysurfer.domain.dashboard)</h1>
+<h1>Coverage Summary for Class: DebugDataPrefillerImpl (com.georgeci.moneysurfer.domain.debug)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,24 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardLayoutItem</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
+  <td class="name">DebugDataPrefillerImpl</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -77,14 +57,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    87.5%
   </span>
   <span class="absValue">
-    (20/20)
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.3%
+  </span>
+  <span class="absValue">
+    (26/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.4%
+  </span>
+  <span class="absValue">
+    (528/531)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">DebugDataPrefillerImpl$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">DebugDataPrefillerImpl$prefill$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">DebugDataPrefillerImpl$pushIfSignedIn$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.3%
+  </span>
+  <span class="absValue">
+    (26/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.4%
+  </span>
+  <span class="absValue">
+    (528/531)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,18 +134,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.debug
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.CurrencyDefaults
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * One row of the dashboard layout: which widget, whether the user kept it, and how it is styled.
-&nbsp; * A disabled item is retained rather than removed so the widget keeps its position (and its card
-&nbsp; * style) if the user switches it back on.
+&nbsp; * Reads the pinned workspace, plans a batch against it and writes it. See [DebugDataPrefiller] for
+&nbsp; * what this is for and why the ordinary repositories are the write path.
 &nbsp; */
-&nbsp;data class DashboardLayoutItem(
-<b class="fc">&nbsp;    val type: DashboardWidgetType,</b>
-<b class="fc">&nbsp;    val enabled: Boolean = true,</b>
-<b class="fc">&nbsp;    val cardStyle: DashboardCardStyle = DashboardCardStyle.EXPANDED,</b>
-&nbsp;)
+<b class="fc">&nbsp;@Single(binds = [DebugDataPrefiller::class])</b>
+&nbsp;internal class DebugDataPrefillerImpl(
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;    private val workspaceRepository: WorkspaceRepository,</b>
+<b class="fc">&nbsp;    private val writer: DemoDataWriter,</b>
+<b class="fc">&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,</b>
+<b class="fc">&nbsp;    private val syncCoordinator: SyncCoordinator,</b>
+&nbsp;) : DebugDataPrefiller {
+&nbsp;
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+<b class="fc">&nbsp;    override suspend fun prefill(): Either&lt;DebugPrefillError, DebugPrefillReport&gt; = either {</b>
+<b class="fc">&nbsp;        val workspaceId = session.currentWorkspaceId.first()</b>
+<b class="fc">&nbsp;            ?: raise(DebugPrefillError.NoWorkspace)</b>
+<b class="fc">&nbsp;        val now = getCurrentTime()</b>
+<b class="fc">&nbsp;        log.i { &quot;[start] wid=${workspaceId.value}&quot; }</b>
+&nbsp;
+<b class="fc">&nbsp;        val report = Either</b>
+<b class="fc">&nbsp;            .catch {</b>
+&nbsp;                // A workspace with no base currency is not a state the app produces; falling back
+&nbsp;                // to the locale&#39;s keeps the run going rather than refusing over a cosmetic field.
+<b class="pc">&nbsp;                val currency = workspaceRepository.getById(workspaceId)?.baseCurrency</b>
+<b class="nc">&nbsp;                    ?: CurrencyDefaults.systemDefault()</b>
+<b class="fc">&nbsp;                val start = writer.snapshot(workspaceId, currency, now)</b>
+<b class="fc">&nbsp;                writer.write(buildDemoDataPlan(start.snapshot, now), start.categoriesSeeded)</b>
+&nbsp;            }
+<b class="fc">&nbsp;            .onLeft { log.e(it) { &quot;[abort] write failed wid=${workspaceId.value}&quot; } }</b>
+<b class="fc">&nbsp;            .mapLeft { DebugPrefillError.WriteFailed(it) }</b>
+<b class="fc">&nbsp;            .bind()</b>
+&nbsp;
+<b class="fc">&nbsp;        log.i { &quot;[done] $report&quot; }</b>
+<b class="fc">&nbsp;        pushIfSignedIn()</b>
+<b class="fc">&nbsp;        report</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The rows are already on the outbox; this only saves the tester waiting for the next tick.
+&nbsp;     * Skipped for a guest session, which has no Firebase uid and therefore nowhere to drain to —
+&nbsp;     * demo data must never reach Firestore (`docs/architecture/sync.md` §2.11).
+&nbsp;     */
+&nbsp;    private suspend fun pushIfSignedIn() {
+<b class="fc">&nbsp;        if (session.currentFirebaseUid.first() == null) {</b>
+<b class="fc">&nbsp;            log.i { &quot;[sync] skipped — local/demo session, rows stay on the device&quot; }</b>
+&nbsp;            return
+&nbsp;        }
+<b class="fc">&nbsp;        syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;DebugPrefill&quot;
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -127,7 +227,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

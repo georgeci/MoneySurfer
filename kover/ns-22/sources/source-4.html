@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountBalanceSeriesKt</title>
+  <title>MoneySurfer Coverage Report > PiiRedactionKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.logging</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountBalanceSeriesKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: PiiRedactionKt (com.georgeci.moneysurfer.domain.logging)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AccountBalanceSeriesKt</td>
+  <td class="name">PiiRedactionKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,23 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (16/16)
+    (20/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.7%
+    100%
   </span>
   <span class="absValue">
-    (18/19)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.7%
+    100%
   </span>
   <span class="absValue">
-    (151/153)
+    (106/106)
   </span>
 </td>
 </tr>
@@ -99,84 +99,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import kotlinx.datetime.DateTimeUnit
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.minus
-&nbsp;
-&nbsp;/** Closing balance of one account at the end of [date]. */
-&nbsp;data class AccountBalancePoint(
-&nbsp;    val date: LocalDate,
-&nbsp;    val balance: Money,
-&nbsp;)
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.logging
 &nbsp;
 &nbsp;/**
-&nbsp; * The balance curve one account drew over a window, oldest point first, plus the net change
-&nbsp; * across that window.
+&nbsp; * PII redaction helpers for log messages. Emails and user identifiers (Firebase
+&nbsp; * UIDs / `UserId` values) are personal data and must never reach logcat or the
+&nbsp; * iOS unified log in cleartext — not even in release, where anyone with brief
+&nbsp; * physical access (`adb logcat`, Xcode Console) or a log / bug-report collector
+&nbsp; * could harvest the user&#39;s and their invitees&#39; identities (issue #154).
 &nbsp; *
-&nbsp; * [delta] is not `last - first`: the first point already includes its own day&#39;s transactions,
-&nbsp; * so the difference between the ends would silently drop day one. It is the balance at the end
-&nbsp; * of the window minus the balance the account closed the day *before* it opened.
+&nbsp; * The masks keep just enough for a developer to correlate log lines without
+&nbsp; * exposing the underlying identity, and are applied at the call sites regardless
+&nbsp; * of build type — so a stray [co.touchlab.kermit.LogWriter] or a mistakenly
+&nbsp; * lowered min-severity can never leak the raw value. Release muting
+&nbsp; * ([configureLogging]) is the second layer.
 &nbsp; */
-&nbsp;data class AccountBalanceSeries(
-&nbsp;    val points: List&lt;AccountBalancePoint&gt;,
-&nbsp;    val delta: Money,
-&nbsp;) {
-&nbsp;    companion object {
-&nbsp;        /** Window the account details chart draws, matching its &quot;Balance · 30 days&quot; label. */
-&nbsp;        const val DEFAULT_DAYS: Int = 30
-&nbsp;    }
+&nbsp;
+&nbsp;/** `john.doe@example.com` -&gt; `j***@***.com`; blank / malformed -&gt; a fixed marker. */
+&nbsp;fun String?.redactEmail(): String {
+<b class="fc">&nbsp;    val email = this?.trim().orEmpty()</b>
+<b class="fc">&nbsp;    if (email.isEmpty()) return BLANK_EMAIL</b>
+<b class="fc">&nbsp;    val at = email.indexOf(&#39;@&#39;)</b>
+<b class="fc">&nbsp;    if (at &lt;= 0 || at == email.length - 1) return REDACTED_EMAIL</b>
+<b class="fc">&nbsp;    val maskedLocal = &quot;${email.first()}$MASK&quot;</b>
+<b class="fc">&nbsp;    val domain = email.substring(at + 1)</b>
+<b class="fc">&nbsp;    val lastDot = domain.lastIndexOf(&#39;.&#39;)</b>
+<b class="fc">&nbsp;    val maskedDomain = if (lastDot &gt; 0) &quot;$MASK${domain.substring(lastDot)}&quot; else MASK</b>
+<b class="fc">&nbsp;    return &quot;$maskedLocal@$maskedDomain&quot;</b>
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Rebuilds the daily balance curve by walking [transactions] backwards from [currentBalance].
-&nbsp; *
-&nbsp; * Anchored on the cached balance rather than summed from zero: the account&#39;s balance is the
-&nbsp; * authoritative figure the rest of the app shows, and a series summed independently would be
-&nbsp; * free to disagree with the number printed right above the chart. Working backwards makes the
-&nbsp; * last point equal that balance by construction.
-&nbsp; *
-&nbsp; * Pure. [transactions] may span any range and may contain rows for other accounts or non-ACTUAL
-&nbsp; * rows — [balanceImpact] filters those out. Rows dated after [today] are backed out of the
-&nbsp; * anchor, since the cached balance counts them but the curve must not.
+&nbsp; * Firebase UID / `UserId` mask: keeps a short prefix for cross-line correlation
+&nbsp; * and drops the rest. `abcd1234efgh` -&gt; `abcd***`; blank or too-short values are
+&nbsp; * fully masked so nothing identifying survives.
 &nbsp; */
-&nbsp;fun buildAccountBalanceSeries(
-&nbsp;    accountId: AccountId,
-&nbsp;    currentBalance: Money,
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    today: LocalDate,
-<b class="nc">&nbsp;    days: Int = AccountBalanceSeries.DEFAULT_DAYS,</b>
-&nbsp;): AccountBalanceSeries {
-<b class="fc">&nbsp;    require(days &gt; 0) { &quot;days must be positive, was $days&quot; }</b>
-&nbsp;
-<b class="fc">&nbsp;    val byDate = mutableMapOf&lt;LocalDate, Money&gt;()</b>
-<b class="fc">&nbsp;    var future = Money.zero()</b>
-<b class="fc">&nbsp;    for (transaction in transactions) {</b>
-<b class="fc">&nbsp;        val impact = transaction.balanceImpact()[accountId] ?: continue</b>
-<b class="fc">&nbsp;        val date = transaction.operationDate</b>
-<b class="fc">&nbsp;        if (date &gt; today) {</b>
-<b class="fc">&nbsp;            future += impact</b>
-&nbsp;        } else {
-<b class="fc">&nbsp;            byDate[date] = (byDate[date] ?: Money.zero()) + impact</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-<b class="fc">&nbsp;    var running = currentBalance - future</b>
-<b class="fc">&nbsp;    val points = ArrayList&lt;AccountBalancePoint&gt;(days)</b>
-<b class="fc">&nbsp;    repeat(days) { index -&gt;</b>
-<b class="fc">&nbsp;        val date = today.minus(index, DateTimeUnit.DAY)</b>
-<b class="fc">&nbsp;        points += AccountBalancePoint(date = date, balance = running)</b>
-<b class="fc">&nbsp;        running -= byDate[date] ?: Money.zero()</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;    points.reverse()</b>
-&nbsp;
-&nbsp;    // `running` has now walked past the oldest point, so it holds the closing balance of the
-&nbsp;    // day before the window — the baseline the period delta is measured against.
-<b class="fc">&nbsp;    return AccountBalanceSeries(points = points, delta = points.last().balance - running)</b>
+&nbsp;fun String?.redactUid(): String {
+<b class="fc">&nbsp;    val uid = this?.trim().orEmpty()</b>
+<b class="fc">&nbsp;    if (uid.isEmpty()) return BLANK_UID</b>
+<b class="fc">&nbsp;    return if (uid.length &lt;= PREFIX_LEN) MASK else &quot;${uid.take(PREFIX_LEN)}$MASK&quot;</b>
 &nbsp;}
+&nbsp;
+&nbsp;private const val MASK = &quot;***&quot;
+&nbsp;private const val BLANK_EMAIL = &quot;&lt;blank-email&gt;&quot;
+&nbsp;private const val REDACTED_EMAIL = &quot;&lt;redacted-email&gt;&quot;
+&nbsp;private const val BLANK_UID = &quot;&lt;blank-uid&gt;&quot;
+&nbsp;private const val PREFIX_LEN = 4
 </code>
 </pre>
 </div>
@@ -200,7 +167,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

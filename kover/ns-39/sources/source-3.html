@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/18)
+    (0/9)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/93)
+    (0/89)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/145)
+    (0/77)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.2%
+    0.3%
   </span>
   <span class="absValue">
-    (4/1785)
+    (4/1268)
   </span>
 </td>
 </tr>
@@ -366,7 +366,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/33)
+    (0/24)
   </span>
 </td>
 <td class="coverageStat">
@@ -374,7 +374,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/95)
+    (0/91)
   </span>
 </td>
 <td class="coverageStat">
@@ -382,15 +382,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/162)
+    (0/94)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.2%
+    0.3%
   </span>
   <span class="absValue">
-    (4/1946)
+    (4/1429)
   </span>
 </td>
 </tr>
@@ -565,12 +565,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        title = stringResource(Res.string.category_details_title),</b>
 <b class="nc">&nbsp;        onBack = { onEvent(CategoryDetailsEvent.OnBackClick) },</b>
 <b class="nc">&nbsp;        actions = {</b>
-<b class="nc">&nbsp;            SurferToolbarAction(</b>
-<b class="nc">&nbsp;                icon = SurferIcons.Edit,</b>
-<b class="nc">&nbsp;                contentDescription = stringResource(</b>
-<b class="nc">&nbsp;                    Res.string.category_details_edit_content_description,</b>
+&nbsp;            SurferToolbarAction(
+&nbsp;                icon = SurferIcons.Edit,
+&nbsp;                contentDescription = stringResource(
+&nbsp;                    Res.string.category_details_edit_content_description,
 &nbsp;                ),
-<b class="nc">&nbsp;                onClick = { onEvent(CategoryDetailsEvent.OnEditClick) },</b>
+&nbsp;                onClick = { onEvent(CategoryDetailsEvent.OnEditClick) },
 &nbsp;            )
 &nbsp;        },
 <b class="nc">&nbsp;        primaryAction = SurferPaneAction(</b>
@@ -584,73 +584,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            onClick = { onEvent(CategoryDetailsEvent.OnAddTransactionClick) },</b>
 &nbsp;        ),
 <b class="nc">&nbsp;    ) { padding -&gt;</b>
-<b class="nc">&nbsp;        LazyColumn(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxSize()</b>
-<b class="nc">&nbsp;                .surferContentContainer()</b>
-<b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding()),</b>
-<b class="nc">&nbsp;            contentPadding = PaddingValues(</b>
-<b class="nc">&nbsp;                start = AppTheme.spacing.default,</b>
-<b class="nc">&nbsp;                end = AppTheme.spacing.default,</b>
-<b class="nc">&nbsp;                top = AppTheme.spacing.small,</b>
-<b class="nc">&nbsp;                bottom = padding.calculateBottomPadding() +</b>
-<b class="nc">&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,</b>
+&nbsp;        LazyColumn(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding()),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                start = AppTheme.spacing.default,
+&nbsp;                end = AppTheme.spacing.default,
+&nbsp;                top = AppTheme.spacing.small,
+&nbsp;                bottom = padding.calculateBottomPadding() +
+&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
 &nbsp;            ),
-<b class="nc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
-<b class="nc">&nbsp;        ) {</b>
-<b class="nc">&nbsp;            item(key = &quot;hero&quot;) {</b>
-<b class="nc">&nbsp;                SurferCategoryHeroCard(</b>
-<b class="nc">&nbsp;                    icon = visual.icon,</b>
-<b class="nc">&nbsp;                    tint = visual.tint,</b>
-<b class="nc">&nbsp;                    name = state.name,</b>
-<b class="nc">&nbsp;                    label = stringResource(heroLabelFor(state.type), currentMonthLabel),</b>
-<b class="nc">&nbsp;                    formattedAmount = state.formattedTotal,</b>
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;        ) {
+&nbsp;            item(key = &quot;hero&quot;) {
+&nbsp;                SurferCategoryHeroCard(
+&nbsp;                    icon = visual.icon,
+&nbsp;                    tint = visual.tint,
+&nbsp;                    name = state.name,
+&nbsp;                    label = stringResource(heroLabelFor(state.type), currentMonthLabel),
+&nbsp;                    formattedAmount = state.formattedTotal,
 &nbsp;                )
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            item(key = &quot;stats&quot;) {</b>
-<b class="nc">&nbsp;                Row(horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small)) {</b>
-<b class="nc">&nbsp;                    SurferAccountStatCard(</b>
-<b class="nc">&nbsp;                        label = stringResource(Res.string.category_details_stat_average),</b>
-<b class="nc">&nbsp;                        value = state.formattedAverage,</b>
-<b class="nc">&nbsp;                        icon = SurferIcons.Calendar,</b>
-<b class="nc">&nbsp;                        iconTint = visual.tint,</b>
-<b class="nc">&nbsp;                        modifier = Modifier.weight(1f),</b>
+&nbsp;            item(key = &quot;stats&quot;) {
+&nbsp;                Row(horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small)) {
+&nbsp;                    SurferAccountStatCard(
+&nbsp;                        label = stringResource(Res.string.category_details_stat_average),
+&nbsp;                        value = state.formattedAverage,
+&nbsp;                        icon = SurferIcons.Calendar,
+&nbsp;                        iconTint = visual.tint,
+&nbsp;                        modifier = Modifier.weight(1f),
 &nbsp;                    )
-<b class="nc">&nbsp;                    SurferAccountStatCard(</b>
-<b class="nc">&nbsp;                        label = stringResource(Res.string.category_details_stat_transactions),</b>
-<b class="nc">&nbsp;                        value = state.transactionCount.toString(),</b>
-<b class="nc">&nbsp;                        icon = SurferIcons.Receipt,</b>
-<b class="nc">&nbsp;                        iconTint = visual.tint,</b>
-<b class="nc">&nbsp;                        modifier = Modifier.weight(1f),</b>
+&nbsp;                    SurferAccountStatCard(
+&nbsp;                        label = stringResource(Res.string.category_details_stat_transactions),
+&nbsp;                        value = state.transactionCount.toString(),
+&nbsp;                        icon = SurferIcons.Receipt,
+&nbsp;                        iconTint = visual.tint,
+&nbsp;                        modifier = Modifier.weight(1f),
 &nbsp;                    )
-<b class="nc">&nbsp;                    SurferAccountStatCard(</b>
-<b class="nc">&nbsp;                        label = stringResource(Res.string.category_details_stat_per_transaction),</b>
-<b class="nc">&nbsp;                        value = state.formattedPerTransaction,</b>
-<b class="nc">&nbsp;                        icon = SurferIcons.Tag,</b>
-<b class="nc">&nbsp;                        iconTint = visual.tint,</b>
-<b class="nc">&nbsp;                        modifier = Modifier.weight(1f),</b>
+&nbsp;                    SurferAccountStatCard(
+&nbsp;                        label = stringResource(Res.string.category_details_stat_per_transaction),
+&nbsp;                        value = state.formattedPerTransaction,
+&nbsp;                        icon = SurferIcons.Tag,
+&nbsp;                        iconTint = visual.tint,
+&nbsp;                        modifier = Modifier.weight(1f),
 &nbsp;                    )
-<b class="nc">&nbsp;                }</b>
+&nbsp;                }
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            item(key = &quot;trend&quot;) {</b>
+&nbsp;            item(key = &quot;trend&quot;) {
 &nbsp;                // No trailing label — the stat tile directly above already carries the average,
 &nbsp;                // and the mockup&#39;s &quot;Cap …&quot; slot went away with caps moving to Budgets.
-<b class="nc">&nbsp;                SurferCategoryTrendCard(</b>
-<b class="nc">&nbsp;                    title = stringResource(Res.string.category_details_trend_title),</b>
-<b class="nc">&nbsp;                    tint = visual.tint,</b>
-<b class="nc">&nbsp;                    bars = state.months.map { month -&gt;</b>
-<b class="nc">&nbsp;                        SurferCategoryTrendBar(</b>
-<b class="nc">&nbsp;                            label = monthShortLabel(month.monthOfYear),</b>
-<b class="nc">&nbsp;                            value = month.minorValue,</b>
-<b class="nc">&nbsp;                            formattedValue = month.formattedValue,</b>
-<b class="nc">&nbsp;                        )</b>
-<b class="nc">&nbsp;                    },</b>
+&nbsp;                SurferCategoryTrendCard(
+&nbsp;                    title = stringResource(Res.string.category_details_trend_title),
+&nbsp;                    tint = visual.tint,
+&nbsp;                    bars = state.months.map { month -&gt;
+&nbsp;                        SurferCategoryTrendBar(
+&nbsp;                            label = monthShortLabel(month.monthOfYear),
+&nbsp;                            value = month.minorValue,
+&nbsp;                            formattedValue = month.formattedValue,
+&nbsp;                        )
+&nbsp;                    },
 &nbsp;                )
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            item(key = &quot;subcategories-header&quot;) {</b>
+&nbsp;            item(key = &quot;subcategories-header&quot;) {
 &nbsp;                SurferSectionHeader(
 &nbsp;                    title = stringResource(Res.string.category_details_subcategories),
 &nbsp;                    modifier = Modifier.padding(
@@ -660,8 +660,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                )
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            if (state.isLeaf) {</b>
-<b class="nc">&nbsp;                item(key = &quot;subcategories-empty&quot;) {</b>
+&nbsp;            if (state.isLeaf) {
+&nbsp;                item(key = &quot;subcategories-empty&quot;) {
 &nbsp;                    Text(
 &nbsp;                        text = stringResource(Res.string.category_details_subcategories_empty),
 &nbsp;                        style = AppTheme.typography.bodyMedium,
@@ -673,7 +673,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    )
 &nbsp;                }
 &nbsp;            } else {
-<b class="nc">&nbsp;                items(state.subcategories, key = { &quot;sub-${it.id.value}&quot; }) { child -&gt;</b>
+&nbsp;                items(state.subcategories, key = { &quot;sub-${it.id.value}&quot; }) { child -&gt;
 &nbsp;                    val childVisual = SurferCategoryPalette.visualFor(
 &nbsp;                        id = child.id.value,
 &nbsp;                        iconKey = child.iconKey,
@@ -693,7 +693,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                }
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            item(key = &quot;recent-header&quot;) {</b>
+&nbsp;            item(key = &quot;recent-header&quot;) {
 &nbsp;                SurferSectionHeader(
 &nbsp;                    title = stringResource(Res.string.category_details_recent),
 &nbsp;                    modifier = Modifier.padding(
@@ -703,8 +703,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                )
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            if (state.transactions.isEmpty()) {</b>
-<b class="nc">&nbsp;                item(key = &quot;recent-empty&quot;) {</b>
+&nbsp;            if (state.transactions.isEmpty()) {
+&nbsp;                item(key = &quot;recent-empty&quot;) {
 &nbsp;                    Text(
 &nbsp;                        text = stringResource(Res.string.category_details_recent_empty),
 &nbsp;                        style = AppTheme.typography.bodyMedium,
@@ -716,7 +716,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    )
 &nbsp;                }
 &nbsp;            } else {
-<b class="nc">&nbsp;                items(state.transactions, key = { it.id.value }) { txn -&gt;</b>
+&nbsp;                items(state.transactions, key = { it.id.value }) { txn -&gt;
 &nbsp;                    val untitled = stringResource(Res.string.category_details_transaction_untitled)
 &nbsp;                    val title = txn.title.ifBlank { untitled }
 &nbsp;                    SurferSwipeToDeleteTransaction(
@@ -766,8 +766,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun CategoryDetailsContentPreview() {</b>
-<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;private fun CategoryDetailsContentPreview() {
+&nbsp;    AppTheme {
 &nbsp;        CategoryDetailsContent(
 &nbsp;            state = CategoryDetailsState.Content(
 &nbsp;                categoryId = CategoryId(&quot;dining&quot;),
@@ -820,7 +820,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -844,7 +844,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

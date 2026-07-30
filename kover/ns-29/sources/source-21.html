@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > EditCategoryUseCase</title>
+  <title>MoneySurfer Coverage Report > EditBudgetUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: EditCategoryUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: EditBudgetUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">EditCategoryUseCase</td>
+  <td class="name">EditBudgetUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -94,17 +94,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class EditCategoryUseCase(
-<b class="fc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
+&nbsp;class EditBudgetUseCase(
+<b class="fc">&nbsp;    private val budgetRepository: BudgetRepository,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    suspend operator fun invoke(category: Category) {
-<b class="fc">&nbsp;        categoryRepository.update(category)</b>
+&nbsp;    suspend operator fun invoke(budget: Budget) {
+<b class="fc">&nbsp;        budgetRepository.update(budget)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -130,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

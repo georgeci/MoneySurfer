@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Koin_hints_com_georgeci_moneysurfer_navigation_di_NavigationModuleKt</title>
+  <title>MoneySurfer Coverage Report > UserRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: Koin_hints_com_georgeci_moneysurfer_navigation_di_NavigationModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: UserRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Koin_hints_com_georgeci_moneysurfer_navigation_di_NavigationModuleKt</td>
+  <td class="name">UserRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.User
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;interface UserRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;User&gt;&gt;
+&nbsp;    suspend fun getById(id: UserId): User?
+&nbsp;    suspend fun insert(user: User)
+&nbsp;    suspend fun update(user: User)
+&nbsp;    suspend fun upsert(user: User)
+&nbsp;    suspend fun delete(id: UserId)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +81,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

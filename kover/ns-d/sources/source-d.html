@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserDao</title>
+  <title>MoneySurfer Coverage Report > WorkspaceDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: UserDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: WorkspaceDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserDao</td>
+  <td class="name">WorkspaceDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,46 +48,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.Dao
 &nbsp;import androidx.room.Insert
-&nbsp;import androidx.room.OnConflictStrategy
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface UserDao {
+&nbsp;interface WorkspaceDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM users&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;UserEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspaces&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM users WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): UserEntity?
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        SELECT w.*
+&nbsp;        FROM workspaces w
+&nbsp;        INNER JOIN workspace_members wm ON wm.workspaceId = w.id
+&nbsp;        WHERE wm.userId = :userId
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    fun getByUserId(userId: String): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspaces WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): WorkspaceEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: UserEntity)
+&nbsp;    suspend fun insert(entity: WorkspaceEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;UserEntity&gt;)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Stub-insert for foreign user ids that show up via workspace members during a
-&nbsp;     * pull. Skips the row if the id is already present so the local user&#39;s
-&nbsp;     * `displayName` / `isAnon` fields are not overwritten with peer placeholders.
-&nbsp;     */
-&nbsp;    @Insert(onConflict = OnConflictStrategy.IGNORE)
-&nbsp;    suspend fun insertIgnore(entity: UserEntity)
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: UserEntity)
+&nbsp;    suspend fun update(entity: WorkspaceEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: UserEntity)
+&nbsp;    suspend fun upsertAll(entities: List&lt;WorkspaceEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM users WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspaces WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM users&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspaces&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -113,7 +114,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

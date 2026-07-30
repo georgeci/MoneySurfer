@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferAccountItem</title>
+  <title>MoneySurfer Coverage Report > AppSpacing</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.tokens</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferAccountItem (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: AppSpacing (com.georgeci.moneysurfer.uikit.tokens)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferAccountItem</td>
+  <td class="name">AppSpacing</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,10 +60,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    90.9%
   </span>
   <span class="absValue">
-    (1/1)
+    (10/11)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (28/28)
+    (60/60)
   </span>
 </td>
 </tr>
@@ -92,174 +92,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.tokens
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;data class SurferAccountItem(
-<b class="fc">&nbsp;    val id: String,</b>
-<b class="fc">&nbsp;    val name: String,</b>
-<b class="fc">&nbsp;    val subtitle: String,</b>
-<b class="fc">&nbsp;    val balance: String,</b>
-<b class="fc">&nbsp;    val icon: ImageVector = SurferIcons.Wallet,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * The empty-state &quot;add your first account&quot; affordance: its copy, its click, and the selector a
-&nbsp; * UI test taps it by. Four arguments describing one control, so they travel as one — the host
-&nbsp; * screen still owns [testTag], because the CTA is a step in its flow rather than the widget&#39;s.
-&nbsp; */
-&nbsp;data class SurferAddAccountCta(
-&nbsp;    val label: String,
-&nbsp;    val onClick: () -&gt; Unit,
-&nbsp;    val trailingLabel: String? = null,
-&nbsp;    val testTag: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/** Accounts widget for the dashboard column. */
-&nbsp;@Composable
-&nbsp;fun SurferAccountsWidget(
-&nbsp;    items: List&lt;SurferAccountItem&gt;,
-&nbsp;    addCta: SurferAddAccountCta,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,
-&nbsp;    onItemClick: ((SurferAccountItem) -&gt; Unit)? = null,
-&nbsp;) {
-&nbsp;    val hero = size == SurferWidgetSize.Expanded
-&nbsp;    val visibleItems = if (hero) items else items.take(2)
-&nbsp;
-&nbsp;    Column(
-&nbsp;        modifier = modifier,
-&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;    ) {
-&nbsp;        visibleItems.forEach { item -&gt;
-&nbsp;            SurferAccountManageCard(
-&nbsp;                name = item.name,
-&nbsp;                subtitle = item.subtitle,
-&nbsp;                icon = item.icon,
-&nbsp;                formattedBalance = item.balance,
-&nbsp;                onClick = onItemClick?.let { handler -&gt; { handler(item) } },
-&nbsp;            )
-&nbsp;        }
-&nbsp;        // The add-account CTA is the empty-state affordance only; once accounts exist,
-&nbsp;        // new ones are created from the &quot;Manage&quot; flow.
-&nbsp;        if (items.isEmpty()) {
-&nbsp;            AddAccountRow(
-&nbsp;                label = addCta.label,
-&nbsp;                trailingLabel = addCta.trailingLabel,
-&nbsp;                onClick = addCta.onClick,
-&nbsp;                modifier = addCta.testTag?.let { Modifier.testTag(it) } ?: Modifier,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun AddAccountRow(
-&nbsp;    label: String,
-&nbsp;    trailingLabel: String?,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    SurferActionCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
-&nbsp;        Row(
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;        ) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .size(36.dp)
-&nbsp;                    .surferDashedBorder(color = AppTheme.materialColors.outline, shape = CircleShape),
-&nbsp;                contentAlignment = Alignment.Center,
-&nbsp;            ) {
-&nbsp;                Icon(
-&nbsp;                    imageVector = SurferIcons.Add,
-&nbsp;                    contentDescription = SurferSemantics.Decorative,
-&nbsp;                    tint = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                    modifier = Modifier.size(18.dp),
-&nbsp;                )
-&nbsp;            }
-&nbsp;            Text(
-&nbsp;                text = label,
-&nbsp;                style = AppTheme.typography.titleSmall,
-&nbsp;                color = AppTheme.materialColors.onSurface,
-&nbsp;                modifier = Modifier.weight(1f),
-&nbsp;            )
-&nbsp;            if (trailingLabel != null) {
-&nbsp;                Text(
-&nbsp;                    text = trailingLabel,
-&nbsp;                    style = AppTheme.typography.labelMedium,
-&nbsp;                    color = AppTheme.materialColors.primary,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferAccountsWidgetHeroPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferAccountsWidget(
-&nbsp;                items = listOf(
-&nbsp;                    SurferAccountItem(&quot;1&quot;, &quot;Everyday&quot;, &quot;Current · •• 4021&quot;, &quot;€2,480.32&quot;, SurferIcons.CreditCard),
-&nbsp;                    SurferAccountItem(&quot;2&quot;, &quot;Emergency Fund&quot;, &quot;Savings · •• 7712&quot;, &quot;€8,915.00&quot;, SurferIcons.Savings),
-&nbsp;                    SurferAccountItem(&quot;3&quot;, &quot;Cash wallet&quot;, &quot;Cash&quot;, &quot;€180.00&quot;, SurferIcons.Cash),
-&nbsp;                ),
-&nbsp;                addCta = SurferAddAccountCta(
-&nbsp;                    label = &quot;Add account&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                    trailingLabel = &quot;New&quot;,
-&nbsp;                ),
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .width(360.dp),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferAccountsWidgetEmptyPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferAccountsWidget(
-&nbsp;                items = emptyList(),
-&nbsp;                addCta = SurferAddAccountCta(
-&nbsp;                    label = &quot;Add account&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                    trailingLabel = &quot;New&quot;,
-&nbsp;                ),
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
+&nbsp;object AppSpacing {
+<b class="fc">&nbsp;    val None: Dp = 0.dp</b>
+<b class="fc">&nbsp;    val XXSmall: Dp = 2.dp</b>
+<b class="fc">&nbsp;    val XSmall: Dp = 4.dp</b>
+<b class="fc">&nbsp;    val Small: Dp = 8.dp</b>
+<b class="fc">&nbsp;    val Medium: Dp = 12.dp</b>
+<b class="fc">&nbsp;    val Default: Dp = 16.dp</b>
+<b class="fc">&nbsp;    val Large: Dp = 24.dp</b>
+<b class="fc">&nbsp;    val XLarge: Dp = 32.dp</b>
+<b class="fc">&nbsp;    val XXLarge: Dp = 48.dp</b>
+<b class="fc">&nbsp;    val XXXLarge: Dp = 64.dp</b>
 &nbsp;}
 </code>
 </pre>
@@ -284,7 +132,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

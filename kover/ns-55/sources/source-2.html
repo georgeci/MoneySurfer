@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEffect</title>
+  <title>MoneySurfer Coverage Report > SyncEvent</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.settings.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEffect (com.georgeci.moneysurfer.feature.settings.sync)</h1>
+<h1>Coverage Summary for Class: SyncEvent (com.georgeci.moneysurfer.feature.settings.sync)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,119 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">SyncEffect$NavigateBack</td>
+    <td class="name">SyncEvent$OnBackClick</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncEvent$OnResetCursorsClick</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncEvent$OnResetCursorsConfirmed</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncEvent$OnResetCursorsDismissed</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncEvent$OnSyncClick</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (5/5)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -89,7 +201,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -97,7 +209,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (10/10)
   </span>
 </td>
 </tr>
@@ -341,15 +453,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface SyncEvent {
-&nbsp;    data object OnBackClick : SyncEvent
-&nbsp;    data object OnSyncClick : SyncEvent
-&nbsp;    data object OnResetCursorsClick : SyncEvent
-&nbsp;    data object OnResetCursorsDismissed : SyncEvent
-&nbsp;    data object OnResetCursorsConfirmed : SyncEvent
+<b class="fc">&nbsp;    data object OnBackClick : SyncEvent</b>
+<b class="fc">&nbsp;    data object OnSyncClick : SyncEvent</b>
+<b class="fc">&nbsp;    data object OnResetCursorsClick : SyncEvent</b>
+<b class="fc">&nbsp;    data object OnResetCursorsDismissed : SyncEvent</b>
+<b class="fc">&nbsp;    data object OnResetCursorsConfirmed : SyncEvent</b>
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface SyncEffect {
-<b class="fc">&nbsp;    data object NavigateBack : SyncEffect</b>
+&nbsp;    data object NavigateBack : SyncEffect
 &nbsp;}
 </code>
 </pre>
@@ -374,7 +486,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

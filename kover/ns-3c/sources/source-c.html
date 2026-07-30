@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardBurnRateWidgetKt</title>
+  <title>MoneySurfer Coverage Report > CategoryPickerRows</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardBurnRateWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: CategoryPickerRows (com.georgeci.moneysurfer.feature.category.picker)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,79 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardBurnRateWidgetKt</td>
+  <td class="name">CategoryPickerRows</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    58.3%
-  </span>
-  <span class="absValue">
-    (7/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.9%
-  </span>
-  <span class="absValue">
-    (32/36)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    91.3%
-  </span>
-  <span class="absValue">
-    (325/356)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">DashboardBurnRateWidgetKt$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    58.3%
+    90.7%
   </span>
   <span class="absValue">
-    (7/12)
+    (49/54)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.9%
+    100%
   </span>
   <span class="absValue">
-    (32/36)
+    (33/33)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.3%
+    95%
   </span>
   <span class="absValue">
-    (325/356)
+    (322/339)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -126,99 +99,98 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.picker
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.domain.model.BurnRatePace
-&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateEmpty
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_average
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_caption
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_chart_a11y
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_empty_subtitle
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_empty_title
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_off_pace
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_projection
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_title
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
 &nbsp;
 &nbsp;/**
-&nbsp; * What the week has been costing per day, and where the month lands if it keeps costing that.
+&nbsp; * Turns the raw category list into what each picker variant renders.
 &nbsp; *
-&nbsp; * Like the safe-to-spend card this one keeps drawing with no budget behind it — the chart, the
-&nbsp; * average and the projection are arithmetic over transactions. Only the pace pill needs a cap, and
-&nbsp; * it is simply left off without one rather than the widget standing down.
+&nbsp; * Kept as pure functions rather than folded into the composables so both shapes — the flat grid
+&nbsp; * and the parent/child tree — are asserted by the state tests instead of by eyeballing a sheet.
 &nbsp; */
-&nbsp;@Composable
-<b class="pc">&nbsp;internal fun BurnRateWidget(state: DashboardState.Content) {</b>
-<b class="fc">&nbsp;    SurferBurnRateWidget(</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_burn_rate_title),</b>
-<b class="fc">&nbsp;        data = state.burnRate?.toWidgetData(),</b>
-<b class="fc">&nbsp;        empty = SurferBurnRateEmpty(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_burn_rate_empty_title),</b>
-<b class="fc">&nbsp;            subtitle = stringResource(Res.string.dashboard_burn_rate_empty_subtitle),</b>
-&nbsp;        ),
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
-<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
-<b class="fc">&nbsp;            .testTag(DashboardTestTags.BurnRate),</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
+&nbsp;internal object CategoryPickerRows {
 &nbsp;
-&nbsp;/**
-&nbsp; * The sentences around the numbers. The chart restates money the card prints nowhere else, so its
-&nbsp; * screen-reader line carries the week&#39;s total and its busiest day rather than seven bar heights.
-&nbsp; */
-&nbsp;@Composable
-<b class="fc">&nbsp;private fun BurnRateUi.toWidgetData(): SurferBurnRateData = SurferBurnRateData(</b>
-<b class="fc">&nbsp;    average = stringResource(Res.string.dashboard_burn_rate_average, averageFormatted),</b>
-<b class="fc">&nbsp;    caption = stringResource(Res.string.dashboard_burn_rate_caption),</b>
-<b class="fc">&nbsp;    bars = days.map {</b>
-<b class="fc">&nbsp;        SurferBurnRateBar(</b>
-<b class="fc">&nbsp;            label = it.dayOfMonth.toString(),</b>
-<b class="fc">&nbsp;            fraction = it.fraction,</b>
-<b class="fc">&nbsp;            isToday = it.isToday,</b>
-<b class="fc">&nbsp;        )</b>
-&nbsp;    },
-<b class="fc">&nbsp;    projection = stringResource(Res.string.dashboard_burn_rate_projection, projectedFormatted),</b>
-<b class="fc">&nbsp;    pace = pace?.toWidgetPace(),</b>
-<b class="fc">&nbsp;    chartContentDescription = stringResource(</b>
-<b class="fc">&nbsp;        Res.string.dashboard_burn_rate_chart_a11y,</b>
-<b class="fc">&nbsp;        weekTotalFormatted,</b>
-<b class="fc">&nbsp;        busiestDayFormatted,</b>
-&nbsp;    ),
-&nbsp;)
+&nbsp;    /** Type the sheet opens on: what the caller pinned, else the selection&#39;s own type. */
+&nbsp;    fun initialType(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        selectedId: CategoryId?,
+&nbsp;        filterType: CategoryType?,
+<b class="fc">&nbsp;    ): CategoryType = filterType</b>
+<b class="fc">&nbsp;        ?: categories.firstOrNull { it.id == selectedId }?.type</b>
+<b class="fc">&nbsp;        ?: CategoryType.EXPENSE</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * `uikit` does not depend on `domain`, so the verdict crosses over here.
-&nbsp; *
-&nbsp; * Off pace borrows the Over colour rather than a warning one: the projection has already passed the
-&nbsp; * cap in the only sense a projection can, and a second amber step between &quot;fine&quot; and &quot;not&quot; would be
-&nbsp; * a distinction the maths does not make.
-&nbsp; */
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun BurnRatePace.toWidgetPace(): SurferBurnRatePace = when (this) {</b>
-<b class="nc">&nbsp;    BurnRatePace.OnTrack -&gt; SurferBurnRatePace(</b>
-<b class="nc">&nbsp;        label = stringResource(Res.string.dashboard_burn_rate_on_track),</b>
-<b class="nc">&nbsp;        status = SurferBudgetStatus.Ok,</b>
+&nbsp;    /**
+&nbsp;     * Parents that start expanded: the one holding the current selection, so a selected child is
+&nbsp;     * on screen the moment the sheet opens instead of hidden behind a chevron.
+&nbsp;     */
+&nbsp;    fun expandedForSelection(categories: List&lt;Category&gt;, selectedId: CategoryId?): Set&lt;CategoryId&gt; =
+<b class="fc">&nbsp;        categories.firstOrNull { it.id == selectedId }?.parentId?.let(::setOf).orEmpty()</b>
+&nbsp;
+&nbsp;    /** Variant A: every category of [type], hierarchy flattened away, in arrival order. */
+&nbsp;    fun grid(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        type: CategoryType,
+&nbsp;        query: String,
+&nbsp;        selectedId: CategoryId?,
+<b class="fc">&nbsp;    ): List&lt;CategoryPickerItem&gt; = categories</b>
+<b class="fc">&nbsp;        .filter { it.type == type &amp;&amp; it.matches(query) }</b>
+<b class="fc">&nbsp;        .map { it.toItem(selectedId) }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Variant B: top-level categories of [type], each carrying the children it currently shows.
+&nbsp;     *
+&nbsp;     * A category whose parent is missing from [categories] — filtered out by type, or not yet
+&nbsp;     * synced — is drawn at the top level rather than dropped, the same call `CategoryTree.flatten`
+&nbsp;     * makes on the manage screen.
+&nbsp;     *
+&nbsp;     * Search overrides [expandedIds]: a parent is kept when it matches or holds a match, and it is
+&nbsp;     * force-expanded down to the matching children, since a hit the user cannot see is no hit.
+&nbsp;     */
+&nbsp;    fun tree(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        type: CategoryType,
+&nbsp;        query: String,
+&nbsp;        selectedId: CategoryId?,
+&nbsp;        expandedIds: Set&lt;CategoryId&gt;,
+&nbsp;    ): List&lt;CategoryTreeGroup&gt; {
+<b class="fc">&nbsp;        val ofType = categories.filter { it.type == type }</b>
+<b class="fc">&nbsp;        val present = ofType.mapTo(mutableSetOf()) { it.id }</b>
+<b class="fc">&nbsp;        val childrenByParent = ofType</b>
+<b class="pc">&nbsp;            .filter { it.parentId != null &amp;&amp; it.parentId in present }</b>
+<b class="pc">&nbsp;            .groupBy { requireNotNull(it.parentId) }</b>
+<b class="pc">&nbsp;        val roots = ofType.filter { it.parentId == null || it.parentId !in present }</b>
+<b class="fc">&nbsp;        val searching = query.isNotBlank()</b>
+&nbsp;
+<b class="fc">&nbsp;        return roots.mapNotNull { root -&gt;</b>
+<b class="fc">&nbsp;            val children = childrenByParent[root.id].orEmpty()</b>
+<b class="fc">&nbsp;            val visible = if (searching) children.filter { it.matches(query) } else children</b>
+<b class="fc">&nbsp;            if (searching &amp;&amp; !root.matches(query) &amp;&amp; visible.isEmpty()) return@mapNotNull null</b>
+&nbsp;
+<b class="fc">&nbsp;            val expanded = if (searching) visible.isNotEmpty() else root.id in expandedIds</b>
+<b class="fc">&nbsp;            CategoryTreeGroup(</b>
+<b class="fc">&nbsp;                parent = root.toItem(selectedId),</b>
+<b class="fc">&nbsp;                childCount = children.size,</b>
+<b class="fc">&nbsp;                expanded = expanded,</b>
+<b class="fc">&nbsp;                children = if (expanded) visible.map { it.toItem(selectedId) } else emptyList(),</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun Category.matches(query: String): Boolean =
+<b class="fc">&nbsp;        query.isBlank() || name.contains(query.trim(), ignoreCase = true)</b>
+&nbsp;
+<b class="fc">&nbsp;    private fun Category.toItem(selectedId: CategoryId?) = CategoryPickerItem(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        name = name,</b>
+<b class="fc">&nbsp;        iconKey = iconKey,</b>
+<b class="fc">&nbsp;        hue = hue,</b>
+<b class="pc">&nbsp;        systemKind = systemKind?.name,</b>
+<b class="fc">&nbsp;        selected = id == selectedId,</b>
 &nbsp;    )
-<b class="fc">&nbsp;    BurnRatePace.OffPace -&gt; SurferBurnRatePace(</b>
-<b class="fc">&nbsp;        label = stringResource(Res.string.dashboard_burn_rate_off_pace),</b>
-<b class="fc">&nbsp;        status = SurferBudgetStatus.Over,</b>
-&nbsp;    )
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -242,7 +214,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

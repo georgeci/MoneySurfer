@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferDeleteTransactionDialogTestTags</title>
+  <title>MoneySurfer Coverage Report > SurferStatusHeroCardKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,106 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.transaction</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferDeleteTransactionDialogTestTags (com.georgeci.moneysurfer.uikit.components.transaction)</h1>
+<h1>Coverage Summary for Class: SurferStatusHeroCardKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SurferDeleteTransactionDialogTestTags</td>
-    <td class="coverageStat"/>
+  <td class="name">SurferStatusHeroCardKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.2%
+  </span>
+  <span class="absValue">
+    (9/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (46/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99%
+  </span>
+  <span class="absValue">
+    (474/479)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">SurferStatusHeroCardKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.2%
+  </span>
+  <span class="absValue">
+    (9/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (46/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99%
+  </span>
+  <span class="absValue">
+    (474/479)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,200 +126,118 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.transaction
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
 &nbsp;
-&nbsp;import androidx.compose.material3.AlertDialog
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.ButtonDefaults
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_cancel
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_confirm
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_message
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_message_generic
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_message
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_message_generic
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_title
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_title
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message_generic
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_title
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;enum class SurferStatusHeroTone { Primary, Secondary, Tertiary }
 &nbsp;
 &nbsp;/**
-&nbsp; * Stable selectors for the shared delete dialog — see docs/testing/testing-strategy.md.
-&nbsp; *
-&nbsp; * The value keeps its `transactionDetails:` prefix even though the dialog is no longer owned by
-&nbsp; * that screen: it is the id two Maestro flows already tap (`08`, `17`), and renaming it would
-&nbsp; * break them for nothing. The prefix names where the flows first meet this dialog, not where the
-&nbsp; * composable lives.
-&nbsp; */
-&nbsp;object SurferDeleteTransactionDialogTestTags {
-&nbsp;    const val Confirm = &quot;transactionDetails:confirmDelete&quot;
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * The one &quot;delete this transaction?&quot; dialog. Deleting is the same act wherever it is started —
-&nbsp; * the details screen, edit mode on the creation screen, or a swipe on any of the three
-&nbsp; * transaction lists — so a second dialog with its own wording (or its own idea of what Cancel
-&nbsp; * does) would be two answers to one question.
-&nbsp; *
-&nbsp; * It lives in uikit rather than in the transaction feature because those lists span three feature
-&nbsp; * modules, and uikit is the only place all three can see.
-&nbsp; *
-&nbsp; * @param titleOrNull the row&#39;s title, quoted back so the user can see which one is meant; null
-&nbsp; *   falls back to the generic wording rather than quoting an empty string.
-&nbsp; * @param isTransfer whether the row is one leg of a transfer, which changes the copy: a transfer
-&nbsp; *   is deleted whole, so the dialog has to say the money disappears from *both* accounts before
-&nbsp; *   the user agrees to it.
-&nbsp; * @param isSplit whether the row stands for a receipt split across categories, for the same
-&nbsp; *   reason: the delete takes every leg of it, so a user who swiped what looks like one row has to
-&nbsp; *   be told several transactions are about to go. Ignored when [isTransfer] is set — a transfer leg
-&nbsp; *   is never split, and a caller passing both is naming a state the app cannot produce.
+&nbsp; * Tinted hero card with a circular icon, title, and optional supporting line.
+&nbsp; * Generic enough to power sync status, last-backup, and similar surfaces.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferDeleteTransactionDialog(
-&nbsp;    titleOrNull: String?,
-&nbsp;    onConfirm: () -&gt; Unit,
-&nbsp;    onDismiss: () -&gt; Unit,
-&nbsp;    isTransfer: Boolean = false,
-&nbsp;    isSplit: Boolean = false,
-&nbsp;) {
-&nbsp;    val variant = DeleteVariant.of(isTransfer = isTransfer, isSplit = isSplit)
-&nbsp;    AlertDialog(
-&nbsp;        onDismissRequest = onDismiss,
-&nbsp;        icon = {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Delete,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.error,
+&nbsp;fun SurferStatusHeroCard(
+&nbsp;    title: String,
+&nbsp;    icon: ImageVector,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    supporting: String? = null,</b>
+<b class="fc">&nbsp;    tone: SurferStatusHeroTone = SurferStatusHeroTone.Tertiary,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    val (bg, fg) = when (tone) {</b>
+<b class="fc">&nbsp;        SurferStatusHeroTone.Primary -&gt; colors.primaryContainer to colors.onPrimaryContainer</b>
+<b class="fc">&nbsp;        SurferStatusHeroTone.Secondary -&gt; colors.secondaryContainer to colors.onSecondaryContainer</b>
+<b class="fc">&nbsp;        SurferStatusHeroTone.Tertiary -&gt; colors.tertiaryContainer to colors.onTertiaryContainer</b>
+&nbsp;    }
+<b class="fc">&nbsp;    val shape = RoundedCornerShape(20.dp)</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .shadow(elevation = 2.dp, shape = shape)</b>
+<b class="fc">&nbsp;            .clip(shape)</b>
+<b class="fc">&nbsp;            .background(bg)</b>
+<b class="fc">&nbsp;            .padding(18.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(48.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(Color.White.copy(alpha = 0.2f)),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = icon,</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = fg,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(24.dp),</b>
 &nbsp;            )
-&nbsp;        },
-&nbsp;        title = {
-&nbsp;            Text(
-&nbsp;                text = stringResource(variant.title),
-&nbsp;                textAlign = TextAlign.Center,
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = title,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;                color = fg,</b>
 &nbsp;            )
-&nbsp;        },
-&nbsp;        text = {
-&nbsp;            Text(text = deleteMessage(titleOrNull, variant), textAlign = TextAlign.Center)
-&nbsp;        },
-&nbsp;        confirmButton = {
-&nbsp;            Button(
-&nbsp;                onClick = onConfirm,
-&nbsp;                // The dialog is its own window, so the hosting screen&#39;s `surferTestTagAsId()`
-&nbsp;                // does not reach in here — it has to be applied again alongside the tag.
-&nbsp;                modifier = Modifier
-&nbsp;                    .surferTestTagAsId()
-&nbsp;                    .testTag(SurferDeleteTransactionDialogTestTags.Confirm),
-&nbsp;                colors = ButtonDefaults.buttonColors(
-&nbsp;                    containerColor = AppTheme.materialColors.error,
-&nbsp;                    contentColor = AppTheme.materialColors.onError,
-&nbsp;                ),
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.uikit_transaction_delete_confirm))
-&nbsp;            }
-&nbsp;        },
-&nbsp;        dismissButton = {
-&nbsp;            TextButton(onClick = onDismiss) {
-&nbsp;                Text(stringResource(Res.string.uikit_transaction_delete_cancel))
-&nbsp;            }
-&nbsp;        },
-&nbsp;    )
-&nbsp;}
+<b class="fc">&nbsp;            if (supporting != null) {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = supporting,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                    color = fg.copy(alpha = 0.85f),</b>
+<b class="fc">&nbsp;                    modifier = Modifier.padding(top = 2.dp),</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * What is actually being deleted, which is what the copy has to say. Two of the three take more
-&nbsp; * than the row the user pointed at with them, and that is the whole reason the wording differs.
-&nbsp; */
-&nbsp;private enum class DeleteVariant(
-&nbsp;    val title: StringResource,
-&nbsp;    val message: StringResource,
-&nbsp;    val genericMessage: StringResource,
-&nbsp;) {
-&nbsp;    Single(
-&nbsp;        title = Res.string.uikit_transaction_delete_title,
-&nbsp;        message = Res.string.uikit_transaction_delete_message,
-&nbsp;        genericMessage = Res.string.uikit_transaction_delete_message_generic,
-&nbsp;    ),
-&nbsp;    Transfer(
-&nbsp;        title = Res.string.uikit_transaction_delete_transfer_title,
-&nbsp;        message = Res.string.uikit_transaction_delete_transfer_message,
-&nbsp;        genericMessage = Res.string.uikit_transaction_delete_transfer_message_generic,
-&nbsp;    ),
-&nbsp;    Split(
-&nbsp;        title = Res.string.uikit_transaction_delete_split_title,
-&nbsp;        message = Res.string.uikit_transaction_delete_split_message,
-&nbsp;        genericMessage = Res.string.uikit_transaction_delete_split_message_generic,
-&nbsp;    ),
-&nbsp;    ;
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        fun of(isTransfer: Boolean, isSplit: Boolean): DeleteVariant = when {
-&nbsp;            isTransfer -&gt; Transfer
-&nbsp;            isSplit -&gt; Split
-&nbsp;            else -&gt; Single
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferStatusHeroCardPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;        ) {
+&nbsp;            SurferStatusHeroCard(
+&nbsp;                title = &quot;Up to date&quot;,
+&nbsp;                supporting = &quot;Last sync: today, 14:02&quot;,
+&nbsp;                icon = SurferIcons.Sync,
+&nbsp;                tone = SurferStatusHeroTone.Tertiary,
+&nbsp;            )
+&nbsp;            SurferStatusHeroCard(
+&nbsp;                title = &quot;Last backup · today&quot;,
+&nbsp;                supporting = &quot;14:02 · 18 MB · 2,341 transactions&quot;,
+&nbsp;                icon = SurferIcons.Cloud,
+&nbsp;                tone = SurferStatusHeroTone.Primary,
+&nbsp;            )
 &nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** One sentence, quoting the row&#39;s title when there is one to quote. */
-&nbsp;@Composable
-&nbsp;private fun deleteMessage(titleOrNull: String?, variant: DeleteVariant): String =
-&nbsp;    if (titleOrNull != null) {
-&nbsp;        stringResource(variant.message, titleOrNull)
-&nbsp;    } else {
-&nbsp;        stringResource(variant.genericMessage)
-&nbsp;    }
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferDeleteTransactionDialogPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = &quot;Starbucks&quot;,
-&nbsp;            onConfirm = {},
-&nbsp;            onDismiss = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferDeleteTransactionDialogSplitPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = &quot;Pyaterochka&quot;,
-&nbsp;            onConfirm = {},
-&nbsp;            onDismiss = {},
-&nbsp;            isSplit = true,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferDeleteTransactionDialogTransferPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = &quot;Savings top-up&quot;,
-&nbsp;            onConfirm = {},
-&nbsp;            onDismiss = {},
-&nbsp;            isTransfer = true,
-&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -263,7 +263,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

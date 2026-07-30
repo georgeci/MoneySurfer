@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetSplitLegsUseCase</title>
+  <title>MoneySurfer Coverage Report > GetMonthlyNetHistoryUseCaseKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetSplitLegsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetMonthlyNetHistoryUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetSplitLegsUseCase</td>
+  <td class="name">GetMonthlyNetHistoryUseCaseKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,23 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (17/17)
+    (6/6)
   </span>
 </td>
 </tr>
@@ -101,28 +94,136 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.BalanceTrend
+&nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendScope
+&nbsp;import com.georgeci.moneysurfer.domain.model.next
+&nbsp;import com.georgeci.moneysurfer.domain.model.trailingMonths
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.delay
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;import kotlinx.datetime.atStartOfDayIn
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlinx.datetime.yearMonth
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Duration
+&nbsp;import kotlin.time.Duration.Companion.minutes
 &nbsp;
 &nbsp;/**
-&nbsp; * Every leg of the receipt [transaction] belongs to, or an empty list when it is not part of a
-&nbsp; * split — the breakdown a details screen renders under the amount.
+&nbsp; * Income against spend per calendar month over the trailing [BalanceTrend.TREND_MONTHS], for the
+&nbsp; * balance widget&#39;s sparkline and its month delta. Null while nothing backs it — nobody signed in,
+&nbsp; * no workspace selected, or a workspace row the device has not pulled yet.
 &nbsp; *
-&nbsp; * A one-leg result is possible and is not a broken group: a leg can arrive from sync or a CSV
-&nbsp; * import before (or without) its siblings, and it is a complete transaction on its own. Callers
-&nbsp; * treat &quot;fewer than two legs&quot; as &quot;nothing to break down&quot;, not as an error.
+&nbsp; * Returns the nets rather than the finished curve because the anchor the curve hangs off — the
+&nbsp; * converted total across every account — is assembled a layer up, out of the account list and the
+&nbsp; * cached FX table. Same split as [GetAccountBalanceSeriesUseCase]: this owns the window and the
+&nbsp; * query, [com.georgeci.moneysurfer.domain.model.buildBalanceTrend] owns the fold, and the caller
+&nbsp; * pairs it with the total it is already printing so the curve cannot end anywhere else.
+&nbsp; *
+&nbsp; * The window&#39;s ends fall on month boundaries, which is what
+&nbsp; * [SpendAnalyticsRepository.netByMonth] requires to return whole months.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class GetSplitLegsUseCase(
-<b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
+&nbsp;@Single
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class GetMonthlyNetHistoryUseCase(
+&nbsp;    private val spendAnalytics: SpendAnalyticsRepository,
+&nbsp;    private val workspaceRepository: WorkspaceRepository,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val clock: ClockUseCase,
 &nbsp;) {
 &nbsp;
-&nbsp;    suspend operator fun invoke(transaction: Transaction): List&lt;Transaction&gt; {
-<b class="fc">&nbsp;        val splitId = transaction.splitId ?: return emptyList()</b>
-<b class="fc">&nbsp;        return transactionRepository.getBySplitId(splitId)</b>
+&nbsp;    operator fun invoke(
+&nbsp;        months: Int = BalanceTrend.TREND_MONTHS,
+&nbsp;        timeZone: TimeZone = TimeZone.currentSystemDefault(),
+&nbsp;    ): Flow&lt;MonthlyNetHistory?&gt; {
+&nbsp;        // A zero-month window has no ends to query between; the fold is happy with no months, this
+&nbsp;        // is not. Same guard as `buildAccountBalanceSeries` puts on its day count.
+&nbsp;        require(months &gt; 0) { &quot;months must be positive, was $months&quot; }
+&nbsp;        return session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;
+&nbsp;            workspaceId ?: return@flatMapLatest flowOf(null)
+&nbsp;
+&nbsp;            combine(currentMonth(timeZone), baseCurrency(workspaceId), ::Pair)
+&nbsp;                .flatMapLatest { (anchor, currency) -&gt;
+&nbsp;                    // The aggregate *filters* on the base currency, so a null one matches nothing.
+&nbsp;                    // Reporting &quot;no history&quot; beats querying with it and drawing a curve from no rows.
+&nbsp;                    currency ?: return@flatMapLatest flowOf(null)
+&nbsp;                    history(workspaceId, currency, trailingMonths(anchor, months))
+&nbsp;                }
+&nbsp;        }
 &nbsp;    }
+&nbsp;
+&nbsp;    private fun history(
+&nbsp;        workspaceId: WorkspaceId,
+&nbsp;        currency: CurrencyCode,
+&nbsp;        window: List&lt;YearMonth&gt;,
+&nbsp;    ): Flow&lt;MonthlyNetHistory&gt; {
+&nbsp;        val scope = SpendScope(
+&nbsp;            workspaceId = workspaceId,
+&nbsp;            baseCurrency = currency,
+&nbsp;            window = TransactionPeriodWindow(
+&nbsp;                from = window.first().firstDay,
+&nbsp;                to = window.last().lastDay,
+&nbsp;            ),
+&nbsp;        )
+&nbsp;        return spendAnalytics.netByMonth(scope).map { nets -&gt;
+&nbsp;            MonthlyNetHistory(months = window, nets = nets, currency = currency)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The month the trend is anchored on, re-emitted when the calendar rolls into the next one.
+&nbsp;     *
+&nbsp;     * Read once, the window would freeze for the life of the subscription: the workspace pointer
+&nbsp;     * does not re-emit at midnight, so a session left open across a month boundary would keep
+&nbsp;     * printing the finished month&#39;s net under copy that says &quot;this month&quot;, with the new month&#39;s
+&nbsp;     * transactions outside every queried month and no way to self-correct short of re-subscribing.
+&nbsp;     * [GenerateInsightsUseCase] sleeps to the next local midnight for the same reason; this one only
+&nbsp;     * has to wake on the first of a month, so it sleeps to the start of the next one.
+&nbsp;     */
+&nbsp;    private fun currentMonth(timeZone: TimeZone): Flow&lt;YearMonth&gt; = flow {
+&nbsp;        while (true) {
+&nbsp;            val now = clock.now()
+&nbsp;            val today = now.toLocalDateTime(timeZone).date
+&nbsp;            emit(today.yearMonth)
+&nbsp;            val nextMonth = today.yearMonth.next().firstDay.atStartOfDayIn(timeZone)
+&nbsp;            // Floored, like the insights engine&#39;s rollover: a clock that jumps backwards must cost a
+&nbsp;            // minute of staleness rather than re-running the aggregate as fast as the dispatcher can.
+&nbsp;            delay((nextMonth - now).coerceAtLeast(MIN_ROLLOVER_SLEEP))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The workspace base currency, live — the same reason [GetDailySpendSeriesUseCase] observes it:
+&nbsp;     * the session pointer is restored independently of the `workspaces` row, so a device that has
+&nbsp;     * not pulled the workspace yet resolves null, and a null would otherwise latch an empty curve
+&nbsp;     * on screen for as long as the caller stayed subscribed.
+&nbsp;     */
+&nbsp;    private fun baseCurrency(workspaceId: WorkspaceId): Flow&lt;CurrencyCode?&gt; =
+&nbsp;        workspaceRepository.getAll()
+&nbsp;            .map { workspaces -&gt; workspaces.firstOrNull { it.id == workspaceId }?.baseCurrency }
+&nbsp;            .distinctUntilChanged()
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Floor on the rollover sleep, matching the insights engine&#39;s. A clock that jumps backwards costs a
+&nbsp; * minute of staleness instead of a busy loop.
+&nbsp; */
+<b class="fc">&nbsp;private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes</b>
 </code>
 </pre>
 </div>
@@ -146,7 +247,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

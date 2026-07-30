@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionCreationStateKt</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationState__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionCreationStateKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionCreationState__OpticsKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,109 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionCreationStateKt</td>
+  <td class="name">TransactionCreationState__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    12.5%
   </span>
   <span class="absValue">
-    (1/1)
+    (1/8)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    11.1%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (13/13)
+    (4/36)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (1/12)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (4/36)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -101,153 +158,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import arrow.core.left
+&nbsp;import arrow.core.right
+&nbsp;import arrow.core.identity
 &nbsp;
-&nbsp;enum class TransactionTypeUi { Expense, Income, Transfer }
 &nbsp;
-&nbsp;@optics
-&nbsp;sealed interface TransactionCreationState {
-&nbsp;    data object Loading : TransactionCreationState
+<b class="fc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Companion.`content`: arrow.optics.Prism&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = arrow.optics.Prism.instanceOf()</b>
 &nbsp;
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        val amount: String,
-&nbsp;        val note: String,
-&nbsp;        val type: TransactionTypeUi,
-&nbsp;        val accounts: List&lt;Account&gt;,
-&nbsp;        val categories: List&lt;Category&gt;,
-&nbsp;        val selectedAccount: Account?,
-&nbsp;        val selectedCategory: Category?,
-&nbsp;        val isEditMode: Boolean,
-&nbsp;        val editingTransactionId: TransactionId?,
-&nbsp;        /** Non-null only in edit mode: the stored row behind the identity band. */
-&nbsp;        val editIdentity: TransactionEditIdentity? = null,
-&nbsp;        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
-&nbsp;        val showDeleteConfirmation: Boolean = false,
-&nbsp;        val editingCreatedAt: kotlin.time.Instant? = null,
-&nbsp;        // Original `operationDate` from the persisted transaction. Preserved across
-&nbsp;        // edits unless the user explicitly picks a new date — otherwise a timezone
-&nbsp;        // change between the original save and the edit would silently shift the
-&nbsp;        // stored business date.
-&nbsp;        val pinnedOperationDate: LocalDate? = null,
-&nbsp;        /**
-&nbsp;         * Fields of the transaction being edited that this form cannot change but must not
-&nbsp;         * destroy — see [PreservedTransactionFields].
-&nbsp;         */
-&nbsp;        val preserved: PreservedTransactionFields = PreservedTransactionFields(),
-&nbsp;        val timestamp: Long,
-&nbsp;        val categoryUsageCounts: Map&lt;CategoryId, Int&gt;,
-&nbsp;        val displayCategories: List&lt;Category&gt;,
-&nbsp;        val fromAccount: Account? = null,
-&nbsp;        val toAccount: Account? = null,
-&nbsp;        val toAmount: String = &quot;&quot;,
-&nbsp;        val transferEnabled: Boolean = true,
-&nbsp;        /**
-&nbsp;         * Lines of the split editor, or empty when the form is entering an ordinary single-category
-&nbsp;         * transaction. Non-empty is what &quot;the user asked to split this&quot; means — there is no separate
-&nbsp;         * flag that could disagree with the lines.
-&nbsp;         */
-&nbsp;        val splitLines: List&lt;TransactionSplitLineUi&gt; = emptyList(),
-&nbsp;    ) : TransactionCreationState {
-&nbsp;        val isExpense: Boolean get() = type == TransactionTypeUi.Expense
-&nbsp;        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Companion.`loading`: arrow.optics.Prism&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = arrow.optics.Prism.instanceOf()</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`content`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`content`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`content`: arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`content`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`content`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`content`</b>
 &nbsp;
-&nbsp;        /** Whether the form is entering one receipt across several categories. */
-&nbsp;        val isSplit: Boolean get() = splitLines.isNotEmpty()
 &nbsp;
-&nbsp;        /**
-&nbsp;         * Whether the row being edited is one leg of a stored receipt. Distinct from [isSplit],
-&nbsp;         * which is about the editor being open: an edit never opens it, but deleting from here
-&nbsp;         * still takes the whole group, and the confirmation has to say so.
-&nbsp;         */
-&nbsp;        val isEditingSplitLeg: Boolean get() = isEditMode &amp;&amp; preserved.splitId != null
-&nbsp;
-&nbsp;        /**
-&nbsp;         * The receipt total: what the amount hero holds, which is also what the legs must add up to.
-&nbsp;         * Unparseable input is zero here — the amount field flags it on its own.
-&nbsp;         */
-&nbsp;        val splitTotal: Money
-&nbsp;            get() = Money.fromDouble(TransactionAmountInput.parse(amount) ?: 0.0).abs()
-&nbsp;
-&nbsp;        /**
-&nbsp;         * What is left for the last line after every line above it. May be negative, which is the
-&nbsp;         * &quot;over the amount&quot; state the editor reports and Save refuses.
-&nbsp;         */
-&nbsp;        val splitRemainder: Money
-&nbsp;            get() = splitLines.dropLast(1)
-&nbsp;                .fold(splitTotal) { left, line -&gt; left - line.enteredMoney() }
-&nbsp;
-&nbsp;        /**
-&nbsp;         * Every line&#39;s money, in line order, with the last line holding the remainder — the legs
-&nbsp;         * a save would write. Only meaningful once [isSplitComplete] holds.
-&nbsp;         */
-&nbsp;        val splitAmounts: List&lt;Money&gt;
-&nbsp;            get() = splitLines.dropLast(1).map { it.enteredMoney() } + listOfNotNull(
-&nbsp;                splitRemainder.takeIf { splitLines.isNotEmpty() },
-&nbsp;            )
-&nbsp;
-&nbsp;        /**
-&nbsp;         * Whether the lines describe a receipt that can be written: at least two of them, each
-&nbsp;         * filed under a category and carrying a positive amount. The remainder line is what makes
-&nbsp;         * the last condition non-trivial — assign more than the total above it and it goes negative.
-&nbsp;         */
-&nbsp;        val isSplitComplete: Boolean
-&nbsp;            get() = splitLines.size &gt;= MIN_SPLIT_LINES &amp;&amp;
-&nbsp;                splitLines.all { it.category != null } &amp;&amp;
-&nbsp;                splitAmounts.all { it.isPositive() }
-&nbsp;        val crossCurrency: Boolean
-&nbsp;            get() = isTransfer &amp;&amp;
-&nbsp;                fromAccount != null &amp;&amp;
-&nbsp;                toAccount != null &amp;&amp;
-&nbsp;                fromAccount.currencyCode != toAccount.currencyCode
-&nbsp;
-&nbsp;        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
-&nbsp;        val amountError: TransactionAmountError?
-&nbsp;            get() = TransactionAmountInput.errorFor(amount)
-&nbsp;
-&nbsp;        /** Inline validation error for the cross-currency &quot;to&quot; amount, or null when it is acceptable. */
-&nbsp;        val toAmountError: TransactionAmountError?
-&nbsp;            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null
-&nbsp;
-&nbsp;        val isSaveEnabled: Boolean
-&nbsp;            get() = when {
-&nbsp;                isTransfer -&gt;
-&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                        (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &amp;&amp;
-&nbsp;                        fromAccount != null &amp;&amp; toAccount != null &amp;&amp;
-&nbsp;                        fromAccount.id != toAccount.id
-&nbsp;                isSplit -&gt;
-&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                        selectedAccount != null &amp;&amp;
-&nbsp;                        isSplitComplete
-&nbsp;                else -&gt;
-&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                        selectedAccount != null &amp;&amp;
-&nbsp;                        selectedCategory != null
-&nbsp;            }
-&nbsp;
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object
-&nbsp;}
-&nbsp;
-&nbsp;/** Fewer lines than this is an ordinary transaction, not a split. */
-&nbsp;const val MIN_SPLIT_LINES: Int = 2
-&nbsp;
-&nbsp;/**
-&nbsp; * The line&#39;s typed amount as money, zero for anything unparseable — the editor shows what is left
-&nbsp; * to assign rather than an inline error per line, so a half-typed figure simply counts as nothing
-&nbsp; * yet.
-&nbsp; */
-&nbsp;private fun TransactionSplitLineUi.enteredMoney(): Money =
-<b class="fc">&nbsp;    Money.fromDouble(TransactionAmountInput.parse(amount) ?: 0.0).abs()</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`loading`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`loading`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`loading`: arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`loading`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`loading`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`loading`</b>
 </code>
 </pre>
 </div>
@@ -271,7 +197,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

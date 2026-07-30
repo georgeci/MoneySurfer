@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WidgetSources</title>
+  <title>MoneySurfer Coverage Report > DashboardViewModelKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: WidgetSources (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: DashboardViewModelKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WidgetSources</td>
+  <td class="name">DashboardViewModelKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,24 +63,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (5/5)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    95.5%
+  </span>
+  <span class="absValue">
+    (42/44)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (42/42)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    98.4%
   </span>
   <span class="absValue">
-    (27/27)
+    (308/313)
   </span>
 </td>
 </tr>
@@ -110,10 +117,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 &nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
+&nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 &nbsp;import com.georgeci.moneysurfer.domain.model.SpentByCategory
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpentMonth
 &nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
+&nbsp;import com.georgeci.moneysurfer.domain.model.UpcomingRecurring
+&nbsp;import com.georgeci.moneysurfer.domain.model.buildBalanceTrend
 &nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -121,6 +132,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
@@ -131,8 +143,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetUpcomingRecurringUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
 &nbsp;import kotlinx.coroutines.flow.MutableStateFlow
 &nbsp;import kotlinx.coroutines.flow.combine
@@ -161,8 +176,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val getCategorySpend: GetCategorySpendUseCase,
 &nbsp;    private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
 &nbsp;    private val getBurnRate: GetBurnRateUseCase,
+&nbsp;    private val getSpentMonth: GetSpentMonthUseCase,
 &nbsp;    private val generateInsights: GenerateInsightsUseCase,
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
+&nbsp;    private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
+&nbsp;    private val getUpcomingRecurring: GetUpcomingRecurringUseCase,
 &nbsp;    uiPreferences: UiPreferences,
 &nbsp;    hostCapabilities: HostCapabilities,
 &nbsp;) : MviViewModel&lt;DashboardState, DashboardEvent, DashboardEffect&gt;(
@@ -227,17 +245,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            getCategorySpend(period).onStart { emit(null) },
 &nbsp;            ::WidgetSources,
 &nbsp;        )
+&nbsp;        // The balance widget&#39;s two non-account inputs, folded for the same reason the chrome is: the
+&nbsp;        // cached FX table is what turns the account list into one figure, and the monthly nets are
+&nbsp;        // what shape the curve under it. Neither is read anywhere else, and together they leave the
+&nbsp;        // fifth `combine` slot below free.
+&nbsp;        val balanceSources = combine(
+&nbsp;            getExchangeRates().onStart { emit(null) },
+&nbsp;            getMonthlyNetHistory().onStart { emit(null) },
+&nbsp;            ::BalanceSources,
+&nbsp;        )
 &nbsp;        launch {
 &nbsp;            combine(
 &nbsp;                getAccounts().onStart { emit(emptyList()) },
 &nbsp;                getRecentTransactions(),
 &nbsp;                getGoals(),
-&nbsp;                getExchangeRates().onStart { emit(null) },
+&nbsp;                balanceSources,
 &nbsp;                widgetSources,
 &nbsp;                // Read by name rather than destructured: at five members the positional form is
 &nbsp;                // one reordered field away from a silent swap, and detekt caps it at three.
-&nbsp;            ) { accounts, transactions, goals, rates, widgets -&gt;
-&nbsp;                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
+&nbsp;            ) { accounts, transactions, goals, balanceInputs, widgets -&gt;
+&nbsp;                val balance = accounts.convertedTotal(balanceInputs.rates)
+&nbsp;                    ?.toBalanceUi(balanceInputs.netHistory)
 &nbsp;                DashboardState.Content(
 &nbsp;                    accounts = accounts.map { it.toUi() },
 &nbsp;                    transactions = transactions
@@ -250,10 +278,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    workspaceName = null,
 &nbsp;                    workspaceInitial = null,
 &nbsp;                    greeting = null,
-&nbsp;                    formattedTrendDelta = null,
+&nbsp;                    formattedTrendDelta = balance?.trend?.text,
+&nbsp;                    isTrendDeltaNegative = balance?.trend?.isNegative == true,
+&nbsp;                    balanceSeries = balance?.trend?.series.orEmpty(),
 &nbsp;                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
 &nbsp;                    safeToSpend = widgets.safeToSpend?.toUi(),
 &nbsp;                    spentByCategory = widgets.categorySpend?.toUi().orEmpty(),
+&nbsp;                    spentByCategoryTotal = widgets.categorySpend
+&nbsp;                        ?.let { MoneyFormatter.format(it.total, it.currency) },
 &nbsp;                    budgets = widgets.budgetProgress.toBudgetsUi(),
 &nbsp;                    burnRate = widgets.burnRate?.toUi(),
 &nbsp;                    isOffline = isOffline,
@@ -267,6 +299,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                // rest of the dashboard draw without waiting on them.
 &nbsp;                .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights -&gt;
 &nbsp;                    content.copy(insights = insights.map { it.toUi() })
+&nbsp;                }
+&nbsp;                // Appended for the same reason the insights are, not because it is slow: the fold
+&nbsp;                // above is already at `combine`&#39;s five-flow ceiling, and chaining one reader on is
+&nbsp;                // the cheaper edit than repacking six widget sources into a second holder type.
+&nbsp;                // Takes no period — see `DashboardWidgetType.SpentMonth`.
+&nbsp;                .combine(getSpentMonth().onStart { emit(null) }) { content, spentMonth -&gt;
+&nbsp;                    content.copy(spentMonth = spentMonth?.toUi())
+&nbsp;                }
+&nbsp;                // Chained on for the same reason, and it costs the upcoming card nothing — it
+&nbsp;                // re-dates itself on a timer, so it is never what the rest is waiting on.
+&nbsp;                .combine(getUpcomingRecurring().onStart { emit(emptyList()) }) { content, upcoming -&gt;
+&nbsp;                    content.copy(upcoming = upcoming.map { it.toUi() })
 &nbsp;                }
 &nbsp;                .collect { newContent -&gt; updateState { newContent } }
 &nbsp;        }
@@ -288,8 +332,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * bucket instead of going empty. `formattedTotalBalance == null` is the screen&#39;s &quot;no accounts
 &nbsp;     * at all&quot; signal, and letting an unconvertible balance trip it would tell a user who *has*
 &nbsp;     * money to add their first account.
+&nbsp;     *
+&nbsp;     * That fallback headline gets no trend: [history] is quoted in the base currency, and hanging
+&nbsp;     * its curve off a total that is one currency&#39;s bucket would draw a shape belonging to neither.
+&nbsp;     * Neither does a headline that took a rate to assemble — see [coversWholeHeadline].
 &nbsp;     */
-&nbsp;    private fun ConvertedTotal.toBalanceUi(): BalanceUi {
+&nbsp;    private fun ConvertedTotal.toBalanceUi(history: MonthlyNetHistory?): BalanceUi {
 &nbsp;        val leftOver = unconverted.map { MoneyFormatter.format(it.amount, it.currencyCode) }
 &nbsp;        return when (val converted = total) {
 &nbsp;            null -&gt; BalanceUi(
@@ -301,8 +349,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                headline = MoneyFormatter.format(converted, baseCurrency),
 &nbsp;                notConverted = leftOver,
 &nbsp;                asOf = asOf?.asIsoDate(),
+&nbsp;                trend = history?.takeIf { coversWholeHeadline }?.toTrendUi(converted, baseCurrency),
 &nbsp;            )
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether base-currency history can account for the whole headline, which is what it takes for a
+&nbsp;     * delta folded out of that history to be the movement of *this* figure.
+&nbsp;     *
+&nbsp;     * The aggregate behind the nets filters on the base currency and the app caches only today&#39;s
+&nbsp;     * rates, so a foreign account&#39;s movement is outside the fold no matter how it is anchored. It is
+&nbsp;     * inside the headline, though, the moment a rate could price it — and &quot;+$0.00 this month&quot; beside
+&nbsp;     * a balance that grew by a third of itself is the class of answer
+&nbsp;     * [ConvertedTotal] exists to prevent. So the trend stands down unless every balance in the
+&nbsp;     * workspace was already in the base currency: nothing left unconverted ([ConvertedTotal.isComplete])
+&nbsp;     * and no quote needed to build the total (a null `asOf`, which is exactly that signal).
+&nbsp;     *
+&nbsp;     * Costs multi-currency workspaces their trend until the day transactions carry a rate snapshot.
+&nbsp;     * A figure that silently omits money is worse than no figure.
+&nbsp;     */
+&nbsp;    private val ConvertedTotal.coversWholeHeadline: Boolean
+&nbsp;        get() = isComplete &amp;&amp; asOf == null
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This month&#39;s movement and the curve behind it, or null when there is nothing honest to draw:
+&nbsp;     *
+&nbsp;     * - the nets are *filtered* to their own workspace&#39;s base currency, and the total is converted
+&nbsp;     *   into whatever the cached FX table is based on. The two agree except in the window between a
+&nbsp;     *   base-currency change and the next rate refresh, and in that window a fold would subtract
+&nbsp;     *   euros from dollars;
+&nbsp;     * - a window that booked nothing has no curve. The fold would still produce six points — the
+&nbsp;     *   present balance repeated — and a flat line across half a year is a claim about months the
+&nbsp;     *   aggregate cannot see, since opening balances are outside its monthly nets by construction.
+&nbsp;     */
+&nbsp;    private fun MonthlyNetHistory.toTrendUi(total: Money, base: CurrencyCode): BalanceTrendUi? {
+&nbsp;        if (currency != base || nets.isEmpty()) return null
+&nbsp;        val trend = buildBalanceTrend(currentBalance = total, nets = nets, months = months)
+&nbsp;        val formatted = MoneyFormatter.format(trend.delta, base)
+&nbsp;        return BalanceTrendUi(
+&nbsp;            // Locale formatting only signs negatives; a flat month reads as &quot;+&quot; too, since &quot;no
+&nbsp;            // change&quot; is not a loss. Same call as the account details chart&#39;s delta.
+&nbsp;            text = if (trend.delta.isNegative()) formatted else &quot;+$formatted&quot;,
+&nbsp;            isNegative = trend.delta.isNegative(),
+&nbsp;            // Major units: the curve only needs its own shape, and minor units are a Long the
+&nbsp;            // chart would have to narrow anyway.
+&nbsp;            series = trend.points.map { (it.balance.minor / Money.MINOR_PER_MAJOR).toFloat() },
+&nbsp;        )
 &nbsp;    }
 &nbsp;
 &nbsp;    /** ISO date — the &quot;as of&quot; label has to be unambiguous, and the app ships no date locale rules. */
@@ -473,7 +566,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val workspaceName: String?,
 &nbsp;        val workspaceInitial: String?,
 &nbsp;        val greeting: String?,
+&nbsp;        /**
+&nbsp;         * What the balance moved by this month, signed and formatted, or null when no window of
+&nbsp;         * base-currency history backs a figure — see `toTrendUi`.
+&nbsp;         */
 &nbsp;        val formattedTrendDelta: String?,
+&nbsp;        /** Whether [formattedTrendDelta] went down. Picks the arrow the widget draws beside it. */
+&nbsp;        val isTrendDeltaNegative: Boolean = false,
+&nbsp;        /**
+&nbsp;         * The balance at the close of each of the charted months, oldest first, in major units.
+&nbsp;         * Empty when there is no curve to draw — the widget needs two points to draw one.
+&nbsp;         */
+&nbsp;        val balanceSeries: List&lt;Float&gt; = emptyList(),
 &nbsp;        val goals: List&lt;GoalUi&gt; = emptyList(),
 &nbsp;        /** What is still safe to spend this period, or null while no active budget backs a number. */
 &nbsp;        val safeToSpend: SafeToSpendUi? = null,
@@ -485,13 +589,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         */
 &nbsp;        val spentByCategory: List&lt;CategorySpendUi&gt; = emptyList(),
 &nbsp;        /**
+&nbsp;         * Everything [spentByCategory] adds up to, formatted — the donut&#39;s centre figure. Kept
+&nbsp;         * beside the rows rather than re-summed on the screen: the rows carry formatted strings,
+&nbsp;         * not money, so a screen-side sum would have to parse its way back to the amounts. Null
+&nbsp;         * while no workspace backs a breakdown, which is not the same as a breakdown of zero.
+&nbsp;         */
+&nbsp;        val spentByCategoryTotal: String? = null,
+&nbsp;        /**
 &nbsp;         * The week&#39;s spend pace and where the month lands at it, or null while no workspace backs a
 &nbsp;         * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
 &nbsp;         * the &quot;no cap to miss&quot; state, and the chart is drawn either way.
 &nbsp;         */
 &nbsp;        val burnRate: BurnRateUi? = null,
+&nbsp;        /**
+&nbsp;         * What this month has cost, or null while no workspace and base currency back the figure.
+&nbsp;         * Like [burnRate] this one does not need a budget — a null cap inside it is the &quot;no budget
+&nbsp;         * set&quot; state the card is partly *for*, and the amount is drawn either way.
+&nbsp;         */
+&nbsp;        val spentMonth: SpentMonthUi? = null,
 &nbsp;        /** Generated spending insights, most actionable first. Empty until the engine has run. */
 &nbsp;        val insights: List&lt;InsightUi&gt; = emptyList(),
+&nbsp;        /**
+&nbsp;         * The scheduled payments still to come, soonest first. Empty is the upcoming card&#39;s own
+&nbsp;         * &quot;nothing scheduled&quot; state — a workspace that keeps no recurring rules is the common case,
+&nbsp;         * not a missing read.
+&nbsp;         */
+&nbsp;        val upcoming: List&lt;UpcomingRecurringUi&gt; = emptyList(),
 &nbsp;        val isOffline: Boolean = false,
 &nbsp;        /**
 &nbsp;         * Whether this build offers multi-account transfers. The quick-actions widget is the only
@@ -529,34 +652,67 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * The per-widget sources `combine` cannot take as separate arguments — it tops out at five typed
 &nbsp; * flows and the screen already reads four others.
 &nbsp; */
-<b class="fc">&nbsp;private data class WidgetSources(</b>
-<b class="fc">&nbsp;    val chrome: DashboardChrome,</b>
-<b class="fc">&nbsp;    val safeToSpend: SafeToSpend?,</b>
+&nbsp;private data class WidgetSources(
+&nbsp;    val chrome: DashboardChrome,
+&nbsp;    val safeToSpend: SafeToSpend?,
 &nbsp;    /** Every active budget&#39;s progress — the rows the budgets card draws. */
-<b class="fc">&nbsp;    val budgetProgress: List&lt;BudgetProgress&gt;,</b>
-<b class="fc">&nbsp;    val burnRate: BurnRate?,</b>
-<b class="fc">&nbsp;    val categorySpend: SpentByCategory?,</b>
+&nbsp;    val budgetProgress: List&lt;BudgetProgress&gt;,
+&nbsp;    val burnRate: BurnRate?,
+&nbsp;    val categorySpend: SpentByCategory?,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One scheduled payment as the card draws it. The due *label* is not built here: &quot;Today&quot; and
+&nbsp; * &quot;Tomorrow&quot; are copy, and the fallback is a date — so the screen gets the day count and the ISO
+&nbsp; * date and picks between them where the string resources are.
+&nbsp; *
+&nbsp; * File-level like the spend rows&#39; mapper below, rather than a method: it reads nothing off the view
+&nbsp; * model, and the class is at detekt&#39;s function ceiling.
+&nbsp; */
+<b class="fc">&nbsp;private fun UpcomingRecurring.toUi() = UpcomingRecurringUi(</b>
+<b class="fc">&nbsp;    id = ruleId,</b>
+<b class="fc">&nbsp;    name = title,</b>
+<b class="fc">&nbsp;    amountFormatted = MoneyFormatter.format(amount, currency),</b>
+<b class="fc">&nbsp;    dueDateIso = dueDate.toString(),</b>
+<b class="fc">&nbsp;    daysUntil = daysUntil,</b>
+<b class="fc">&nbsp;    isImminent = isImminent,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The month&#39;s spend as the card draws it. A file-level mapper like [SpentByCategory.toUi] below —
+&nbsp; * it reads nothing off the view model, and the class is at detekt&#39;s function ceiling.
+&nbsp; *
+&nbsp; * [SpentMonthUi.capFormatted] carries the &quot;is there a budget&quot; answer rather than a second boolean:
+&nbsp; * the caption is either &quot;of &lt;cap&gt;&quot; or the no-budget line, and one nullable string cannot disagree
+&nbsp; * with itself. The bar reads 0 without a cap — there is no limit to fill it against, and inventing
+&nbsp; * one from the spend would draw a full bar on an unbudgeted month.
+&nbsp; */
+<b class="fc">&nbsp;private fun SpentMonth.toUi(): SpentMonthUi = SpentMonthUi(</b>
+<b class="fc">&nbsp;    spentFormatted = MoneyFormatter.format(spent, currency),</b>
+<b class="fc">&nbsp;    capFormatted = cap?.let { MoneyFormatter.format(it, currency) },</b>
+<b class="fc">&nbsp;    progress = capFraction ?: 0f,</b>
+<b class="fc">&nbsp;    delta = delta?.let { SpentMonthDeltaUi(trend = it.trend, percent = it.changePercent) },</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
 &nbsp; * The breakdown&#39;s rows, largest spender first. Money is formatted here against the breakdown&#39;s
 &nbsp; * own currency — non-null by construction, so nothing has to invent one.
 &nbsp; */
-&nbsp;private fun SpentByCategory.toUi(): List&lt;CategorySpendUi&gt; = entries.map { it.toUi(currency) }
+<b class="fc">&nbsp;private fun SpentByCategory.toUi(): List&lt;CategorySpendUi&gt; = entries.map { it.toUi(currency) }</b>
 &nbsp;
-&nbsp;private fun CategorySpend.toUi(currency: CurrencyCode) = CategorySpendUi(
-&nbsp;    categoryId = category?.id?.value,
-&nbsp;    name = category?.name,
-&nbsp;    hue = category?.hue,
-&nbsp;    spentFormatted = MoneyFormatter.format(spent, currency),
-&nbsp;    share = share,
-&nbsp;    cap = cap?.let {
-&nbsp;        CategoryCapUi(
-&nbsp;            limitFormatted = MoneyFormatter.format(it.limit, currency),
-&nbsp;            status = it.status,
+<b class="fc">&nbsp;private fun CategorySpend.toUi(currency: CurrencyCode) = CategorySpendUi(</b>
+<b class="fc">&nbsp;    categoryId = category?.id?.value,</b>
+<b class="fc">&nbsp;    name = category?.name,</b>
+<b class="fc">&nbsp;    hue = category?.hue,</b>
+<b class="fc">&nbsp;    spentFormatted = MoneyFormatter.format(spent, currency),</b>
+<b class="fc">&nbsp;    share = share,</b>
+<b class="fc">&nbsp;    cap = cap?.let {</b>
+<b class="fc">&nbsp;        CategoryCapUi(</b>
+<b class="fc">&nbsp;            limitFormatted = MoneyFormatter.format(it.limit, currency),</b>
+<b class="fc">&nbsp;            status = it.status,</b>
 &nbsp;            // Non-null whenever `cap` is — the two come off the same entry.
-&nbsp;            progress = capFraction ?: 0f,
-&nbsp;        )
+<b class="pc">&nbsp;            progress = capFraction ?: 0f,</b>
+<b class="fc">&nbsp;        )</b>
 &nbsp;    },
 &nbsp;)
 &nbsp;
@@ -569,11 +725,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val period: DashboardPeriod,
 &nbsp;)
 &nbsp;
-&nbsp;/** The three strings the balance widget needs, already formatted. */
+&nbsp;/** Everything the balance widget draws, already formatted. */
 &nbsp;private data class BalanceUi(
 &nbsp;    val headline: String?,
 &nbsp;    val notConverted: List&lt;String&gt;,
 &nbsp;    val asOf: String?,
+&nbsp;    /** Null when no base-currency history could be anchored on the headline. */
+&nbsp;    val trend: BalanceTrendUi? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/** The balance card&#39;s movement half: the delta as a signed string, and the curve behind it. */
+&nbsp;private data class BalanceTrendUi(
+&nbsp;    val text: String,
+&nbsp;    val isNegative: Boolean,
+&nbsp;    val series: List&lt;Float&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The two flows behind the headline figure and its curve, folded into one so the screen&#39;s
+&nbsp; * five-source `combine` still fits. See `observeDashboard`.
+&nbsp; */
+&nbsp;private data class BalanceSources(
+&nbsp;    val rates: ExchangeRateSnapshot?,
+&nbsp;    val netHistory: MonthlyNetHistory?,
 &nbsp;)
 &nbsp;
 &nbsp;data class AccountUi(
@@ -725,6 +899,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;/**
+&nbsp; * The spent-this-month card&#39;s numbers. Money is formatted here; the sentences around it are built on
+&nbsp; * the screen, which is where the string resources are.
+&nbsp; */
+&nbsp;data class SpentMonthUi(
+&nbsp;    val spentFormatted: String,
+&nbsp;    /** The monthly cap, or null when no budget sets one — which is the caption the card shows. */
+&nbsp;    val capFormatted: String?,
+&nbsp;    /** Spend against the cap, `0f` without one. Can exceed 1, which the bar clamps. */
+&nbsp;    val progress: Float,
+&nbsp;    /** How the month compares to the last one, or null when no honest comparison is available. */
+&nbsp;    val delta: SpentMonthDeltaUi? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The month-over-month change. [percent] is a magnitude — [trend] picks which sentence and which
+&nbsp; * colour it is printed in, so a sign is never formatted into the number itself.
+&nbsp; */
+&nbsp;data class SpentMonthDeltaUi(
+&nbsp;    val trend: SpendTrend,
+&nbsp;    val percent: Int,
+&nbsp;)
+&nbsp;
+&nbsp;/**
 &nbsp; * One bar. [dayOfMonth] rather than a weekday name because the app ships no date locale rules, and
 &nbsp; * a number needs none.
 &nbsp; */
@@ -734,6 +931,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val fraction: Float,
 &nbsp;    /** The last bar — a day still being spent, which the chart draws solid. */
 &nbsp;    val isToday: Boolean,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One row of the upcoming card. Money is formatted here; the due label is assembled on the screen,
+&nbsp; * which is where the &quot;Today&quot;/&quot;Tomorrow&quot; strings are.
+&nbsp; */
+&nbsp;data class UpcomingRecurringUi(
+&nbsp;    val id: RecurringRuleId,
+&nbsp;    val name: String,
+&nbsp;    val amountFormatted: String,
+&nbsp;    /** ISO — the fallback label, for the reason the balance card&#39;s &quot;as of&quot; date is one. */
+&nbsp;    val dueDateIso: String,
+&nbsp;    /** Whole days from today. `0` is today, `1` tomorrow; never negative. */
+&nbsp;    val daysUntil: Int,
+&nbsp;    /** Whether the row gets the tint — today and tomorrow. Decided in the domain, not re-derived. */
+&nbsp;    val isImminent: Boolean,
 &nbsp;)
 &nbsp;
 &nbsp;data class TransactionUi(
@@ -764,23 +977,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;// The table&#39;s &quot;complexity&quot; is the number of places the dashboard can reach, not tangled logic —
 &nbsp;// every branch is one destination. Same call as `SettingsScreen` and `DashboardNavigation.navigate`.
 &nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
-&nbsp;internal fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {
-&nbsp;    is DashboardEvent.OnAccountClick -&gt; DashboardEffect.NavigateToAccountDetails(accountId)
-&nbsp;    is DashboardEvent.OnTransactionClick -&gt; DashboardEffect.NavigateToTransactionDetails(transactionId)
-&nbsp;    DashboardEvent.OnAddAccountClick -&gt; DashboardEffect.NavigateToAccountCreation
-&nbsp;    DashboardEvent.OnSeeAllTransactionsClick -&gt; DashboardEffect.NavigateToTransactionsList
-&nbsp;    DashboardEvent.OnAddTransactionClick -&gt; DashboardEffect.NavigateToTransactionCreation(accountId = null)
-&nbsp;    DashboardEvent.OnTransferClick -&gt; DashboardEffect.NavigateToTransferCreation
-&nbsp;    is DashboardEvent.OnAddTransactionForAccountClick -&gt;
-&nbsp;        DashboardEffect.NavigateToTransactionCreation(accountId = accountId)
-&nbsp;    DashboardEvent.OnManageAccountsClick -&gt; DashboardEffect.NavigateToAccountsManage
-&nbsp;    DashboardEvent.OnSettingsClick -&gt; DashboardEffect.NavigateToSettings
-&nbsp;    DashboardEvent.OnCustomizeClick -&gt; DashboardEffect.NavigateToCustomize
-&nbsp;    DashboardEvent.OnSeeAllGoalsClick -&gt; DashboardEffect.NavigateToGoals
-&nbsp;    is DashboardEvent.OnGoalClick -&gt; DashboardEffect.NavigateToGoalDetails(goalId)
-&nbsp;    DashboardEvent.OnSetBudgetClick -&gt; DashboardEffect.NavigateToBudgetCreation
-&nbsp;    DashboardEvent.OnSeeAllBudgetsClick -&gt; DashboardEffect.NavigateToBudgets
-&nbsp;    is DashboardEvent.OnBudgetClick -&gt; DashboardEffect.NavigateToBudgetDetails(budgetId)
+<b class="fc">&nbsp;internal fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {</b>
+<b class="fc">&nbsp;    is DashboardEvent.OnAccountClick -&gt; DashboardEffect.NavigateToAccountDetails(accountId)</b>
+<b class="fc">&nbsp;    is DashboardEvent.OnTransactionClick -&gt; DashboardEffect.NavigateToTransactionDetails(transactionId)</b>
+<b class="fc">&nbsp;    DashboardEvent.OnAddAccountClick -&gt; DashboardEffect.NavigateToAccountCreation</b>
+<b class="fc">&nbsp;    DashboardEvent.OnSeeAllTransactionsClick -&gt; DashboardEffect.NavigateToTransactionsList</b>
+<b class="fc">&nbsp;    DashboardEvent.OnAddTransactionClick -&gt; DashboardEffect.NavigateToTransactionCreation(accountId = null)</b>
+<b class="fc">&nbsp;    DashboardEvent.OnTransferClick -&gt; DashboardEffect.NavigateToTransferCreation</b>
+<b class="fc">&nbsp;    is DashboardEvent.OnAddTransactionForAccountClick -&gt;</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToTransactionCreation(accountId = accountId)</b>
+<b class="fc">&nbsp;    DashboardEvent.OnManageAccountsClick -&gt; DashboardEffect.NavigateToAccountsManage</b>
+<b class="fc">&nbsp;    DashboardEvent.OnSettingsClick -&gt; DashboardEffect.NavigateToSettings</b>
+<b class="fc">&nbsp;    DashboardEvent.OnCustomizeClick -&gt; DashboardEffect.NavigateToCustomize</b>
+<b class="fc">&nbsp;    DashboardEvent.OnSeeAllGoalsClick -&gt; DashboardEffect.NavigateToGoals</b>
+<b class="fc">&nbsp;    is DashboardEvent.OnGoalClick -&gt; DashboardEffect.NavigateToGoalDetails(goalId)</b>
+<b class="fc">&nbsp;    DashboardEvent.OnSetBudgetClick -&gt; DashboardEffect.NavigateToBudgetCreation</b>
+<b class="pc">&nbsp;    DashboardEvent.OnSeeAllBudgetsClick -&gt; DashboardEffect.NavigateToBudgets</b>
+<b class="fc">&nbsp;    is DashboardEvent.OnBudgetClick -&gt; DashboardEffect.NavigateToBudgetDetails(budgetId)</b>
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardEvent {
@@ -870,7 +1083,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDetailsTestTags</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,138 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDetailsTestTags (com.georgeci.moneysurfer.feature.transaction.details)</h1>
+<h1>Coverage Summary for Class: TransactionCreationState (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
 </th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
 </tr>
-<tr>
-  <td class="name">TransactionDetailsTestTags</td>
+  <tr>
+    <td class="name">TransactionCreationState$Companion</td>
     <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState$Content</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.1%
+  </span>
+  <span class="absValue">
+    (53/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (55/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (424/424)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState$Content$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState$Loading</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.1%
+  </span>
+  <span class="absValue">
+    (53/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (56/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (426/426)
+  </span>
+</td>
 </tr>
-
 </table>
 
 <br/>
@@ -44,208 +158,155 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.FilledTonalButton
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_content_description
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_duplicate
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_edit_content_description
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_title
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
+&nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
-&nbsp;/**
-&nbsp; * Stable selectors for the transaction details screen — see docs/testing/testing-strategy.md.
-&nbsp; *
-&nbsp; * The dialog&#39;s confirm button is not here: the dialog moved to uikit when the transaction lists
-&nbsp; * gained swipe-to-delete, and its tag went with it as
-&nbsp; * [SurferDeleteTransactionDialogTestTags][com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialogTestTags].
-&nbsp; * The id the flows tap is unchanged.
-&nbsp; */
-&nbsp;object TransactionDetailsTestTags {
-&nbsp;    const val Root = &quot;transactionDetails:root&quot;
-&nbsp;    const val Edit = &quot;transactionDetails:edit&quot;
-&nbsp;    const val Delete = &quot;transactionDetails:delete&quot;
-&nbsp;}
+&nbsp;enum class TransactionTypeUi { Expense, Income, Transfer }
 &nbsp;
-&nbsp;@Composable
-&nbsp;fun TransactionDetailsScreen(
-&nbsp;    transactionId: TransactionId,
-&nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    onNavigateToEdit: (TransactionId) -&gt; Unit = {},
-&nbsp;    onNavigateToDuplicate: (TransactionId) -&gt; Unit = {},
-&nbsp;    viewModel: TransactionDetailsViewModel = koinViewModel(
-&nbsp;        key = transactionId.value,
-&nbsp;    ) { parametersOf(transactionId) },
-&nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;@optics
+&nbsp;sealed interface TransactionCreationState {
+<b class="fc">&nbsp;    data object Loading : TransactionCreationState</b>
 &nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            TransactionDetailsEffect.NavigateBack -&gt; onNavigateBack()
-&nbsp;            is TransactionDetailsEffect.NavigateToEdit -&gt; onNavigateToEdit(effect.transactionId)
-&nbsp;            is TransactionDetailsEffect.NavigateToDuplicate -&gt; onNavigateToDuplicate(effect.transactionId)
-&nbsp;        }
-&nbsp;    }
+<b class="fc">&nbsp;    @optics</b>
+<b class="fc">&nbsp;    data class Content(</b>
+<b class="fc">&nbsp;        val amount: String,</b>
+<b class="fc">&nbsp;        val note: String,</b>
+<b class="fc">&nbsp;        val type: TransactionTypeUi,</b>
+<b class="fc">&nbsp;        val accounts: List&lt;Account&gt;,</b>
+<b class="fc">&nbsp;        val categories: List&lt;Category&gt;,</b>
+<b class="fc">&nbsp;        val selectedAccount: Account?,</b>
+<b class="fc">&nbsp;        val selectedCategory: Category?,</b>
+<b class="fc">&nbsp;        val isEditMode: Boolean,</b>
+<b class="fc">&nbsp;        val editingTransactionId: TransactionId?,</b>
+&nbsp;        /** Non-null only in edit mode: the stored row behind the identity band. */
+<b class="fc">&nbsp;        val editIdentity: TransactionEditIdentity? = null,</b>
+&nbsp;        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
+<b class="fc">&nbsp;        val showDeleteConfirmation: Boolean = false,</b>
+<b class="fc">&nbsp;        val editingCreatedAt: kotlin.time.Instant? = null,</b>
+&nbsp;        // Original `operationDate` from the persisted transaction. Preserved across
+&nbsp;        // edits unless the user explicitly picks a new date — otherwise a timezone
+&nbsp;        // change between the original save and the edit would silently shift the
+&nbsp;        // stored business date.
+<b class="fc">&nbsp;        val pinnedOperationDate: LocalDate? = null,</b>
+&nbsp;        /**
+&nbsp;         * Fields of the transaction being edited that this form cannot change but must not
+&nbsp;         * destroy — see [PreservedTransactionFields].
+&nbsp;         */
+<b class="fc">&nbsp;        val preserved: PreservedTransactionFields = PreservedTransactionFields(),</b>
+<b class="fc">&nbsp;        val timestamp: Long,</b>
+<b class="fc">&nbsp;        val categoryUsageCounts: Map&lt;CategoryId, Int&gt;,</b>
+<b class="fc">&nbsp;        val displayCategories: List&lt;Category&gt;,</b>
+<b class="fc">&nbsp;        val fromAccount: Account? = null,</b>
+<b class="fc">&nbsp;        val toAccount: Account? = null,</b>
+<b class="fc">&nbsp;        val toAmount: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;        val transferEnabled: Boolean = true,</b>
+&nbsp;        /**
+&nbsp;         * Lines of the split editor, or empty when the form is entering an ordinary single-category
+&nbsp;         * transaction. Non-empty is what &quot;the user asked to split this&quot; means — there is no separate
+&nbsp;         * flag that could disagree with the lines.
+&nbsp;         */
+<b class="fc">&nbsp;        val splitLines: List&lt;TransactionSplitLineUi&gt; = emptyList(),</b>
+&nbsp;    ) : TransactionCreationState {
+<b class="fc">&nbsp;        val isExpense: Boolean get() = type == TransactionTypeUi.Expense</b>
+<b class="fc">&nbsp;        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer</b>
 &nbsp;
-&nbsp;    when (val current = state) {
-&nbsp;        is TransactionDetailsState.Loading -&gt; TransactionDetailsLoading(onEvent = viewModel::onEvent)
-&nbsp;        is TransactionDetailsState.Content -&gt; TransactionDetailsContent(
-&nbsp;            state = current,
-&nbsp;            onEvent = viewModel::onEvent,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+&nbsp;        /** Whether the form is entering one receipt across several categories. */
+<b class="fc">&nbsp;        val isSplit: Boolean get() = splitLines.isNotEmpty()</b>
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun TransactionDetailsLoading(onEvent: (TransactionDetailsEvent) -&gt; Unit) {
-&nbsp;    SurferPaneScaffold(
-&nbsp;        title = stringResource(Res.string.transaction_details_title),
-&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
-&nbsp;    ) { padding -&gt;
-&nbsp;        Box(modifier = Modifier.fillMaxSize().padding(padding))
-&nbsp;    }
-&nbsp;}
+&nbsp;        /**
+&nbsp;         * Whether the row being edited is one leg of a stored receipt. Distinct from [isSplit],
+&nbsp;         * which is about the editor being open: an edit never opens it, but deleting from here
+&nbsp;         * still takes the whole group, and the confirmation has to say so.
+&nbsp;         */
+<b class="fc">&nbsp;        val isEditingSplitLeg: Boolean get() = isEditMode &amp;&amp; preserved.splitId != null</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * The details of one transaction, drawn from a state it is handed.
-&nbsp; *
-&nbsp; * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
-&nbsp; * own — see docs/testing/testing-strategy.md.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun TransactionDetailsContent(
-&nbsp;    state: TransactionDetailsState.Content,
-&nbsp;    onEvent: (TransactionDetailsEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    if (state.showDeleteConfirmation) {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = state.note.ifBlank { null },
-&nbsp;            onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },
-&nbsp;            onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },
-&nbsp;            isTransfer = state.isTransfer,
-&nbsp;            isSplit = state.isSplit,
-&nbsp;        )
-&nbsp;    }
+&nbsp;        /**
+&nbsp;         * The receipt total: what the amount hero holds, which is also what the legs must add up to.
+&nbsp;         * Unparseable input is zero here — the amount field flags it on its own.
+&nbsp;         */
+&nbsp;        val splitTotal: Money
+<b class="fc">&nbsp;            get() = Money.fromDouble(TransactionAmountInput.parse(amount) ?: 0.0).abs()</b>
 &nbsp;
-&nbsp;    SurferPaneScaffold(
-&nbsp;        title = stringResource(Res.string.transaction_details_title),
-&nbsp;        modifier = Modifier
-&nbsp;            .testTag(TransactionDetailsTestTags.Root)
-&nbsp;            .surferTestTagAsId(),
-&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
-&nbsp;        actions = { DetailsActions(onEvent = onEvent) },
-&nbsp;    ) { padding -&gt;
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(top = padding.calculateTopPadding()),
-&nbsp;        ) {
-&nbsp;            Column(
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .verticalScroll(rememberScrollState())
-&nbsp;                    .weight(1f),
-&nbsp;            ) {
-&nbsp;                val heroVisual = heroVisualFor(state)
-&nbsp;                HeroCard(
-&nbsp;                    header = heroHeaderFor(state),
-&nbsp;                    headerColor = heroVisual.tint,
-&nbsp;                    visual = heroVisual,
-&nbsp;                    formattedAmount = state.formattedAmount,
-&nbsp;                    note = state.note,
-&nbsp;                    formattedDate = state.formattedDate,
-&nbsp;                    isPlanned = state.isPlanned,
-&nbsp;                )
+&nbsp;        /**
+&nbsp;         * What is left for the last line after every line above it. May be negative, which is the
+&nbsp;         * &quot;over the amount&quot; state the editor reports and Save refuses.
+&nbsp;         */
+&nbsp;        val splitRemainder: Money
+<b class="fc">&nbsp;            get() = splitLines.dropLast(1)</b>
+<b class="fc">&nbsp;                .fold(splitTotal) { left, line -&gt; left - line.enteredMoney() }</b>
 &nbsp;
-&nbsp;                state.split?.let { SplitCard(split = it) }
-&nbsp;
-&nbsp;                DetailsCard(state = state)
-&nbsp;
-&nbsp;                Spacer(Modifier.height(padding.calculateBottomPadding()))
-&nbsp;            }
-&nbsp;
-&nbsp;            if (state.canDuplicate) {
-&nbsp;                DuplicateButton(onEvent = onEvent)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun DetailsActions(onEvent: (TransactionDetailsEvent) -&gt; Unit) {
-&nbsp;    SurferToolbarAction(
-&nbsp;        icon = SurferIcons.Edit,
-&nbsp;        contentDescription = stringResource(Res.string.transaction_details_edit_content_description),
-&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },
-&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),
-&nbsp;    )
-&nbsp;    SurferToolbarAction(
-&nbsp;        icon = SurferIcons.Delete,
-&nbsp;        contentDescription = stringResource(Res.string.transaction_details_delete_content_description),
-&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },
-&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),
-&nbsp;        tint = AppTheme.materialColors.error,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun DuplicateButton(onEvent: (TransactionDetailsEvent) -&gt; Unit) {
-&nbsp;    Row(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(horizontal = 16.dp)
-&nbsp;            .padding(bottom = AppTheme.spacing.large),
-&nbsp;    ) {
-&nbsp;        FilledTonalButton(
-&nbsp;            onClick = { onEvent(TransactionDetailsEvent.OnDuplicateClick) },
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            shape = RoundedCornerShape(20.dp),
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Copy,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                modifier = Modifier.size(18.dp),
+&nbsp;        /**
+&nbsp;         * Every line&#39;s money, in line order, with the last line holding the remainder — the legs
+&nbsp;         * a save would write. Only meaningful once [isSplitComplete] holds.
+&nbsp;         */
+&nbsp;        val splitAmounts: List&lt;Money&gt;
+<b class="fc">&nbsp;            get() = splitLines.dropLast(1).map { it.enteredMoney() } + listOfNotNull(</b>
+<b class="fc">&nbsp;                splitRemainder.takeIf { splitLines.isNotEmpty() },</b>
 &nbsp;            )
-&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;            Text(stringResource(Res.string.transaction_details_duplicate))
-&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Whether the lines describe a receipt that can be written: at least two of them, each
+&nbsp;         * filed under a category and carrying a positive amount. The remainder line is what makes
+&nbsp;         * the last condition non-trivial — assign more than the total above it and it goes negative.
+&nbsp;         */
+&nbsp;        val isSplitComplete: Boolean
+<b class="fc">&nbsp;            get() = splitLines.size &gt;= MIN_SPLIT_LINES &amp;&amp;</b>
+<b class="fc">&nbsp;                splitLines.all { it.category != null } &amp;&amp;</b>
+<b class="fc">&nbsp;                splitAmounts.all { it.isPositive() }</b>
+&nbsp;        val crossCurrency: Boolean
+<b class="pc">&nbsp;            get() = isTransfer &amp;&amp;</b>
+<b class="fc">&nbsp;                fromAccount != null &amp;&amp;</b>
+<b class="fc">&nbsp;                toAccount != null &amp;&amp;</b>
+<b class="fc">&nbsp;                fromAccount.currencyCode != toAccount.currencyCode</b>
+&nbsp;
+&nbsp;        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
+&nbsp;        val amountError: TransactionAmountError?
+<b class="fc">&nbsp;            get() = TransactionAmountInput.errorFor(amount)</b>
+&nbsp;
+&nbsp;        /** Inline validation error for the cross-currency &quot;to&quot; amount, or null when it is acceptable. */
+&nbsp;        val toAmountError: TransactionAmountError?
+<b class="fc">&nbsp;            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null</b>
+&nbsp;
+&nbsp;        val isSaveEnabled: Boolean
+<b class="fc">&nbsp;            get() = when {</b>
+<b class="fc">&nbsp;                isTransfer -&gt;</b>
+<b class="fc">&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;</b>
+<b class="fc">&nbsp;                        (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &amp;&amp;</b>
+<b class="fc">&nbsp;                        fromAccount != null &amp;&amp; toAccount != null &amp;&amp;</b>
+<b class="fc">&nbsp;                        fromAccount.id != toAccount.id</b>
+<b class="fc">&nbsp;                isSplit -&gt;</b>
+<b class="fc">&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;</b>
+<b class="fc">&nbsp;                        selectedAccount != null &amp;&amp;</b>
+<b class="fc">&nbsp;                        isSplitComplete</b>
+&nbsp;                else -&gt;
+<b class="fc">&nbsp;                    TransactionAmountInput.isValid(amount) &amp;&amp;</b>
+<b class="fc">&nbsp;                        selectedAccount != null &amp;&amp;</b>
+<b class="fc">&nbsp;                        selectedCategory != null</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        companion object
 &nbsp;    }
+&nbsp;
+&nbsp;    companion object
 &nbsp;}
+&nbsp;
+&nbsp;/** Fewer lines than this is an ordinary transaction, not a split. */
+&nbsp;const val MIN_SPLIT_LINES: Int = 2
+&nbsp;
+&nbsp;/**
+&nbsp; * The line&#39;s typed amount as money, zero for anything unparseable — the editor shows what is left
+&nbsp; * to assign rather than an inline error per line, so a half-typed figure simply counts as nothing
+&nbsp; * yet.
+&nbsp; */
+&nbsp;private fun TransactionSplitLineUi.enteredMoney(): Money =
+&nbsp;    Money.fromDouble(TransactionAmountInput.parse(amount) ?: 0.0).abs()
 </code>
 </pre>
 </div>
@@ -269,7 +330,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

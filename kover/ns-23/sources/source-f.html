@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetStatus</title>
+  <title>MoneySurfer Coverage Report > BudgetPeriod</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetStatus (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: BudgetPeriod (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BudgetStatus</td>
+  <td class="name">BudgetPeriod</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -94,198 +94,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.util.BudgetPeriodWindow
-&nbsp;import com.georgeci.moneysurfer.domain.util.previousWindow
-&nbsp;import com.georgeci.moneysurfer.domain.util.windowContaining
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.daysUntil
+&nbsp;import kotlin.time.Instant
 &nbsp;
-&nbsp;/** Traffic light for a budget, derived from spend against the effective limit. */
-&nbsp;enum class BudgetStatus {
-<b class="fc">&nbsp;    OK,</b>
-<b class="fc">&nbsp;    WARN,</b>
-<b class="fc">&nbsp;    OVER,</b>
-&nbsp;}
+&nbsp;data class Budget(
+&nbsp;    val id: BudgetId = BudgetId.uuid(),
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;    val name: String,
+&nbsp;    /** Empty = every expense category. Income categories are never counted. */
+&nbsp;    val categoryIds: List&lt;CategoryId&gt;,
+&nbsp;    val amount: Money,
+&nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,
+&nbsp;    val startDate: LocalDate,
+&nbsp;    val alertPercent: Int = 80,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    /** Carry the previous period&#39;s unspent remainder into the next period&#39;s limit. */
+&nbsp;    val rollover: Boolean = false,
+&nbsp;    val createdAt: Instant,
+&nbsp;    val updatedAt: Instant = createdAt,
+&nbsp;)
 &nbsp;
-&nbsp;/**
-&nbsp; * Everything the budget screens show for one budget in one period window. Derived on read —
-&nbsp; * nothing here is persisted, so a change to the maths never needs a migration.
-&nbsp; */
-&nbsp;data class BudgetProgress(
-&nbsp;    val budget: Budget,
-&nbsp;    val window: BudgetPeriodWindow,
-&nbsp;    val spent: Money,
-&nbsp;    /** [Budget.amount] plus the rollover carry, when rollover is on and the last period ended under. */
-&nbsp;    val effectiveLimit: Money,
-&nbsp;    val rolloverCarry: Money,
-&nbsp;    /** Negative once the budget is overspent. */
-&nbsp;    val remaining: Money,
-&nbsp;    /** Spend as a percentage of [effectiveLimit]; can exceed 100. */
-&nbsp;    val percent: Int,
-&nbsp;    val status: BudgetStatus,
-&nbsp;    /** Days from `today` to the end of the window, counting today. Zero once the window is over. */
-&nbsp;    val daysLeft: Int,
-&nbsp;    val dailyAverage: Money,
-&nbsp;    /** [dailyAverage] extrapolated across the whole period. */
-&nbsp;    val projectedTotal: Money,
-&nbsp;    /** What is left to spend per remaining day to land on the limit. Zero when nothing is left. */
-&nbsp;    val perDayRemaining: Money,
-&nbsp;    /**
-&nbsp;     * Whether the window holds expenses in a currency other than the workspace base currency.
-&nbsp;     * Those are skipped — v1 does no conversion — so the UI flags the number as incomplete.
-&nbsp;     */
-&nbsp;    val hasMixedCurrency: Boolean,
-&nbsp;    /** Workspace base currency, carried along so callers can format without a second lookup. */
-&nbsp;    val currency: CurrencyCode?,
-&nbsp;) {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Spend as a fraction of [effectiveLimit] — what a progress bar is drawn from. Can exceed 1,
-&nbsp;     * which is the overspend; a zero limit reads as 0, never as a NaN.
-&nbsp;     */
-&nbsp;    val spentFraction: Float
-&nbsp;        get() = if (effectiveLimit.minor &lt;= 0L) 0f else spent.minor.toFloat() / effectiveLimit.minor.toFloat()
-&nbsp;}
-&nbsp;
-&nbsp;private const val PERCENT = 100
-&nbsp;private const val WEEKLY_DAYS = 7
-&nbsp;private const val MONTHLY_DAYS = 30
-&nbsp;private const val YEARLY_DAYS = 365
-&nbsp;
-&nbsp;/** Nominal period length used for the forecast maths, per the mockup. */
-&nbsp;val BudgetPeriod.forecastDays: Int
-&nbsp;    get() = when (this) {
-&nbsp;        BudgetPeriod.WEEKLY -&gt; WEEKLY_DAYS
-&nbsp;        BudgetPeriod.MONTHLY -&gt; MONTHLY_DAYS
-&nbsp;        BudgetPeriod.YEARLY -&gt; YEARLY_DAYS
-&nbsp;    }
-&nbsp;
-&nbsp;/**
-&nbsp; * Whether [transaction] counts against this budget in [window].
-&nbsp; *
-&nbsp; * Expenses only, and never a leg of a transfer: moving money between the user&#39;s own accounts
-&nbsp; * is not spending. Only the workspace [baseCurrency] counts — v1 converts nothing, and a
-&nbsp; * skipped foreign-currency expense is surfaced through [BudgetProgress.hasMixedCurrency]
-&nbsp; * instead of being silently added at face value.
-&nbsp; */
-&nbsp;fun Budget.counts(
-&nbsp;    transaction: Transaction,
-&nbsp;    window: BudgetPeriodWindow,
-&nbsp;    baseCurrency: CurrencyCode?,
-&nbsp;): Boolean = countsIgnoringCurrency(transaction, window) &amp;&amp; transaction.currencyCode == baseCurrency
-&nbsp;
-&nbsp;/** Same as [counts] but ignoring the currency — the input to the mixed-currency flag. */
-&nbsp;private fun Budget.countsIgnoringCurrency(
-&nbsp;    transaction: Transaction,
-&nbsp;    window: BudgetPeriodWindow,
-&nbsp;): Boolean =
-&nbsp;    transaction.workspaceId == workspaceId &amp;&amp;
-&nbsp;        transaction.type == TransactionType.EXPENSE &amp;&amp;
-&nbsp;        transaction.status == TransactionStatus.ACTUAL &amp;&amp;
-&nbsp;        transaction.transferId == null &amp;&amp;
-&nbsp;        transaction.operationDate in window &amp;&amp;
-&nbsp;        matchesCategory(transaction)
-&nbsp;
-&nbsp;/** An empty [Budget.categoryIds] is a general budget: every expense category counts. */
-&nbsp;private fun Budget.matchesCategory(transaction: Transaction): Boolean =
-&nbsp;    categoryIds.isEmpty() || transaction.categoryId in categoryIds
-&nbsp;
-&nbsp;/** The transactions behind [BudgetProgress.spent], newest business date first. */
-&nbsp;fun Budget.transactionsIn(
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    window: BudgetPeriodWindow,
-&nbsp;    baseCurrency: CurrencyCode?,
-&nbsp;): List&lt;Transaction&gt; =
-&nbsp;    transactions.filter { counts(it, window, baseCurrency) }
-&nbsp;        .sortedByDescending { it.operationDate }
-&nbsp;
-&nbsp;/**
-&nbsp; * Pure progress maths for one budget. [transactions] is the whole workspace list — filtering
-&nbsp; * happens here so callers cannot forget the transfer or currency rules.
-&nbsp; *
-&nbsp; * A rollover carry is the previous window&#39;s leftover, computed by the same filter. It is one
-&nbsp; * level deep on purpose: chaining every window back to `startDate` would make the cost of
-&nbsp; * opening the list grow with the age of the budget, for a number the user stopped tracking
-&nbsp; * periods ago.
-&nbsp; */
-&nbsp;fun calculateBudgetProgress(
-&nbsp;    budget: Budget,
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    baseCurrency: CurrencyCode?,
-&nbsp;    today: LocalDate,
-&nbsp;): BudgetProgress {
-&nbsp;    val window = budget.windowContaining(today)
-&nbsp;    val spent = budget.spendIn(transactions, window, baseCurrency)
-&nbsp;    val carry = budget.rolloverCarry(transactions, window, baseCurrency)
-&nbsp;    val effectiveLimit = budget.amount + carry
-&nbsp;    val remaining = effectiveLimit - spent
-&nbsp;
-&nbsp;    val daysLeft = today.daysUntil(window.endExclusive).coerceAtLeast(0)
-&nbsp;    val elapsedDays = window.startInclusive.daysUntil(today).coerceAtLeast(0) + 1
-&nbsp;    val dailyAverage = spent / elapsedDays
-&nbsp;
-&nbsp;    return BudgetProgress(
-&nbsp;        budget = budget,
-&nbsp;        window = window,
-&nbsp;        spent = spent,
-&nbsp;        effectiveLimit = effectiveLimit,
-&nbsp;        rolloverCarry = carry,
-&nbsp;        remaining = remaining,
-&nbsp;        percent = percentOf(spent, effectiveLimit),
-&nbsp;        status = budgetStatusOf(spent, effectiveLimit, budget.alertPercent),
-&nbsp;        daysLeft = daysLeft,
-&nbsp;        dailyAverage = dailyAverage,
-&nbsp;        projectedTotal = dailyAverage * budget.period.forecastDays,
-&nbsp;        perDayRemaining = if (daysLeft &gt; 0 &amp;&amp; remaining.isPositive()) remaining / daysLeft else Money.zero(),
-&nbsp;        hasMixedCurrency = transactions.any {
-&nbsp;            budget.countsIgnoringCurrency(it, window) &amp;&amp; it.currencyCode != baseCurrency
-&nbsp;        },
-&nbsp;        currency = baseCurrency,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;private fun Budget.spendIn(
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    window: BudgetPeriodWindow,
-&nbsp;    baseCurrency: CurrencyCode?,
-&nbsp;): Money = transactions.fold(Money.zero()) { acc, transaction -&gt;
-&nbsp;    if (counts(transaction, window, baseCurrency)) acc + transaction.money.abs() else acc
-&nbsp;}
-&nbsp;
-&nbsp;private fun Budget.rolloverCarry(
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    window: BudgetPeriodWindow,
-&nbsp;    baseCurrency: CurrencyCode?,
-&nbsp;): Money {
-&nbsp;    if (!rollover) return Money.zero()
-&nbsp;    val previous = previousWindow(window)
-&nbsp;    val leftover = amount - spendIn(transactions, previous, baseCurrency)
-&nbsp;    return if (leftover.isPositive()) leftover else Money.zero()
-&nbsp;}
-&nbsp;
-&nbsp;/** Percentage of [limit] that [spent] represents. A zero limit reads as 0 %, never as a crash. */
-&nbsp;private fun percentOf(spent: Money, limit: Money): Int =
-&nbsp;    if (limit.minor &lt;= 0L) 0 else (spent.minor * PERCENT / limit.minor).toInt()
-&nbsp;
-&nbsp;/**
-&nbsp; * The traffic light for [spent] against [limit], with [alertPercent] as the near-limit threshold.
-&nbsp; *
-&nbsp; * Public because [calculateBudgetProgress] is not the only place spend meets a cap: the dashboard&#39;s
-&nbsp; * per-category breakdown ([buildSpentByCategory]) measures a category against its own budget
-&nbsp; * without folding the transaction list, and a second set of thresholds there would let the same
-&nbsp; * budget read WARN on one screen and OK on another.
-&nbsp; */
-&nbsp;fun budgetStatusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
-&nbsp;    val percent = percentOf(spent, limit)
-&nbsp;    return when {
-&nbsp;        spent &gt; limit -&gt; BudgetStatus.OVER
-&nbsp;        percent &gt;= alertPercent -&gt; BudgetStatus.WARN
-&nbsp;        else -&gt; BudgetStatus.OK
-&nbsp;    }
+&nbsp;enum class BudgetPeriod {
+<b class="fc">&nbsp;    WEEKLY,</b>
+<b class="fc">&nbsp;    MONTHLY,</b>
+<b class="fc">&nbsp;    YEARLY,</b>
 &nbsp;}
 </code>
 </pre>
@@ -310,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

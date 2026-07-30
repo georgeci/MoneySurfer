@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FormattedTotals</title>
+  <title>MoneySurfer Coverage Report > TransactionFilter</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.account.details</a>
 </div>
 
-<h1>Coverage Summary for Class: FormattedTotals (com.georgeci.moneysurfer.feature.account.details)</h1>
+<h1>Coverage Summary for Class: TransactionFilter (com.georgeci.moneysurfer.feature.account.details)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FormattedTotals</td>
+  <td class="name">TransactionFilter</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -291,9 +291,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;/** Display-ready income/expense totals for the quick-stats row. */
-<b class="fc">&nbsp;private data class FormattedTotals(val income: String, val expenses: String)</b>
+&nbsp;private data class FormattedTotals(val income: String, val expenses: String)
 &nbsp;
-&nbsp;enum class TransactionFilter { All, Expenses, Income }
+<b class="fc">&nbsp;enum class TransactionFilter { All, Expenses, Income }</b>
 &nbsp;
 &nbsp;/** Balance curve for the details chart: `x to y` pairs the card plots, plus its signed delta. */
 &nbsp;data class AccountBalanceChartUi(
@@ -360,7 +360,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEntityPlugin</title>
+  <title>MoneySurfer Coverage Report > LwwConflictResolver</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.plugin</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEntityPlugin (com.georgeci.moneysurfer.sync.plugin)</h1>
+<h1>Coverage Summary for Class: LwwConflictResolver (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,89 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncEntityPlugin</td>
+  <td class="name">LwwConflictResolver</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SyncEntityPlugin$DefaultImpls</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    25%
-  </span>
-  <span class="absValue">
-    (1/4)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    25%
-  </span>
-  <span class="absValue">
-    (1/4)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    16.7%
+    100%
   </span>
   <span class="absValue">
-    (1/6)
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -136,63 +99,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.plugin
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;
-&nbsp;/**
-&nbsp; * Self-contained per-entity sync adapter.
-&nbsp; *
-&nbsp; * [UploadPendingChangesUseCaseImpl] calls [push] for mutations whose
-&nbsp; * [entityType] matches. [PullRemoteChangesUseCaseImpl] calls [applyDoc]
-&nbsp; * for each document in the plugin&#39;s [firestoreCollectionName].
-&nbsp; *
-&nbsp; * [firestoreCollectionName] is null for entities that are not pulled via the
-&nbsp; * subcollection cursor path (e.g. workspace root docs, users).
-&nbsp; *
-&nbsp; * [pullPriority] controls the pull order within a workspace. Lower values run
-&nbsp; * first. Plugins that have Room FK dependencies on other plugins must declare a
-&nbsp; * higher (later) priority than the plugins they depend on. Defaults to 0
-&nbsp; * (no ordering preference). Concrete values are defined in each plugin
-&nbsp; * implementation inside `:sync-surfer`.
-&nbsp; */
-&nbsp;interface SyncEntityPlugin {
-&nbsp;    val entityType: String
-&nbsp;    val firestoreCollectionName: String?
-&nbsp;
-&nbsp;    /** Pull order within a workspace. Lower = pulled first. Default: 100. */
-<b class="nc">&nbsp;    val pullPriority: Int get() = 100</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Which document tree this plugin&#39;s collection hangs off. Defaults to
-&nbsp;     * [PullScope.Workspace] — everything but per-user configuration.
-&nbsp;     */
-<b class="pc">&nbsp;    val pullScope: PullScope get() = PullScope.Workspace</b>
-&nbsp;
-&nbsp;    suspend fun push(mutation: PendingMutation)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Applies one remote document. [scopeKey] is the workspace id for a
-&nbsp;     * [PullScope.Workspace] plugin and the Firebase uid for a [PullScope.User] one — the
-&nbsp;     * same value the plugin&#39;s own outbox rows carry in `scopeKey`.
-&nbsp;     */
-&nbsp;    suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult
-&nbsp;}
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Whether a plugin&#39;s documents live under `workspaces/{wid}` or under `users/{uid}`.
+&nbsp; * Last-Write-Wins resolver — picks the side with the newer `updatedAt`.
 &nbsp; *
-&nbsp; * The discriminator exists because [PullRemoteChangesUseCaseImpl] runs *every* registered plugin
-&nbsp; * for *every* workspace. A user-scoped plugin dragged into that loop breaks either way: with
-&nbsp; * `firestoreCollectionName = null` it is handed the workspace root document and a lenient DTO
-&nbsp; * writes a garbage row, and with a name it queries a path that does not exist, once per workspace.
+&nbsp; * No local row → remote wins.
+&nbsp; * Equal timestamps → local wins (stable; remote re-pulls have no effect).
+&nbsp; *
+&nbsp; * See sync.md §2.2 / §4.7 «Сценарий 2».
 &nbsp; */
-&nbsp;enum class PullScope {
-&nbsp;    Workspace,
-&nbsp;    User,
-&nbsp;}
+<b class="fc">&nbsp;@Single(binds = [ConflictResolver::class])</b>
+&nbsp;class LwwConflictResolver : ConflictResolver {
 &nbsp;
-&nbsp;data class EntityApplyResult(val applied: Boolean, val wasConflict: Boolean)
+&nbsp;    override fun &lt;T : Any&gt; resolve(
+&nbsp;        local: T?,
+&nbsp;        remote: T,
+&nbsp;        metadata: ConflictMetadata,
+&nbsp;    ): ConflictResolution&lt;T&gt; {
+<b class="fc">&nbsp;        if (local == null) return ConflictResolution.TakeRemote(remote)</b>
+<b class="fc">&nbsp;        val localUpdatedAt = metadata.localUpdatedAt ?: Instant.DISTANT_PAST</b>
+<b class="fc">&nbsp;        return if (metadata.remoteUpdatedAt &gt; localUpdatedAt) {</b>
+<b class="fc">&nbsp;            ConflictResolution.TakeRemote(remote)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            ConflictResolution.TakeLocal(local)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -216,7 +152,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

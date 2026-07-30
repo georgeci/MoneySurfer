@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceDocumentWriter</title>
+  <title>MoneySurfer Coverage Report > UserWorkspacesProvider</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceDocumentWriter (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: UserWorkspacesProvider (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceDocumentWriter</td>
+  <td class="name">UserWorkspacesProvider</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,77 +46,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.sync.plugin.TombstonePatch
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
-&nbsp;import kotlinx.serialization.SerializationStrategy
-&nbsp;import org.koin.core.annotation.Single
-&nbsp;
 &nbsp;/**
-&nbsp; * A document somewhere under `workspaces/…`, addressed by its full path.
-&nbsp; *
-&nbsp; * A path rather than a `(workspaceId, collection, id)` triple because the workspace root document
-&nbsp; * has no collection and no id of its own, and a nullable-collection triple would have to be
-&nbsp; * re-checked at every call site.
+&nbsp; * Provides the authoritative list of workspace IDs for the current user from the remote
+&nbsp; * source (`users/{uid}.workspaceIds`). Used by [PullRemoteChangesUseCaseImpl] to discover
+&nbsp; * workspaces not yet present in the local database.
 &nbsp; */
-&nbsp;data class WorkspaceDocRef(val path: String) {
+&nbsp;interface UserWorkspacesProvider {
+&nbsp;    suspend fun workspaceIds(): List&lt;String&gt;
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        /** `workspaces/{workspaceId}` — the workspace&#39;s own document. */
-&nbsp;        fun root(workspaceId: String): WorkspaceDocRef =
-&nbsp;            WorkspaceDocRef(&quot;${SyncCollection.WORKSPACES}/$workspaceId&quot;)
-&nbsp;
-&nbsp;        /** `workspaces/{workspaceId}/{collectionName}/{documentId}`. */
-&nbsp;        fun inCollection(
-&nbsp;            workspaceId: String,
-&nbsp;            collectionName: String,
-&nbsp;            documentId: String,
-&nbsp;        ): WorkspaceDocRef =
-&nbsp;            WorkspaceDocRef(&quot;${SyncCollection.WORKSPACES}/$workspaceId/$collectionName/$documentId&quot;)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * The write half of the workspace tree — the counterpart of [WorkspaceCollectionReader], and the
-&nbsp; * same seam [UserConfigRemoteSource] is.
-&nbsp; *
-&nbsp; * What is worth testing about a push is which document it addresses and what it puts there, and
-&nbsp; * gitlive&#39;s client cannot be constructed off Android (its &quot;JVM&quot; artefact casts to
-&nbsp; * `android.content.Context`). Taking this interface rather than `FirebaseFirestore` is what lets a
-&nbsp; * plugin&#39;s push half be exercised on the JVM host instead of only on a device.
-&nbsp; */
-&nbsp;interface WorkspaceDocumentWriter {
-&nbsp;
-&nbsp;    /** Overwrites the document at [ref] with [value]. */
-&nbsp;    suspend fun &lt;T : Any&gt; set(ref: WorkspaceDocRef, strategy: SerializationStrategy&lt;T&gt;, value: T)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Writes [patch] onto an existing document, skipping one that never reached Firestore: an
-&nbsp;     * entity created and deleted between two drains leaves the INSERT push a no-op (its `getById`
-&nbsp;     * finds no live row), and updating the missing doc would raise NOT_FOUND on every retry,
-&nbsp;     * wedging the batch. A doc that never existed remotely has nothing for peers to forget.
-&nbsp;     */
-&nbsp;    suspend fun tombstone(ref: WorkspaceDocRef, patch: TombstonePatch)
-&nbsp;}
-&nbsp;
-&nbsp;@Single(binds = [WorkspaceDocumentWriter::class])
-&nbsp;class FirebaseWorkspaceDocumentWriter(
-&nbsp;    private val firestore: FirebaseFirestore,
-&nbsp;) : WorkspaceDocumentWriter {
-&nbsp;
-&nbsp;    override suspend fun &lt;T : Any&gt; set(
-&nbsp;        ref: WorkspaceDocRef,
-&nbsp;        strategy: SerializationStrategy&lt;T&gt;,
-&nbsp;        value: T,
-&nbsp;    ) {
-&nbsp;        firestore.document(ref.path).set(strategy, value)
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun tombstone(ref: WorkspaceDocRef, patch: TombstonePatch) {
-&nbsp;        val document = firestore.document(ref.path)
-&nbsp;        if (!document.get().exists) return
-&nbsp;        document.update(TombstonePatch.serializer(), patch)
-&nbsp;    }
+&nbsp;    /** Workspace IDs the user has been invited to but not yet joined. */
+&nbsp;    suspend fun invitedWorkspaceIds(): List&lt;String&gt;
 &nbsp;}
 </code>
 </pre>
@@ -141,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

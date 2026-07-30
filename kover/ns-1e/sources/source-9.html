@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEntityTypes</title>
+  <title>MoneySurfer Coverage Report > DemoDataStart</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.debug</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEntityTypes (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: DemoDataStart (com.georgeci.moneysurfer.domain.debug)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SyncEntityTypes</td>
+  <td class="name">DemoDataStart</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,24 +92,113 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.debug
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Opaque entity-type strings that flow through the sync outbox.
-&nbsp; * Values are stable — they are persisted in the local database as [PendingMutation.entityType].
+&nbsp; * What the workspace looked like before the run, plus the categories this run had to create to
+&nbsp; * make it plannable at all — the one count the generator cannot report on itself.
 &nbsp; */
-&nbsp;object SyncEntityTypes {
-&nbsp;    const val USER = &quot;USER&quot;
-&nbsp;    const val WORKSPACE = &quot;WORKSPACE&quot;
-&nbsp;    const val WORKSPACE_MEMBER = &quot;WORKSPACE_MEMBER&quot;
-&nbsp;    const val WORKSPACE_INVITE = &quot;WORKSPACE_INVITE&quot;
-&nbsp;    const val WORKSPACE_REF = &quot;WORKSPACE_REF&quot;
-&nbsp;    const val ACCOUNT = &quot;ACCOUNT&quot;
-&nbsp;    const val CATEGORY = &quot;CATEGORY&quot;
-&nbsp;    const val TRANSACTION = &quot;TRANSACTION&quot;
-&nbsp;    const val BUDGET = &quot;BUDGET&quot;
-&nbsp;    const val GOAL = &quot;GOAL&quot;
-&nbsp;    const val GOAL_CONTRIBUTION = &quot;GOAL_CONTRIBUTION&quot;
+<b class="fc">&nbsp;internal data class DemoDataStart(</b>
+<b class="fc">&nbsp;    val snapshot: DemoDataSnapshot,</b>
+<b class="fc">&nbsp;    val categoriesSeeded: Int,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The IO half of [DebugDataPrefiller]: reads what the workspace already holds, then writes the
+&nbsp; * plan the generator produced.
+&nbsp; *
+&nbsp; * Every write goes through the ordinary repositories rather than a bulk path of its own — that is
+&nbsp; * what puts the rows on the outbox, and it is the only reason prefilled data reaches Firestore for
+&nbsp; * a signed-in tester. Transactions specifically go through [ApplyTransactionChangeUseCase], the
+&nbsp; * single writer that keeps `Account.balance` a projection of the ledger; inserting them straight
+&nbsp; * would leave every account showing its opening balance forever.
+&nbsp; */
+&nbsp;@Single
+&nbsp;internal class DemoDataWriter(
+&nbsp;    private val accountRepository: AccountRepository,
+&nbsp;    private val categoryRepository: CategoryRepository,
+&nbsp;    private val budgetRepository: BudgetRepository,
+&nbsp;    private val savingsGoalRepository: SavingsGoalRepository,
+&nbsp;    private val goalContributionRepository: GoalContributionRepository,
+&nbsp;    private val applyTransactionChange: ApplyTransactionChangeUseCase,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * State the generator plans against. Categories are seeded first when the workspace has none:
+&nbsp;     * a transaction with no category is legal but tells the tester nothing, and every screen that
+&nbsp;     * groups by category would come up empty.
+&nbsp;     */
+&nbsp;    suspend fun snapshot(
+&nbsp;        workspaceId: WorkspaceId,
+&nbsp;        currency: CurrencyCode,
+&nbsp;        now: Instant,
+&nbsp;    ): DemoDataStart {
+&nbsp;        val seeded = seedCategoriesIfMissing(workspaceId, now)
+&nbsp;        return DemoDataStart(
+&nbsp;            snapshot = DemoDataSnapshot(
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                currency = currency,
+&nbsp;                accounts = accountRepository.getByWorkspaceId(workspaceId).first(),
+&nbsp;                categories = categoryRepository.getByWorkspaceId(workspaceId).first(),
+&nbsp;                budgetNames = budgetRepository.getByWorkspaceId(workspaceId).first().map { it.name }.toSet(),
+&nbsp;                goalTitles = savingsGoalRepository.getByWorkspaceId(workspaceId).first().map { it.title }.toSet(),
+&nbsp;            ),
+&nbsp;            categoriesSeeded = seeded,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    suspend fun write(plan: DemoDataPlan, categoriesSeeded: Int): DebugPrefillReport {
+&nbsp;        plan.accounts.forEach { accountRepository.insert(it) }
+&nbsp;        plan.transactions.forEach { applyTransactionChange(old = null, new = it) }
+&nbsp;        plan.budgets.forEach { budgetRepository.insert(it) }
+&nbsp;        plan.goals.forEach { savingsGoalRepository.insert(it) }
+&nbsp;        plan.contributions.forEach { goalContributionRepository.insert(it) }
+&nbsp;        return DebugPrefillReport(
+&nbsp;            accounts = plan.accounts.size,
+&nbsp;            categories = categoriesSeeded,
+&nbsp;            transactions = plan.transactions.size,
+&nbsp;            budgets = plan.budgets.size,
+&nbsp;            goals = plan.goals.size,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normally a no-op: `CreateWorkspaceUseCase` seeds the same list when the workspace is created.
+&nbsp;     * It matters for a workspace pulled from a device that deleted its categories, and for the
+&nbsp;     * hand-built ones in tests.
+&nbsp;     */
+&nbsp;    private suspend fun seedCategoriesIfMissing(workspaceId: WorkspaceId, now: Instant): Int {
+&nbsp;        if (categoryRepository.getByWorkspaceId(workspaceId).first().isNotEmpty()) return 0
+&nbsp;        DEFAULT_CATEGORY_SEEDS.forEach { seed -&gt;
+&nbsp;            categoryRepository.insert(
+&nbsp;                Category(
+&nbsp;                    id = CategoryId.uuid(),
+&nbsp;                    workspaceId = workspaceId,
+&nbsp;                    name = seed.name,
+&nbsp;                    type = seed.type,
+&nbsp;                    parentId = null,
+&nbsp;                    createdAt = now,
+&nbsp;                    systemKind = seed.systemKind,
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        return DEFAULT_CATEGORY_SEEDS.size
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -86,7 +223,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

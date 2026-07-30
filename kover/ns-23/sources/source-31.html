@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringFrequency</title>
+  <title>MoneySurfer Coverage Report > MerchantSpend</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringFrequency (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: MerchantSpend (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringFrequency</td>
+  <td class="name">MerchantSpend</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -96,51 +96,70 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.DayOfWeek
 &nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+&nbsp;import kotlinx.datetime.YearMonth
 &nbsp;
-&nbsp;data class RecurringRule(
-&nbsp;    val id: RecurringRuleId = RecurringRuleId.uuid(),
-&nbsp;    /**
-&nbsp;     * Workspace the rule belongs to. Every co-member sees the same rule, so
-&nbsp;     * [com.georgeci.moneysurfer.domain.model.Transaction.recurringRuleId] resolves on
-&nbsp;     * every device rather than dangling on the ones that never created it.
-&nbsp;     */
-&nbsp;    val workspaceId: WorkspaceId,
-&nbsp;    val title: String,
-&nbsp;    val amount: Money,
-&nbsp;    val categoryId: CategoryId,
-&nbsp;    val schedule: RecurringSchedule,
-&nbsp;    val startDate: LocalDate,
-&nbsp;    val nextRunAt: Instant?,
-&nbsp;    val autoCreate: Boolean = true,
-&nbsp;    val isActive: Boolean = true,
-&nbsp;    val createdAt: Instant = Instant.fromEpochMilliseconds(0),
-&nbsp;    val updatedAt: Instant = createdAt,
+&nbsp;/*
+&nbsp; * Return shapes of SpendAnalyticsRepository.
+&nbsp; *
+&nbsp; * All of them are magnitudes in the workspace base currency: the queries behind them sum
+&nbsp; * `ABS(amount)`, so an expense reads as a positive number rather than a negative one. Nothing
+&nbsp; * here is persisted or pushed — a change to the maths never needs a migration.
+&nbsp; */
+&nbsp;
+&nbsp;/**
+&nbsp; * What one category booked inside a spend window.
+&nbsp; *
+&nbsp; * [categoryId] is `null` for the uncategorized bucket. That is a real slice, not a missing one:
+&nbsp; * `Transaction.categoryId` is nullable, and a workspace with half its rows uncategorized would
+&nbsp; * otherwise show a donut that does not add up to what was spent.
+&nbsp; */
+&nbsp;data class CategorySpendSlice(
+&nbsp;    val categoryId: CategoryId?,
+&nbsp;    val total: Money,
+&nbsp;    val transactionCount: Int,
 &nbsp;)
 &nbsp;
-&nbsp;data class RecurringSchedule(
-&nbsp;    val frequency: RecurringFrequency,
-&nbsp;    val interval: Int = 1,
-&nbsp;    val daysOfWeek: Set&lt;DayOfWeek&gt; = emptySet(),
-&nbsp;    val daysOfMonth: Set&lt;Int&gt; = emptySet(),
-&nbsp;    val missingDayPolicy: MissingDayPolicy = MissingDayPolicy.LAST_DAY_OF_MONTH,
+&nbsp;/**
+&nbsp; * One month of the income-vs-expense trend. Both figures are magnitudes, so [net] is the
+&nbsp; * subtraction rather than a sum of signed rows.
+&nbsp; *
+&nbsp; * A month with income but no spend still produces a row — the query groups by month and type,
+&nbsp; * and the missing side folds to zero here rather than dropping the column from the chart.
+&nbsp; *
+&nbsp; * [month] names the calendar month the rows fell in; it does *not* promise the whole month was
+&nbsp; * counted. A query window that starts or ends mid-month yields a part-month row indistinguishable
+&nbsp; * from a full one — see
+&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.netByMonth].
+&nbsp; */
+&nbsp;data class MonthlyNet(
+&nbsp;    val month: YearMonth,
+&nbsp;    val income: Money,
+&nbsp;    val expense: Money,
+&nbsp;) {
+&nbsp;    /** Negative once the month spent more than it earned. */
+&nbsp;    val net: Money get() = income - expense
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One day of the spend series. Days with nothing booked are absent — the heatmap and the burn
+&nbsp; * rate both need to tell &quot;no spend&quot; from &quot;no data&quot;, and only the caller knows which window it
+&nbsp; * asked for.
+&nbsp; */
+&nbsp;data class DailySpendPoint(
+&nbsp;    val date: LocalDate,
+&nbsp;    val total: Money,
 &nbsp;)
 &nbsp;
-&nbsp;enum class RecurringFrequency {
-<b class="fc">&nbsp;    DAILY,</b>
-<b class="fc">&nbsp;    WEEKLY,</b>
-<b class="fc">&nbsp;    MONTHLY,</b>
-<b class="fc">&nbsp;    YEARLY,</b>
-&nbsp;}
-&nbsp;
-&nbsp;enum class MissingDayPolicy {
-&nbsp;    SKIP,
-&nbsp;    LAST_DAY_OF_MONTH,
-&nbsp;}
+&nbsp;/**
+&nbsp; * What one merchant took inside a spend window. [merchant] is never blank — see
+&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.topMerchants].
+&nbsp; */
+<b class="fc">&nbsp;data class MerchantSpend(</b>
+<b class="fc">&nbsp;    val merchant: String,</b>
+<b class="fc">&nbsp;    val total: Money,</b>
+<b class="fc">&nbsp;    val transactionCount: Int,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -164,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

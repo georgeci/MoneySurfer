@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferTextFieldKt</title>
+  <title>MoneySurfer Coverage Report > SurferToolbarPreviewKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferTextFieldKt (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferToolbarPreviewKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,110 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferTextFieldKt</td>
+  <td class="name">SurferToolbarPreviewKt</td>
 <td class="coverageStat">
   <span class="percent">
-    58.3%
+    0%
   </span>
   <span class="absValue">
-    (7/12)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    56.9%
+    0%
   </span>
   <span class="absValue">
-    (41/72)
+    (0/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96%
+    0%
   </span>
   <span class="absValue">
-    (72/75)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    92.9%
-  </span>
-  <span class="absValue">
-    (1176/1266)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SurferTextFieldKt$SurferTextField$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    22.2%
-  </span>
-  <span class="absValue">
-    (4/18)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    61.5%
-  </span>
-  <span class="absValue">
-    (8/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    56.8%
-  </span>
-  <span class="absValue">
-    (42/74)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    96.1%
-  </span>
-  <span class="absValue">
-    (73/76)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    91.9%
-  </span>
-  <span class="absValue">
-    (1180/1284)
+    (0/192)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -159,170 +94,74 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
-&nbsp;import androidx.compose.foundation.ExperimentalFoundationApi
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.ime
-&nbsp;import androidx.compose.foundation.relocation.BringIntoViewRequester
-&nbsp;import androidx.compose.foundation.relocation.bringIntoViewRequester
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.desktop.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.IconButton
-&nbsp;import androidx.compose.material3.OutlinedTextField
-&nbsp;import androidx.compose.material3.OutlinedTextFieldDefaults
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextFieldColors
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.LaunchedEffect
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.saveable.rememberSaveable
-&nbsp;import androidx.compose.runtime.setValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.focus.onFocusChanged
-&nbsp;import androidx.compose.ui.platform.LocalDensity
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.ImeAction
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
-&nbsp;import androidx.compose.ui.text.input.VisualTransformation
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_password_hide
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_password_show
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;
-&nbsp;/** Corner radius shared by every Surfer form field. */
-<b class="fc">&nbsp;val SurferFieldCorner: Dp = 14.dp</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Outlined form field for the app&#39;s data-entry screens.
-&nbsp; *
-&nbsp; * Two behaviours are the reason this exists as a shared component rather than a raw
-&nbsp; * [OutlinedTextField] per screen:
-&nbsp; *
-&nbsp; *  - **Errors are attached to the field.** Pass [errorText] and the message renders as supporting
-&nbsp; *    text right under the input, with the error outline — instead of a detached line elsewhere on
-&nbsp; *    the form that leaves the user hunting for which input is wrong.
-&nbsp; *  - **The keyboard never covers the focused field.** While focused, the field re-requests
-&nbsp; *    [BringIntoViewRequester.bringIntoView] every time the IME inset changes, so it scrolls clear
-&nbsp; *    of the keyboard as it animates in. The host still has to be scrollable and IME-padded for
-&nbsp; *    this to have anywhere to scroll to.
-&nbsp; *
-&nbsp; * [fieldTestTag] tags the input; the supporting text is tagged `&quot;&lt;fieldTestTag&gt;:error&quot;` so a UI
-&nbsp; * test can assert the message without matching on localized copy.
-&nbsp; */
-&nbsp;@OptIn(ExperimentalFoundationApi::class)
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;fun SurferTextField(</b>
-&nbsp;    value: String,
-&nbsp;    onValueChange: (String) -&gt; Unit,
-&nbsp;    label: String,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    errorText: String? = null,</b>
-<b class="fc">&nbsp;    enabled: Boolean = true,</b>
-<b class="fc">&nbsp;    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,</b>
-<b class="fc">&nbsp;    visualTransformation: VisualTransformation = VisualTransformation.None,</b>
-<b class="fc">&nbsp;    trailingIcon: @Composable (() -&gt; Unit)? = null,</b>
-<b class="fc">&nbsp;    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),</b>
-<b class="nc">&nbsp;    fieldTestTag: String? = null,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val bringIntoView = remember { BringIntoViewRequester() }</b>
-<b class="fc">&nbsp;    var focused by remember { mutableStateOf(false) }</b>
-&nbsp;    // Recomposes on every frame of the IME animation, which is exactly what re-triggers the
-&nbsp;    // scroll below — a single bringIntoView() on focus fires before the keyboard has taken up
-&nbsp;    // its space and lands the field back underneath it.
-<b class="fc">&nbsp;    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)</b>
-&nbsp;
-<b class="fc">&nbsp;    LaunchedEffect(focused, imeBottom, errorText) {</b>
-<b class="pc">&nbsp;        if (focused) bringIntoView.bringIntoView()</b>
+<b class="nc">&nbsp;private fun SurferToolbarPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(title = &quot;Screen Title&quot;)
 &nbsp;    }
+<b class="nc">&nbsp;}</b>
 &nbsp;
-<b class="fc">&nbsp;    OutlinedTextField(</b>
-<b class="fc">&nbsp;        value = value,</b>
-<b class="fc">&nbsp;        onValueChange = onValueChange,</b>
-<b class="fc">&nbsp;        label = { Text(label) },</b>
-<b class="fc">&nbsp;        singleLine = true,</b>
-<b class="fc">&nbsp;        keyboardOptions = keyboardOptions,</b>
-<b class="fc">&nbsp;        visualTransformation = visualTransformation,</b>
-<b class="fc">&nbsp;        enabled = enabled,</b>
-<b class="fc">&nbsp;        isError = errorText != null,</b>
-<b class="fc">&nbsp;        trailingIcon = trailingIcon,</b>
-<b class="fc">&nbsp;        supportingText = errorText?.let {</b>
-<b class="fc">&nbsp;            {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = it,</b>
-<b class="pc">&nbsp;                    modifier = fieldTestTag?.let { tag -&gt; Modifier.testTag(&quot;$tag:error&quot;) } ?: Modifier,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        },</b>
-<b class="fc">&nbsp;        shape = RoundedCornerShape(SurferFieldCorner),</b>
-<b class="fc">&nbsp;        colors = colors,</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .bringIntoViewRequester(bringIntoView)</b>
-<b class="fc">&nbsp;            .onFocusChanged { focused = it.isFocused }</b>
-<b class="pc">&nbsp;            .then(fieldTestTag?.let { Modifier.testTag(it) } ?: Modifier),</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * [SurferTextField] pre-wired for password entry: password keyboard, masked text, and a trailing
-&nbsp; * reveal toggle. The reveal state is [rememberSaveable] so rotating the device does not silently
-&nbsp; * re-mask a password the user chose to check.
-&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
 &nbsp;@Composable
-<b class="fc">&nbsp;fun SurferPasswordField(</b>
-&nbsp;    value: String,
-&nbsp;    onValueChange: (String) -&gt; Unit,
-&nbsp;    label: String,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    errorText: String? = null,</b>
-<b class="fc">&nbsp;    enabled: Boolean = true,</b>
-<b class="fc">&nbsp;    imeAction: ImeAction = ImeAction.Done,</b>
-<b class="fc">&nbsp;    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),</b>
-<b class="nc">&nbsp;    fieldTestTag: String? = null,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    var revealed by rememberSaveable { mutableStateOf(false) }</b>
+<b class="nc">&nbsp;private fun SurferToolbarWithBackPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Details&quot;,
+&nbsp;            onBack = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 &nbsp;
-<b class="fc">&nbsp;    SurferTextField(</b>
-<b class="fc">&nbsp;        value = value,</b>
-<b class="fc">&nbsp;        onValueChange = onValueChange,</b>
-<b class="fc">&nbsp;        label = label,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        errorText = errorText,</b>
-<b class="fc">&nbsp;        enabled = enabled,</b>
-<b class="fc">&nbsp;        keyboardOptions = KeyboardOptions(</b>
-<b class="fc">&nbsp;            keyboardType = KeyboardType.Password,</b>
-<b class="fc">&nbsp;            imeAction = imeAction,</b>
-&nbsp;        ),
-<b class="fc">&nbsp;        visualTransformation = if (revealed) {</b>
-<b class="fc">&nbsp;            VisualTransformation.None</b>
-&nbsp;        } else {
-<b class="fc">&nbsp;            PasswordVisualTransformation()</b>
-&nbsp;        },
-<b class="fc">&nbsp;        trailingIcon = {</b>
-<b class="fc">&nbsp;            IconButton(</b>
-<b class="fc">&nbsp;                onClick = { revealed = !revealed },</b>
-<b class="fc">&nbsp;                enabled = enabled,</b>
-<b class="pc">&nbsp;                modifier = fieldTestTag?.let { Modifier.testTag(&quot;$it:reveal&quot;) } ?: Modifier,</b>
-<b class="fc">&nbsp;            ) {</b>
-<b class="fc">&nbsp;                Icon(</b>
-<b class="fc">&nbsp;                    imageVector = if (revealed) SurferIcons.VisibilityOff else SurferIcons.Visibility,</b>
-<b class="fc">&nbsp;                    contentDescription = stringResource(</b>
-<b class="fc">&nbsp;                        if (revealed) Res.string.uikit_password_hide else Res.string.uikit_password_show,</b>
-&nbsp;                    ),
-&nbsp;                )
-&nbsp;            }
-&nbsp;        },
-<b class="fc">&nbsp;        colors = colors,</b>
-<b class="fc">&nbsp;        fieldTestTag = fieldTestTag,</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarWithActionsPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Dashboard&quot;,
+&nbsp;            actions = {
+&nbsp;                IconButton(onClick = {}) {
+&nbsp;                    Icon(
+&nbsp;                        imageVector = SurferIcons.Settings,
+&nbsp;                        contentDescription = &quot;Settings&quot;,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarFullPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit Account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                IconButton(onClick = {}) {
+&nbsp;                    Icon(
+&nbsp;                        imageVector = SurferIcons.Delete,
+&nbsp;                        contentDescription = &quot;Delete&quot;,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -346,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

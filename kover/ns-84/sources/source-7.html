@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferGoalIconDefaults</title>
+  <title>MoneySurfer Coverage Report > SurferStatusHeroTone</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.goal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferGoalIconDefaults (com.georgeci.moneysurfer.uikit.components.goal)</h1>
+<h1>Coverage Summary for Class: SurferStatusHeroTone (com.georgeci.moneysurfer.uikit.components.settings)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferGoalIconDefaults</td>
+  <td class="name">SurferStatusHeroTone</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,10 +60,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -92,117 +92,117 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.goal
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.ReadOnlyComposable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.luminance
-&nbsp;import androidx.compose.ui.text.TextStyle
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.compose.ui.unit.sp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+<b class="fc">&nbsp;enum class SurferStatusHeroTone { Primary, Secondary, Tertiary }</b>
+&nbsp;
 &nbsp;/**
-&nbsp; * Emoji tile for a savings goal: a squircle filled with a tint derived from the goal&#39;s hue.
-&nbsp; *
-&nbsp; * Goals are the design system&#39;s second sanctioned use of emoji (workspace icons are the
-&nbsp; * first) — see decision 8 in md/goals.md.
+&nbsp; * Tinted hero card with a circular icon, title, and optional supporting line.
+&nbsp; * Generic enough to power sync status, last-backup, and similar surfaces.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferGoalIcon(
-&nbsp;    emoji: String,
-&nbsp;    hue: Int,
+&nbsp;fun SurferStatusHeroCard(
+&nbsp;    title: String,
+&nbsp;    icon: ImageVector,
 &nbsp;    modifier: Modifier = Modifier,
-&nbsp;    size: Dp = SurferGoalIconDefaults.Size,
+&nbsp;    supporting: String? = null,
+&nbsp;    tone: SurferStatusHeroTone = SurferStatusHeroTone.Tertiary,
 &nbsp;) {
-&nbsp;    Box(
+&nbsp;    val colors = AppTheme.materialColors
+&nbsp;    val (bg, fg) = when (tone) {
+&nbsp;        SurferStatusHeroTone.Primary -&gt; colors.primaryContainer to colors.onPrimaryContainer
+&nbsp;        SurferStatusHeroTone.Secondary -&gt; colors.secondaryContainer to colors.onSecondaryContainer
+&nbsp;        SurferStatusHeroTone.Tertiary -&gt; colors.tertiaryContainer to colors.onTertiaryContainer
+&nbsp;    }
+&nbsp;    val shape = RoundedCornerShape(20.dp)
+&nbsp;    Row(
 &nbsp;        modifier = modifier
-&nbsp;            .size(size)
-&nbsp;            .clip(RoundedCornerShape(SurferGoalIconDefaults.CORNER_PERCENT))
-&nbsp;            .background(goalTileColor(hue)),
-&nbsp;        contentAlignment = Alignment.Center,
+&nbsp;            .fillMaxWidth()
+&nbsp;            .shadow(elevation = 2.dp, shape = shape)
+&nbsp;            .clip(shape)
+&nbsp;            .background(bg)
+&nbsp;            .padding(18.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),
 &nbsp;    ) {
-&nbsp;        Text(
-&nbsp;            text = emoji,
-&nbsp;            style = TextStyle(fontSize = (size.value * SurferGoalIconDefaults.EMOJI_RATIO).sp),
-&nbsp;        )
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(48.dp)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(Color.White.copy(alpha = 0.2f)),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = icon,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                tint = fg,
+&nbsp;                modifier = Modifier.size(24.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = title,
+&nbsp;                style = AppTheme.typography.titleMedium,
+&nbsp;                color = fg,
+&nbsp;            )
+&nbsp;            if (supporting != null) {
+&nbsp;                Text(
+&nbsp;                    text = supporting,
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = fg.copy(alpha = 0.85f),
+&nbsp;                    modifier = Modifier.padding(top = 2.dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;object SurferGoalIconDefaults {
-<b class="fc">&nbsp;    val Size: Dp = 44.dp</b>
-&nbsp;
-&nbsp;    /** The mockup draws the tile between a 32% and 38% corner radius; 35% splits the two. */
-&nbsp;    const val CORNER_PERCENT: Int = 35
-&nbsp;    const val EMOJI_RATIO: Float = 0.5f
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Tile fill for a goal hue. Saturation and lightness are fixed per theme so a hue picked in
-&nbsp; * light mode stays legible in dark mode instead of glowing.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;@ReadOnlyComposable
-&nbsp;fun goalTileColor(hue: Int): Color {
-&nbsp;    val dark = isDarkSurface()
-&nbsp;    return Color.hsl(
-&nbsp;        hue = hue.coerceIn(0, HUE_MAX).toFloat(),
-&nbsp;        saturation = if (dark) 0.35f else 0.55f,
-&nbsp;        lightness = if (dark) 0.28f else 0.90f,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;/** Accent for a goal hue — progress fills, rings and the emoji-picker selection ring. */
-&nbsp;@Composable
-&nbsp;@ReadOnlyComposable
-&nbsp;fun goalAccentColor(hue: Int): Color {
-&nbsp;    val dark = isDarkSurface()
-&nbsp;    return Color.hsl(
-&nbsp;        hue = hue.coerceIn(0, HUE_MAX).toFloat(),
-&nbsp;        saturation = if (dark) 0.55f else 0.65f,
-&nbsp;        lightness = if (dark) 0.62f else 0.45f,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;private const val HUE_MAX = 360
-&nbsp;private const val DARK_SURFACE_LUMINANCE = 0.5f
-&nbsp;
-&nbsp;/**
-&nbsp; * The theme carries no `isDark` flag, and hue tints need one: the same hue has to be pale on a
-&nbsp; * light surface and muted on a dark one. Reading the surface luminance keeps that decision here
-&nbsp; * instead of threading a flag through every goal composable.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;@ReadOnlyComposable
-&nbsp;private fun isDarkSurface(): Boolean =
-&nbsp;    AppTheme.materialColors.surface.luminance() &lt; DARK_SURFACE_LUMINANCE
-&nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferGoalIconPreview() {
+&nbsp;private fun SurferStatusHeroCardPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        Row(
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
 &nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
 &nbsp;        ) {
-&nbsp;            SurferGoalIcon(emoji = &quot;🚲&quot;, hue = 210)
-&nbsp;            SurferGoalIcon(emoji = &quot;🏖️&quot;, hue = 30)
-&nbsp;            SurferGoalIcon(emoji = &quot;🏠&quot;, hue = 140, size = 56.dp)
+&nbsp;            SurferStatusHeroCard(
+&nbsp;                title = &quot;Up to date&quot;,
+&nbsp;                supporting = &quot;Last sync: today, 14:02&quot;,
+&nbsp;                icon = SurferIcons.Sync,
+&nbsp;                tone = SurferStatusHeroTone.Tertiary,
+&nbsp;            )
+&nbsp;            SurferStatusHeroCard(
+&nbsp;                title = &quot;Last backup · today&quot;,
+&nbsp;                supporting = &quot;14:02 · 18 MB · 2,341 transactions&quot;,
+&nbsp;                icon = SurferIcons.Cloud,
+&nbsp;                tone = SurferStatusHeroTone.Primary,
+&nbsp;            )
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
@@ -229,7 +229,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>

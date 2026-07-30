@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (128/128)
+    (137/137)
   </span>
 </td>
 </tr>
@@ -157,6 +157,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * Phase 2. Until then the switch does not claim to drive this card.
 &nbsp;     */
 <b class="fc">&nbsp;    Insights,</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The scheduled payments the next few days hold. **Not** period-scoped, and this one could not
+&nbsp;     * be: it looks forward, and [DashboardPeriod] names a window that has already elapsed. Switching
+&nbsp;     * to Week must not turn &quot;what is about to be charged&quot; into &quot;the next seven days only&quot; —
+&nbsp;     * a rent payment eight days out is exactly what the card exists to warn about.
+&nbsp;     */
+<b class="fc">&nbsp;    Recurring,</b>
 <b class="fc">&nbsp;    Goals,</b>
 <b class="fc">&nbsp;    RecentTransactions,</b>
 &nbsp;}
@@ -183,7 +191,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-30 23:40</div>
 </div>
 </body>
 </html>
