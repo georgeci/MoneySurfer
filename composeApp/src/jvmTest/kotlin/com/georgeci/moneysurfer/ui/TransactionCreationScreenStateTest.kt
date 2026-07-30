@@ -1,8 +1,10 @@
 package com.georgeci.moneysurfer.ui
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
@@ -113,6 +115,25 @@ class TransactionCreationScreenStateTest : StringSpec({
             setContent { TransactionCreationContent(state = form(amount = "0"), onEvent = {}) }
 
             onNodeWithText("Amount must be greater than zero.").assertIsDisplayed()
+        }
+    }
+
+    "a state the view model pushes back redraws the form it is already showing" {
+        runComposeUiTest {
+            val state = mutableStateOf(form(amount = "80"))
+            setContent { TransactionCreationContent(state = state.value, onEvent = {}) }
+
+            onNodeWithText("Enter a valid amount.").assertDoesNotExist()
+            onNodeWithTag(TransactionCreationTestTags.Save).assertIsEnabled()
+
+            // Every case above mounts the form once. This is the other half of the contract: the
+            // screen is a function of the state, so a state arriving after composition — a picked
+            // category, a restored draft, an amount the ViewModel rewrote — has to reach the
+            // screen without it being torn down and rebuilt.
+            runOnIdle { state.value = form(amount = "1.2.3") }
+
+            onNodeWithText("Enter a valid amount.").assertIsDisplayed()
+            onNodeWithTag(TransactionCreationTestTags.Save).assertIsNotEnabled()
         }
     }
 
