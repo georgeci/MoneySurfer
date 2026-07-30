@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.feature.dashboard.AccountUi
 import com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi
 import com.georgeci.moneysurfer.feature.dashboard.BurnRateDayUi
@@ -33,6 +34,7 @@ import com.georgeci.moneysurfer.feature.dashboard.DashboardEvent
 import com.georgeci.moneysurfer.feature.dashboard.DashboardState
 import com.georgeci.moneysurfer.feature.dashboard.DashboardTestTags
 import com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi
+import com.georgeci.moneysurfer.feature.dashboard.UpcomingRecurringUi
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -567,6 +569,30 @@ class DashboardScreenStateTest : StringSpec({
             onNodeWithText("No spend").assertIsDisplayed()
         }
     }
+
+    "the upcoming card names the two nearest days rather than printing their dates" {
+        runPhoneUiTest {
+            setContent { DashboardContent(state = upcomingState(), onEvent = {}) }
+
+            onNodeWithTag(DashboardTestTags.Recurring).assertIsDisplayed()
+            onNodeWithText("Today").assertIsDisplayed()
+            onNodeWithText("Tomorrow").assertIsDisplayed()
+            // Anything further out is a date, which needs no locale rules to read.
+            onNodeWithText("2026-05-02").assertIsDisplayed()
+            onNodeWithText(RENT_DUE).assertIsDisplayed()
+        }
+    }
+
+    "a workspace with nothing scheduled keeps the card and says so" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(state = upcomingState().copy(upcoming = emptyList()), onEvent = {})
+            }
+
+            onNodeWithTag(DashboardTestTags.Recurring).assertIsDisplayed()
+            onNodeWithText("Nothing scheduled").assertIsDisplayed()
+        }
+    }
 })
 
 /**
@@ -765,3 +791,29 @@ private fun contentWith(accounts: Int, transferEnabled: Boolean) = DashboardStat
     formattedTrendDelta = null,
     transferEnabled = transferEnabled,
 )
+
+/**
+ * The upcoming card alone, for the same reason [categoriesDonutState] draws the donut alone: the
+ * whole default layout is taller than the test window, and a widget below the fold never composes.
+ */
+private fun upcomingState() = contentWith(accounts = 2, transferEnabled = true).copy(
+    upcoming = listOf(
+        upcomingUi(id = "coffee", days = 0, iso = "2026-04-30", amount = "€9.99"),
+        upcomingUi(id = "rent", days = 1, iso = "2026-05-01", amount = RENT_DUE),
+        upcomingUi(id = "gym", days = 2, iso = "2026-05-02", amount = "€32.00"),
+    ),
+    layout = DashboardLayoutConfig(
+        items = listOf(DashboardLayoutItem(type = DashboardWidgetType.Recurring)),
+    ),
+)
+
+private fun upcomingUi(id: String, days: Int, iso: String, amount: String) = UpcomingRecurringUi(
+    id = RecurringRuleId(id),
+    name = id,
+    amountFormatted = amount,
+    dueDateIso = iso,
+    daysUntil = days,
+    isImminent = days <= 1,
+)
+
+private const val RENT_DUE = "€980.00"
