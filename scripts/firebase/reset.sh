@@ -7,7 +7,9 @@
 
 set -euo pipefail
 
-PROJECT_ID="${FIREBASE_PROJECT_ID:-moneysurfer-test}"
+# Keep in sync with start.sh / seed.sh — resetting a different project id than the
+# emulator was booted with silently wipes nothing.
+PROJECT_ID="${FIREBASE_PROJECT_ID:-demo-moneysurfer}"
 AUTH_HOST="${AUTH_EMULATOR_HOST:-localhost:9099}"
 FIRESTORE_HOST="${FIRESTORE_EMULATOR_HOST:-localhost:8080}"
 

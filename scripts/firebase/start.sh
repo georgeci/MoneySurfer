@@ -7,6 +7,7 @@
 # Usage:
 #   scripts/firebase/start.sh                  # foreground (Ctrl-C to stop)
 #   scripts/firebase/start.sh --background     # detached, prints PID
+#   FIREBASE_PROJECT_ID=foo scripts/firebase/start.sh   # override project
 #
 # All emulator data is in-memory by default. Add `--export-on-exit=...` if you
 # want to snapshot state between runs.
@@ -15,7 +16,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 
-PROJECT_ID="${FIREBASE_PROJECT_ID:-moneysurfer-test}"
+# Must match every other emulator surface — the Gradle wrappers, firestore-tests,
+# EmulatorFirebaseConfig.DEFAULT_PROJECT_ID, EmulatorEnv.EMULATOR_PROJECT_ID and the
+# desktop bootstrap all pin `demo-moneysurfer`. A different id here boots the emulator
+# on another namespace, so seeded state is invisible to whatever reads it. The `demo-`
+# prefix is also what puts Firebase in demo-project mode (no credentials required).
+PROJECT_ID="${FIREBASE_PROJECT_ID:-demo-moneysurfer}"
 
 if [[ "${1:-}" == "--background" ]]; then
     nohup firebase emulators:start \
