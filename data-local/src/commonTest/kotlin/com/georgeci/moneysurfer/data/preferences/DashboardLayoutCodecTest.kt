@@ -29,6 +29,7 @@ class DashboardLayoutCodecTest : StringSpec({
                 // Every type, or the decode-side `normalized()` would append the missing one and
                 // the round trip would fail for a reason that has nothing to do with the codec.
                 DashboardLayoutItem(DashboardWidgetType.QuickActions),
+                DashboardLayoutItem(DashboardWidgetType.SpentMonth),
                 DashboardLayoutItem(DashboardWidgetType.SafeToSpend),
                 DashboardLayoutItem(DashboardWidgetType.BurnRate),
                 DashboardLayoutItem(DashboardWidgetType.Budgets),
@@ -73,6 +74,7 @@ class DashboardLayoutCodecTest : StringSpec({
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
             DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SpentMonth,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.BurnRate,
             DashboardWidgetType.Budgets,
