@@ -148,7 +148,9 @@ Every push to `main` republishes the aggregated CI reports to GitHub Pages
 - [Reports index](https://georgeci.github.io/MoneySurfer/)
 - [Allure](https://georgeci.github.io/MoneySurfer/allure/) — common + Firestore rules tests, with history
 - [Kover coverage](https://georgeci.github.io/MoneySurfer/kover/) — HTML report, common scope
-- [Allure (nightly)](https://georgeci.github.io/MoneySurfer/nightly/allure/) — all five nightly scopes
+- [Allure (nightly)](https://georgeci.github.io/MoneySurfer/nightly/allure/) — all five nightly scopes.
+  **Stale:** the `nightly-publish` job in [nightly.yml](.github/workflows/nightly.yml) is
+  disabled (issue #297), so nothing republishes this subtree and the link currently 404s
 - [Codecov](https://codecov.io/gh/georgeci/MoneySurfer) — coverage trend, PR diff, and per-layer / per-feature components
 - [SonarCloud](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer) — quality gate, detekt findings, duplication
 
