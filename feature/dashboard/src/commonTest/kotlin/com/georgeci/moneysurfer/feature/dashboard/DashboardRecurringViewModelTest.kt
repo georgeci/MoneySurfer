@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
 import com.georgeci.moneysurfer.domain.fixtures.FakeRecurringRuleRepository
+import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
@@ -10,6 +11,7 @@ import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.RecurringFrequency
 import com.georgeci.moneysurfer.domain.model.RecurringRule
 import com.georgeci.moneysurfer.domain.model.RecurringSchedule
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import io.kotest.core.spec.style.StringSpec
@@ -22,16 +24,25 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Duration.Companion.hours
 
 /**
  * What the upcoming-payments card is handed: the next occurrence of each rule, soonest first.
  *
- * The shared clock is fixed at 2024-01-01, so every expected date below is read against that day.
+ * Its own clock rather than the shared one, pinned to *midday* on [TODAY]: the use case dates rules
+ * in the device's own zone, and the shared anchor is midnight UTC — which is still the day before on
+ * every runner west of it. These are the specs that assert exact dates, so they carry a clock that
+ * reads as the same day from UTC-11 to UTC+11.
+ *
  * Split from `DashboardViewModelTest` for the reason the insights spec is — shared fakes live in
  * `DashboardTestFakes.kt`.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DashboardRecurringViewModelTest : StringSpec({
+
+    val clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC) + MIDDAY))
 
     beforeSpec { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     afterSpec { Dispatchers.resetMain() }
@@ -42,6 +53,7 @@ class DashboardRecurringViewModelTest : StringSpec({
             ws = ws,
             accounts = FakeAccountRepository(emptyList()),
             transactions = FakeTransactionRepository(emptyList()),
+            clock = clock,
             recurringRules = FakeRecurringRuleRepository(
                 listOf(
                     // The 5th of every month, so the next one is four days out.
@@ -69,6 +81,7 @@ class DashboardRecurringViewModelTest : StringSpec({
             ws = ws,
             accounts = FakeAccountRepository(emptyList()),
             transactions = FakeTransactionRepository(emptyList()),
+            clock = clock,
             recurringRules = FakeRecurringRuleRepository(
                 listOf(ruleIn(ws, "gym", RecurringFrequency.DAILY, isActive = false)),
             ),
@@ -77,6 +90,12 @@ class DashboardRecurringViewModelTest : StringSpec({
         viewModel.value.shouldBeInstanceOf<DashboardState.Content>().upcoming.shouldBeEmpty()
     }
 })
+
+/** The day every expectation in this spec is read against. */
+private val TODAY = LocalDate(2024, 1, 1)
+
+/** Half a day past [TODAY]'s UTC midnight, so no ordinary zone offset moves the date. */
+private val MIDDAY = 12.hours
 
 @Suppress("LongParameterList")
 private fun ruleIn(
