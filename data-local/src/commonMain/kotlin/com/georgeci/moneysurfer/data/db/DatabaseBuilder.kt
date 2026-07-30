@@ -31,9 +31,8 @@ import kotlinx.coroutines.IO
 fun getRoomDatabase(
     builder: RoomDatabase.Builder<MoneySurferDatabase>,
     allowDestructiveMigration: Boolean = false,
-): MoneySurferDatabase {
-    lateinit var database: MoneySurferDatabase
-    database = builder
+): MoneySurferDatabase =
+    builder
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         // Pre-baseline versions (< 25, plus the 26→27 and 28→29 gaps) never shipped to a
@@ -55,7 +54,5 @@ fun getRoomDatabase(
             }
         }
         .build()
-    return database
-}
 
 internal const val DB_NAME = "moneysurfer.db"
