@@ -32,6 +32,24 @@
 - Lines: 26-46
 - Tasks: adr, sync, outbox, pull
 
+## app-check-clients
+- Title: How each host attests
+- File: docs/security/app-check.md
+- Lines: 16-54
+- Tasks: security, firebase, appcheck
+
+## app-check-console
+- Title: Console setup (not in this repo)
+- File: docs/security/app-check.md
+- Lines: 56-75
+- Tasks: security, firebase, appcheck, setup
+
+## app-check-rollout
+- Title: Rollout order
+- File: docs/security/app-check.md
+- Lines: 77-96
+- Tasks: security, firebase, appcheck, release
+
 ## app-version-gate-config
 - Title: Remote config schema
 - File: docs/architecture/app-version-gate.md

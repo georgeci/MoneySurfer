@@ -52,7 +52,14 @@ fun initializeDesktopFirebase() {
     // `Application`, not its `Context` supertype: Firestore's ComponentProvider casts down to
     // `Application` to register lifecycle callbacks, and a plain `Context` panics its async
     // queue with a ClassCastException on the first read.
-    Firebase.initialize(Application(), desktopFirebaseOptions())
+    val useEmulator = defaultUseEmulator()
+    val options = desktopFirebaseOptions(useEmulator = useEmulator)
+    Firebase.initialize(Application(), options)
+    // Skipped against the emulator: it does not verify App Check tokens, and there is no
+    // project to register a debug secret with. See DesktopAppCheck.jvm.kt.
+    if (!useEmulator) {
+        installDesktopAppCheck(options)
+    }
     initialized = true
 }
 

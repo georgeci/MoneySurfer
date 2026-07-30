@@ -1,10 +1,24 @@
 import SwiftUI
+import FirebaseAppCheck
 import FirebaseCore
 import FirebaseCrashlytics
+
+/// Firebase ships `AppAttestProvider` but — unlike DeviceCheck — no factory for it, and there is
+/// no implicit fallback: with no factory registered `FIRAppCheck` logs "without a provider
+/// factory" and App Check is never instantiated at all. Hence this adapter.
+private final class AppAttestProviderFactory: NSObject, AppCheckProviderFactory {
+    func createProvider(with app: FirebaseApp) -> AppCheckProvider? {
+        AppAttestProvider(app: app)
+    }
+}
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        // Must precede `FirebaseApp.configure()` — Firebase reads the factory during
+        // configuration, and a provider installed afterwards is ignored for the first calls.
+        installAppCheckProviderFactory()
+
         if shouldUseFirebaseEmulator() {
             let options = FirebaseOptions(
                 googleAppID: "1:000000000000:ios:0000000000000000",
@@ -25,6 +39,23 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             FirebaseApp.configure()
         }
         return true
+    }
+
+    /// App Check attests that the caller is the real MoneySurfer build, which Firestore rules
+    /// cannot express — they only know who the user is.
+    ///
+    /// Skipped against the emulator: it does not verify tokens, and the demo project has no
+    /// place to register a debug secret. App Attest needs a real device and a provisioned
+    /// bundle id, so the Simulator and debug builds fall back to the debug provider, whose
+    /// secret must be registered under App Check → Apps → Manage debug tokens.
+    private func installAppCheckProviderFactory() {
+        guard !shouldUseFirebaseEmulator() else { return }
+
+        #if targetEnvironment(simulator) || DEBUG
+        AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+        #else
+        AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory())
+        #endif
     }
 
     private func shouldUseFirebaseEmulator() -> Bool {

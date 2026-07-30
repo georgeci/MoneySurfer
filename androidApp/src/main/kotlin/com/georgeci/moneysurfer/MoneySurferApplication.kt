@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer
 
 import android.app.Application
+import com.georgeci.moneysurfer.appcheck.installAppCheckProvider
 import com.georgeci.moneysurfer.di.initKoin
 import com.georgeci.moneysurfer.di.onlineWiring
 import org.koin.android.ext.koin.androidContext
@@ -16,6 +17,15 @@ class MoneySurferApplication : Application() {
         // on first instantiation.
         if (BuildConfig.USE_EMULATOR) {
             System.setProperty("MS_USE_EMULATOR", "true")
+        } else {
+            // App Check attests that the caller is the real app, which Firestore rules cannot
+            // express — they only know who the user is. Skipped against the emulator, which
+            // does not verify tokens and has no project to register a debug secret with.
+            //
+            // Must run before the first Firestore/Auth call: the provider is installed on the
+            // already-auto-initialized default FirebaseApp, and Koin resolves those lazily
+            // below. The variant source sets pick the provider — debug secret vs Play Integrity.
+            installAppCheckProvider()
         }
 
         initKoin(isDebug = BuildConfig.DEBUG, extraModules = onlineWiring) {

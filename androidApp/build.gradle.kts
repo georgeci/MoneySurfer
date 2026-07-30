@@ -41,6 +41,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.appcheck.playintegrity)
+    // Debug-only on purpose: the debug provider mints tokens for any device holding a
+    // registered debug secret, so it must not exist in a release binary at all.
+    debugImplementation(libs.firebase.appcheck.debug)
 }
 
 // Sonar Gradle plugin (≤6.0.x) still references the legacy AGP `AppExtension`,
