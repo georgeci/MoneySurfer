@@ -94,15 +94,11 @@ Full reference — install, configuration, per-platform switching, troubleshooti
 — is in [firebase-emulator](firebase-emulator.md). Bootstrap scripts live in
 `scripts/firebase/` (`start.sh`, `stop.sh`, `reset.sh`, `seed.sh`).
 
-One gotcha worth repeating here, because it bites when mixing entry points: the
-Gradle wrappers and `firestore-tests` pin `--project demo-moneysurfer`, but
-`scripts/firebase/start.sh` / `reset.sh` default to `moneysurfer-test` unless
-`FIREBASE_PROJECT_ID` is set — so state seeded through the scripts lands in a
-different emulator namespace than the tests read. For one shared namespace:
-
-```bash
-FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
-```
+Every entry point shares one emulator namespace: the Gradle wrappers,
+`firestore-tests`, all four `scripts/firebase/*` scripts and the desktop host
+resolve to `--project demo-moneysurfer`. Override with `FIREBASE_PROJECT_ID`
+only if you deliberately want a separate namespace — and then set it for *every*
+process in the run, or seeded state becomes invisible to whatever reads it.
 
 ## QA tasks
 

@@ -122,7 +122,7 @@ data class DashboardLayoutConfig(
         /**
          * Variant A from the design: the balance headline first, the quick actions under it, then
          * safe-to-spend, the burn rate that explains it, the budgets both are read off, where
-         * the period's money went, the accounts strip, the generated
+         * the period's money went, the accounts strip, the same spend as a donut, the generated
          * insights, goals, and the recent-transactions list. Every widget starts enabled and
          * Hero-sized.
          *
@@ -130,6 +130,11 @@ data class DashboardLayoutConfig(
          * beside the shortcuts, a row of three stat cards, the spend chart with the accounts rail
          * next to it, insights and goals paired, and the activity list full width at the bottom.
          * Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
+         *
+         * The donut takes a band of its own at [DashboardWidgetSpan.Full] — a card that is already
+         * a wide row (chart beside legend) reads fine at that width, and it is the only span that
+         * seats a new widget without renarrowing the cards around it, which would have changed the
+         * default dashboard of every user who never opened the customize screen.
          */
         val DEFAULT = DashboardLayoutConfig(
             items = listOf(
@@ -140,6 +145,7 @@ data class DashboardLayoutConfig(
                 DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),
                 DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),
                 DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.CategoriesDonut, span = DashboardWidgetSpan.Full),
                 DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),

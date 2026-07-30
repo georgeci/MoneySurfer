@@ -86,7 +86,8 @@ class DashboardGridScreenTest : StringSpec({
             val recent = onNodeWithTag(DashboardTestTags.Recent).getUnclippedBoundsInRoot()
             val goals = onNodeWithTag(DashboardTestTags.Goals).getUnclippedBoundsInRoot()
 
-            // Recent transactions is the only Full-span widget in the default layout.
+            // Recent transactions is the last Full-span widget in the default layout, so nothing
+            // shares its row and everything narrower sits above it.
             (recent.top >= goals.bottom) shouldBe true
             (recent.width > goals.width) shouldBe true
         }
@@ -111,7 +112,12 @@ private const val PHONE_WIDTH_PX = 411f
 /** The 1360 dp desktop window the design is drawn at. */
 private const val DESKTOP_WIDTH_PX = 1360f
 
-private const val WINDOW_HEIGHT_PX = 900f
+/**
+ * Tall enough for the whole default layout to be composed at once. The grid is lazy, so a widget
+ * below the fold has no node to read bounds off — and these tests are about where widgets land
+ * relative to each other, not about what fits a real window.
+ */
+private const val WINDOW_HEIGHT_PX = 1600f
 
 /** Column widths are integer pixels, so two "equal" cells can differ by a rounding step. */
 private val ROUNDING_SLACK = 2.dp

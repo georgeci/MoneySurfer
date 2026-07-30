@@ -100,7 +100,11 @@ kotlin {
         }
 
         jvmMain {
-            dependencies {}
+            dependencies {
+                // Desktop has no google-services.json / GoogleService-Info.plist, so
+                // FirebaseBootstrap builds the default FirebaseApp by hand against the java-sdk.
+                implementation(libs.gitlive.firebase.java.sdk)
+            }
         }
     }
 }

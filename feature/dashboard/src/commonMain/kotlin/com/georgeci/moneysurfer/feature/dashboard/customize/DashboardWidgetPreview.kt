@@ -17,7 +17,7 @@ import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
-import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceTrend
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
@@ -26,8 +26,10 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
 import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
+import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
@@ -60,6 +62,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_cap
 import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
 import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_projection
 import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_center_label
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
@@ -75,6 +78,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_pre
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_groceries
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_rent
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_transport
 import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
@@ -89,6 +93,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_cate
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
 import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -130,6 +135,7 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.Budgets -> BudgetsPreview(modifier.then(content))
             DashboardWidgetType.SpentByCategory ->
                 SpentByCategoryPreview(cardStyle.variant, modifier.then(content))
+            DashboardWidgetType.CategoriesDonut -> CategoriesDonutPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
@@ -138,13 +144,18 @@ internal fun DashboardWidgetPreview(
     }
 }
 
+/**
+ * Sample curve as well as sample figures: half of what tells the six treatments apart is how much
+ * room each gives the trend, and a tile drawn from a workspace with no history would show none of
+ * that.
+ */
 @Composable
 private fun BalancePreview(variant: String?, modifier: Modifier) {
     SurferBalanceWidget(
         title = stringResource(Res.string.dashboard_balance_title),
         balance = SAMPLE_TOTAL,
         variant = SurferBalanceVariant.fromKey(variant),
-        footnote = SurferBalanceFootnote.Trend(SAMPLE_TREND),
+        trend = SurferBalanceTrend(text = SAMPLE_TREND, series = SAMPLE_BALANCE_SERIES),
         modifier = modifier,
     )
 }
@@ -246,6 +257,41 @@ private fun SpentByCategoryPreview(variant: String?, modifier: Modifier) {
             ),
         ),
         variant = SurferSpentByCategoryVariant.fromKey(variant),
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample segments, for the same reason [SpentByCategoryPreview] uses sample rows. Five of them,
+ * because the legend keeps five at Hero and three at Compact — a tile with three would look
+ * identical at both sizes, and the size is exactly what this picker is asking about.
+ *
+ * The last one is the uncategorized bucket, drawn under its real label: it is a segment the live
+ * widget shows whenever the period holds spend nobody filed, so the preview should not pretend
+ * every wedge has a category behind it.
+ */
+@Composable
+private fun CategoriesDonutPreview(modifier: Modifier) {
+    val tints = SurferCategoryPalette.tints
+    val labels = listOf(
+        stringResource(Res.string.dashboard_customize_preview_transaction_rent),
+        stringResource(Res.string.dashboard_customize_preview_transaction_groceries),
+        stringResource(Res.string.dashboard_customize_preview_transaction_coffee),
+        stringResource(Res.string.dashboard_customize_preview_transaction_transport),
+        stringResource(Res.string.dashboard_spent_by_category_uncategorized),
+    )
+    SurferCategoriesDonutWidget(
+        // Zipped rather than indexed: the shares are a separate list, and a label added to one
+        // without the other should shorten the sample, not crash the picker.
+        segments = labels.zip(SAMPLE_DONUT_SHARES).mapIndexed { index, (label, share) ->
+            SurferDonutSegment(
+                label = label,
+                percent = share,
+                color = tints[index % tints.size],
+            )
+        },
+        centerLabel = stringResource(Res.string.dashboard_categories_donut_center_label),
+        centerValue = SAMPLE_DONUT_TOTAL,
         modifier = modifier,
     )
 }
@@ -469,6 +515,7 @@ private fun RecentTransactionsPreview(modifier: Modifier) {
 private const val SAMPLE_CURRENCY = "EUR"
 private const val SAMPLE_TOTAL = "€11,575.32"
 private const val SAMPLE_TREND = "+€412"
+private val SAMPLE_BALANCE_SERIES = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f)
 private const val SAMPLE_ACCOUNT_ONE = "€2,480.32"
 private const val SAMPLE_ACCOUNT_TWO = "€8,915.00"
 private const val SAMPLE_ACCOUNT_THREE = "€180.00"
@@ -515,3 +562,7 @@ private const val SAMPLE_SHARE_COFFEE = 0.13f
 private const val SAMPLE_PERCENT_RENT = 62
 private const val SAMPLE_PERCENT_COFFEE = 13
 private const val SAMPLE_CAP_PROGRESS = 0.95f
+
+/** Adds up to 1 exactly, so the sample donut closes rather than leaving a wedge of track showing. */
+private val SAMPLE_DONUT_SHARES = listOf(0.42f, 0.22f, 0.14f, 0.12f, 0.1f)
+private const val SAMPLE_DONUT_TOTAL = "€1,214.60"

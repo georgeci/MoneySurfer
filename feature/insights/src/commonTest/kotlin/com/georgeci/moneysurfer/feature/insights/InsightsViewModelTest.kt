@@ -90,7 +90,7 @@ class InsightsViewModelTest : StringSpec({
                     CategorySpendSlice(null, 100.dollars, 1),
                 ),
             ),
-            topMerchants = listOf(MerchantSpend("Albert Heijn", 120.dollars, 7)),
+            merchants = listOf(MerchantSpend("Albert Heijn", 120.dollars, 7)),
         )
 
         val content = viewModel(analytics).value.shouldBeInstanceOf<InsightsState.Content>()
@@ -104,7 +104,7 @@ class InsightsViewModelTest : StringSpec({
 
     "a month the workspace booked nothing in still draws a column" {
         val analytics = FakeSpendAnalyticsRepository(
-            netByMonth = listOf(MonthlyNet(today().yearMonth, 900.dollars, 400.dollars)),
+            nets = listOf(MonthlyNet(today().yearMonth, 900.dollars, 400.dollars)),
         )
 
         val content = viewModel(analytics).value.shouldBeInstanceOf<InsightsState.Content>()
@@ -117,7 +117,7 @@ class InsightsViewModelTest : StringSpec({
 
     "the base-currency filter is named as the reason when it hides everything" {
         val analytics = FakeSpendAnalyticsRepository(
-            excludedByCurrency = listOf(CurrencyTotal(USD, 500.dollars)),
+            excluded = listOf(CurrencyTotal(USD, 500.dollars)),
         )
 
         val content = viewModel(analytics, baseCurrency = EUR)
@@ -134,7 +134,7 @@ class InsightsViewModelTest : StringSpec({
                 periodWindow(TransactionPeriodMode.Month, today()) to
                     listOf(CategorySpendSlice(DINING, 300.dollars, 4)),
             ),
-            excludedByCurrency = listOf(CurrencyTotal(USD, 500.dollars)),
+            excluded = listOf(CurrencyTotal(USD, 500.dollars)),
         )
 
         val content = viewModel(analytics, baseCurrency = EUR)
