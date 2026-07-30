@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.uikit.components.base
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -69,7 +69,10 @@ fun <T> SurferSegmentedControl(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(bg)
-                    .clickable { onSelect(value) }
+                    // `selectable`, not `clickable`: the fill and the check glyph are the only
+                    // things saying which option is active, and the glyph is decorative — without
+                    // this a screen reader announces every segment identically.
+                    .selectable(selected = isSelected, onClick = { onSelect(value) })
                     .then(optionTestTag?.let { Modifier.testTag(it(value)) } ?: Modifier),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,

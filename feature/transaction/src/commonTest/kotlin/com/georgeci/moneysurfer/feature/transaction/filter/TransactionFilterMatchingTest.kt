@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.transaction.filter
 
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
+import com.georgeci.moneysurfer.domain.fixtures.accountId
+import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.Money
@@ -138,7 +140,76 @@ class TransactionFilterMatchingTest : StringSpec({
         cleared.query shouldBe "coffee"
         cleared.recurringOnly shouldBe false
     }
+
+    "each preset resolves the span its label promises" {
+        windowFor(TransactionDatePreset.Yesterday) shouldBe
+            TransactionPeriodWindow(LocalDate(2025, 3, 26), LocalDate(2025, 3, 26))
+        // Monday to Sunday around a Thursday, not the seven days before it.
+        windowFor(TransactionDatePreset.ThisWeek) shouldBe
+            TransactionPeriodWindow(LocalDate(2025, 3, 24), LocalDate(2025, 3, 30))
+        windowFor(TransactionDatePreset.ThisMonth) shouldBe
+            TransactionPeriodWindow(LocalDate(2025, 3, 1), LocalDate(2025, 3, 31))
+        windowFor(TransactionDatePreset.ThisYear) shouldBe
+            TransactionPeriodWindow(LocalDate(2025, 1, 1), LocalDate(2025, 12, 31))
+    }
+
+    "a preset ignores where the pager was left" {
+        // Every range but FollowPeriod takes the window over completely, so the anchor cannot leak
+        // into it — the pager is hidden while one is set.
+        resolveWindow(
+            TransactionDateRange.Preset(TransactionDatePreset.ThisMonth),
+            TransactionPeriodMode.Week,
+            anchor = LocalDate(2019, 7, 4),
+            today = TODAY,
+        ) shouldBe TransactionPeriodWindow(LocalDate(2025, 3, 1), LocalDate(2025, 3, 31))
+    }
+
+    "the account and category pickers narrow to what was ticked" {
+        val row = row(minor = 1240)
+        val accounts = TransactionFilters(accountIds = setOf(row.transaction.accountId))
+
+        accounts.matches(row) shouldBe true
+        TransactionFilters(accountIds = setOf(accountId("a-other"))).matches(row) shouldBe false
+
+        val category = row.transaction.categoryId
+        TransactionFilters(categoryIds = setOfNotNull(category)).matches(row) shouldBe true
+        TransactionFilters(categoryIds = setOf(categoryId("c-other"))).matches(row) shouldBe false
+    }
+
+    "search reaches everything the row shows, and the amount numerically" {
+        val row = CategorizedTransaction(
+            transaction = aTransaction(
+                money = Money.fromMinor(1240),
+                note = "weekly shop",
+                merchant = "Lidl",
+                tags = listOf("food"),
+            ),
+            categoryName = "Groceries",
+        )
+
+        TransactionFilters(query = "lidl").matches(row) shouldBe true
+        TransactionFilters(query = "SHOP").matches(row) shouldBe true
+        TransactionFilters(query = "food").matches(row) shouldBe true
+        TransactionFilters(query = "grocer").matches(row) shouldBe true
+        TransactionFilters(query = "12.40").matches(row) shouldBe true
+        TransactionFilters(query = "rent").matches(row) shouldBe false
+    }
+
+    "the bounds compare against the magnitude and stay inclusive" {
+        val row = row(minor = 1240)
+
+        TransactionFilters(minAmount = "12", maxAmount = "12").matches(row) shouldBe true
+        TransactionFilters(maxAmount = "12.39").matches(row) shouldBe false
+        TransactionFilters(minAmount = "12.41").matches(row) shouldBe false
+    }
 })
+
+private fun windowFor(preset: TransactionDatePreset): TransactionPeriodWindow = resolveWindow(
+    TransactionDateRange.Preset(preset),
+    TransactionPeriodMode.Month,
+    anchor = TODAY,
+    today = TODAY,
+)
 
 private fun row(minor: Long): CategorizedTransaction = CategorizedTransaction(
     transaction = aTransaction(money = Money.fromMinor(minor)),

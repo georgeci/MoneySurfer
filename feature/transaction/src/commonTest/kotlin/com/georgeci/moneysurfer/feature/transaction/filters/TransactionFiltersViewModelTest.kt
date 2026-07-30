@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
+import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.splitId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
@@ -34,6 +35,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -56,6 +58,7 @@ import kotlin.time.Instant
 private val TODAY = LocalDate(2025, 3, 27)
 private val WORKSPACE = WorkspaceId("ws-1")
 private val ACCOUNT = accountId("acc-1")
+private val CATEGORY = categoryId("cat-1")
 
 /**
  * The draft/apply contract of the filter screen (issue #262), and the live result count behind
@@ -207,6 +210,90 @@ class TransactionFiltersViewModelTest : StringSpec({
             env.viewModel().currentState.resultCount shouldBe 1
         }
     }
+
+    "an account or a category is toggled on, then off again" {
+        runTest {
+            val viewModel = Env().viewModel()
+
+            viewModel.onEvent(TransactionFiltersEvent.OnAccountToggled(ACCOUNT))
+            viewModel.onEvent(TransactionFiltersEvent.OnCategoryToggled(CATEGORY))
+            viewModel.currentState.draft.accountIds shouldBe setOf(ACCOUNT)
+            viewModel.currentState.draft.categoryIds shouldBe setOf(CATEGORY)
+
+            viewModel.onEvent(TransactionFiltersEvent.OnAccountToggled(ACCOUNT))
+            viewModel.onEvent(TransactionFiltersEvent.OnCategoryToggled(CATEGORY))
+            viewModel.currentState.draft.accountIds shouldBe emptySet()
+            viewModel.currentState.draft.categoryIds shouldBe emptySet()
+        }
+    }
+
+    "All categories drops the selection rather than adding one more chip" {
+        runTest {
+            val viewModel = Env().viewModel()
+            viewModel.onEvent(TransactionFiltersEvent.OnCategoryToggled(CATEGORY))
+
+            viewModel.onEvent(TransactionFiltersEvent.OnAllCategoriesClick)
+
+            viewModel.currentState.draft.categoryIds shouldBe emptySet()
+        }
+    }
+
+    "the amount bounds, the two flags and the sort all land in the draft" {
+        runTest {
+            val viewModel = Env().viewModel()
+
+            viewModel.onEvent(TransactionFiltersEvent.OnMinAmountChanged("12."))
+            viewModel.onEvent(TransactionFiltersEvent.OnMaxAmountChanged("50"))
+            viewModel.onEvent(TransactionFiltersEvent.OnRecurringOnlyChanged(enabled = true))
+            viewModel.onEvent(TransactionFiltersEvent.OnPlannedOnlyChanged(enabled = true))
+            viewModel.onEvent(TransactionFiltersEvent.OnSortSelected(TransactionSort.Oldest))
+
+            val draft = viewModel.currentState.draft
+            // Raw text, not a parsed number: a half-typed bound has to survive the round trip back
+            // to the field the user is still typing in.
+            draft.minAmount shouldBe "12."
+            draft.maxAmount shouldBe "50"
+            draft.recurringOnly shouldBe true
+            draft.plannedOnly shouldBe true
+            draft.sort shouldBe TransactionSort.Oldest
+        }
+    }
+
+    "Reset is offered only once something is set" {
+        runTest {
+            val viewModel = Env().viewModel()
+            viewModel.currentState.canReset shouldBe false
+
+            viewModel.onEvent(TransactionFiltersEvent.OnSortSelected(TransactionSort.Oldest))
+            viewModel.currentState.canReset shouldBe true
+        }
+    }
+
+    "tapping Custom a second time hands the window back to the pager" {
+        runTest {
+            val viewModel = Env().viewModel()
+
+            viewModel.onEvent(TransactionFiltersEvent.OnCustomDateClick)
+            viewModel.currentState.draft.dateRange shouldBe TransactionDateRange.Custom(null, null)
+
+            viewModel.onEvent(TransactionFiltersEvent.OnCustomToPicked(LocalDate(2025, 3, 31)))
+            viewModel.currentState.draft.dateRange shouldBe
+                TransactionDateRange.Custom(from = null, to = LocalDate(2025, 3, 31))
+
+            viewModel.onEvent(TransactionFiltersEvent.OnCustomDateClick)
+            viewModel.currentState.draft.dateRange shouldBe TransactionDateRange.FollowPeriod
+        }
+    }
+
+    "an archived account is not offered as a filter" {
+        runTest {
+            val viewModel = Env().viewModel()
+
+            // Everything the workspace still uses, and nothing it has put away: filtering by an
+            // archived account could only ever narrow the list to rows the user retired.
+            viewModel.currentState.accounts.map { it.id } shouldBe listOf(ACCOUNT)
+        }
+    }
 })
 
 private fun expense(id: String, amount: Int, date: LocalDate = TODAY): Transaction = aTransaction(
@@ -236,7 +323,7 @@ private class Env(transactions: List<Transaction> = emptyList()) {
             anchorEpochDay = anchorEpochDay,
             filterStore = filterStore,
             getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
-            getAccounts = GetAccountsUseCase(OneAccount, session),
+            getAccounts = GetAccountsUseCase(WorkspaceAccounts, session),
             getCategories = GetCategoriesUseCase(OneCategory, session),
             uiPreferences = FakeUiPreferences(),
             clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC))),
@@ -289,12 +376,22 @@ private class WindowedTransactions(transactions: List<Transaction>) : Transactio
     override suspend fun restore(id: TransactionId): Transaction? = null
 }
 
-private object OneAccount : AccountRepository {
+/** One live account and one retired one, so the screen has something to leave out. */
+private object WorkspaceAccounts : AccountRepository {
     private val account = anAccount(id = ACCOUNT, workspaceId = WORKSPACE, name = "Everyday")
 
-    override suspend fun getById(id: AccountId): Account? = account.takeIf { it.id == id }
-    override fun getAll(): Flow<List<Account>> = flowOf(listOf(account))
-    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = flowOf(listOf(account))
+    private val archived = anAccount(
+        id = accountId("acc-old"),
+        workspaceId = WORKSPACE,
+        name = "Old card",
+        archived = true,
+    )
+
+    private val accounts = listOf(account, archived)
+
+    override suspend fun getById(id: AccountId): Account? = accounts.find { it.id == id }
+    override fun getAll(): Flow<List<Account>> = flowOf(accounts)
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = flowOf(accounts)
     override suspend fun insert(account: Account) = Unit
     override suspend fun update(account: Account) = Unit
     override suspend fun delete(id: AccountId) = Unit
@@ -305,7 +402,7 @@ private object OneAccount : AccountRepository {
 }
 
 private object OneCategory : CategoryRepository {
-    private val category = aCategory(workspaceId = WORKSPACE, name = "Groceries")
+    private val category = aCategory(id = CATEGORY, workspaceId = WORKSPACE, name = "Groceries")
 
     override fun getAll(): Flow<List<Category>> = flowOf(listOf(category))
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = flowOf(listOf(category))

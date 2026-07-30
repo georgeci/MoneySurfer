@@ -81,8 +81,14 @@ fun TransactionFiltersScreen(
     TransactionFiltersContent(state = state, onEvent = viewModel::onEvent)
 }
 
+/**
+ * The filter draft, drawn from a state it is handed.
+ *
+ * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+ * own — see docs/testing/testing-strategy.md.
+ */
 @Composable
-private fun TransactionFiltersContent(
+fun TransactionFiltersContent(
     state: TransactionFiltersState,
     onEvent: (TransactionFiltersEvent) -> Unit,
 ) {

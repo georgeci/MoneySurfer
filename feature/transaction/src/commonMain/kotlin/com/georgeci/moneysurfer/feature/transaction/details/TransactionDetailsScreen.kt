@@ -94,8 +94,14 @@ private fun TransactionDetailsLoading(onEvent: (TransactionDetailsEvent) -> Unit
     }
 }
 
+/**
+ * The details of one transaction, drawn from a state it is handed.
+ *
+ * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+ * own — see docs/testing/testing-strategy.md.
+ */
 @Composable
-internal fun TransactionDetailsContent(
+fun TransactionDetailsContent(
     state: TransactionDetailsState.Content,
     onEvent: (TransactionDetailsEvent) -> Unit,
 ) {

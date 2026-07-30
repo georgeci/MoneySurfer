@@ -203,9 +203,15 @@ private fun TransactionCreationLoading(onEvent: (TransactionCreationEvent) -> Un
     }
 }
 
+/**
+ * The form, drawn from a state it is handed rather than one it resolves.
+ *
+ * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+ * own — see docs/testing/testing-strategy.md.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TransactionCreationContent(
+fun TransactionCreationContent(
     state: TransactionCreationState.Content,
     onEvent: (TransactionCreationEvent) -> Unit,
     amountState: TextFieldState = rememberTextFieldState(state.amount),
