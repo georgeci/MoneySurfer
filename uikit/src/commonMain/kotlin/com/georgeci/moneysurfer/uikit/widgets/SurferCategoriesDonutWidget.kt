@@ -26,6 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import kotlin.math.roundToInt
+
+/** A `0f..1f` share as whole percent. */
+private const val PERCENT = 100f
 
 data class SurferDonutSegment(
     val label: String,
@@ -178,7 +182,9 @@ private fun LegendRow(seg: SurferDonutSegment, hero: Boolean) {
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = "${(seg.percent * 100).toInt()}%",
+            // Rounded rather than truncated: every other share the app prints rounds, and a
+            // legend reading 61% beside a row reading 62% for one category reads as a bug.
+            text = "${(seg.percent * PERCENT).roundToInt()}%",
             style = if (hero) AppTheme.typography.labelMedium else AppTheme.typography.labelSmall,
             color = AppTheme.materialColors.onSurfaceVariant,
         )

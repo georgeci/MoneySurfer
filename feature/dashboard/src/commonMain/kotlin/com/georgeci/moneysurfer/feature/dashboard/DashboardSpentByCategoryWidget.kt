@@ -106,11 +106,18 @@ private fun BudgetStatus.statusLabel(): String? = when (this) {
     BudgetStatus.OVER -> stringResource(Res.string.dashboard_spent_by_category_status_over)
 }
 
-/** List key for the uncategorized bucket, which has no category id to be keyed by. */
-private const val UNCATEGORIZED_ID = "uncategorized"
+/**
+ * List key and tint seed for the uncategorized bucket, which has no category id to be keyed by.
+ *
+ * Shared with the categories donut rather than declared twice: both cards hash this string into
+ * the same palette, so the bucket has one colour across the dashboard, and changing the seed
+ * cannot repaint one card without the other.
+ */
+internal const val UNCATEGORIZED_ID = "uncategorized"
 
 /**
  * The "never stored" hue sentinel — `SurferCategoryPalette.tintForHue` reads anything off the
- * colour wheel as absent and falls back to hashing the id.
+ * colour wheel as absent and falls back to hashing the id. Shared for the same reason as
+ * [UNCATEGORIZED_ID].
  */
-private const val NO_STORED_HUE = -1
+internal const val NO_STORED_HUE = -1

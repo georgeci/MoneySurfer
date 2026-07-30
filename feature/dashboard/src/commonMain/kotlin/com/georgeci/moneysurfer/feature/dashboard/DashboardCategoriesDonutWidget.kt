@@ -57,22 +57,17 @@ internal fun CategoriesDonutWidget(state: DashboardState.Content) {
 @Composable
 private fun List<CategorySpendUi>.toDonutSegments(): List<SurferDonutSegment> {
     val fallbackName = stringResource(Res.string.dashboard_spent_by_category_uncategorized)
-    return map { row ->
-        val id = row.categoryId ?: DONUT_UNCATEGORIZED_ID
+    val segments = map { row ->
+        val id = row.categoryId ?: UNCATEGORIZED_ID
         SurferDonutSegment(
             label = row.name ?: fallbackName,
             percent = row.share,
-            color = SurferCategoryPalette.tintForHue(row.hue ?: DONUT_NO_STORED_HUE)
+            color = SurferCategoryPalette.tintForHue(row.hue ?: NO_STORED_HUE)
                 ?: SurferCategoryPalette.tintFor(id),
         )
     }
+    // Rows that all measure zero are no chart: every arc would sweep nothing, and the widget
+    // draws its empty track only for an empty list — so a period whose whole spend is 0.00 would
+    // render as a hole with a legend of 0% rows instead of the empty state it has copy for.
+    return if (segments.any { it.percent > 0f }) segments else emptyList()
 }
-
-/** Tint seed for the uncategorized bucket, which has no category id to be hashed from. */
-private const val DONUT_UNCATEGORIZED_ID = "uncategorized"
-
-/**
- * The "never stored" hue sentinel — `SurferCategoryPalette.tintForHue` reads anything off the
- * colour wheel as absent and falls back to hashing the id.
- */
-private const val DONUT_NO_STORED_HUE = -1

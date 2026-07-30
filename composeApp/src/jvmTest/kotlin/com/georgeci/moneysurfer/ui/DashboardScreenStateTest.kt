@@ -516,6 +516,25 @@ class DashboardScreenStateTest : StringSpec({
             onNodeWithText("No spend").assertIsDisplayed()
         }
     }
+
+    "rows that all measure zero read as no spend rather than as a blank ring" {
+        runPhoneUiTest {
+            setContent {
+                DashboardContent(
+                    // A period whose only expense is 0.00: real rows, every share zero. Drawn as
+                    // segments they would sweep nothing and suppress the empty track too.
+                    state = categoriesDonutState().copy(
+                        spentByCategory = listOf(
+                            categorySpendUi(categoryId = "c-groceries", name = "Groceries", share = 0f),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("No spend").assertIsDisplayed()
+        }
+    }
 })
 
 /**
