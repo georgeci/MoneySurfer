@@ -57,18 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    38.5%
+    38.9%
   </span>
   <span class="absValue">
-    (55/143)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    79.2%
-  </span>
-  <span class="absValue">
-    (164/207)
+    (56/144)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     79.3%
   </span>
   <span class="absValue">
-    (2144/2702)
+    (165/208)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.5%
+  </span>
+  <span class="absValue">
+    (2163/2721)
   </span>
 </td>
 </tr>
@@ -96,18 +96,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    38.5%
+    38.9%
   </span>
   <span class="absValue">
-    (55/143)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    79.2%
-  </span>
-  <span class="absValue">
-    (164/207)
+    (56/144)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +107,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     79.3%
   </span>
   <span class="absValue">
-    (2144/2702)
+    (165/208)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.5%
+  </span>
+  <span class="absValue">
+    (2163/2721)
   </span>
 </td>
 </tr>
@@ -223,6 +223,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * their labels, both of which this screen owns.
 &nbsp;     */
 &nbsp;    const val QuickActions = &quot;dashboard:quickActions&quot;
+&nbsp;
+&nbsp;    /** The whole spent-this-month card, with or without a budget behind its bar. */
+&nbsp;    const val SpentMonth = &quot;dashboard:spentMonth&quot;
 &nbsp;    const val SafeToSpend = &quot;dashboard:safeToSpend&quot;
 &nbsp;
 &nbsp;    /** The &quot;Set a budget&quot; link, shown only while the safe-to-spend widget has no budget to read. */
@@ -399,6 +402,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="pc">&nbsp;    when (type) {</b>
 <b class="fc">&nbsp;        DashboardWidgetType.Balance -&gt; BalanceWidget(state, variant)</b>
 <b class="fc">&nbsp;        DashboardWidgetType.QuickActions -&gt; QuickActionsWidget(state, onEvent)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.SpentMonth -&gt; SpentMonthWidget(state)</b>
 <b class="fc">&nbsp;        DashboardWidgetType.SafeToSpend -&gt; SafeToSpendWidget(state, onEvent)</b>
 <b class="fc">&nbsp;        DashboardWidgetType.BurnRate -&gt; BurnRateWidget(state)</b>
 <b class="fc">&nbsp;        DashboardWidgetType.Budgets -&gt; BudgetsWidget(state, onEvent)</b>
@@ -700,7 +704,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

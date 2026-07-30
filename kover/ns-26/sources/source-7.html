@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UploadPendingChangesUseCase</title>
+  <title>MoneySurfer Coverage Report > PullRemoteChangesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: UploadPendingChangesUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: PullRemoteChangesUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UploadPendingChangesUseCase</td>
+  <td class="name">PullRemoteChangesUseCase</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,27 +51,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
 &nbsp;
 &nbsp;/**
-&nbsp; * Pushes pending mutations from the outbox to the remote backend.
+&nbsp; * Pulls remote changes since the last cursor, applies them locally, and resolves
+&nbsp; * conflicts inline (LWW by default).
 &nbsp; *
-&nbsp; * Implementations must classify SDK exceptions into [com.georgeci.moneysurfer.sync.api.SyncError]
-&nbsp; * and return them via `Either.Left` — never throw typed errors out of here.
-&nbsp; * See SyncCoordinatorFAQ.md №11, §4.2.
+&nbsp; * Pull-applied writes MUST bypass the outbox to avoid push echo.
+&nbsp; * See SyncCoordinatorFAQ.md №5, §4.3.
 &nbsp; */
-&nbsp;interface UploadPendingChangesUseCase {
+&nbsp;interface PullRemoteChangesUseCase {
 &nbsp;    suspend operator fun invoke(
 &nbsp;        scope: SyncScope,
-&nbsp;        onProgress: suspend (UploadProgress) -&gt; Unit,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
 &nbsp;        cancelToken: SyncCancelToken,
-&nbsp;    ): SyncResult&lt;UploadSummary&gt;
+&nbsp;    ): SyncResult&lt;PullSummary&gt;
 &nbsp;}
 &nbsp;
-&nbsp;data class UploadProgress(
-&nbsp;    val entityType: String,
+&nbsp;data class PullProgress(
+&nbsp;    val collection: String,
 &nbsp;    val current: Int,
 &nbsp;    val total: Int,
 &nbsp;)
 &nbsp;
-&nbsp;data class UploadSummary(val uploadedCount: Int)
+&nbsp;data class PullSummary(
+&nbsp;    val downloadedCount: Int,
+&nbsp;    val conflictCount: Int,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -95,7 +98,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

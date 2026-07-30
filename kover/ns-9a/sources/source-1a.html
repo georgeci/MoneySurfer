@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserAccountDeletionRepository</title>
+  <title>MoneySurfer Coverage Report > RemoteDataResetRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: UserAccountDeletionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: RemoteDataResetRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserAccountDeletionRepository</td>
+  <td class="name">RemoteDataResetRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,31 +46,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
-&nbsp;
 &nbsp;/**
-&nbsp; * Remote-side cleanup for the user-account deletion flow (issue #213). Deletes everything the
-&nbsp; * hosted account-deletion page promises to remove — personal workspaces with their financial
-&nbsp; * records, the user&#39;s memberships, and the user/email lookup docs — while leaving content in
-&nbsp; * workspaces shared with other active members visible to those members.
+&nbsp; * Wipes the sync-side ledgers (pending_mutations, sync_meta) so a fresh
+&nbsp; * post-logout session doesn&#39;t reattempt the previous user&#39;s outbox or
+&nbsp; * resume from their cursor positions.
 &nbsp; *
-&nbsp; * Implementation lives in `:data-remote` (online hosts only); the offline build binds a no-op.
+&nbsp; * Lives separately from [LocalDataResetRepository] so the offline build
+&nbsp; * can stay unaware of the sync database — it provides a no-op binding
+&nbsp; * while still satisfying [LogoutUseCase]&#39;s contract.
 &nbsp; */
-&nbsp;fun interface UserAccountDeletionRepository {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Idempotently deletes the remote footprint of [uid]:
-&nbsp;     *  - workspaces owned by the user with no other ACTIVE member are hard-deleted
-&nbsp;     *    (all subcollections, then the root doc),
-&nbsp;     *  - in every other workspace the user&#39;s member row is marked LEFT (profile snapshots
-&nbsp;     *    stay, matching the retention promise on the hosted deletion page),
-&nbsp;     *  - the `userEmails/{email}` mapping (when it points at [uid]) and `users/{uid}` go last.
-&nbsp;     *
-&nbsp;     * Must be called while the user is still authenticated — Firestore rules authorize each
-&nbsp;     * step against `request.auth.uid`. Deleting the Firebase Auth user is a separate step.
-&nbsp;     */
-&nbsp;    suspend fun deleteRemoteUserData(uid: String, email: String?): Either&lt;AccountDeletionError, Unit&gt;
+&nbsp;interface RemoteDataResetRepository {
+&nbsp;    suspend fun clearAll()
 &nbsp;}
 </code>
 </pre>
@@ -95,7 +81,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WidgetSources</title>
+  <title>MoneySurfer Coverage Report > SpentMonthDeltaUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: WidgetSources (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: SpentMonthDeltaUi (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WidgetSources</td>
+  <td class="name">SpentMonthDeltaUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (27/27)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -114,6 +114,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 &nbsp;import com.georgeci.moneysurfer.domain.model.SpentByCategory
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpentMonth
 &nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 &nbsp;import com.georgeci.moneysurfer.domain.model.buildBalanceTrend
 &nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
@@ -136,6 +137,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
 &nbsp;import kotlinx.coroutines.flow.MutableStateFlow
 &nbsp;import kotlinx.coroutines.flow.combine
@@ -164,6 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val getCategorySpend: GetCategorySpendUseCase,
 &nbsp;    private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
 &nbsp;    private val getBurnRate: GetBurnRateUseCase,
+&nbsp;    private val getSpentMonth: GetSpentMonthUseCase,
 &nbsp;    private val generateInsights: GenerateInsightsUseCase,
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
 &nbsp;    private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
@@ -285,6 +288,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                // rest of the dashboard draw without waiting on them.
 &nbsp;                .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights -&gt;
 &nbsp;                    content.copy(insights = insights.map { it.toUi() })
+&nbsp;                }
+&nbsp;                // Appended for the same reason the insights are, not because it is slow: the fold
+&nbsp;                // above is already at `combine`&#39;s five-flow ceiling, and chaining one reader on is
+&nbsp;                // the cheaper edit than repacking six widget sources into a second holder type.
+&nbsp;                // Takes no period — see `DashboardWidgetType.SpentMonth`.
+&nbsp;                .combine(getSpentMonth().onStart { emit(null) }) { content, spentMonth -&gt;
+&nbsp;                    content.copy(spentMonth = spentMonth?.toUi())
 &nbsp;                }
 &nbsp;                .collect { newContent -&gt; updateState { newContent } }
 &nbsp;        }
@@ -575,6 +585,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * the &quot;no cap to miss&quot; state, and the chart is drawn either way.
 &nbsp;         */
 &nbsp;        val burnRate: BurnRateUi? = null,
+&nbsp;        /**
+&nbsp;         * What this month has cost, or null while no workspace and base currency back the figure.
+&nbsp;         * Like [burnRate] this one does not need a budget — a null cap inside it is the &quot;no budget
+&nbsp;         * set&quot; state the card is partly *for*, and the amount is drawn either way.
+&nbsp;         */
+&nbsp;        val spentMonth: SpentMonthUi? = null,
 &nbsp;        /** Generated spending insights, most actionable first. Empty until the engine has run. */
 &nbsp;        val insights: List&lt;InsightUi&gt; = emptyList(),
 &nbsp;        val isOffline: Boolean = false,
@@ -614,13 +630,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * The per-widget sources `combine` cannot take as separate arguments — it tops out at five typed
 &nbsp; * flows and the screen already reads four others.
 &nbsp; */
-<b class="fc">&nbsp;private data class WidgetSources(</b>
-<b class="fc">&nbsp;    val chrome: DashboardChrome,</b>
-<b class="fc">&nbsp;    val safeToSpend: SafeToSpend?,</b>
+&nbsp;private data class WidgetSources(
+&nbsp;    val chrome: DashboardChrome,
+&nbsp;    val safeToSpend: SafeToSpend?,
 &nbsp;    /** Every active budget&#39;s progress — the rows the budgets card draws. */
-<b class="fc">&nbsp;    val budgetProgress: List&lt;BudgetProgress&gt;,</b>
-<b class="fc">&nbsp;    val burnRate: BurnRate?,</b>
-<b class="fc">&nbsp;    val categorySpend: SpentByCategory?,</b>
+&nbsp;    val budgetProgress: List&lt;BudgetProgress&gt;,
+&nbsp;    val burnRate: BurnRate?,
+&nbsp;    val categorySpend: SpentByCategory?,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The month&#39;s spend as the card draws it. A file-level mapper like [SpentByCategory.toUi] below —
+&nbsp; * it reads nothing off the view model, and the class is at detekt&#39;s function ceiling.
+&nbsp; *
+&nbsp; * [SpentMonthUi.capFormatted] carries the &quot;is there a budget&quot; answer rather than a second boolean:
+&nbsp; * the caption is either &quot;of &lt;cap&gt;&quot; or the no-budget line, and one nullable string cannot disagree
+&nbsp; * with itself. The bar reads 0 without a cap — there is no limit to fill it against, and inventing
+&nbsp; * one from the spend would draw a full bar on an unbudgeted month.
+&nbsp; */
+&nbsp;private fun SpentMonth.toUi(): SpentMonthUi = SpentMonthUi(
+&nbsp;    spentFormatted = MoneyFormatter.format(spent, currency),
+&nbsp;    capFormatted = cap?.let { MoneyFormatter.format(it, currency) },
+&nbsp;    progress = capFraction ?: 0f,
+&nbsp;    delta = delta?.let { SpentMonthDeltaUi(trend = it.trend, percent = it.changePercent) },
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -828,6 +860,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;/**
+&nbsp; * The spent-this-month card&#39;s numbers. Money is formatted here; the sentences around it are built on
+&nbsp; * the screen, which is where the string resources are.
+&nbsp; */
+&nbsp;data class SpentMonthUi(
+&nbsp;    val spentFormatted: String,
+&nbsp;    /** The monthly cap, or null when no budget sets one — which is the caption the card shows. */
+&nbsp;    val capFormatted: String?,
+&nbsp;    /** Spend against the cap, `0f` without one. Can exceed 1, which the bar clamps. */
+&nbsp;    val progress: Float,
+&nbsp;    /** How the month compares to the last one, or null when no honest comparison is available. */
+&nbsp;    val delta: SpentMonthDeltaUi? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The month-over-month change. [percent] is a magnitude — [trend] picks which sentence and which
+&nbsp; * colour it is printed in, so a sign is never formatted into the number itself.
+&nbsp; */
+<b class="fc">&nbsp;data class SpentMonthDeltaUi(</b>
+<b class="fc">&nbsp;    val trend: SpendTrend,</b>
+<b class="fc">&nbsp;    val percent: Int,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
 &nbsp; * One bar. [dayOfMonth] rather than a weekday name because the app ships no date locale rules, and
 &nbsp; * a number needs none.
 &nbsp; */
@@ -973,7 +1028,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncStep</title>
+  <title>MoneySurfer Coverage Report > SyncProgress</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncStep (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SyncProgress (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,43 +45,90 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SyncStep</td>
+  <tr>
+    <td class="name">SyncProgress$Completed</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (12/12)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (78/78)
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncProgress$InProgress</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -104,12 +148,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * [Completed] carrying the aggregated [SyncReport]. Errors are propagated as flow exceptions.
 &nbsp; */
 &nbsp;sealed interface SyncProgress {
-&nbsp;    data class InProgress(val step: SyncStep) : SyncProgress
-&nbsp;    data class Completed(val report: SyncReport) : SyncProgress
+<b class="nc">&nbsp;    data class InProgress(val step: SyncStep) : SyncProgress</b>
+<b class="nc">&nbsp;    data class Completed(val report: SyncReport) : SyncProgress</b>
 &nbsp;}
 &nbsp;
 &nbsp;enum class SyncStep {
-<b class="fc">&nbsp;    PUSH_WORKSPACE,</b>
+&nbsp;    PUSH_WORKSPACE,
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Pushes `/workspaces/{wid}/members/{uid}` rows. Must run BEFORE any
@@ -118,23 +162,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * first `pushAccounts` after a fresh workspace creation fails with
 &nbsp;     * `PERMISSION_DENIED`.
 &nbsp;     */
-<b class="fc">&nbsp;    PUSH_MEMBERS,</b>
+&nbsp;    PUSH_MEMBERS,
 &nbsp;
 &nbsp;    /** Pushes `/workspaces/{wid}/invites/{id}` rows after members so the roster sees them. */
-<b class="fc">&nbsp;    PUSH_INVITES,</b>
-<b class="fc">&nbsp;    PUSH_ACCOUNTS,</b>
-<b class="fc">&nbsp;    PUSH_CATEGORIES,</b>
-<b class="fc">&nbsp;    PUSH_TRANSACTIONS,</b>
-<b class="fc">&nbsp;    PULL_WORKSPACE,</b>
+&nbsp;    PUSH_INVITES,
+&nbsp;    PUSH_ACCOUNTS,
+&nbsp;    PUSH_CATEGORIES,
+&nbsp;    PUSH_TRANSACTIONS,
+&nbsp;    PULL_WORKSPACE,
 &nbsp;
 &nbsp;    /** Mirror of [PUSH_MEMBERS] on the read side — pulls remote membership rows. */
-<b class="fc">&nbsp;    PULL_MEMBERS,</b>
+&nbsp;    PULL_MEMBERS,
 &nbsp;
 &nbsp;    /** Mirror of [PUSH_INVITES] on the read side. */
-<b class="fc">&nbsp;    PULL_INVITES,</b>
-<b class="fc">&nbsp;    PULL_ACCOUNTS,</b>
-<b class="fc">&nbsp;    PULL_CATEGORIES,</b>
-<b class="fc">&nbsp;    PULL_TRANSACTIONS,</b>
+&nbsp;    PULL_INVITES,
+&nbsp;    PULL_ACCOUNTS,
+&nbsp;    PULL_CATEGORIES,
+&nbsp;    PULL_TRANSACTIONS,
 &nbsp;}
 &nbsp;
 &nbsp;suspend fun Flow&lt;SyncProgress&gt;.awaitReport(): SyncReport =
@@ -162,7 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

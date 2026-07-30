@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMetaRepository</title>
+  <title>MoneySurfer Coverage Report > OutboxEnqueuer</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMetaRepository (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: OutboxEnqueuer (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMetaRepository</td>
+  <td class="name">OutboxEnqueuer</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,43 +46,37 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlin.time.Instant
-&nbsp;
 &nbsp;/**
-&nbsp; * Per-(scopeKey, collection) sync metadata.
+&nbsp; * Outbox writer used by data-layer repositories to enqueue local mutations
+&nbsp; * for deferred push to the remote backend.
 &nbsp; *
-&nbsp; * - [cursor] — `lastPulledAt` value used as `WHERE updatedAt &gt; cursor` filter
-&nbsp; *   in the next pull. Updated only when remote rows are successfully written
-&nbsp; *   to local Room within the same transaction.
-&nbsp; * - [lastSyncSuccessAt] / [lastSyncAttemptAt] — timestamps for the UI badge.
+&nbsp; * The implementation guards against demo mode and non-Firebase sessions —
+&nbsp; * callers do not need to check [isEnabled] before calling [enqueueUpsert] /
+&nbsp; * [enqueueDelete]; the impl silently no-ops when sync is not allowed.
 &nbsp; *
-&nbsp; * [scopeKey] is typically a workspace id string. [collection] is an opaque
-&nbsp; * Firestore collection name string (e.g. &quot;accounts&quot;, &quot;transactions&quot;).
+&nbsp; * [entityType] — constant from [com.georgeci.moneysurfer.domain.sync.SyncEntityTypes].
+&nbsp; * [scopeKey]   — workspace id for subcollection entities, null for root entities.
 &nbsp; *
-&nbsp; * Lives in `sync:api` rather than next to its Room-backed implementation because
-&nbsp; * the Settings → Sync screen reads the cursors: &quot;a cursor newer than the remote
-&nbsp; * change&quot; is the answer to &quot;why did the pull bring nothing&quot;, and a feature module
-&nbsp; * must not depend on `sync:default` to ask it.
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №14, sync.md §4.3.
+&nbsp; * See sync.md §4.3.
 &nbsp; */
-&nbsp;interface SyncMetaRepository {
-&nbsp;    suspend fun cursor(scopeKey: String, collection: String): Instant?
-&nbsp;    suspend fun setCursor(scopeKey: String, collection: String, cursor: Instant)
-&nbsp;    suspend fun markAttempt(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun markSuccess(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun clearScope(scopeKey: String)
-&nbsp;    fun observe(scopeKey: String): Flow&lt;List&lt;SyncMeta&gt;&gt;
-&nbsp;}
+&nbsp;interface OutboxEnqueuer {
 &nbsp;
-&nbsp;data class SyncMeta(
-&nbsp;    val scopeKey: String,
-&nbsp;    val collection: String,
-&nbsp;    val lastPulledAt: Instant?,
-&nbsp;    val lastSyncSuccessAt: Instant?,
-&nbsp;    val lastSyncAttemptAt: Instant?,
-&nbsp;)
+&nbsp;    suspend fun enqueueUpsert(
+&nbsp;        entityType: String,
+&nbsp;        entityId: String,
+&nbsp;        scopeKey: String?,
+&nbsp;        operation: MutationOperation,
+&nbsp;    )
+&nbsp;
+&nbsp;    suspend fun enqueueDelete(
+&nbsp;        entityType: String,
+&nbsp;        entityId: String,
+&nbsp;        scopeKey: String?,
+&nbsp;    )
+&nbsp;
+&nbsp;    /** Returns false for demo / signed-out sessions — mutations are local-only. */
+&nbsp;    suspend fun isEnabled(): Boolean
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -106,7 +100,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

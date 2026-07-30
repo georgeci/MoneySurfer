@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncedSettingsSession</title>
+  <title>MoneySurfer Coverage Report > SyncSettings</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncedSettingsSession (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: SyncSettings (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncedSettingsSession</td>
+  <td class="name">SyncSettings</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,31 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;/**
-&nbsp; * Session-boundary maintenance for the settings that replicate per user.
-&nbsp; *
-&nbsp; * A domain facade for the same reason `ConfigHydration` and `RemoteConfigRefresh` are: the callers
-&nbsp; * are session-lifecycle use cases in `domain`, which must not see `app-config` any more than a
-&nbsp; * feature may.
-&nbsp; */
-&nbsp;fun interface SyncedSettingsSession {
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Run at the start of every session, before its first pull. Two jobs, both of which have to
-&nbsp;     * happen there and nowhere else:
-&nbsp;     *
-&nbsp;     * - **Drop the logout overlay.** The previous user&#39;s theme is held in memory so the UI does not
-&nbsp;     *   snap to defaults mid-session; left in place it would shadow whatever this user&#39;s pull writes
-&nbsp;     *   into local storage, which is the leak the account wipe exists to prevent.
-&nbsp;     * - **Re-enqueue writes the outbox refused.** `OutboxEnqueuerImpl` silently no-ops for demo and
-&nbsp;     *   signed-out sessions and nothing else replays those writes, so every setting whose stored
-&nbsp;     *   value never reached the server is queued now. This also closes the window between a local
-&nbsp;     *   write and its enqueue, which no shared transaction can protect — the two stores are
-&nbsp;     *   different databases.
-&nbsp;     *
-&nbsp;     * Idempotent, and safe without a Firebase session: the enqueue itself no-ops there.
-&nbsp;     */
-&nbsp;    suspend fun onSessionStart()
+&nbsp;/**
+&nbsp; * Whether sync may run at all. Replaces `SyncFeatureFlag`.
+&nbsp; *
+&nbsp; * Gates the Settings → Sync screen, the manual &quot;Force sync&quot; action, the in-process periodic
+&nbsp; * ticker, and every use-case-driven trigger (post-auth bootstrap, create-workspace push,
+&nbsp; * accept-invite hydration, incoming-invite refresh).
+&nbsp; *
+&nbsp; * [isEnabled] combines **three** terms — build AND server kill switch AND user toggle. The build
+&nbsp; * term matters: the offline host has no Firebase to sync against, and a server/user pair would
+&nbsp; * have no slot for that, so dropping it would switch sync on there.
+&nbsp; *
+&nbsp; * A flow rather than a `Boolean`, because a server-side kill switch can retract mid-session.
+&nbsp; */
+&nbsp;interface SyncSettings {
+&nbsp;    val isEnabled: Flow&lt;Boolean&gt;
 &nbsp;}
 </code>
 </pre>
@@ -95,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InsightUi</title>
+  <title>MoneySurfer Coverage Report > InsightKind</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: InsightUi (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: InsightKind (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">InsightUi</td>
+  <td class="name">InsightKind</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (50/50)
+    (42/42)
   </span>
 </td>
 </tr>
@@ -114,6 +114,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 &nbsp;import com.georgeci.moneysurfer.domain.model.SpentByCategory
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpentMonth
 &nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 &nbsp;import com.georgeci.moneysurfer.domain.model.buildBalanceTrend
 &nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
@@ -136,6 +137,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSpentMonthUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
 &nbsp;import kotlinx.coroutines.flow.MutableStateFlow
 &nbsp;import kotlinx.coroutines.flow.combine
@@ -164,6 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val getCategorySpend: GetCategorySpendUseCase,
 &nbsp;    private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
 &nbsp;    private val getBurnRate: GetBurnRateUseCase,
+&nbsp;    private val getSpentMonth: GetSpentMonthUseCase,
 &nbsp;    private val generateInsights: GenerateInsightsUseCase,
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
 &nbsp;    private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
@@ -285,6 +288,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                // rest of the dashboard draw without waiting on them.
 &nbsp;                .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights -&gt;
 &nbsp;                    content.copy(insights = insights.map { it.toUi() })
+&nbsp;                }
+&nbsp;                // Appended for the same reason the insights are, not because it is slow: the fold
+&nbsp;                // above is already at `combine`&#39;s five-flow ceiling, and chaining one reader on is
+&nbsp;                // the cheaper edit than repacking six widget sources into a second holder type.
+&nbsp;                // Takes no period — see `DashboardWidgetType.SpentMonth`.
+&nbsp;                .combine(getSpentMonth().onStart { emit(null) }) { content, spentMonth -&gt;
+&nbsp;                    content.copy(spentMonth = spentMonth?.toUi())
 &nbsp;                }
 &nbsp;                .collect { newContent -&gt; updateState { newContent } }
 &nbsp;        }
@@ -575,6 +585,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * the &quot;no cap to miss&quot; state, and the chart is drawn either way.
 &nbsp;         */
 &nbsp;        val burnRate: BurnRateUi? = null,
+&nbsp;        /**
+&nbsp;         * What this month has cost, or null while no workspace and base currency back the figure.
+&nbsp;         * Like [burnRate] this one does not need a budget — a null cap inside it is the &quot;no budget
+&nbsp;         * set&quot; state the card is partly *for*, and the amount is drawn either way.
+&nbsp;         */
+&nbsp;        val spentMonth: SpentMonthUi? = null,
 &nbsp;        /** Generated spending insights, most actionable first. Empty until the engine has run. */
 &nbsp;        val insights: List&lt;InsightUi&gt; = emptyList(),
 &nbsp;        val isOffline: Boolean = false,
@@ -621,6 +637,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val budgetProgress: List&lt;BudgetProgress&gt;,
 &nbsp;    val burnRate: BurnRate?,
 &nbsp;    val categorySpend: SpentByCategory?,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The month&#39;s spend as the card draws it. A file-level mapper like [SpentByCategory.toUi] below —
+&nbsp; * it reads nothing off the view model, and the class is at detekt&#39;s function ceiling.
+&nbsp; *
+&nbsp; * [SpentMonthUi.capFormatted] carries the &quot;is there a budget&quot; answer rather than a second boolean:
+&nbsp; * the caption is either &quot;of &lt;cap&gt;&quot; or the no-budget line, and one nullable string cannot disagree
+&nbsp; * with itself. The bar reads 0 without a cap — there is no limit to fill it against, and inventing
+&nbsp; * one from the spend would draw a full bar on an unbudgeted month.
+&nbsp; */
+&nbsp;private fun SpentMonth.toUi(): SpentMonthUi = SpentMonthUi(
+&nbsp;    spentFormatted = MoneyFormatter.format(spent, currency),
+&nbsp;    capFormatted = cap?.let { MoneyFormatter.format(it, currency) },
+&nbsp;    progress = capFraction ?: 0f,
+&nbsp;    delta = delta?.let { SpentMonthDeltaUi(trend = it.trend, percent = it.changePercent) },
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -700,12 +732,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * sentences, not one with a sign in it.
 &nbsp; */
 &nbsp;enum class InsightKind {
-&nbsp;    CategoryUp,
-&nbsp;    CategoryDown,
-&nbsp;    PeriodUp,
-&nbsp;    PeriodDown,
-&nbsp;    PeriodFlat,
-&nbsp;    Subscriptions,
+<b class="fc">&nbsp;    CategoryUp,</b>
+<b class="fc">&nbsp;    CategoryDown,</b>
+<b class="fc">&nbsp;    PeriodUp,</b>
+<b class="fc">&nbsp;    PeriodDown,</b>
+<b class="fc">&nbsp;    PeriodFlat,</b>
+<b class="fc">&nbsp;    Subscriptions,</b>
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -717,19 +749,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * does not use keep their defaults and never reach its copy.
 &nbsp; */
 &nbsp;data class InsightUi(
-<b class="fc">&nbsp;    val id: String,</b>
-<b class="fc">&nbsp;    val kind: InsightKind,</b>
-<b class="fc">&nbsp;    val tone: InsightTone,</b>
+&nbsp;    val id: String,
+&nbsp;    val kind: InsightKind,
+&nbsp;    val tone: InsightTone,
 &nbsp;    /** Category name for the two category kinds; null for the uncategorized bucket. */
-<b class="fc">&nbsp;    val label: String? = null,</b>
+&nbsp;    val label: String? = null,
 &nbsp;    /** The headline amount — this period&#39;s spend, or the monthly subscription total. */
-<b class="fc">&nbsp;    val amount: String = &quot;&quot;,</b>
+&nbsp;    val amount: String = &quot;&quot;,
 &nbsp;    /** The same-stretch figure from the previous period. Unused by [InsightKind.Subscriptions]. */
-<b class="fc">&nbsp;    val comparison: String = &quot;&quot;,</b>
+&nbsp;    val comparison: String = &quot;&quot;,
 &nbsp;    /** Magnitude of the change in whole percent. Zero for the kinds that compare nothing. */
-<b class="fc">&nbsp;    val percent: Int = 0,</b>
+&nbsp;    val percent: Int = 0,
 &nbsp;    /** Active subscription count. Zero for every kind but [InsightKind.Subscriptions]. */
-<b class="fc">&nbsp;    val count: Int = 0,</b>
+&nbsp;    val count: Int = 0,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -825,6 +857,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * normal state, not a loading one — see [com.georgeci.moneysurfer.domain.model.BurnRate].
 &nbsp;     */
 &nbsp;    val pace: BurnRatePace?,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The spent-this-month card&#39;s numbers. Money is formatted here; the sentences around it are built on
+&nbsp; * the screen, which is where the string resources are.
+&nbsp; */
+&nbsp;data class SpentMonthUi(
+&nbsp;    val spentFormatted: String,
+&nbsp;    /** The monthly cap, or null when no budget sets one — which is the caption the card shows. */
+&nbsp;    val capFormatted: String?,
+&nbsp;    /** Spend against the cap, `0f` without one. Can exceed 1, which the bar clamps. */
+&nbsp;    val progress: Float,
+&nbsp;    /** How the month compares to the last one, or null when no honest comparison is available. */
+&nbsp;    val delta: SpentMonthDeltaUi? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The month-over-month change. [percent] is a magnitude — [trend] picks which sentence and which
+&nbsp; * colour it is printed in, so a sign is never formatted into the number itself.
+&nbsp; */
+&nbsp;data class SpentMonthDeltaUi(
+&nbsp;    val trend: SpendTrend,
+&nbsp;    val percent: Int,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -973,7 +1028,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

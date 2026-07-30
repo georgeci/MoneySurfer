@@ -135,6 +135,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_safe_to_spend
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_spent_by_category
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_spent_month
 &nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
@@ -158,6 +159,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    DashboardWidgetType.SpentByCategory -&gt; SPENT_BY_CATEGORY_VARIANTS
 &nbsp;    DashboardWidgetType.Insights -&gt; INSIGHTS_VARIANTS
 &nbsp;    DashboardWidgetType.QuickActions,
+&nbsp;    DashboardWidgetType.SpentMonth,
 &nbsp;    DashboardWidgetType.SafeToSpend,
 &nbsp;    DashboardWidgetType.BurnRate,
 &nbsp;    DashboardWidgetType.Budgets,
@@ -272,6 +274,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
 &nbsp;    DashboardWidgetType.Balance -&gt; Res.string.dashboard_customize_widget_balance
 &nbsp;    DashboardWidgetType.QuickActions -&gt; Res.string.dashboard_customize_widget_quick_actions
+&nbsp;    DashboardWidgetType.SpentMonth -&gt; Res.string.dashboard_customize_widget_spent_month
 &nbsp;    DashboardWidgetType.SafeToSpend -&gt; Res.string.dashboard_customize_widget_safe_to_spend
 &nbsp;    DashboardWidgetType.BurnRate -&gt; Res.string.dashboard_customize_widget_burn_rate
 &nbsp;    DashboardWidgetType.Budgets -&gt; Res.string.dashboard_customize_widget_budgets
@@ -305,7 +308,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>

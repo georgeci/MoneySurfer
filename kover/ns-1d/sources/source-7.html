@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (119/119)
+    (128/128)
   </span>
 </td>
 </tr>
@@ -108,6 +108,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {</b>
 <b class="fc">&nbsp;    Balance,</b>
 <b class="fc">&nbsp;    QuickActions,</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Spend-oriented, and **not** period-scoped — a decision, not an oversight.
+&nbsp;     *
+&nbsp;     * The card is month-shaped end to end: the headline is what *this month* has cost, the bar is
+&nbsp;     * that against a monthly budget cap (`monthlySpendCap` qualifies monthly budgets only), and the
+&nbsp;     * label compares it against the same stretch of the month before. Pointing it at
+&nbsp;     * [DashboardPeriod.Week] would not narrow a window — it would have to pick a different cap and
+&nbsp;     * a different baseline, which is a different card. Its title says &quot;this month&quot; for that reason,
+&nbsp;     * so the switch never claims to drive it. See `md/insights.md` Phase 2.
+&nbsp;     */
+<b class="fc">&nbsp;    SpentMonth,</b>
 <b class="fc">&nbsp;    SafeToSpend(isPeriodScoped = true),</b>
 &nbsp;
 &nbsp;    /**
@@ -171,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 14:15</div>
+    <div style="float:right;">generated on 2026-07-30 15:22</div>
 </div>
 </body>
 </html>
