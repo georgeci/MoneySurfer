@@ -1,9 +1,9 @@
 package com.georgeci.moneysurfer.data.config
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
+import com.georgeci.moneysurfer.data.platform.isDebuggableBuild
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -16,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
  * in a file that already exists per platform.
  */
 fun createDebugConfigSource(context: Context, scope: CoroutineScope): DebugConfigSource =
-    if (context.isDebuggable()) {
+    if (context.isDebuggableBuild()) {
         DebugConfigSourceImpl(
             createReplaceOnCorruptionDataStore(
                 producePath = { context.filesDir.resolve(DEBUG_OVERRIDES_FILE_NAME).absolutePath },
@@ -26,11 +26,3 @@ fun createDebugConfigSource(context: Context, scope: CoroutineScope): DebugConfi
     } else {
         DebugConfigSource.Empty
     }
-
-/**
- * `BuildConfig.DEBUG` belongs to whichever Gradle module it is generated in, and this is a library
- * module — the installed application's own `FLAG_DEBUGGABLE` is the signal that actually tracks the
- * APK the user is running.
- */
-private fun Context.isDebuggable(): Boolean =
-    applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0

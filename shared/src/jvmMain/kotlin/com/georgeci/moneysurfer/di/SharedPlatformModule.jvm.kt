@@ -16,7 +16,13 @@ import org.koin.dsl.module
 
 actual val sharedPlatformModule: Module = module {
     includes(applicationScopeModule)
-    single<MoneySurferDatabase> { getRoomDatabase(getDatabaseBuilder()) }
+    // The desktop host is developer-only today and starts Koin with `isDebug = true`
+    // (`composeApp/.../main.kt`), so the destructive fallback stays on here. Revisit together
+    // with that flag if a packaged desktop release ships — see
+    // docs/architecture/persistence.md → "Room schema versioning".
+    single<MoneySurferDatabase> {
+        getRoomDatabase(builder = getDatabaseBuilder(), allowDestructiveMigration = true)
+    }
     single { createDataStore() }
     // Own DataStore file, created in the factory rather than bound — see the Android actual.
     single<DebugConfigSource> { createDebugConfigSource(scope = get()) }

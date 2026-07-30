@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.data.datastore.createDataStore
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.data.db.getDatabaseBuilder
 import com.georgeci.moneysurfer.data.db.getRoomDatabase
+import com.georgeci.moneysurfer.data.platform.isDebuggableBuild
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
 import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
@@ -18,8 +19,13 @@ import org.koin.dsl.module
 actual val sharedPlatformModule: Module = module {
     includes(applicationScopeModule)
     single<MoneySurferDatabase> {
-        val builder = getDatabaseBuilder(context = get())
-        getRoomDatabase(builder)
+        val context: Context = get()
+        // Debuggable APKs may drop the local database on a schema change; release APKs must
+        // migrate. See docs/architecture/persistence.md → "Room schema versioning".
+        getRoomDatabase(
+            builder = getDatabaseBuilder(context = context),
+            allowDestructiveMigration = context.isDebuggableBuild(),
+        )
     }
     single { createDataStore(context = get()) }
     // Debug overrides get their own DataStore file, created inside the factory rather than

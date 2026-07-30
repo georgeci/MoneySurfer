@@ -38,6 +38,17 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
  */
 const val MONEY_SURFER_DB_VERSION: Int = 36
 
+/**
+ * Schema version frozen for the first MVP release. Nothing below this number ever reached a
+ * user, so those upgrade paths may stay unimplemented; every version *at or above* it must be
+ * reachable by a hand-written [androidx.room.migration.Migration] chain, and the
+ * `verifyRoomMigrations` Gradle task fails the build when a newly exported schema arrives
+ * without one. See `docs/architecture/persistence.md` → "Room schema versioning".
+ *
+ * Do not raise this constant: it is a historical marker, not a moving floor.
+ */
+const val MONEY_SURFER_DB_RELEASE_BASELINE_VERSION: Int = 36
+
 @Database(
     entities = [
         UserEntity::class,
