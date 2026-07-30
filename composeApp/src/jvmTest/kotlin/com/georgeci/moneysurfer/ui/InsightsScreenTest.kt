@@ -104,6 +104,18 @@ class InsightsScreenTest : StringSpec({
         }
     }
 
+    "an empty period answers once, not three times over" {
+        runComposeUiTest {
+            setContent { InsightsContent(state = EMPTY, onEvent = {}) }
+
+            // Merchants read the same window the breakdown does and their rows are a subset of it,
+            // so an empty breakdown guarantees an empty merchant list. Saying so under the empty
+            // state would answer the same question twice.
+            onNodeWithText("Top merchants").assertDoesNotExist()
+            onNodeWithText("No period spending names a merchant.").assertDoesNotExist()
+        }
+    }
+
     "the base-currency filter is named as the reason, and nothing else is drawn" {
         runComposeUiTest {
             setContent { InsightsContent(state = CURRENCY_FILTERED, onEvent = {}) }

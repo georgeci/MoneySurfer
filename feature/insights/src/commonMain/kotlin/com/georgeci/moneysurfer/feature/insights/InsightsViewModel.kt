@@ -55,7 +55,19 @@ class InsightsViewModel(
         }
     }
 
-    private fun shift(by: Int) = select(selection.value.shifted(by))
+    /**
+     * Pages the period, bounded forward by the same rule the arrow is drawn inert on.
+     *
+     * The bound is repeated here rather than left to the composable because it is a rule about the
+     * state, not about the control: a period that has not happened has nothing to show, and its own
+     * forward arrow would be inert too — so one stray event lands the screen in a dead period it can
+     * only leave by paging back. Backwards is deliberately unbounded; there is no first period.
+     */
+    private fun shift(by: Int) {
+        val content = currentState as? InsightsState.Content
+        if (by > 0 && content?.canGoToNextPeriod != true) return
+        select(selection.value.shifted(by))
+    }
 
     /**
      * Moves the period and marks the screen busy in the same breath.

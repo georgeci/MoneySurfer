@@ -167,6 +167,31 @@ class InsightsViewModelTest : StringSpec({
         content.inFlight shouldBe false
     }
 
+    "the forward arrow's bound is the view model's, not just the arrow's" {
+        val analytics = FakeSpendAnalyticsRepository()
+        val vm = viewModel(analytics)
+        val queriesBefore = analytics.byCategoryScopes.size
+
+        // The composable draws this arrow inert, so this event should not arrive at all — but a
+        // period that has not happened is a dead end (its own forward arrow is inert too), so the
+        // rule belongs to the state rather than to the control.
+        vm.onEvent(InsightsEvent.OnNextPeriodClick)
+
+        analytics.byCategoryScopes.size shouldBe queriesBefore
+        vm.value.shouldBeInstanceOf<InsightsState.Content>().canGoToNextPeriod shouldBe false
+    }
+
+    "paging forward is allowed once there is a period to page into" {
+        val analytics = FakeSpendAnalyticsRepository()
+        val vm = viewModel(analytics)
+
+        vm.onEvent(InsightsEvent.OnPreviousPeriodClick)
+        vm.onEvent(InsightsEvent.OnNextPeriodClick)
+
+        analytics.byCategoryScopes.last().window shouldBe
+            periodWindow(TransactionPeriodMode.Month, today())
+    }
+
     "switching cadence narrows the window to the ISO week without moving the anchor" {
         val analytics = FakeSpendAnalyticsRepository()
         val vm = viewModel(analytics)

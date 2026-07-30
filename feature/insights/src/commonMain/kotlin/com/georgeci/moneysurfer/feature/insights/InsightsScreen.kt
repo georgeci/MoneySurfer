@@ -177,11 +177,16 @@ fun InsightsContent(
                 categoryBreakdown(content, bodyModifier)
             }
 
+            // The trend stays: it spans six months, so it has something to say about a period that
+            // holds nothing. The merchant list does not — it reads the same window the breakdown
+            // does, and its rows are a subset of the breakdown's, so an empty breakdown guarantees
+            // an empty merchant list. Drawing its "nobody is named" line under the empty state
+            // would answer the same question twice.
             item(key = "trend") {
                 NetTrendCard(state = content, modifier = bodyModifier)
             }
 
-            merchantList(content, bodyModifier)
+            if (!content.isEmpty) merchantList(content, bodyModifier)
         }
     }
 }
