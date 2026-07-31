@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SignInTestTags</title>
+  <title>MoneySurfer Coverage Report > InsightsViewModel</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,165 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.insights</a>
 </div>
 
-<h1>Coverage Summary for Class: SignInTestTags (com.georgeci.moneysurfer.feature.login)</h1>
+<h1>Coverage Summary for Class: InsightsViewModel (com.georgeci.moneysurfer.feature.insights)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SignInTestTags</td>
-    <td class="coverageStat"/>
+  <td class="name">InsightsViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (16/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (132/135)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">InsightsViewModel$observeInsights$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InsightsViewModel$observeInsights$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85%
+  </span>
+  <span class="absValue">
+    (17/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (18/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.6%
+  </span>
+  <span class="absValue">
+    (172/178)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,635 +185,154 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.insights
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.BoxWithConstraints
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.heightIn
-&nbsp;import androidx.compose.foundation.layout.only
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.safeDrawing
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.layout.widthIn
-&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.AlertDialog
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.ButtonDefaults
-&nbsp;import androidx.compose.material3.Card
-&nbsp;import androidx.compose.material3.CardDefaults
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedButton
-&nbsp;import androidx.compose.material3.OutlinedTextFieldDefaults
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.semantics.Role
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.text.input.ImeAction
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.text.style.TextDecoration
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.compose.ui.unit.sp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferPasswordField
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferTextField
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
-&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AuthColors
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.login.generated.resources.Res
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_anonymous
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_brand
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_demo_mode
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_email_label
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_ok
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_title
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_invalid
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_required
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_password_required
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_password_too_short
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_permission_denied
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_unknown
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_weak_password
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_subtitle
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_title
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_or
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_password_label
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_sheet_subtitle
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_sheet_title
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signin
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signup
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_terms
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signin
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpend
+&nbsp;import com.georgeci.moneysurfer.domain.model.InsightsSelection
+&nbsp;import com.georgeci.moneysurfer.domain.model.MerchantSpend
+&nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNet
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendInsights
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSpendInsightsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.util.isoWeek
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.number
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;object SignInTestTags {
-&nbsp;    const val Root = &quot;signIn:root&quot;
-&nbsp;    const val BrandHeader = &quot;signIn:brandHeader&quot;
-&nbsp;    const val HeroTitle = &quot;signIn:heroTitle&quot;
-&nbsp;    const val HeroSubtitle = &quot;signIn:heroSubtitle&quot;
-&nbsp;    const val Sheet = &quot;signIn:sheet&quot;
-&nbsp;    const val SheetTitle = &quot;signIn:sheetTitle&quot;
-&nbsp;    const val SheetSubtitle = &quot;signIn:sheetSubtitle&quot;
-&nbsp;    const val EmailField = &quot;signIn:email&quot;
-&nbsp;    const val PasswordField = &quot;signIn:password&quot;
-&nbsp;    const val SubmitButton = &quot;signIn:submit&quot;
-&nbsp;    const val ToggleModeButton = &quot;signIn:toggleMode&quot;
-&nbsp;    const val AnonymousButton = &quot;signIn:anonymous&quot;
-&nbsp;    const val DemoButton = &quot;signIn:demo&quot;
-&nbsp;    const val ErrorText = &quot;signIn:error&quot;
-&nbsp;    const val ErrorDialog = &quot;signIn:errorDialog&quot;
-&nbsp;    const val ErrorDialogConfirm = &quot;signIn:errorDialog:confirm&quot;
-&nbsp;    const val EmailError = &quot;$EmailField:error&quot;
-&nbsp;    const val PasswordError = &quot;$PasswordField:error&quot;
-&nbsp;    const val PasswordReveal = &quot;$PasswordField:reveal&quot;
-&nbsp;    const val Loader = &quot;signIn:loader&quot;
-&nbsp;    const val Terms = &quot;signIn:terms&quot;
-&nbsp;}
+&nbsp;/** List key for the uncategorized bucket, which has no category id to be keyed by. */
+&nbsp;private const val UNCATEGORIZED_ID = &quot;uncategorized&quot;
 &nbsp;
-&nbsp;private val SheetCorner: Dp = 28.dp
-&nbsp;private val PrimaryButtonHeight: Dp = 52.dp
-&nbsp;private val BrandIconSize: Dp = 42.dp
-&nbsp;private val HeroTitleSize = 40.sp
-&nbsp;private val HeroTitleLineHeight = 44.sp
-&nbsp;private val HeroSubtitleMaxWidth: Dp = 320.dp
-&nbsp;private val SheetPadding: Dp = 20.dp
-&nbsp;private val SheetElevation: Dp = 12.dp
-&nbsp;private val SheetTitleSize = 18.sp
-&nbsp;private val PasskeyIconSize: Dp = 18.dp
-&nbsp;private val OrLabelSize = 11.sp
-&nbsp;private val PrimaryLabelSize = 15.sp
-&nbsp;private val ContentMaxWidth: Dp = 480.dp
+<b class="fc">&nbsp;@KoinViewModel</b>
+&nbsp;class InsightsViewModel(
+<b class="fc">&nbsp;    private val getSpendInsights: GetSpendInsightsUseCase,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
+<b class="fc">&nbsp;) : MviViewModel&lt;InsightsState, InsightsEvent, InsightsEffect&gt;(initialState = InsightsState.Loading) {</b>
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInError.localized(): String = stringResource(
-&nbsp;    when (this) {
-&nbsp;        SignInError.EmailRequired -&gt; Res.string.sign_in_error_email_required
-&nbsp;        SignInError.EmailInvalid -&gt; Res.string.sign_in_error_email_invalid
-&nbsp;        SignInError.PasswordRequired -&gt; Res.string.sign_in_error_password_required
-&nbsp;        SignInError.PasswordTooShort -&gt; Res.string.sign_in_error_password_too_short
-&nbsp;        SignInError.InvalidCredentials -&gt; Res.string.sign_in_error_invalid_credentials
-&nbsp;        SignInError.EmailAlreadyInUse -&gt; Res.string.sign_in_error_email_in_use
-&nbsp;        SignInError.WeakPassword -&gt; Res.string.sign_in_error_weak_password
-&nbsp;        SignInError.PermissionDenied -&gt; Res.string.sign_in_error_permission_denied
-&nbsp;        SignInError.Unknown -&gt; Res.string.sign_in_error_unknown
-&nbsp;    },
-&nbsp;)
+<b class="fc">&nbsp;    private val zone = TimeZone.currentSystemDefault()</b>
+<b class="fc">&nbsp;    private val today: LocalDate get() = clock.now().toLocalDateTime(zone).date</b>
 &nbsp;
-&nbsp;@Composable
-&nbsp;fun SignInScreen(
-&nbsp;    onNavigateToWorkspaceSelector: (cloudDataUnavailable: Boolean) -&gt; Unit,
-&nbsp;    onNavigateToLegal: () -&gt; Unit,
-&nbsp;    viewModel: SignInViewModel = koinViewModel(),
-&nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;    /**
+&nbsp;     * The period the screen is pointed at.
+&nbsp;     *
+&nbsp;     * Deliberately not persisted (`md/insights.md` decision 6): reopening the screen on a month the
+&nbsp;     * user last browsed weeks ago would read as missing data, the same call the transactions list
+&nbsp;     * made for its own pager.
+&nbsp;     */
+<b class="fc">&nbsp;    private val selection = MutableStateFlow(</b>
+<b class="fc">&nbsp;        InsightsSelection(mode = DashboardPeriod.DEFAULT, anchor = today),</b>
+&nbsp;    )
 &nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            is SignInEffect.NavigateToWorkspaceSelector -&gt;
-&nbsp;                onNavigateToWorkspaceSelector(effect.cloudDataUnavailable)
-&nbsp;            SignInEffect.NavigateToLegal -&gt; onNavigateToLegal()
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        observeInsights()</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    override fun onEvent(event: InsightsEvent) {
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="fc">&nbsp;            InsightsEvent.OnBackClick -&gt; postSideEffect(InsightsEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            InsightsEvent.OnPreviousPeriodClick -&gt; shift(by = -1)</b>
+<b class="fc">&nbsp;            InsightsEvent.OnNextPeriodClick -&gt; shift(by = 1)</b>
+<b class="fc">&nbsp;            is InsightsEvent.OnPeriodModeChanged -&gt; select(selection.value.copy(mode = event.mode))</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    SignInContent(
-&nbsp;        state = state,
-&nbsp;        onEvent = viewModel::onEvent,
-&nbsp;    )
+&nbsp;    /**
+&nbsp;     * Pages the period, bounded forward by the same rule the arrow is drawn inert on.
+&nbsp;     *
+&nbsp;     * The bound is repeated here rather than left to the composable because it is a rule about the
+&nbsp;     * state, not about the control: a period that has not happened has nothing to show, and its own
+&nbsp;     * forward arrow would be inert too — so one stray event lands the screen in a dead period it can
+&nbsp;     * only leave by paging back. Backwards is deliberately unbounded; there is no first period.
+&nbsp;     */
+&nbsp;    private fun shift(by: Int) {
+<b class="pc">&nbsp;        val content = currentState as? InsightsState.Content</b>
+<b class="pc">&nbsp;        if (by &gt; 0 &amp;&amp; content?.canGoToNextPeriod != true) return</b>
+<b class="fc">&nbsp;        select(selection.value.shifted(by))</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Moves the period and marks the screen busy in the same breath.
+&nbsp;     *
+&nbsp;     * The flag is raised here rather than in the collector because that is where the wait starts:
+&nbsp;     * the new window&#39;s rollups are only queried once [selection] emits, and the collector&#39;s next
+&nbsp;     * emission is what ends it.
+&nbsp;     */
+&nbsp;    private fun select(next: InsightsSelection) {
+<b class="fc">&nbsp;        if (next == selection.value) return</b>
+&nbsp;        // A no-op while the screen is still Loading — the optic only reaches into Content.
+<b class="fc">&nbsp;        updateState { InsightsState.content.inFlight.modify(this) { true } }</b>
+<b class="fc">&nbsp;        selection.value = next</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeInsights() {
+<b class="fc">&nbsp;        launch {</b>
+<b class="fc">&nbsp;            getSpendInsights(selection).collect { insights -&gt;</b>
+<b class="pc">&nbsp;                updateState { insights?.toContent(today) ?: InsightsState.Loading }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Stateless body of the sign-in screen. Public so screen-state UI tests can mount it with an
-&nbsp; * injected [SignInState] instead of standing up a Koin-backed [SignInViewModel].
+&nbsp; * The screen&#39;s state for one answered selection.
+&nbsp; *
+&nbsp; * A null answer maps back to [InsightsState.Loading] rather than to an empty [InsightsState.Content]:
+&nbsp; * null means the workspace or its base currency is not readable yet, and an empty screen would claim
+&nbsp; * the period holds nothing when nothing was actually asked.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;fun SignInContent(
-&nbsp;    state: SignInState,
-&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    // The brand backdrop is drawn edge to edge, under the status bar and the navigation bar, and
-&nbsp;    // only the content is inset — that is what tints the system bars green. The gradient is light
-&nbsp;    // at the top and the wave band is dark at the bottom, so the two bars get opposite icon tints.
-&nbsp;    ConfigureSystemBars(darkStatusBarBackground = false, darkNavigationBarBackground = true)
-&nbsp;    Box(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxSize()
-&nbsp;            .surferTestTagAsId()
-&nbsp;            .testTag(SignInTestTags.Root),
-&nbsp;    ) {
-&nbsp;        SurferAuthBackground(modifier = Modifier.fillMaxSize())
-&nbsp;
-&nbsp;        // The bottom safe-drawing inset carries the IME, so the insets below already lift the
-&nbsp;        // content clear of the keyboard. What was still missing is somewhere to lift it TO: with
-&nbsp;        // a fixed-height column the sheet was squeezed off-screen and the &quot;Create account&quot; button
-&nbsp;        // became unreachable. Measuring inside the inset padding yields a viewport height that
-&nbsp;        // already accounts for the keyboard, and the scroll container covers the rest.
-&nbsp;        BoxWithConstraints(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferSafeInsets()
-&nbsp;                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
-&nbsp;        ) {
-&nbsp;            val viewportHeight = maxHeight
-&nbsp;            Column(
-&nbsp;                modifier = Modifier
-&nbsp;                    .align(Alignment.TopCenter)
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .widthIn(max = ContentMaxWidth)
-&nbsp;                    .verticalScroll(rememberScrollState())
-&nbsp;                    .heightIn(min = viewportHeight)
-&nbsp;                    .padding(
-&nbsp;                        start = AppTheme.spacing.default,
-&nbsp;                        end = AppTheme.spacing.default,
-&nbsp;                        top = AppTheme.spacing.xLarge,
-&nbsp;                        bottom = AppTheme.spacing.large,
-&nbsp;                    ),
-&nbsp;                verticalArrangement = Arrangement.SpaceBetween,
-&nbsp;            ) {
-&nbsp;                // Exactly two children so SpaceBetween reproduces the pinned-to-bottom sheet of
-&nbsp;                // the original weight(1f) layout, which a scrollable column cannot use.
-&nbsp;                Column(modifier = Modifier.padding(bottom = AppTheme.spacing.large)) {
-&nbsp;                    SignInBrandHeader()
-&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.xLarge))
-&nbsp;                    SignInHero()
-&nbsp;                }
-&nbsp;                SignInActionSheet(state = state, onEvent = onEvent)
-&nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        if (state.isLoading) {
-&nbsp;            SurferFullScreenLoader(
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxSize()
-&nbsp;                    .testTag(SignInTestTags.Loader),
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        state.dialogError?.let { error -&gt;
-&nbsp;            SignInErrorDialog(
-&nbsp;                error = error,
-&nbsp;                onDismiss = { onEvent(SignInEvent.OnErrorDismiss) },
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInErrorDialog(
-&nbsp;    error: SignInError,
-&nbsp;    onDismiss: () -&gt; Unit,
-&nbsp;) {
-&nbsp;    AlertDialog(
-&nbsp;        onDismissRequest = onDismiss,
-&nbsp;        title = { Text(stringResource(Res.string.sign_in_error_dialog_title)) },
-&nbsp;        text = { Text(error.localized()) },
-&nbsp;        confirmButton = {
-&nbsp;            TextButton(
-&nbsp;                onClick = onDismiss,
-&nbsp;                modifier = Modifier.testTag(SignInTestTags.ErrorDialogConfirm),
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.sign_in_error_dialog_ok))
-&nbsp;            }
-&nbsp;        },
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        modifier = Modifier.testTag(SignInTestTags.ErrorDialog),
+&nbsp;private fun SpendInsights.toContent(today: LocalDate): InsightsState.Content {
+&nbsp;    // Non-null in practice — neither DashboardPeriod entry is all-time — but the window type also
+&nbsp;    // allows an unbounded one, and &quot;no end&quot; is not a period there is a next one of.
+&nbsp;    val end = selection.window.to
+&nbsp;    return InsightsState.Content(
+&nbsp;        mode = selection.mode,
+&nbsp;        period = selection.toPeriodUi(),
+&nbsp;        canGoToNextPeriod = end != null &amp;&amp; end &lt; today,
+&nbsp;        baseCurrency = currency.value,
+&nbsp;        totalFormatted = MoneyFormatter.format(breakdown.total, currency),
+&nbsp;        categories = breakdown.entries.map { it.toUi(currency) },
+&nbsp;        months = months.map { it.toUi(currency) },
+&nbsp;        merchants = merchants.map { it.toUi(currency) },
+&nbsp;        hiddenCurrencies = excludedByCurrency.map { it.currencyCode.value },
+&nbsp;        hiddenByBaseCurrency = hiddenByBaseCurrency,
 &nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInBrandHeader(modifier: Modifier = Modifier) {
-&nbsp;    Row(
-&nbsp;        modifier = modifier.testTag(SignInTestTags.BrandHeader),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
-&nbsp;    ) {
-&nbsp;        SurferAppIcon(size = BrandIconSize)
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.sign_in_brand),
-&nbsp;            style = AppTheme.typography.titleLarge,
-&nbsp;            color = AuthColors.OnBrand,
-&nbsp;            fontWeight = FontWeight.Bold,
-&nbsp;        )
+&nbsp;private fun InsightsSelection.toPeriodUi(): InsightsPeriodUi = when (mode) {
+&nbsp;    DashboardPeriod.Month -&gt; InsightsPeriodUi.Month(monthNumber = anchor.month.number, year = anchor.year)
+&nbsp;    DashboardPeriod.Week -&gt; anchor.isoWeek().let { week -&gt;
+&nbsp;        InsightsPeriodUi.Week(weekNumber = week.weekNumber, weekYear = week.weekYear)
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInHero(modifier: Modifier = Modifier) {
-&nbsp;    Column(modifier = modifier) {
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.sign_in_hero_title),
-&nbsp;            color = AuthColors.OnBrand,
-&nbsp;            fontSize = HeroTitleSize,
-&nbsp;            lineHeight = HeroTitleLineHeight,
-&nbsp;            fontWeight = FontWeight.ExtraBold,
-&nbsp;            modifier = Modifier.testTag(SignInTestTags.HeroTitle),
-&nbsp;        )
-&nbsp;        Spacer(Modifier.height(AppTheme.spacing.default))
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.sign_in_hero_subtitle),
-&nbsp;            color = AuthColors.OnBrandMuted,
-&nbsp;            style = AppTheme.typography.bodyLarge,
-&nbsp;            modifier = Modifier
-&nbsp;                .widthIn(max = HeroSubtitleMaxWidth)
-&nbsp;                .testTag(SignInTestTags.HeroSubtitle),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+&nbsp;private fun CategorySpend.toUi(currency: CurrencyCode) = InsightsCategoryUi(
+&nbsp;    id = category?.id?.value ?: UNCATEGORIZED_ID,
+&nbsp;    name = category?.name,
+&nbsp;    hue = category?.hue,
+&nbsp;    spentFormatted = MoneyFormatter.format(spent, currency),
+&nbsp;    share = share,
+&nbsp;)
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInActionSheet(
-&nbsp;    state: SignInState,
-&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Card(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .testTag(SignInTestTags.Sheet),
-&nbsp;        shape = RoundedCornerShape(SheetCorner),
-&nbsp;        colors = CardDefaults.cardColors(
-&nbsp;            containerColor = AuthColors.Sheet,
-&nbsp;            contentColor = AuthColors.Ink,
-&nbsp;        ),
-&nbsp;        elevation = CardDefaults.cardElevation(defaultElevation = SheetElevation),
-&nbsp;    ) {
-&nbsp;        Column(modifier = Modifier.padding(SheetPadding)) {
-&nbsp;            SheetHeader()
-&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;private fun MonthlyNet.toUi(currency: CurrencyCode) = InsightsMonthUi(
+&nbsp;    monthNumber = month.month.number,
+&nbsp;    year = month.year,
+&nbsp;    income = income.minor,
+&nbsp;    expense = expense.minor,
+&nbsp;    incomeFormatted = MoneyFormatter.format(income, currency),
+&nbsp;    expenseFormatted = MoneyFormatter.format(expense, currency),
+&nbsp;)
 &nbsp;
-&nbsp;            if (state.emailPasswordEnabled) {
-&nbsp;                EmailPasswordForm(state = state, onEvent = onEvent)
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;                // Only errors that belong to no single field land here; the rest are rendered
-&nbsp;                // as supporting text under the input that caused them.
-&nbsp;                val formError = state.formError
-&nbsp;                if (formError != null) {
-&nbsp;                    Text(
-&nbsp;                        text = formError.localized(),
-&nbsp;                        style = AppTheme.typography.bodySmall,
-&nbsp;                        color = AppTheme.materialColors.error,
-&nbsp;                        textAlign = TextAlign.Center,
-&nbsp;                        modifier = Modifier
-&nbsp;                            .fillMaxWidth()
-&nbsp;                            .testTag(SignInTestTags.ErrorText),
-&nbsp;                    )
-&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;                }
-&nbsp;                PrimaryFilledButton(
-&nbsp;                    text = stringResource(
-&nbsp;                        when (state.mode) {
-&nbsp;                            AuthMode.SignIn -&gt; Res.string.sign_in_submit_signin
-&nbsp;                            AuthMode.SignUp -&gt; Res.string.sign_in_submit_signup
-&nbsp;                        },
-&nbsp;                    ),
-&nbsp;                    onClick = { onEvent(SignInEvent.OnSubmitClick) },
-&nbsp;                    enabled = state.canSubmit,
-&nbsp;                    modifier = Modifier.testTag(SignInTestTags.SubmitButton),
-&nbsp;                )
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.xSmall))
-&nbsp;                TextButton(
-&nbsp;                    onClick = { onEvent(SignInEvent.OnToggleModeClick) },
-&nbsp;                    enabled = !state.isLoading,
-&nbsp;                    modifier = Modifier
-&nbsp;                        .fillMaxWidth()
-&nbsp;                        .testTag(SignInTestTags.ToggleModeButton),
-&nbsp;                ) {
-&nbsp;                    Text(
-&nbsp;                        text = stringResource(
-&nbsp;                            when (state.mode) {
-&nbsp;                                AuthMode.SignIn -&gt; Res.string.sign_in_toggle_to_signup
-&nbsp;                                AuthMode.SignUp -&gt; Res.string.sign_in_toggle_to_signin
-&nbsp;                            },
-&nbsp;                        ),
-&nbsp;                        color = AuthColors.PrimaryDark,
-&nbsp;                        fontWeight = FontWeight.SemiBold,
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            if (state.anonymousEnabled) {
-&nbsp;                if (state.emailPasswordEnabled) {
-&nbsp;                    OrDivider()
-&nbsp;                }
-&nbsp;                PasskeyOutlinedButton(
-&nbsp;                    text = stringResource(Res.string.sign_in_anonymous),
-&nbsp;                    onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
-&nbsp;                    enabled = !state.isLoading,
-&nbsp;                    modifier = Modifier.testTag(SignInTestTags.AnonymousButton),
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            if (state.demoEnabled) {
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;                if (state.demoOnly) {
-&nbsp;                    PrimaryFilledButton(
-&nbsp;                        text = stringResource(Res.string.sign_in_demo_mode),
-&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
-&nbsp;                        enabled = !state.isLoading,
-&nbsp;                        modifier = Modifier.testTag(SignInTestTags.DemoButton),
-&nbsp;                    )
-&nbsp;                } else {
-&nbsp;                    TextButton(
-&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
-&nbsp;                        enabled = !state.isLoading,
-&nbsp;                        modifier = Modifier
-&nbsp;                            .fillMaxWidth()
-&nbsp;                            .testTag(SignInTestTags.DemoButton),
-&nbsp;                    ) {
-&nbsp;                        Text(
-&nbsp;                            text = stringResource(Res.string.sign_in_demo_mode),
-&nbsp;                            color = AuthColors.PrimaryDark,
-&nbsp;                            fontWeight = FontWeight.SemiBold,
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
-&nbsp;            SignInTerms(onClick = { onEvent(SignInEvent.OnTermsClick) })
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SheetHeader() {
-&nbsp;    Text(
-&nbsp;        text = stringResource(Res.string.sign_in_sheet_title),
-&nbsp;        color = AuthColors.Ink,
-&nbsp;        fontSize = SheetTitleSize,
-&nbsp;        fontWeight = FontWeight.Bold,
-&nbsp;        modifier = Modifier.testTag(SignInTestTags.SheetTitle),
-&nbsp;    )
-&nbsp;    Spacer(Modifier.height(AppTheme.spacing.xxSmall))
-&nbsp;    Text(
-&nbsp;        text = stringResource(Res.string.sign_in_sheet_subtitle),
-&nbsp;        color = AuthColors.SheetMuted,
-&nbsp;        style = AppTheme.typography.bodySmall,
-&nbsp;        modifier = Modifier.testTag(SignInTestTags.SheetSubtitle),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun EmailPasswordForm(
-&nbsp;    state: SignInState,
-&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    val fieldColors = OutlinedTextFieldDefaults.colors(
-&nbsp;        focusedBorderColor = AuthColors.PrimaryDark,
-&nbsp;        unfocusedBorderColor = AuthColors.Divider,
-&nbsp;        focusedLabelColor = AuthColors.PrimaryDark,
-&nbsp;        unfocusedLabelColor = AuthColors.SheetSubtle,
-&nbsp;        cursorColor = AuthColors.PrimaryDark,
-&nbsp;        focusedTextColor = AuthColors.Ink,
-&nbsp;        unfocusedTextColor = AuthColors.Ink,
-&nbsp;    )
-&nbsp;    SurferTextField(
-&nbsp;        value = state.email,
-&nbsp;        onValueChange = { onEvent(SignInEvent.OnEmailChanged(it)) },
-&nbsp;        label = stringResource(Res.string.sign_in_email_label),
-&nbsp;        errorText = state.emailError?.localized(),
-&nbsp;        enabled = !state.isLoading,
-&nbsp;        keyboardOptions = KeyboardOptions(
-&nbsp;            keyboardType = KeyboardType.Email,
-&nbsp;            imeAction = ImeAction.Next,
-&nbsp;        ),
-&nbsp;        colors = fieldColors,
-&nbsp;        fieldTestTag = SignInTestTags.EmailField,
-&nbsp;    )
-&nbsp;    // No spacer: each field already reserves a message line under itself, which is the gap.
-&nbsp;    SurferPasswordField(
-&nbsp;        value = state.password,
-&nbsp;        onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },
-&nbsp;        label = stringResource(Res.string.sign_in_password_label),
-&nbsp;        errorText = state.passwordError?.localized(),
-&nbsp;        enabled = !state.isLoading,
-&nbsp;        colors = fieldColors,
-&nbsp;        fieldTestTag = SignInTestTags.PasswordField,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun PrimaryFilledButton(
-&nbsp;    text: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    enabled: Boolean,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    Button(
-&nbsp;        onClick = onClick,
-&nbsp;        enabled = enabled,
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .height(PrimaryButtonHeight),
-&nbsp;        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
-&nbsp;        colors = ButtonDefaults.buttonColors(
-&nbsp;            containerColor = AuthColors.PrimaryDark,
-&nbsp;            contentColor = AuthColors.OnBrand,
-&nbsp;        ),
-&nbsp;    ) {
-&nbsp;        Text(
-&nbsp;            text = text,
-&nbsp;            fontSize = PrimaryLabelSize,
-&nbsp;            fontWeight = FontWeight.SemiBold,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun PasskeyOutlinedButton(
-&nbsp;    text: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    enabled: Boolean,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    OutlinedButton(
-&nbsp;        onClick = onClick,
-&nbsp;        enabled = enabled,
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .height(PrimaryButtonHeight),
-&nbsp;        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
-&nbsp;        colors = ButtonDefaults.outlinedButtonColors(
-&nbsp;            contentColor = AuthColors.PrimaryDark,
-&nbsp;        ),
-&nbsp;    ) {
-&nbsp;        Icon(
-&nbsp;            imageVector = SurferIcons.Fingerprint,
-&nbsp;            contentDescription = SurferSemantics.Decorative,
-&nbsp;            modifier = Modifier.size(PasskeyIconSize),
-&nbsp;        )
-&nbsp;        Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;        Text(
-&nbsp;            text = text,
-&nbsp;            fontSize = PrimaryLabelSize,
-&nbsp;            fontWeight = FontWeight.SemiBold,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun OrDivider() {
-&nbsp;    Row(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(vertical = AppTheme.spacing.small),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .weight(1f)
-&nbsp;                .height(1.dp)
-&nbsp;                .background(AuthColors.Divider),
-&nbsp;        )
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.sign_in_or).uppercase(),
-&nbsp;            color = AuthColors.SheetSubtle,
-&nbsp;            fontSize = OrLabelSize,
-&nbsp;            fontWeight = FontWeight.Medium,
-&nbsp;            modifier = Modifier.padding(horizontal = AppTheme.spacing.small),
-&nbsp;        )
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .weight(1f)
-&nbsp;                .height(1.dp)
-&nbsp;                .background(AuthColors.Divider),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInTerms(onClick: () -&gt; Unit) {
-&nbsp;    Box(
-&nbsp;        modifier = Modifier.fillMaxWidth(),
-&nbsp;        contentAlignment = Alignment.Center,
-&nbsp;    ) {
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.sign_in_terms),
-&nbsp;            style = AppTheme.typography.bodySmall,
-&nbsp;            color = AuthColors.PrimaryDark,
-&nbsp;            textAlign = TextAlign.Center,
-&nbsp;            textDecoration = TextDecoration.Underline,
-&nbsp;            modifier = Modifier
-&nbsp;                .clickable(role = Role.Button, onClick = onClick)
-&nbsp;                .testTag(SignInTestTags.Terms),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SignInScreenPreview() {
-&nbsp;    AppTheme {
-&nbsp;        SignInContent(
-&nbsp;            state = SignInState(),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SignInScreenFieldErrorPreview() {
-&nbsp;    AppTheme {
-&nbsp;        SignInContent(
-&nbsp;            state = SignInState(
-&nbsp;                email = &quot;surfer@example&quot;,
-&nbsp;                password = &quot;123&quot;,
-&nbsp;                mode = AuthMode.SignUp,
-&nbsp;                error = SignInError.PasswordTooShort,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SignInScreenDemoOnlyPreview() {
-&nbsp;    AppTheme {
-&nbsp;        SignInContent(
-&nbsp;            state = SignInState(
-&nbsp;                emailPasswordEnabled = false,
-&nbsp;                anonymousEnabled = false,
-&nbsp;                demoEnabled = true,
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+&nbsp;private fun MerchantSpend.toUi(currency: CurrencyCode) = InsightsMerchantUi(
+&nbsp;    merchant = merchant,
+&nbsp;    spentFormatted = MoneyFormatter.format(total, currency),
+&nbsp;    transactionCount = transactionCount,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -696,7 +356,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

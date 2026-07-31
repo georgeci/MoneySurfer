@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PreferenceOptionsSheetKt</title>
+  <title>MoneySurfer Coverage Report > DebugConfigScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.preferences</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.debug</a>
 </div>
 
-<h1>Coverage Summary for Class: PreferenceOptionsSheetKt (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
+<h1>Coverage Summary for Class: DebugConfigScreenKt (com.georgeci.moneysurfer.feature.settings.debug)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PreferenceOptionsSheetKt</td>
+  <td class="name">DebugConfigScreenKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    72%
+  </span>
+  <span class="absValue">
+    (18/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    47.4%
+  </span>
+  <span class="absValue">
+    (36/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.5%
+  </span>
+  <span class="absValue">
+    (142/168)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    74.6%
+  </span>
+  <span class="absValue">
+    (1626/2179)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DebugConfigScreenKt$DebugConfigScreen$1$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/6)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,7 +103,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +111,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/26)
+    (0/33)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DebugConfigScreenKt$DebugConfigScreen$2$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,11 +130,61 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/381)
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (18/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45%
+  </span>
+  <span class="absValue">
+    (36/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.6%
+  </span>
+  <span class="absValue">
+    (142/174)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.4%
+  </span>
+  <span class="absValue">
+    (1626/2245)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -99,85 +192,360 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.preferences
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.debug
 &nbsp;
+&nbsp;import androidx.compose.foundation.horizontalScroll
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.heightIn
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
-&nbsp;import androidx.compose.material3.ModalBottomSheet
-&nbsp;import androidx.compose.material3.rememberModalBottomSheetState
+&nbsp;import androidx.compose.material3.SnackbarDuration
+&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.platform.testTag
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferBottomSheetContent
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRadio
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.config.ConfigDebugRow
+&nbsp;import com.georgeci.moneysurfer.domain.config.ConfigDebugRowKind
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_degraded_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_footnote
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_host_owned
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_invalid_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_absent
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_undecodable_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_reset_all
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_section_keys
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_unavailable
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_winner_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_done_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_footnote
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_no_workspace
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_running
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_prefill_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/** One choice in a [PreferenceOptionsSheet]: the value to store and how to write it out. */
-&nbsp;internal data class PreferenceOption&lt;T&gt;(
-&nbsp;    val value: T,
-&nbsp;    val label: String,
-&nbsp;    /** Stable selector for the row, independent of the label — see [PreferencesTestTags]. */
-&nbsp;    val tag: String,
-&nbsp;)
+&nbsp;/** Stable selectors for the QA configuration panel — see docs/testing/testing-strategy.md. */
+&nbsp;object DebugConfigTestTags {
+&nbsp;    const val Root = &quot;debugConfig:root&quot;
+&nbsp;    const val LogsRow = &quot;debugConfig:logs&quot;
+&nbsp;    const val ResetAllRow = &quot;debugConfig:resetAll&quot;
+&nbsp;    const val DegradedBanner = &quot;debugConfig:degradedBanner&quot;
+&nbsp;    const val Unavailable = &quot;debugConfig:unavailable&quot;
 &nbsp;
-<b class="nc">&nbsp;private val SHEET_PADDING = 20.dp</b>
+&nbsp;    const val PrefillRow = &quot;debugConfig:prefill&quot;
 &nbsp;
-&nbsp;/** Caps the list so a nine-region sheet scrolls instead of pushing the title off the screen. */
-<b class="nc">&nbsp;private val LIST_MAX_HEIGHT = 420.dp</b>
+&nbsp;    fun row(name: String): String = &quot;debugConfig:row:$name&quot;
 &nbsp;
-&nbsp;/**
-&nbsp; * Single-choice chooser for one preference row, in the same modal shape the dashboard card-style
-&nbsp; * sheet uses. Radio rows rather than a dialog: the option sets are short but the sheet reaches the
-&nbsp; * thumb, and it matches the appearance screen&#39;s radio idiom.
-&nbsp; *
-&nbsp; * The currency row does not use this — it has its own searchable sheet in `uikit`, because that
-&nbsp; * list is data and keeps growing.
-&nbsp; */
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;    /** The switch on a `Bool` row. */
+&nbsp;    fun toggle(name: String): String = &quot;debugConfig:toggle:$name&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * One chip of a `Choice` row. Tagged per option because the chip&#39;s only other handle is its
+&nbsp;     * label, which here is the raw encoded value — see the note on `SurferFilterChipRow`.
+&nbsp;     */
+&nbsp;    fun choice(name: String, choice: String): String = &quot;debugConfig:choice:$name:$choice&quot;
+&nbsp;}
+&nbsp;
 &nbsp;@Composable
-&nbsp;internal fun &lt;T&gt; PreferenceOptionsSheet(
-&nbsp;    title: String,
-&nbsp;    options: List&lt;PreferenceOption&lt;T&gt;&gt;,
-&nbsp;    selected: T,
-&nbsp;    onSelect: (T) -&gt; Unit,
-&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;fun DebugConfigScreen(</b>
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToLogs: () -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: DebugConfigViewModel = koinViewModel(),</b>
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    ModalBottomSheet(</b>
-<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
-<b class="nc">&nbsp;        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),</b>
-<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surfaceContainerLow,</b>
-<b class="nc">&nbsp;        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),</b>
-<b class="nc">&nbsp;    ) {</b>
-<b class="nc">&nbsp;        SurferBottomSheetContent(title = title) {</b>
-<b class="nc">&nbsp;            Column(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth()</b>
-<b class="nc">&nbsp;                    .heightIn(max = LIST_MAX_HEIGHT)</b>
-<b class="nc">&nbsp;                    .verticalScroll(rememberScrollState())</b>
-<b class="nc">&nbsp;                    .padding(horizontal = SHEET_PADDING),</b>
-<b class="nc">&nbsp;                verticalArrangement = Arrangement.spacedBy(8.dp),</b>
-&nbsp;            ) {
-<b class="nc">&nbsp;                options.forEach { option -&gt;</b>
-<b class="nc">&nbsp;                    SurferSettingsRow(</b>
-<b class="nc">&nbsp;                        title = option.label,</b>
-<b class="nc">&nbsp;                        onClick = { onSelect(option.value) },</b>
-<b class="nc">&nbsp;                        trailing = { SurferSettingsRadio(selected = option.value == selected) },</b>
-<b class="nc">&nbsp;                        modifier = Modifier.testTag(option.tag),</b>
-&nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+<b class="nc">&nbsp;    val snackbarHostState = remember { SnackbarHostState() }</b>
+<b class="nc">&nbsp;    var pendingInvalid by remember { mutableStateOf&lt;DebugConfigEffect.NotifyInvalidValue?&gt;(null) }</b>
+<b class="nc">&nbsp;    var pendingPrefill by remember { mutableStateOf&lt;PrefillOutcome?&gt;(null) }</b>
+&nbsp;
+&nbsp;    // Resolved during composition so the positional placeholders go through Compose&#39;s own format
+&nbsp;    // path and survive translator reordering; the effect below only feeds the snackbar.
+<b class="nc">&nbsp;    val invalidText: String? = pendingInvalid?.let {</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_debug_config_invalid_format, it.raw, it.name)</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    LaunchedEffect(invalidText) {</b>
+<b class="nc">&nbsp;        val text = invalidText ?: return@LaunchedEffect</b>
+<b class="nc">&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)</b>
+<b class="nc">&nbsp;        pendingInvalid = null</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    val prefillText: String? = pendingPrefill?.let { prefillMessage(it) }</b>
+<b class="nc">&nbsp;    LaunchedEffect(prefillText) {</b>
+<b class="nc">&nbsp;        val text = prefillText ?: return@LaunchedEffect</b>
+<b class="nc">&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Long)</b>
+<b class="nc">&nbsp;        pendingPrefill = null</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            DebugConfigEffect.NavigateBack -&gt; onNavigateBack()</b>
+<b class="nc">&nbsp;            DebugConfigEffect.NavigateToLogs -&gt; onNavigateToLogs()</b>
+<b class="nc">&nbsp;            is DebugConfigEffect.NotifyInvalidValue -&gt; pendingInvalid = effect</b>
+<b class="nc">&nbsp;            is DebugConfigEffect.NotifyPrefillResult -&gt; pendingPrefill = effect.outcome</b>
 &nbsp;        }
 &nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    DebugConfigContent(</b>
+<b class="nc">&nbsp;        state = state,</b>
+<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
+<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
+&nbsp;    )
 <b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** Stateless content, public so `:composeApp`&#39;s desktop UI tests can mount it — as with the other screens. */
+&nbsp;@Composable
+&nbsp;fun DebugConfigContent(
+&nbsp;    state: DebugConfigState,
+&nbsp;    snackbarHostState: SnackbarHostState,
+&nbsp;    onEvent: (DebugConfigEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SettingsSubScreenScaffold(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.settings_debug_config_title),</b>
+<b class="fc">&nbsp;        snackbarHostState = snackbarHostState,</b>
+<b class="fc">&nbsp;        onBack = { onEvent(DebugConfigEvent.OnBackClick) },</b>
+<b class="fc">&nbsp;        showProgressOverlay = false,</b>
+<b class="fc">&nbsp;    ) { padding -&gt;</b>
+<b class="fc">&nbsp;        if (!state.isAvailable) {</b>
+&nbsp;            // Release builds bind `DebugConfigSource.Empty`, which accepts writes and drops them.
+&nbsp;            // A restored back stack can still land here, and editable rows that silently no-op are
+&nbsp;            // worse than none.
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = stringResource(Res.string.settings_debug_config_unavailable),</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.default)</b>
+<b class="fc">&nbsp;                    .testTag(DebugConfigTestTags.Unavailable),</b>
+&nbsp;            )
+&nbsp;            return@SettingsSubScreenScaffold
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        if (state.degradedLayers.isNotEmpty()) {</b>
+&nbsp;            // A layer whose store failed to load resolves as absent, so every row below it shows a
+&nbsp;            // fallback. Saying so beats letting the panel present that fallback as the truth.
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.settings_debug_config_degraded_format,</b>
+<b class="fc">&nbsp;                    state.degradedLayers.joinToString(),</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.error,</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.small)</b>
+<b class="fc">&nbsp;                    .testTag(DebugConfigTestTags.DegradedBanner),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        SurferSettingsGroup(</b>
+<b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.Root),</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.settings_debug_config_section_keys),</b>
+<b class="fc">&nbsp;            footnote = stringResource(Res.string.settings_debug_config_footnote),</b>
+<b class="fc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;            state.rows.forEach { row -&gt; ConfigKeyRow(row = row, onEvent = onEvent) }</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        SurferSettingsGroup(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.settings_debug_prefill_section),</b>
+<b class="fc">&nbsp;            footnote = stringResource(Res.string.settings_debug_prefill_footnote),</b>
+<b class="fc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;            SurferSettingsRow(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Sparkle,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.settings_debug_prefill_title),</b>
+<b class="fc">&nbsp;                supportingText = if (state.inFlight) {</b>
+<b class="fc">&nbsp;                    stringResource(Res.string.settings_debug_prefill_running)</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    stringResource(Res.string.settings_debug_prefill_supporting)</b>
+&nbsp;                },
+&nbsp;                // A run writes hundreds of rows. Dropping the click handler while it is going is
+&nbsp;                // what makes the row look busy — there is no disabled state on a settings row.
+<b class="fc">&nbsp;                onClick = if (state.inFlight) null else ({ onEvent(DebugConfigEvent.OnPrefillClick) }),</b>
+<b class="fc">&nbsp;                modifier = Modifier.testTag(DebugConfigTestTags.PrefillRow),</b>
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        SurferSettingsGroup {</b>
+&nbsp;            // The other half of the debug panel: what the app logged, for hosts where reading
+&nbsp;            // logcat or the desktop console is not an option.
+<b class="fc">&nbsp;            SurferSettingsRow(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.ListView,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.settings_debug_log_title),</b>
+<b class="fc">&nbsp;                supportingText = stringResource(Res.string.settings_debug_log_supporting),</b>
+<b class="fc">&nbsp;                onClick = { onEvent(DebugConfigEvent.OnLogsClick) },</b>
+&nbsp;                trailing = { SurferSettingsChevron() },
+<b class="fc">&nbsp;                modifier = Modifier.testTag(DebugConfigTestTags.LogsRow),</b>
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        SurferSettingsGroup {</b>
+<b class="fc">&nbsp;            SurferSettingsRow(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Delete,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.settings_debug_config_reset_all),</b>
+<b class="fc">&nbsp;                danger = true,</b>
+<b class="fc">&nbsp;                onClick = { onEvent(DebugConfigEvent.OnResetAllClick) },</b>
+<b class="fc">&nbsp;                modifier = Modifier.testTag(DebugConfigTestTags.ResetAllRow),</b>
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The snackbar line for a finished prefill run.
+&nbsp; *
+&nbsp; * Resolved during composition, like the invalid-value message above, so the indexed placeholders go
+&nbsp; * through Compose&#39;s own format path rather than being assembled inside the effect. Public for the
+&nbsp; * same reason [DebugConfigContent] is: the counts are positional, and only a rendered assertion
+&nbsp; * catches them being read off the wrong report field.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;fun prefillMessage(outcome: PrefillOutcome): String = when (outcome) {</b>
+<b class="fc">&nbsp;    is PrefillOutcome.Done -&gt; stringResource(</b>
+<b class="fc">&nbsp;        Res.string.settings_debug_prefill_done_format,</b>
+<b class="fc">&nbsp;        outcome.report.transactions,</b>
+<b class="fc">&nbsp;        outcome.report.accounts,</b>
+<b class="fc">&nbsp;        outcome.report.budgets,</b>
+<b class="fc">&nbsp;        outcome.report.goals,</b>
+&nbsp;    )
+<b class="fc">&nbsp;    PrefillOutcome.NoWorkspace -&gt; stringResource(Res.string.settings_debug_prefill_no_workspace)</b>
+<b class="fc">&nbsp;    PrefillOutcome.Failed -&gt; stringResource(Res.string.settings_debug_prefill_failed)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * One key. The control comes from the row&#39;s value kind — a boolean gets a switch, a closed set gets
+&nbsp; * chips — so nobody has to type `PRESET:Plum` by hand. Tapping an overridden row clears its
+&nbsp; * override.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun ConfigKeyRow(
+&nbsp;    row: ConfigDebugRow,
+&nbsp;    onEvent: (DebugConfigEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val clearOverride: (() -&gt; Unit)? =</b>
+<b class="fc">&nbsp;        if (row.overridden) ({ onEvent(DebugConfigEvent.OnClearOverride(row.name)) }) else null</b>
+&nbsp;
+<b class="fc">&nbsp;    when (val kind = row.kind) {</b>
+<b class="fc">&nbsp;        ConfigDebugRowKind.Bool -&gt; SurferSettingsRow(</b>
+<b class="fc">&nbsp;            icon = SurferIcons.Code,</b>
+<b class="fc">&nbsp;            title = row.name,</b>
+<b class="fc">&nbsp;            supporting = { ResolutionSummary(row) },</b>
+<b class="fc">&nbsp;            trailing = {</b>
+<b class="fc">&nbsp;                SurferSettingsSwitch(</b>
+<b class="fc">&nbsp;                    checked = row.effectiveValue.toBoolean(),</b>
+<b class="fc">&nbsp;                    onCheckedChange = { checked -&gt;</b>
+<b class="fc">&nbsp;                        onEvent(DebugConfigEvent.OnOverride(row.name, checked.toString()))</b>
+&nbsp;                    },
+<b class="fc">&nbsp;                    modifier = Modifier.testTag(DebugConfigTestTags.toggle(row.name)),</b>
+&nbsp;                )
+&nbsp;            },
+<b class="fc">&nbsp;            onClick = clearOverride,</b>
+<b class="fc">&nbsp;            multiline = true,</b>
+<b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
+&nbsp;        )
+&nbsp;
+<b class="fc">&nbsp;        is ConfigDebugRowKind.Choice -&gt; SurferSettingsRow(</b>
+<b class="fc">&nbsp;            icon = SurferIcons.Code,</b>
+<b class="fc">&nbsp;            title = row.name,</b>
+<b class="fc">&nbsp;            supporting = {</b>
+<b class="fc">&nbsp;                Column {</b>
+<b class="fc">&nbsp;                    ResolutionSummary(row)</b>
+<b class="fc">&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))</b>
+&nbsp;                    // A closed set can be longer than the screen (the palette&#39;s presets), so the
+&nbsp;                    // chip row scrolls rather than clipping the tail options out of reach.
+<b class="fc">&nbsp;                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {</b>
+<b class="fc">&nbsp;                        SurferFilterChipRow(</b>
+<b class="fc">&nbsp;                            options = kind.choices,</b>
+<b class="fc">&nbsp;                            selected = row.effectiveValue,</b>
+<b class="fc">&nbsp;                            label = { it },</b>
+<b class="fc">&nbsp;                            onSelect = { choice -&gt; onEvent(DebugConfigEvent.OnOverride(row.name, choice)) },</b>
+<b class="fc">&nbsp;                            optionTestTag = { choice -&gt; DebugConfigTestTags.choice(row.name, choice) },</b>
+&nbsp;                        )
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            },
+<b class="fc">&nbsp;            onClick = clearOverride,</b>
+<b class="fc">&nbsp;            multiline = true,</b>
+<b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
+&nbsp;        )
+&nbsp;
+&nbsp;        // Free-form values (the encoded dashboard layout) are inspect-only: a text field here is a
+&nbsp;        // routine way to store something no codec can read back.
+<b class="fc">&nbsp;        ConfigDebugRowKind.FreeText -&gt; SurferSettingsRow(</b>
+<b class="fc">&nbsp;            icon = SurferIcons.Code,</b>
+<b class="fc">&nbsp;            title = row.name,</b>
+<b class="fc">&nbsp;            supporting = { ResolutionSummary(row) },</b>
+<b class="fc">&nbsp;            onClick = clearOverride,</b>
+<b class="fc">&nbsp;            multiline = true,</b>
+<b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Effective value, the layer that won, and every layer&#39;s cell — absent and undecodable read
+&nbsp; * differently on purpose, because &quot;stored but rejected by the codec&quot; is the failure the per-layer
+&nbsp; * view exists to expose.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun ResolutionSummary(row: ConfigDebugRow) {</b>
+<b class="fc">&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = row.effectiveValue + &quot; · &quot; +</b>
+<b class="fc">&nbsp;                stringResource(Res.string.settings_debug_config_winner_format, row.winner),</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;        )
+<b class="fc">&nbsp;        if (row.hostOwned) {</b>
+&nbsp;            // Overriding one of these makes the app believe it is a different build while its DI
+&nbsp;            // graph stays as compiled — worth saying out loud next to an ordinary feature flag.
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = stringResource(Res.string.settings_debug_config_host_owned),</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelSmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.error,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        row.layers.forEach { cell -&gt;</b>
+<b class="fc">&nbsp;            val rendered = when {</b>
+<b class="fc">&nbsp;                cell.undecodable -&gt;</b>
+<b class="pc">&nbsp;                    stringResource(Res.string.settings_debug_config_layer_undecodable_format, cell.value.orEmpty())</b>
+<b class="fc">&nbsp;                cell.value == null -&gt; stringResource(Res.string.settings_debug_config_layer_absent)</b>
+<b class="fc">&nbsp;                else -&gt; cell.value</b>
+&nbsp;            }
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = &quot;${cell.layer}: $rendered&quot;,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelSmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                modifier = Modifier.padding(start = 2.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -201,7 +569,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

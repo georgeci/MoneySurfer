@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpAppVersionGate</title>
+  <title>MoneySurfer Coverage Report > OfflineWiringKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.di</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpAppVersionGate (com.georgeci.moneysurfer.offline.noop)</h1>
+<h1>Coverage Summary for Class: OfflineWiringKt (com.georgeci.moneysurfer.offline.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpAppVersionGate</td>
+  <td class="name">OfflineWiringKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    90.9%
   </span>
   <span class="absValue">
-    (0/3)
+    (20/22)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    88.9%
   </span>
   <span class="absValue">
-    (0/5)
+    (32/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    95.4%
   </span>
   <span class="absValue">
-    (0/15)
+    (206/216)
   </span>
 </td>
 </tr>
@@ -92,27 +92,113 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.di
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
+&nbsp;import com.georgeci.moneysurfer.appconfig.BuildConfigSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.HostConfigKeys
+&nbsp;import com.georgeci.moneysurfer.appconfig.RemoteGlobalConfigSource
+&nbsp;import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
-&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
-&nbsp;import kotlinx.coroutines.flow.StateFlow
-&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.ExchangeRateRemoteSource
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserAccountDeletionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
+&nbsp;import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.SeedDefaultsUseCase
+&nbsp;import com.georgeci.moneysurfer.offline.firstrun.OfflineFirstRunSeeder
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpAppConfigRepository
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpAppVersionGate
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpAuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpCrashReporter
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpExchangeRateRemoteSource
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpOutboxEnqueuer
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpPendingMutationQueue
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpRemoteDataResetRepository
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpSessionShutdownGate
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpSyncMetaRepository
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpUserAccountDeletionRepository
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpUserRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.offline.noop.NoOpWorkspaceSyncer
+&nbsp;import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
+&nbsp;import org.koin.core.module.Module
+&nbsp;import org.koin.dsl.module
+&nbsp;
+<b class="fc">&nbsp;private val offlineNoOpModule: Module = module {</b>
+<b class="fc">&nbsp;    single&lt;OutboxEnqueuer&gt; { NoOpOutboxEnqueuer() }</b>
+<b class="fc">&nbsp;    single&lt;CrashReporter&gt; { NoOpCrashReporter() }</b>
+<b class="fc">&nbsp;    single&lt;AuthRemoteRepository&gt; { NoOpAuthRemoteRepository() }</b>
+<b class="fc">&nbsp;    single&lt;UserRemoteRepository&gt; { NoOpUserRemoteRepository() }</b>
+<b class="fc">&nbsp;    single&lt;AppConfigRepository&gt; { NoOpAppConfigRepository() }</b>
+<b class="fc">&nbsp;    single&lt;AppVersionGate&gt; { NoOpAppVersionGate() }</b>
+<b class="fc">&nbsp;    single&lt;WorkspaceSyncer&gt; { NoOpWorkspaceSyncer() }</b>
+<b class="fc">&nbsp;    single&lt;RemoteDataResetRepository&gt; { NoOpRemoteDataResetRepository() }</b>
+<b class="fc">&nbsp;    single&lt;UserAccountDeletionRepository&gt; { NoOpUserAccountDeletionRepository() }</b>
+<b class="fc">&nbsp;    single&lt;SessionShutdownGate&gt; { NoOpSessionShutdownGate() }</b>
+<b class="fc">&nbsp;    single&lt;PendingMutationQueue&gt; { NoOpPendingMutationQueue() }</b>
+<b class="fc">&nbsp;    single&lt;SyncMetaRepository&gt; { NoOpSyncMetaRepository() }</b>
+<b class="fc">&nbsp;    single&lt;ExchangeRateRemoteSource&gt; { NoOpExchangeRateRemoteSource() }</b>
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Offline build skips the remote version gate; status stays `Supported`
-&nbsp; * forever and `isSyncAllowed()` is always true (sync itself is a no-op).
+&nbsp; * Offline-only first-run seed: pre-creates demo user + default workspace + Cash account on a
+&nbsp; * clean install so the app lands on a populated Dashboard. Online builds bind their own no-op
+&nbsp; * (Firestore-backed onboarding handles empty workspaces).
 &nbsp; */
-<b class="nc">&nbsp;class NoOpAppVersionGate : AppVersionGate {</b>
-<b class="nc">&nbsp;    private val _status = MutableStateFlow&lt;AppVersionStatus?&gt;(AppVersionStatus.Supported)</b>
-&nbsp;
-<b class="nc">&nbsp;    override val status: StateFlow&lt;AppVersionStatus?&gt; = _status.asStateFlow()</b>
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun refresh(): AppVersionStatus = AppVersionStatus.Supported</b>
-&nbsp;
-<b class="nc">&nbsp;    override fun isSyncAllowed(): Boolean = true</b>
+<b class="fc">&nbsp;private val offlineFirstRunModule: Module = module {</b>
+<b class="fc">&nbsp;    single&lt;FirstRunSeeder&gt; {</b>
+<b class="nc">&nbsp;        OfflineFirstRunSeeder(</b>
+<b class="nc">&nbsp;            session = get(),</b>
+<b class="nc">&nbsp;            demoLoginUseCase = get&lt;DemoLoginUseCase&gt;(),</b>
+<b class="nc">&nbsp;            seedDefaultsUseCase = get&lt;SeedDefaultsUseCase&gt;(),</b>
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The offline host&#39;s Build layer, replacing the four flag data classes it used to override
+&nbsp; * individually.
+&nbsp; *
+&nbsp; * Sign-in is demo-only (no remote auth backend), the Transfer segment is out of the offline MVP
+&nbsp; * scope, and sync has no Firestore-backed implementation here at all. Keeping these host-owned is
+&nbsp; * what stops the offline build regressing to the online surface through Koin module load order.
+&nbsp; *
+&nbsp; * The RemoteGlobal layer binds `Empty`: the offline build has no Firestore, and `Empty` lives in
+&nbsp; * `app-config/api` precisely so binding it needs no dependency on a remote implementation.
+&nbsp; */
+<b class="fc">&nbsp;private val offlineConfigModule: Module = module {</b>
+<b class="fc">&nbsp;    single&lt;BuildConfigSource&gt; {</b>
+<b class="fc">&nbsp;        BuildConfigSource {</b>
+<b class="fc">&nbsp;            put(HostConfigKeys.isOffline, true)</b>
+<b class="fc">&nbsp;            put(HostConfigKeys.signInEmailPassword, false)</b>
+<b class="fc">&nbsp;            put(HostConfigKeys.signInAnonymous, false)</b>
+<b class="fc">&nbsp;            put(HostConfigKeys.signInDemo, true)</b>
+<b class="fc">&nbsp;            put(HostConfigKeys.transferEnabled, false)</b>
+&nbsp;            // Same dark flag as the online host — the picker is unfinished, not host-specific.
+<b class="fc">&nbsp;            put(HostConfigKeys.dashboardWidgetStyle, false)</b>
+<b class="fc">&nbsp;            put(HostConfigKeys.syncEnabled, false)</b>
+&nbsp;        }
+&nbsp;    }
+<b class="fc">&nbsp;    single&lt;RemoteGlobalConfigSource&gt; { RemoteGlobalConfigSource.Empty }</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Modules layered on top of shared&#39;s `AppModule` graph for the offline build.
+&nbsp; * No data-remote, no sync-surfer, no sync/default — every remote-side
+&nbsp; * dependency is satisfied by an explicit no-op binding.
+&nbsp; */
+<b class="fc">&nbsp;val offlineWiring: List&lt;Module&gt; = listOf(</b>
+<b class="fc">&nbsp;    offlineNoOpModule,</b>
+<b class="fc">&nbsp;    offlineConfigModule,</b>
+<b class="fc">&nbsp;    offlineFirstRunModule,</b>
+<b class="fc">&nbsp;    OfflineKoinApp().module(),</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -136,7 +222,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

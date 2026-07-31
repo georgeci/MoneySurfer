@@ -1,0 +1,142 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > NoOpSyncMetaRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+</div>
+
+<h1>Coverage Summary for Class: NoOpSyncMetaRepository (com.georgeci.moneysurfer.offline.noop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">NoOpSyncMetaRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMeta
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * Offline build never pulls, so there is nothing to keep a cursor for: reads answer &quot;no cursor&quot;,
+&nbsp; * writes are dropped, and [observe] emits a single empty list so the Sync screen&#39;s cursor section
+&nbsp; * renders its empty state instead of waiting on a flow that never emits.
+&nbsp; */
+<b class="nc">&nbsp;class NoOpSyncMetaRepository : SyncMetaRepository {</b>
+<b class="nc">&nbsp;    override suspend fun cursor(scopeKey: String, collection: String): Instant? = null</b>
+<b class="nc">&nbsp;    override suspend fun setCursor(scopeKey: String, collection: String, cursor: Instant) = Unit</b>
+<b class="nc">&nbsp;    override suspend fun markAttempt(scopeKey: String, collection: String, at: Instant) = Unit</b>
+<b class="nc">&nbsp;    override suspend fun markSuccess(scopeKey: String, collection: String, at: Instant) = Unit</b>
+<b class="nc">&nbsp;    override suspend fun clearScope(scopeKey: String) = Unit</b>
+<b class="nc">&nbsp;    override fun observe(scopeKey: String): Flow&lt;List&lt;SyncMeta&gt;&gt; = flowOf(emptyList())</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
+</div>
+</body>
+</html>

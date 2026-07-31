@@ -1,0 +1,338 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionsListTestTags</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionsListTestTags (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionsListTestTags</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.LazyListState
+&nbsp;import androidx.compose.foundation.lazy.rememberLazyListState
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.derivedStateOf
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_new
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_untitled
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
+&nbsp;
+&nbsp;/**
+&nbsp; * Stable selectors for the transactions list screen — see docs/testing/testing-strategy.md.
+&nbsp; *
+&nbsp; * The `filter:*` tags name the chips of the rail, not filter *values*: every chip is a shortcut
+&nbsp; * that opens the filters screen rather than a segment that toggles a value on this screen.
+&nbsp; */
+&nbsp;object TransactionsListTestTags {
+&nbsp;    const val Root = &quot;transactionsList:root&quot;
+&nbsp;    const val FilterDate = &quot;transactionsList:filter:date&quot;
+&nbsp;    const val FilterType = &quot;transactionsList:filter:type&quot;
+&nbsp;    const val FilterAccount = &quot;transactionsList:filter:account&quot;
+&nbsp;    const val FilterCategory = &quot;transactionsList:filter:category&quot;
+&nbsp;    const val FilterSort = &quot;transactionsList:filter:sort&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun TransactionsByAccountScreen(
+&nbsp;    accountId: AccountId?,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToTransactionCreation: (AccountId?) -&gt; Unit,
+&nbsp;    onNavigateToTransactionDetails: (TransactionId) -&gt; Unit,
+&nbsp;    onNavigateToFilters: (AccountId?, Long) -&gt; Unit,
+&nbsp;    viewModel: TransactionsByAccountViewModel = koinViewModel(
+&nbsp;        key = accountId?.value.orEmpty(),
+&nbsp;    ) { parametersOf(accountId) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            TransactionsByAccountEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is TransactionsByAccountEffect.NavigateToTransactionCreation -&gt;
+&nbsp;                onNavigateToTransactionCreation(effect.accountId)
+&nbsp;            is TransactionsByAccountEffect.NavigateToTransactionDetails -&gt;
+&nbsp;                onNavigateToTransactionDetails(effect.transactionId)
+&nbsp;            is TransactionsByAccountEffect.NavigateToFilters -&gt;
+&nbsp;                onNavigateToFilters(effect.accountId, effect.anchorEpochDay)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    when (val current = state) {
+&nbsp;        is TransactionsByAccountState.Loading -&gt; TransactionsByAccountLoading(
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;        is TransactionsByAccountState.Content -&gt; TransactionsByAccountContent(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TransactionsByAccountLoading(onEvent: (TransactionsByAccountEvent) -&gt; Unit) {
+&nbsp;    val titleFallback = stringResource(Res.string.transactions_list_title)
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier.surferSafeInsets(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = titleFallback,
+&nbsp;                onBack = { onEvent(TransactionsByAccountEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The list, drawn from a state it is handed rather than one it resolves.
+&nbsp; *
+&nbsp; * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/testing-strategy.md.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun TransactionsByAccountContent(
+&nbsp;    state: TransactionsByAccountState.Content,
+&nbsp;    onEvent: (TransactionsByAccountEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val titleFallback = stringResource(Res.string.transactions_list_title)
+&nbsp;    val title = state.accountName.ifBlank { titleFallback }
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(TransactionsListTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = title,
+&nbsp;                onBack = { onEvent(TransactionsByAccountEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        floatingActionButton = {
+&nbsp;            // Not while the empty state is showing its own &quot;Add transaction&quot; CTA — see
+&nbsp;            // `showsAddCta`.
+&nbsp;            if (!state.showsAddCta) {
+&nbsp;                SurferAddFab(
+&nbsp;                    label = stringResource(Res.string.transactions_list_new),
+&nbsp;                    onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding()),
+&nbsp;        ) {
+&nbsp;            SearchRow(
+&nbsp;                query = state.query,
+&nbsp;                activeFilterCount = state.activeFilterCount,
+&nbsp;                onEvent = onEvent,
+&nbsp;            )
+&nbsp;
+&nbsp;            Spacer(Modifier.height(8.dp))
+&nbsp;
+&nbsp;            // Only while the pager still owns the date window — an explicit range from the filter
+&nbsp;            // screen takes it over, and two controls over one window is exactly the trap the
+&nbsp;            // filters were supposed to avoid.
+&nbsp;            if (state.showPeriodPager) {
+&nbsp;                PeriodPager(
+&nbsp;                    state = state,
+&nbsp;                    onEvent = onEvent,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .padding(horizontal = 16.dp, vertical = 4.dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SummaryStrip(
+&nbsp;                summary = state.summary,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .padding(horizontal = 16.dp, vertical = 8.dp),
+&nbsp;            )
+&nbsp;
+&nbsp;            FilterChipRail(
+&nbsp;                chips = state.filters,
+&nbsp;                onOpenFilters = { onEvent(TransactionsByAccountEvent.OnOpenFiltersClick) },
+&nbsp;            )
+&nbsp;
+&nbsp;            Spacer(Modifier.height(4.dp))
+&nbsp;
+&nbsp;            if (state.isEmpty) {
+&nbsp;                EmptyState(state = state, onEvent = onEvent)
+&nbsp;                return@Scaffold
+&nbsp;            }
+&nbsp;
+&nbsp;            TransactionsList(
+&nbsp;                state = state,
+&nbsp;                onEvent = onEvent,
+&nbsp;                bottomPadding = padding.calculateBottomPadding(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TransactionsList(
+&nbsp;    state: TransactionsByAccountState.Content,
+&nbsp;    onEvent: (TransactionsByAccountEvent) -&gt; Unit,
+&nbsp;    bottomPadding: Dp,
+&nbsp;) {
+&nbsp;    val untitled = stringResource(Res.string.transactions_list_untitled)
+&nbsp;    val listState = rememberLazyListState()
+&nbsp;    LoadMoreOnScrollToEnd(
+&nbsp;        listState = listState,
+&nbsp;        enabled = state.canLoadMore,
+&nbsp;        onLoadMore = { onEvent(TransactionsByAccountEvent.OnLoadMore) },
+&nbsp;    )
+&nbsp;
+&nbsp;    LazyColumn(
+&nbsp;        state = listState,
+&nbsp;        modifier = Modifier.fillMaxSize(),
+&nbsp;        contentPadding = PaddingValues(bottom = bottomPadding),
+&nbsp;    ) {
+&nbsp;        state.groups.forEach { group -&gt;
+&nbsp;            item(key = &quot;h-${group.date}&quot;) {
+&nbsp;                DateHeader(group = group)
+&nbsp;            }
+&nbsp;            group.transactions.forEach { row -&gt;
+&nbsp;                item(key = &quot;t-${row.id.value}&quot;) {
+&nbsp;                    TransactionRow(
+&nbsp;                        row = row,
+&nbsp;                        showAccount = state.showAccountOnRows,
+&nbsp;                        untitled = untitled,
+&nbsp;                        onClick = { onEvent(TransactionsByAccountEvent.OnTransactionClick(row.id)) },
+&nbsp;                        onDelete = { onEvent(TransactionsByAccountEvent.OnDeleteTransaction(row.id)) },
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Asks for the next page once the list is within [LOAD_MORE_THRESHOLD] rows of the end, so the
+&nbsp; * fetch overlaps the remaining scroll instead of stalling at the bottom.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun LoadMoreOnScrollToEnd(
+&nbsp;    listState: LazyListState,
+&nbsp;    enabled: Boolean,
+&nbsp;    onLoadMore: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val shouldLoadMore by remember(enabled) {
+&nbsp;        derivedStateOf {
+&nbsp;            val layoutInfo = listState.layoutInfo
+&nbsp;            // Guard the pre-measurement frame: before the list is laid out, totalItemsCount is 0
+&nbsp;            // and there are no visible items, which would otherwise satisfy `0 &gt;= 0 - threshold`
+&nbsp;            // and fire a page load with no scroll behind it.
+&nbsp;            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+&nbsp;            enabled &amp;&amp; lastVisible != null &amp;&amp;
+&nbsp;                lastVisible &gt;= layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
+&nbsp;        }
+&nbsp;    }
+&nbsp;    LaunchedEffect(shouldLoadMore) {
+&nbsp;        if (shouldLoadMore) onLoadMore()
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private const val LOAD_MORE_THRESHOLD = 10
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
+</div>
+</body>
+</html>

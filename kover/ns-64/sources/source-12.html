@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NavigationSection</title>
+  <title>MoneySurfer Coverage Report > WorkspaceMembersScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.members</a>
 </div>
 
-<h1>Coverage Summary for Class: NavigationSection (com.georgeci.moneysurfer.navigation)</h1>
+<h1>Coverage Summary for Class: WorkspaceMembersScreenKt (com.georgeci.moneysurfer.feature.workspace.members)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NavigationSection</td>
+  <td class="name">WorkspaceMembersScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/23)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
+    (0/142)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (30/30)
+    (0/241)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3266)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">WorkspaceMembersScreenKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/142)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/241)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3266)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,87 +126,503 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.members
 &nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.drawBehind
+&nbsp;import androidx.compose.ui.geometry.CornerRadius
+&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferInvitePendingRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import moneysurfer.navigation.generated.resources.Res
-&nbsp;import moneysurfer.navigation.generated.resources.nav_accounts
-&nbsp;import moneysurfer.navigation.generated.resources.nav_budgets
-&nbsp;import moneysurfer.navigation.generated.resources.nav_categories
-&nbsp;import moneysurfer.navigation.generated.resources.nav_dashboard
-&nbsp;import moneysurfer.navigation.generated.resources.nav_goals
-&nbsp;import moneysurfer.navigation.generated.resources.nav_section_manage
-&nbsp;import moneysurfer.navigation.generated.resources.nav_settings
-&nbsp;import moneysurfer.navigation.generated.resources.nav_transactions
-&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.workspace.generated.resources.Res
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_close_content_description
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_cancel_content_description
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_status_expired
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_status_pending
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_subtitle
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invite_title
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_invites_empty
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_cancel
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_confirm
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_message_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_leave_title_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_role_editor
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_role_owner
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_role_viewer
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_editor_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_owner_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_unknown_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_viewer_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_tab_active_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_tab_invited_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_title_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_view_only_hint
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/**
-&nbsp; * The groups the navigation drawer draws its destinations in — everyday surfaces first, then the
-&nbsp; * things you set up once and revisit rarely.
-&nbsp; *
-&nbsp; * Only the drawer renders [label]; the rail shows one flat list, because a `NavigationRail` has
-&nbsp; * no room for a caption and no grouping affordance to hang one on.
-&nbsp; */
-<b class="fc">&nbsp;internal enum class NavigationSection(val label: StringResource?) {</b>
-&nbsp;    /** No caption — the primary group leads the drawer and needs no naming. */
-<b class="fc">&nbsp;    Primary(label = null),</b>
-<b class="fc">&nbsp;    Manage(label = Res.string.nav_section_manage),</b>
+&nbsp;/** Stable selectors for the workspace members view — see docs/testing/testing-strategy.md. */
+&nbsp;object WorkspaceMembersTestTags {
+&nbsp;    const val Root = &quot;workspaceMembers:root&quot;
+&nbsp;    const val Invite = &quot;workspaceMembers:invite&quot;
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The app&#39;s top-level destinations, in the order every width presents them.
-&nbsp; *
-&nbsp; * This list is authoritative for all three widths (issue #389): the drawer groups it by
-&nbsp; * [NavigationSection], the rail flattens it, and Compact deliberately presents none of it — see
-&nbsp; * [navigationPresentation].
-&nbsp; *
-&nbsp; * The taxonomy resolves §G7 of `md/tablet-desktop-responsive.md` towards the design&#39;s
-&nbsp; * `Home · Accounts · Activity · Budgets · Goals` + `Manage`, keeping the app&#39;s own names for the
-&nbsp; * two that differ only in wording (Dashboard, Transactions). Categories was primary and is now a
-&nbsp; * Manage entry — it is a setup surface, not a daily one — and the design&#39;s &quot;Bills&quot; is left out
-&nbsp; * because it has no route or screen behind it, only a dashboard widget.
-&nbsp; *
-&nbsp; * Entries must stay grouped by section, since the drawer renders each group as one contiguous
-&nbsp; * block in declaration order.
+&nbsp; * Pure content composable for the Members view. Renders header + Active/Invited tabs +
+&nbsp; * member list / pending-invite list against the provided [state]/[onEvent]. Callers are
+&nbsp; * responsible for the surrounding container (bottom sheet, dialog, full screen, etc.).
 &nbsp; */
-&nbsp;internal enum class TopLevelDestination(
-&nbsp;    val route: Route.TopLevel,
-&nbsp;    val icon: ImageVector,
-&nbsp;    val label: StringResource,
-&nbsp;    val section: NavigationSection = NavigationSection.Primary,
-&nbsp;) {
-&nbsp;    Dashboard(Route.Dashboard, SurferIcons.Dashboard, Res.string.nav_dashboard),
-&nbsp;    Accounts(Route.AccountsManage, SurferIcons.Wallet, Res.string.nav_accounts),
-&nbsp;    Transactions(
-&nbsp;        route = Route.TransactionsByAccount(accountId = null),
-&nbsp;        icon = SurferIcons.SwapHoriz,
-&nbsp;        label = Res.string.nav_transactions,
-&nbsp;    ),
-&nbsp;    Budgets(Route.Budgets, SurferIcons.Savings, Res.string.nav_budgets),
-&nbsp;    Goals(Route.Goals, SurferIcons.Flag, Res.string.nav_goals),
-&nbsp;    Categories(
-&nbsp;        route = Route.CategoriesManage,
-&nbsp;        icon = SurferIcons.Category,
-&nbsp;        label = Res.string.nav_categories,
-&nbsp;        section = NavigationSection.Manage,
-&nbsp;    ),
-&nbsp;    Settings(
-&nbsp;        route = Route.Settings,
-&nbsp;        icon = SurferIcons.Settings,
-&nbsp;        label = Res.string.nav_settings,
-&nbsp;        section = NavigationSection.Manage,
-&nbsp;    ),
-&nbsp;    ;
+&nbsp;@Composable
+<b class="nc">&nbsp;fun WorkspaceMembersScreen(</b>
+&nbsp;    state: WorkspaceMembersState,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;    headerNavigationIcon: ImageVector = SurferIcons.Close,</b>
+<b class="nc">&nbsp;    showHeader: Boolean = true,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    when (state) {</b>
+<b class="nc">&nbsp;        is WorkspaceMembersState.Loading -&gt;</b>
+<b class="nc">&nbsp;            Box(modifier = modifier.fillMaxWidth().height(200.dp))</b>
+<b class="nc">&nbsp;        is WorkspaceMembersState.Content -&gt;</b>
+<b class="nc">&nbsp;            WorkspaceMembersContent(</b>
+<b class="nc">&nbsp;                state = state,</b>
+<b class="nc">&nbsp;                onEvent = onEvent,</b>
+<b class="nc">&nbsp;                modifier = modifier,</b>
+<b class="nc">&nbsp;                headerNavigationIcon = headerNavigationIcon,</b>
+<b class="nc">&nbsp;                showHeader = showHeader,</b>
+&nbsp;            )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    if (state is WorkspaceMembersState.Content &amp;&amp; state.showLeaveDialog) {</b>
+<b class="nc">&nbsp;        LeaveDialog(</b>
+<b class="nc">&nbsp;            workspaceName = state.workspaceName,</b>
+<b class="nc">&nbsp;            busy = state.busy,</b>
+<b class="nc">&nbsp;            onCancel = { onEvent(WorkspaceMembersEvent.OnLeaveCancel) },</b>
+<b class="nc">&nbsp;            onConfirm = { onEvent(WorkspaceMembersEvent.OnLeaveConfirm) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;    fun matches(current: Route.TopLevel?): Boolean = when (this) {
-&nbsp;        Dashboard -&gt; current is Route.Dashboard
-&nbsp;        Accounts -&gt; current is Route.AccountsManage
-&nbsp;        Transactions -&gt; current is Route.TransactionsByAccount
-&nbsp;        Budgets -&gt; current is Route.Budgets
-&nbsp;        Goals -&gt; current is Route.Goals
-&nbsp;        Categories -&gt; current is Route.CategoriesManage
-&nbsp;        Settings -&gt; current is Route.Settings
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun WorkspaceMembersContent(</b>
+&nbsp;    state: WorkspaceMembersState.Content,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;    headerNavigationIcon: ImageVector = SurferIcons.Close,</b>
+<b class="nc">&nbsp;    showHeader: Boolean = true,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .testTag(WorkspaceMembersTestTags.Root)</b>
+<b class="nc">&nbsp;            .surferTestTagAsId(),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (showHeader) {</b>
+<b class="nc">&nbsp;            Header(</b>
+<b class="nc">&nbsp;                workspaceName = state.workspaceName,</b>
+<b class="nc">&nbsp;                memberCount = state.activeCount,</b>
+<b class="nc">&nbsp;                viewerRole = state.viewerRole,</b>
+<b class="nc">&nbsp;                navigationIcon = headerNavigationIcon,</b>
+<b class="nc">&nbsp;                onClose = { onEvent(WorkspaceMembersEvent.OnDismiss) },</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state.canManage) {</b>
+<b class="nc">&nbsp;            Box(modifier = Modifier.padding(horizontal = AppTheme.spacing.default)) {</b>
+<b class="nc">&nbsp;                SurferInviteRow(</b>
+<b class="nc">&nbsp;                    title = stringResource(Res.string.workspace_members_invite_title),</b>
+<b class="nc">&nbsp;                    subtitle = stringResource(Res.string.workspace_members_invite_subtitle),</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(WorkspaceMembersEvent.OnInviteClick) },</b>
+<b class="nc">&nbsp;                    modifier = Modifier.testTag(WorkspaceMembersTestTags.Invite),</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(AppTheme.spacing.medium))</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        SurferSegmentedControl(</b>
+<b class="nc">&nbsp;            options = listOf(MembersTab.Active, MembersTab.Invited),</b>
+<b class="nc">&nbsp;            selected = state.tab,</b>
+&nbsp;            label = { tab -&gt;
+<b class="nc">&nbsp;                when (tab) {</b>
+<b class="nc">&nbsp;                    MembersTab.Active -&gt; stringResource(</b>
+<b class="nc">&nbsp;                        Res.string.workspace_members_tab_active_format,</b>
+<b class="nc">&nbsp;                        state.activeCount,</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                    MembersTab.Invited -&gt; stringResource(</b>
+<b class="nc">&nbsp;                        Res.string.workspace_members_tab_invited_format,</b>
+<b class="nc">&nbsp;                        state.invitedCount,</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+&nbsp;            },
+<b class="nc">&nbsp;            onSelect = { onEvent(WorkspaceMembersEvent.OnTabSelected(it)) },</b>
+<b class="nc">&nbsp;            modifier = Modifier.padding(horizontal = AppTheme.spacing.large),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.height(AppTheme.spacing.small))</b>
+&nbsp;
+<b class="nc">&nbsp;        when (state.tab) {</b>
+<b class="nc">&nbsp;            MembersTab.Active -&gt; ActiveList(state = state, onEvent = onEvent)</b>
+<b class="nc">&nbsp;            MembersTab.Invited -&gt; InvitedList(state = state, onEvent = onEvent)</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state.canLeave) {</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(AppTheme.spacing.medium))</b>
+<b class="nc">&nbsp;            Box(</b>
+<b class="nc">&nbsp;                modifier = Modifier.padding(horizontal = AppTheme.spacing.large).fillMaxWidth(),</b>
+&nbsp;            ) {
+<b class="nc">&nbsp;                SurferButton(</b>
+<b class="nc">&nbsp;                    text = stringResource(Res.string.workspace_members_leave),</b>
+<b class="nc">&nbsp;                    style = SurferButtonStyle.Outlined,</b>
+<b class="nc">&nbsp;                    enabled = !state.busy,</b>
+<b class="nc">&nbsp;                    startIcon = SurferIcons.Logout,</b>
+<b class="nc">&nbsp;                    onClick = { onEvent(WorkspaceMembersEvent.OnLeaveClick) },</b>
+<b class="nc">&nbsp;                    modifier = Modifier.fillMaxWidth(),</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        Spacer(Modifier.height(AppTheme.spacing.large))</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun Header(
+&nbsp;    workspaceName: String,
+&nbsp;    memberCount: Int,
+&nbsp;    viewerRole: WorkspaceRole?,
+&nbsp;    navigationIcon: ImageVector,
+&nbsp;    onClose: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(start = AppTheme.spacing.large, end = AppTheme.spacing.small, bottom = 14.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Box(</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .size(40.dp)</b>
+<b class="nc">&nbsp;                .clip(RoundedCornerShape(12.dp))</b>
+<b class="nc">&nbsp;                .background(AppTheme.materialColors.surfaceContainerHighest),</b>
+<b class="nc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = workspaceName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Column(Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = stringResource(Res.string.workspace_members_title_format, workspaceName),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.titleLarge,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = subtitleFor(viewerRole, memberCount),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                modifier = Modifier.padding(top = 2.dp),</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        IconButton(onClick = onClose) {</b>
+<b class="nc">&nbsp;            Icon(</b>
+<b class="nc">&nbsp;                imageVector = navigationIcon,</b>
+<b class="nc">&nbsp;                contentDescription = stringResource(Res.string.workspace_members_close_content_description),</b>
+<b class="nc">&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun subtitleFor(role: WorkspaceRole?, memberCount: Int): String = when (role) {</b>
+&nbsp;    WorkspaceRole.OWNER -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_owner_format, memberCount, memberCount)</b>
+&nbsp;    WorkspaceRole.EDITOR -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_editor_format, memberCount, memberCount)</b>
+&nbsp;    WorkspaceRole.VIEWER -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_viewer_format, memberCount, memberCount)</b>
+&nbsp;    null -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_unknown_format, memberCount, memberCount)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ActiveList(
+&nbsp;    state: WorkspaceMembersState.Content,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    state.members.forEachIndexed { index, member -&gt;</b>
+<b class="nc">&nbsp;        if (index &gt; 0) Spacer(Modifier.height(AppTheme.spacing.small))</b>
+<b class="nc">&nbsp;        val clickable = state.canManage &amp;&amp; !member.isYou &amp;&amp; member.role != WorkspaceRole.OWNER</b>
+<b class="nc">&nbsp;        val rowModifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = AppTheme.spacing.large)</b>
+<b class="nc">&nbsp;            .let { if (clickable) it.clickable { onEvent(WorkspaceMembersEvent.OnMemberClick(member.userId)) } else it }</b>
+<b class="nc">&nbsp;        Box(modifier = rowModifier) {</b>
+<b class="nc">&nbsp;            SurferMemberRow(</b>
+<b class="nc">&nbsp;                name = member.name,</b>
+<b class="nc">&nbsp;                initial = member.initial,</b>
+<b class="nc">&nbsp;                roleLabel = roleLabel(member.role),</b>
+<b class="nc">&nbsp;                isYou = member.isYou,</b>
+<b class="nc">&nbsp;                secondaryLine = member.email.takeIf { it.isNotBlank() },</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    if (!state.canManage &amp;&amp; state.viewerRole != null) {</b>
+<b class="nc">&nbsp;        ViewOnlyHint()</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun InvitedList(
+&nbsp;    state: WorkspaceMembersState.Content,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val pending = state.pendingInvites.filter { !it.isExpired }</b>
+<b class="nc">&nbsp;    val expired = state.pendingInvites.filter { it.isExpired }</b>
+<b class="nc">&nbsp;    if (pending.isEmpty() &amp;&amp; expired.isEmpty()) {</b>
+<b class="nc">&nbsp;        EmptyHint(stringResource(Res.string.workspace_members_invites_empty))</b>
+&nbsp;        return
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    val pendingLabel = stringResource(Res.string.workspace_members_invite_status_pending)</b>
+<b class="nc">&nbsp;    val expiredLabel = stringResource(Res.string.workspace_members_invite_status_expired)</b>
+<b class="nc">&nbsp;    val all = pending + expired</b>
+<b class="nc">&nbsp;    all.forEachIndexed { index, invite -&gt;</b>
+<b class="nc">&nbsp;        if (index &gt; 0) Spacer(Modifier.height(AppTheme.spacing.small))</b>
+<b class="nc">&nbsp;        InviteRow(</b>
+<b class="nc">&nbsp;            invite = invite,</b>
+<b class="nc">&nbsp;            statusLabel = if (invite.isExpired) expiredLabel else pendingLabel,</b>
+<b class="nc">&nbsp;            canCancel = state.canManage &amp;&amp; !state.busy,</b>
+<b class="nc">&nbsp;            onCancel = { onEvent(WorkspaceMembersEvent.OnInviteCancel(invite.id)) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun InviteRow(
+&nbsp;    invite: InviteUi,
+&nbsp;    statusLabel: String,
+&nbsp;    canCancel: Boolean,
+&nbsp;    onCancel: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = AppTheme.spacing.large),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Box(modifier = Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;            SurferInvitePendingRow(</b>
+<b class="nc">&nbsp;                email = invite.email,</b>
+<b class="nc">&nbsp;                statusLabel = statusLabel,</b>
+<b class="nc">&nbsp;                isExpired = invite.isExpired,</b>
+<b class="nc">&nbsp;                roleLabel = roleLabel(invite.role),</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (canCancel) {</b>
+<b class="nc">&nbsp;            IconButton(onClick = onCancel) {</b>
+&nbsp;                Icon(
+&nbsp;                    imageVector = SurferIcons.Close,
+&nbsp;                    contentDescription = stringResource(
+&nbsp;                        Res.string.workspace_members_invite_cancel_content_description,
+&nbsp;                    ),
+&nbsp;                    tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun ViewOnlyHint() {</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = AppTheme.spacing.large, vertical = AppTheme.spacing.small)</b>
+<b class="nc">&nbsp;            .clip(RoundedCornerShape(12.dp))</b>
+<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)</b>
+<b class="nc">&nbsp;            .padding(horizontal = 14.dp, vertical = 12.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(10.dp),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Icon(</b>
+<b class="nc">&nbsp;            imageVector = SurferIcons.People,</b>
+<b class="nc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;            modifier = Modifier.size(16.dp),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = stringResource(Res.string.workspace_members_view_only_hint),</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun EmptyHint(text: String) {</b>
+<b class="nc">&nbsp;    val outline = AppTheme.materialColors.outlineVariant</b>
+<b class="nc">&nbsp;    Box(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = AppTheme.spacing.large, vertical = AppTheme.spacing.small)</b>
+<b class="nc">&nbsp;            .clip(RoundedCornerShape(12.dp))</b>
+<b class="nc">&nbsp;            .drawBehind {</b>
+<b class="nc">&nbsp;                drawRoundRect(</b>
+<b class="nc">&nbsp;                    color = outline,</b>
+<b class="nc">&nbsp;                    style = Stroke(width = 1.dp.toPx()),</b>
+<b class="nc">&nbsp;                    cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx()),</b>
+&nbsp;                )
+&nbsp;            }
+<b class="nc">&nbsp;            .padding(horizontal = 14.dp, vertical = 14.dp),</b>
+<b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = text,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun LeaveDialog(
+&nbsp;    workspaceName: String,
+&nbsp;    busy: Boolean,
+&nbsp;    onCancel: () -&gt; Unit,
+&nbsp;    onConfirm: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = { if (!busy) onCancel() },</b>
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onConfirm, enabled = !busy) {</b>
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.workspace_members_leave_confirm),
+&nbsp;                    color = AppTheme.materialColors.error,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onCancel, enabled = !busy) {</b>
+&nbsp;                Text(stringResource(Res.string.workspace_members_leave_cancel))
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        title = { Text(stringResource(Res.string.workspace_members_leave_title_format, workspaceName)) },</b>
+<b class="nc">&nbsp;        text = { Text(stringResource(Res.string.workspace_members_leave_message_format, workspaceName)) },</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun roleLabel(role: WorkspaceRole): String = when (role) {</b>
+<b class="nc">&nbsp;    WorkspaceRole.OWNER -&gt; stringResource(Res.string.workspace_members_role_owner)</b>
+<b class="nc">&nbsp;    WorkspaceRole.EDITOR -&gt; stringResource(Res.string.workspace_members_role_editor)</b>
+<b class="nc">&nbsp;    WorkspaceRole.VIEWER -&gt; stringResource(Res.string.workspace_members_role_viewer)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;// ── Previews ─────────────────────────────────────────────────────────────────
+&nbsp;// Each variant exercises a different role / tab / dialog combination so changes
+&nbsp;// to the layout get reviewed in isolation rather than only via the running app.
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerActive() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.OWNER), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerInvited() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerInvitedEmpty() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited, invites = emptyList()),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewEditorActive() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.EDITOR), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewViewerActive() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.VIEWER), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewLeaveDialog() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = previewState(WorkspaceRole.EDITOR, showLeaveDialog = true),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceMembersScreenPreviewLoading() {
+&nbsp;    SurferBottomSheetPreview {
+&nbsp;        WorkspaceMembersScreen(
+&nbsp;            state = WorkspaceMembersState.Loading(WorkspaceId(&quot;preview-ws-1&quot;)),
+&nbsp;            onEvent = {},
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -198,7 +648,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

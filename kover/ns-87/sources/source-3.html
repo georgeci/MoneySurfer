@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSafeInsetsKt</title>
+  <title>MoneySurfer Coverage Report > SurferSettingsGroupKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSafeInsetsKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
+<h1>Coverage Summary for Class: SurferSettingsGroupKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSafeInsetsKt</td>
+  <td class="name">SurferSettingsGroupKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,27 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    50%
   </span>
   <span class="absValue">
-    (1/1)
+    (1/2)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (8/14)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (30/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    97.5%
   </span>
   <span class="absValue">
-    (27/27)
+    (428/439)
   </span>
 </td>
 </tr>
@@ -92,22 +99,99 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
-&nbsp;import androidx.compose.foundation.layout.only
-&nbsp;import androidx.compose.foundation.layout.safeDrawing
-&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+&nbsp;/**
+&nbsp; * Section wrapper for a stack of [SurferSettingsRow]s. Optional [title] is rendered above the
+&nbsp; * first row in the primary tint; optional [footnote] sits below the last row in the variant tint.
+&nbsp; *
+&nbsp; * Default horizontal padding (16dp) matches the design&#39;s hub layout. Row gap (8dp) is applied
+&nbsp; * automatically — children should be plain rows, not pre-stacked containers.
+&nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;fun Modifier.surferSafeInsets(): Modifier = windowInsetsPadding(</b>
-<b class="fc">&nbsp;    WindowInsets.safeDrawing.only(</b>
-<b class="fc">&nbsp;        WindowInsetsSides.Top + WindowInsetsSides.Horizontal,</b>
-&nbsp;    ),
-&nbsp;)
+&nbsp;fun SurferSettingsGroup(
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    title: String? = null,</b>
+<b class="fc">&nbsp;    footnote: String? = null,</b>
+<b class="fc">&nbsp;    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp),</b>
+<b class="fc">&nbsp;    rowSpacing: androidx.compose.ui.unit.Dp = 8.dp,</b>
+&nbsp;    content: @Composable () -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(contentPadding)</b>
+<b class="fc">&nbsp;            .padding(bottom = 12.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (title != null) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = title,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelLarge,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.primary,</b>
+<b class="fc">&nbsp;                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 14.dp, bottom = 8.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(rowSpacing)) {</b>
+<b class="fc">&nbsp;            content()</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (footnote != null) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = footnote,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferSettingsGroupPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column {
+&nbsp;            SurferSettingsGroup(title = &quot;Personalization&quot;) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Palette,
+&nbsp;                    title = &quot;Appearance&quot;,
+&nbsp;                    supportingText = &quot;Plum · Light&quot;,
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Notifications,
+&nbsp;                    title = &quot;Notifications&quot;,
+&nbsp;                    trailing = { SurferSettingsSwitch(checked = true, onCheckedChange = {}) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;            SurferSettingsGroup(
+&nbsp;                title = &quot;Color source&quot;,
+&nbsp;                footnote = &quot;Use a fixed accent, or match your wallpaper automatically.&quot;,
+&nbsp;            ) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Sparkle,
+&nbsp;                    title = &quot;Dynamic colors&quot;,
+&nbsp;                    supportingText = &quot;Match wallpaper palette&quot;,
+&nbsp;                    trailing = { SurferSettingsSwitch(checked = false, onCheckedChange = {}) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -131,7 +215,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

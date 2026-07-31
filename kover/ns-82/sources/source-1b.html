@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferSyncStatus</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferSyncStatus (com.georgeci.moneysurfer.uikit.components.base)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferSyncStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.CircularProgressIndicator
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.compositionLocalOf
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * Decoupled UI status fed into [SurferToolbar] / [SurferDashboardToolbar] via
+&nbsp; * [LocalSurferSyncStatus]. The uikit module knows nothing about the sync layer —
+&nbsp; * a higher-level provider (in `:shared`) maps `SyncCoordinator` state to this enum
+&nbsp; * and pushes the value through composition once for the whole app, so screens never
+&nbsp; * have to forward sync state into the toolbar.
+&nbsp; */
+&nbsp;enum class SurferSyncStatus {
+<b class="fc">&nbsp;    Hidden,</b>
+<b class="fc">&nbsp;    Syncing,</b>
+<b class="fc">&nbsp;    Synced,</b>
+<b class="fc">&nbsp;    Failed,</b>
+&nbsp;}
+&nbsp;
+&nbsp;val LocalSurferSyncStatus = compositionLocalOf { SurferSyncStatus.Hidden }
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun SurferSyncStatusBadge(
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    status: SurferSyncStatus = LocalSurferSyncStatus.current,
+&nbsp;) {
+&nbsp;    if (status == SurferSyncStatus.Hidden) return
+&nbsp;
+&nbsp;    val color = when (status) {
+&nbsp;        SurferSyncStatus.Failed -&gt; AppTheme.materialColors.error
+&nbsp;        else -&gt; AppTheme.materialColors.primary
+&nbsp;    }
+&nbsp;
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .padding(horizontal = 8.dp)
+&nbsp;            .size(20.dp),
+&nbsp;        contentAlignment = Alignment.Center,
+&nbsp;    ) {
+&nbsp;        when (status) {
+&nbsp;            SurferSyncStatus.Syncing -&gt; CircularProgressIndicator(
+&nbsp;                modifier = Modifier.size(16.dp),
+&nbsp;                color = color,
+&nbsp;                strokeWidth = 2.dp,
+&nbsp;            )
+&nbsp;            SurferSyncStatus.Synced,
+&nbsp;            SurferSyncStatus.Failed,
+&nbsp;            -&gt; Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .size(8.dp)
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(color),
+&nbsp;            )
+&nbsp;            SurferSyncStatus.Hidden -&gt; Unit
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
+</div>
+</body>
+</html>

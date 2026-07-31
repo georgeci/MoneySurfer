@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoryBreakdownRowKt</title>
+  <title>MoneySurfer Coverage Report > SurferAddFabKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoryBreakdownRowKt (com.georgeci.moneysurfer.uikit.components.category)</h1>
+<h1>Coverage Summary for Class: SurferAddFabKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCategoryBreakdownRowKt</td>
+  <td class="name">SurferAddFabKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/3)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    58.3%
   </span>
   <span class="absValue">
-    (0/14)
+    (7/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    90.9%
   </span>
   <span class="absValue">
-    (0/6)
+    (10/11)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    89%
   </span>
   <span class="absValue">
-    (0/222)
+    (203/228)
   </span>
 </td>
 </tr>
@@ -99,131 +99,50 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.category
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.material3.ExtendedFloatingActionButton
+&nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.semantics.contentDescription
+&nbsp;import androidx.compose.ui.semantics.semantics
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryVisual
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;
 &nbsp;/**
-&nbsp; * One subcategory in the parent&#39;s breakdown: bubble, name over a share bar, amount and share.
+&nbsp; * The &quot;add a thing&quot; extended FAB every list screen ends with.
 &nbsp; *
-&nbsp; * [share] is the fraction of the parent&#39;s total this child accounts for, already computed by the
-&nbsp; * caller — the row draws one child and has no view of its siblings. Values outside `0..1` are
-&nbsp; * clamped rather than trusted, so a rounding artefact cannot paint a bar past the track.
-&nbsp; *
-&nbsp; * Takes the resolved [SurferCategoryVisual] rather than a loose icon/tint pair: every call site
-&nbsp; * gets one from [SurferCategoryPalette.visualFor] anyway, and the two always travel together.
+&nbsp; * The accessible name is set here rather than left to each caller: half the screens wrapped the
+&nbsp; * FAB in `semantics { contentDescription = label }` and half relied on the label text alone, so
+&nbsp; * the same control announced itself differently depending on which list you were looking at.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferCategoryBreakdownRow(
-&nbsp;    visual: SurferCategoryVisual,
-&nbsp;    name: String,
-&nbsp;    formattedAmount: String,
-&nbsp;    sharePercentLabel: String,
-&nbsp;    share: Float,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    SurferCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {</b>
-&nbsp;        Row(
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-&nbsp;        ) {
-&nbsp;            SurferCategoryBubble(icon = visual.icon, tint = visual.tint, size = 36.dp)
-&nbsp;
-&nbsp;            Column(modifier = Modifier.weight(1f)) {
-&nbsp;                Text(
-&nbsp;                    text = name,
-&nbsp;                    style = AppTheme.typography.titleSmall,
-&nbsp;                    color = AppTheme.materialColors.onSurface,
-&nbsp;                    maxLines = 1,
-&nbsp;                    overflow = TextOverflow.Ellipsis,
-&nbsp;                )
-&nbsp;                Spacer(Modifier.height(6.dp))
-&nbsp;                Box(
-&nbsp;                    modifier = Modifier
-&nbsp;                        .fillMaxWidth()
-&nbsp;                        .height(TrackHeight)
-&nbsp;                        .clip(AppTheme.shapes.extraSmall)
-&nbsp;                        .background(visual.tint.copy(alpha = TrackAlpha)),
-&nbsp;                ) {
-&nbsp;                    Box(
-&nbsp;                        modifier = Modifier
-&nbsp;                            .fillMaxWidth(share.coerceIn(0f, 1f))
-&nbsp;                            .fillMaxHeight()
-&nbsp;                            .clip(AppTheme.shapes.extraSmall)
-&nbsp;                            .background(visual.tint),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            Column(horizontalAlignment = Alignment.End) {
-&nbsp;                Text(
-&nbsp;                    text = formattedAmount,
-&nbsp;                    style = AppTheme.typography.titleMedium,
-&nbsp;                    color = AppTheme.materialColors.onSurface,
-&nbsp;                    maxLines = 1,
-&nbsp;                )
-&nbsp;                Text(
-&nbsp;                    text = sharePercentLabel,
-&nbsp;                    style = AppTheme.typography.labelSmall,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-<b class="nc">&nbsp;private val TrackHeight = 4.dp</b>
-&nbsp;private const val TrackAlpha = 0.20f
+<b class="nc">&nbsp;fun SurferAddFab(</b>
+&nbsp;    label: String,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    icon: ImageVector = SurferIcons.Add,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    ExtendedFloatingActionButton(</b>
+<b class="fc">&nbsp;        text = { Text(label) },</b>
+<b class="fc">&nbsp;        icon = {</b>
+<b class="fc">&nbsp;            Icon(imageVector = icon, contentDescription = SurferSemantics.Decorative)</b>
+&nbsp;        },
+<b class="fc">&nbsp;        onClick = onClick,</b>
+<b class="fc">&nbsp;        modifier = modifier.semantics { contentDescription = label },</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferCategoryBreakdownRowPreview() {
+&nbsp;private fun SurferAddFabPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;        ) {
-&nbsp;            SurferCategoryBreakdownRow(
-&nbsp;                visual = SurferCategoryVisual(SurferIcons.Receipt, SurferCategoryPalette.tints[5]),
-&nbsp;                name = &quot;Delivery&quot;,
-&nbsp;                formattedAmount = &quot;€106.15&quot;,
-&nbsp;                sharePercentLabel = &quot;63%&quot;,
-&nbsp;                share = 0.63f,
-&nbsp;            )
-&nbsp;            SurferCategoryBreakdownRow(
-&nbsp;                visual = SurferCategoryVisual(SurferIcons.Cash, SurferCategoryPalette.tints[5]),
-&nbsp;                name = &quot;Coffee&quot;,
-&nbsp;                formattedAmount = &quot;€62.40&quot;,
-&nbsp;                sharePercentLabel = &quot;37%&quot;,
-&nbsp;                share = 0.37f,
-&nbsp;            )
-&nbsp;        }
+&nbsp;        SurferAddFab(label = &quot;Add account&quot;, onClick = {})
 &nbsp;    }
 &nbsp;}
 </code>
@@ -249,7 +168,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

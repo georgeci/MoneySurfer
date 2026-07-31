@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionCreationDateFieldsKt</title>
+  <title>MoneySurfer Coverage Report > PreferencesState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionCreationDateFieldsKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: PreferencesState (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,110 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionCreationDateFieldsKt</td>
+  <td class="name">PreferencesState</td>
 <td class="coverageStat">
   <span class="percent">
-    28.6%
+    100%
   </span>
   <span class="absValue">
-    (2/7)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    30.8%
+    100%
   </span>
   <span class="absValue">
-    (8/26)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    63.5%
+    50%
   </span>
   <span class="absValue">
-    (40/63)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    58.4%
+    100%
   </span>
   <span class="absValue">
-    (442/757)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">TransactionCreationDateFieldsKt$TransactionDatePickerDialog$notFuture$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    98.3%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/17)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    20%
-  </span>
-  <span class="absValue">
-    (2/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    26.7%
-  </span>
-  <span class="absValue">
-    (8/30)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    60.6%
-  </span>
-  <span class="absValue">
-    (40/66)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    57.1%
-  </span>
-  <span class="absValue">
-    (442/774)
+    (171/174)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -157,138 +99,168 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.preferences
 &nbsp;
-&nbsp;import androidx.compose.foundation.border
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.heightIn
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.material3.DatePicker
-&nbsp;import androidx.compose.material3.DatePickerDialog
-&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.SelectableDates
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.material3.rememberDatePickerState
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import kotlinx.datetime.TimeZone
-&nbsp;import kotlinx.datetime.toLocalDateTime
-&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_close_content_description
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_placeholder
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_save
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import kotlin.time.Clock
-&nbsp;import kotlin.time.Instant
+&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AppLanguage
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AppRegion
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.DefaultTransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.HourFormat
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.NumberFormatStyle
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.WeekStart
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.collect
+&nbsp;import kotlinx.coroutines.flow.onEach
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;@Composable
-&nbsp;internal fun DateTimeField(
-&nbsp;    timestamp: Long?,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val fieldShape = AppTheme.shapes.extraSmall</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .heightIn(min = 56.dp)</b>
-<b class="fc">&nbsp;            .clip(fieldShape)</b>
-<b class="fc">&nbsp;            .border(1.dp, AppTheme.materialColors.outline, fieldShape)</b>
-<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
-<b class="fc">&nbsp;            .padding(horizontal = 16.dp, vertical = 14.dp),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(12.dp),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = SurferIcons.Event,</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            modifier = Modifier.size(20.dp),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = stringResource(Res.string.transaction_creation_datetime_label),</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            Text(</b>
-<b class="pc">&nbsp;                text = timestamp?.let(::formatShortDate)</b>
-<b class="fc">&nbsp;                    ?: stringResource(Res.string.transaction_creation_datetime_placeholder),</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.bodyLarge,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = SurferIcons.DropDown,</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            modifier = Modifier.size(18.dp),</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;/**
+&nbsp; * Every row on the Preferences screen is a [UiPreferences] handle: state is a projection of the
+&nbsp; * stored values and a tap writes straight through, exactly as `AppearanceViewModel` does. Nothing
+&nbsp; * is held in the ViewModel that a pref does not already hold — the one exception is
+&nbsp; * [PreferencesState.activePicker], which is which sheet is open and dies with the screen on
+&nbsp; * purpose.
+&nbsp; *
+&nbsp; * The choices are stored, not yet obeyed: no locale, calendar or behaviour code reads these keys
+&nbsp; * today (see the `UiPreferences` KDoc). The screen therefore promises persistence and nothing more.
+&nbsp; */
+&nbsp;@KoinViewModel
+&nbsp;class PreferencesViewModel(
+&nbsp;    private val uiPreferences: UiPreferences,
+&nbsp;    getCurrencies: GetCurrenciesUseCase,
+&nbsp;) : MviViewModel&lt;PreferencesState, PreferencesEvent, PreferencesEffect&gt;(
+&nbsp;    initialState = PreferencesState(),
+&nbsp;) {
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Composable
-&nbsp;internal fun TransactionDatePickerDialog(
-&nbsp;    initialTimestamp: Long?,
-&nbsp;    onDismiss: () -&gt; Unit,
-&nbsp;    onConfirm: (Long) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val now = remember { Clock.System.now().toEpochMilliseconds() }</b>
-<b class="nc">&nbsp;    val nowYear = remember(now) {</b>
-<b class="nc">&nbsp;        Instant.fromEpochMilliseconds(now)</b>
-<b class="nc">&nbsp;            .toLocalDateTime(TimeZone.currentSystemDefault())</b>
-<b class="nc">&nbsp;            .year</b>
+&nbsp;    init {
+&nbsp;        observe(uiPreferences.appLanguage) { copy(language = it) }
+&nbsp;        observe(uiPreferences.appRegion) { copy(region = it) }
+&nbsp;        observe(uiPreferences.defaultCurrency) { copy(currency = it) }
+&nbsp;        observe(uiPreferences.numberFormat) { copy(numberFormat = it) }
+&nbsp;        observe(uiPreferences.weekStart) { copy(weekStart = it) }
+&nbsp;        observe(uiPreferences.hourFormat) { copy(hourFormat = it) }
+&nbsp;        observe(uiPreferences.defaultTransactionType) { copy(defaultTransactionType = it) }
+&nbsp;        observe(uiPreferences.hideAmounts) { copy(hideAmounts = it) }
+&nbsp;        observe(uiPreferences.autoCategorize) { copy(autoCategorize = it) }
+&nbsp;        observe(uiPreferences.roundUpSavings) { copy(roundUp = it) }
+&nbsp;
+&nbsp;        launch {
+&nbsp;            getCurrencies()
+&nbsp;                .onEach { currencies -&gt; updateState { copy(currencies = currencies) } }
+&nbsp;                .collect()
+&nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;    val notFuture = remember(now, nowYear) {</b>
-<b class="nc">&nbsp;        object : SelectableDates {</b>
-<b class="nc">&nbsp;            override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis &lt;= now</b>
-<b class="nc">&nbsp;            override fun isSelectableYear(year: Int): Boolean = year &lt;= nowYear</b>
-<b class="nc">&nbsp;        }</b>
-&nbsp;    }
-<b class="nc">&nbsp;    val state = rememberDatePickerState(</b>
-<b class="nc">&nbsp;        initialSelectedDateMillis = initialTimestamp,</b>
-<b class="nc">&nbsp;        selectableDates = notFuture,</b>
-&nbsp;    )
-<b class="nc">&nbsp;    DatePickerDialog(</b>
-<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
-<b class="nc">&nbsp;        confirmButton = {</b>
-<b class="nc">&nbsp;            TextButton(</b>
-<b class="nc">&nbsp;                onClick = { state.selectedDateMillis?.let(onConfirm) },</b>
-<b class="nc">&nbsp;                enabled = state.selectedDateMillis != null,</b>
-&nbsp;            ) { Text(stringResource(Res.string.transaction_creation_save)) }
-&nbsp;        },
-<b class="nc">&nbsp;        dismissButton = {</b>
-<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
-&nbsp;                Text(stringResource(Res.string.transaction_creation_close_content_description))
-&nbsp;            }
-&nbsp;        },
-<b class="nc">&nbsp;    ) {</b>
-<b class="nc">&nbsp;        DatePicker(state = state)</b>
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;private const val MONTH_ABBREVIATION_LENGTH = 3
+&nbsp;    override fun onEvent(event: PreferencesEvent) {
+&nbsp;        when (event) {
+&nbsp;            PreferencesEvent.OnBackClick -&gt; postSideEffect(PreferencesEffect.NavigateBack)
+&nbsp;            is PreferencesEvent.OnPickerOpen -&gt; updateState { copy(activePicker = event.picker) }
+&nbsp;            PreferencesEvent.OnPickerDismiss -&gt; closePicker()
 &nbsp;
-&nbsp;private fun formatShortDate(timestamp: Long): String {
-<b class="fc">&nbsp;    val instant = Instant.fromEpochMilliseconds(timestamp)</b>
-<b class="fc">&nbsp;    val ld = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date</b>
-<b class="pc">&nbsp;    val month = ld.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(MONTH_ABBREVIATION_LENGTH)</b>
-<b class="fc">&nbsp;    val day = ld.day.toString().padStart(2, &#39;0&#39;)</b>
-<b class="fc">&nbsp;    return &quot;$day $month ${ld.year}&quot;</b>
+&nbsp;            is PreferencesEvent.OnLanguageSelect -&gt; select(uiPreferences.appLanguage, event.value)
+&nbsp;            is PreferencesEvent.OnRegionSelect -&gt; select(uiPreferences.appRegion, event.value)
+&nbsp;            is PreferencesEvent.OnCurrencySelect -&gt; select(uiPreferences.defaultCurrency, event.value)
+&nbsp;            is PreferencesEvent.OnNumberFormatSelect -&gt; select(uiPreferences.numberFormat, event.value)
+&nbsp;            is PreferencesEvent.OnWeekStartSelect -&gt; select(uiPreferences.weekStart, event.value)
+&nbsp;            is PreferencesEvent.OnHourFormatSelect -&gt; select(uiPreferences.hourFormat, event.value)
+&nbsp;            is PreferencesEvent.OnDefaultTransactionTypeSelect -&gt;
+&nbsp;                select(uiPreferences.defaultTransactionType, event.value)
+&nbsp;
+&nbsp;            is PreferencesEvent.OnHideAmountsToggle -&gt; write(uiPreferences.hideAmounts, event.enabled)
+&nbsp;            is PreferencesEvent.OnAutoCategorizeToggle -&gt; write(uiPreferences.autoCategorize, event.enabled)
+&nbsp;            is PreferencesEvent.OnRoundUpToggle -&gt; write(uiPreferences.roundUpSavings, event.enabled)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun &lt;T&gt; observe(pref: Pref&lt;T&gt;, reduce: PreferencesState.(T) -&gt; PreferencesState) {
+&nbsp;        launch {
+&nbsp;            pref.flow
+&nbsp;                .onEach { value -&gt; updateState { reduce(value) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Closes the sheet and writes. The pill is *not* updated here — it re-renders when the pref
+&nbsp;     * flow emits, so what the row shows is what the store accepted and nothing else.
+&nbsp;     */
+&nbsp;    private fun &lt;T&gt; select(pref: Pref&lt;T&gt;, value: T) {
+&nbsp;        closePicker()
+&nbsp;        write(pref, value)
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun &lt;T&gt; write(pref: Pref&lt;T&gt;, value: T) {
+&nbsp;        launch { pref.set(value) }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun closePicker() = updateState { copy(activePicker = null) }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Defaults here mirror the `UiConfigKeys` defaults on purpose: they are what the screen shows for
+&nbsp; * the frame before the first flow emission, and a mismatch would be a value the store never held.
+&nbsp; *
+&nbsp; * [currency] is nullable because it has no such constant — its default is the platform locale&#39;s
+&nbsp; * currency, resolved by the config engine — so the row shows a placeholder rather than a guess
+&nbsp; * until the flow arrives.
+&nbsp; */
+<b class="fc">&nbsp;data class PreferencesState(</b>
+<b class="fc">&nbsp;    val language: AppLanguage = AppLanguage.DEFAULT,</b>
+<b class="fc">&nbsp;    val region: AppRegion = AppRegion.DEFAULT,</b>
+<b class="fc">&nbsp;    val currency: CurrencyCode? = null,</b>
+<b class="fc">&nbsp;    val currencies: List&lt;Currency&gt; = emptyList(),</b>
+<b class="fc">&nbsp;    val numberFormat: NumberFormatStyle = NumberFormatStyle.DEFAULT,</b>
+<b class="fc">&nbsp;    val weekStart: WeekStart = WeekStart.DEFAULT,</b>
+<b class="fc">&nbsp;    val hourFormat: HourFormat = HourFormat.DEFAULT,</b>
+<b class="fc">&nbsp;    val defaultTransactionType: DefaultTransactionType = DefaultTransactionType.DEFAULT,</b>
+<b class="fc">&nbsp;    val hideAmounts: Boolean = false,</b>
+<b class="fc">&nbsp;    val autoCategorize: Boolean = true,</b>
+<b class="fc">&nbsp;    val roundUp: Boolean = false,</b>
+<b class="fc">&nbsp;    val activePicker: PreferencePicker? = null,</b>
+&nbsp;) {
+&nbsp;    /** The catalogue entry for [currency], or `null` while it loads or for a code we do not stock. */
+<b class="pc">&nbsp;    val selectedCurrency: Currency? get() = currencies.firstOrNull { it.code == currency }</b>
+&nbsp;}
+&nbsp;
+&nbsp;/** Which row&#39;s chooser is open. One at a time — every picker is a modal sheet. */
+&nbsp;enum class PreferencePicker {
+&nbsp;    Language,
+&nbsp;    Region,
+&nbsp;    Currency,
+&nbsp;    NumberFormat,
+&nbsp;    WeekStart,
+&nbsp;    HourFormat,
+&nbsp;    DefaultTransactionType,
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface PreferencesEvent {
+&nbsp;    data object OnBackClick : PreferencesEvent
+&nbsp;    data class OnPickerOpen(val picker: PreferencePicker) : PreferencesEvent
+&nbsp;    data object OnPickerDismiss : PreferencesEvent
+&nbsp;
+&nbsp;    data class OnLanguageSelect(val value: AppLanguage) : PreferencesEvent
+&nbsp;    data class OnRegionSelect(val value: AppRegion) : PreferencesEvent
+&nbsp;    data class OnCurrencySelect(val value: CurrencyCode) : PreferencesEvent
+&nbsp;    data class OnNumberFormatSelect(val value: NumberFormatStyle) : PreferencesEvent
+&nbsp;    data class OnWeekStartSelect(val value: WeekStart) : PreferencesEvent
+&nbsp;    data class OnHourFormatSelect(val value: HourFormat) : PreferencesEvent
+&nbsp;    data class OnDefaultTransactionTypeSelect(val value: DefaultTransactionType) : PreferencesEvent
+&nbsp;
+&nbsp;    data class OnHideAmountsToggle(val enabled: Boolean) : PreferencesEvent
+&nbsp;    data class OnAutoCategorizeToggle(val enabled: Boolean) : PreferencesEvent
+&nbsp;    data class OnRoundUpToggle(val enabled: Boolean) : PreferencesEvent
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Only navigation is left: the pickers used to be side effects that the screen mapped to `Unit`,
+&nbsp; * and they are state now — which sheet is open is something the screen must be able to re-render
+&nbsp; * after a configuration change, not a one-shot signal.
+&nbsp; */
+&nbsp;sealed interface PreferencesEffect {
+&nbsp;    data object NavigateBack : PreferencesEffect
 &nbsp;}
 </code>
 </pre>
@@ -313,7 +285,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

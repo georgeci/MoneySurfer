@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CompiledFilters</title>
+  <title>MoneySurfer Coverage Report > SplitBreakdown</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.filter</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
 </div>
 
-<h1>Coverage Summary for Class: CompiledFilters (com.georgeci.moneysurfer.feature.transaction.filter)</h1>
+<h1>Coverage Summary for Class: SplitBreakdown (com.georgeci.moneysurfer.feature.transaction.details)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,21 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CompiledFilters</td>
+  <td class="name">SplitBreakdown</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.4%
-  </span>
-  <span class="absValue">
-    (51/54)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,38 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    97.4%
-  </span>
-  <span class="absValue">
-    (223/229)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">CompiledFilters$WhenMappings</td>
     <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.4%
-  </span>
-  <span class="absValue">
-    (51/54)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,18 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    97.4%
-  </span>
-  <span class="absValue">
-    (223/229)
+    (12/12)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -126,214 +92,299 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.filter
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 &nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+&nbsp;import com.georgeci.moneysurfer.domain.model.reference
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
-&nbsp;import com.georgeci.moneysurfer.domain.util.periodWindow
-&nbsp;import com.georgeci.moneysurfer.domain.util.startOfIsoWeek
-&nbsp;import kotlinx.datetime.DateTimeUnit
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.minus
-&nbsp;import kotlinx.datetime.plus
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSplitLegsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransferCounterpartUseCase
+&nbsp;import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_deleted_snackbar
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;private const val MINOR_PER_MAJOR = 100L
-&nbsp;private const val MAX_DECIMALS = 2
-&nbsp;private const val DAYS_PER_WEEK = 7
-&nbsp;
-&nbsp;/** `Money.MAX_MINOR` is 10^15 minor units, i.e. 13 digits of major units. */
-&nbsp;private const val MAX_WHOLE_DIGITS = 13
-&nbsp;
-&nbsp;private const val DECEMBER = 12
-&nbsp;private const val DAYS_IN_DECEMBER = 31
-&nbsp;private const val DECIMAL_RADIX = 10
-&nbsp;
-&nbsp;/**
-&nbsp; * The one date window the list loads, whoever asked for it.
-&nbsp; *
-&nbsp; * [TransactionDateRange.FollowPeriod] defers to the pager ([mode] + [anchor]); every other range
-&nbsp; * takes over completely. The pager is hidden while it is not the source, so the two can never end
-&nbsp; * up as competing windows.
-&nbsp; */
-&nbsp;fun resolveWindow(
-&nbsp;    dateRange: TransactionDateRange,
-&nbsp;    mode: TransactionPeriodMode,
-&nbsp;    anchor: LocalDate,
-&nbsp;    today: LocalDate,
-&nbsp;): TransactionPeriodWindow = when (dateRange) {
-&nbsp;    TransactionDateRange.FollowPeriod -&gt; periodWindow(mode, anchor)
-&nbsp;    is TransactionDateRange.Preset -&gt; presetWindow(dateRange.preset, today)
-&nbsp;    is TransactionDateRange.Custom -&gt; TransactionPeriodWindow(from = dateRange.from, to = dateRange.to)
-&nbsp;}
-&nbsp;
-&nbsp;private fun presetWindow(preset: TransactionDatePreset, today: LocalDate): TransactionPeriodWindow =
-&nbsp;    when (preset) {
-&nbsp;        TransactionDatePreset.Today -&gt; TransactionPeriodWindow(today, today)
-&nbsp;        TransactionDatePreset.Yesterday -&gt; today.minus(1, DateTimeUnit.DAY)
-&nbsp;            .let { TransactionPeriodWindow(it, it) }
-&nbsp;        TransactionDatePreset.ThisWeek -&gt; today.startOfIsoWeek()
-&nbsp;            .let { TransactionPeriodWindow(it, it.plus(DAYS_PER_WEEK - 1, DateTimeUnit.DAY)) }
-&nbsp;        TransactionDatePreset.ThisMonth -&gt; periodWindow(TransactionPeriodMode.Month, today)
-&nbsp;        TransactionDatePreset.LastMonth -&gt; periodWindow(
-&nbsp;            TransactionPeriodMode.Month,
-&nbsp;            LocalDate(today.year, today.month, 1).minus(1, DateTimeUnit.MONTH),
-&nbsp;        )
-&nbsp;        TransactionDatePreset.ThisYear -&gt; TransactionPeriodWindow(
-&nbsp;            from = LocalDate(today.year, 1, 1),
-&nbsp;            to = LocalDate(today.year, DECEMBER, DAYS_IN_DECEMBER),
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;/**
-&nbsp; * An amount the user typed, as an inclusive range of minor units.
-&nbsp; *
-&nbsp; * Typed precision is the tolerance: &quot;12&quot; means &quot;twelve-something&quot; (1200..1299), &quot;12.5&quot; means
-&nbsp; * &quot;twelve fifty-something&quot; (1250..1259), &quot;12.50&quot; is exact. Without that rule a search for the
-&nbsp; * amount on a receipt would only ever hit whole-unit transactions, and the min/max fields would
-&nbsp; * exclude a €12.99 charge from a &quot;max 12&quot; bound the user meant as &quot;no more than twelve-ish&quot;.
-&nbsp; */
-&nbsp;data class AmountRange(val fromMinor: Long, val toMinor: Long)
-&nbsp;
-&nbsp;/**
-&nbsp; * Parses [raw] as an amount, or returns null when it is not one.
-&nbsp; *
-&nbsp; * Currency symbols, spaces and thousands separators are dropped, and both `.` and `,` read as the
-&nbsp; * decimal separator — a filter field is not the place to be strict about how a number is written.
-&nbsp; * More than [MAX_DECIMALS] fraction digits is rejected rather than rounded: it is not an amount
-&nbsp; * this app can hold, so silently matching a truncated one would be a lie.
-&nbsp; */
-&nbsp;fun parseAmountQuery(raw: String): AmountRange? {
-&nbsp;    val normalized = normalizeAmountInput(raw) ?: return null
-&nbsp;    val whole = normalized.substringBefore(&#39;.&#39;)
-&nbsp;    val fraction = normalized.substringAfter(&#39;.&#39;, missingDelimiterValue = &quot;&quot;)
-&nbsp;    val from = whole.toLong() * MINOR_PER_MAJOR + fraction.padEnd(MAX_DECIMALS, &#39;0&#39;).toLong()
-&nbsp;    // Everything the untyped digits could still be: &quot;12&quot; covers 12.00 through 12.99.
-&nbsp;    val slack = pow10(MAX_DECIMALS - fraction.length) - 1
-&nbsp;    return AmountRange(fromMinor = from, toMinor = from + slack)
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * `raw` reduced to `digits[.digits]`, or null when it is not an amount at all. Rejects rather
-&nbsp; * than clamps anything wider than the domain&#39;s own cap ([MAX_WHOLE_DIGITS] major units), so the
-&nbsp; * arithmetic above cannot overflow on a pasted wall of digits.
-&nbsp; */
-&nbsp;private fun normalizeAmountInput(raw: String): String? {
-&nbsp;    val cleaned = raw.trim()
-&nbsp;        .filterNot { it.isWhitespace() || it == &#39;\&#39;&#39; || it == &#39;_&#39; }
-&nbsp;        .removePrefix(&quot;+&quot;)
-&nbsp;        .replace(&#39;,&#39;, &#39;.&#39;)
-&nbsp;    val whole = cleaned.substringBefore(&#39;.&#39;)
-&nbsp;    val fraction = cleaned.substringAfter(&#39;.&#39;, missingDelimiterValue = &quot;&quot;)
-&nbsp;    val wellFormed = cleaned.all { it.isDigit() || it == &#39;.&#39; } &amp;&amp;
-&nbsp;        cleaned.count { it == &#39;.&#39; } &lt;= 1 &amp;&amp;
-&nbsp;        whole.isNotEmpty() &amp;&amp;
-&nbsp;        whole.length &lt;= MAX_WHOLE_DIGITS &amp;&amp;
-&nbsp;        fraction.length &lt;= MAX_DECIMALS
-&nbsp;    return cleaned.takeIf { wellFormed }
-&nbsp;}
-&nbsp;
-&nbsp;private fun pow10(exponent: Int): Long = generateSequence(1L) { it * DECIMAL_RADIX }.elementAt(exponent)
-&nbsp;
-&nbsp;/**
-&nbsp; * A [TransactionFilters] with its three free-text amount fields parsed exactly once, ready to test
-&nbsp; * many rows.
-&nbsp; *
-&nbsp; * The min/max bounds and the search-amount are constant across a whole page, so parsing them per
-&nbsp; * row (as a naive `matches` loop would) repeats the same parse hundreds of times per rebuild.
-&nbsp; * [TransactionFilters.compile] does it once; the per-row [matches] then only compares.
-&nbsp; */
-<b class="fc">&nbsp;class CompiledFilters internal constructor(</b>
-<b class="fc">&nbsp;    private val filters: TransactionFilters,</b>
-<b class="fc">&nbsp;    private val minMinor: Long?,</b>
-<b class="fc">&nbsp;    private val maxMinor: Long?,</b>
-<b class="fc">&nbsp;    private val queryAmount: AmountRange?,</b>
-<b class="fc">&nbsp;    private val needle: String,</b>
+&nbsp;// ViewModel resolves the transaction plus everything the three screen variants need around it.
+&nbsp;@KoinViewModel
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
+&nbsp;class TransactionDetailsViewModel(
+&nbsp;    transactionId: TransactionId,
+&nbsp;    private val getTransactionById: GetTransactionByIdUseCase,
+&nbsp;    private val getAccountById: GetAccountByIdUseCase,
+&nbsp;    private val getCategories: GetCategoriesUseCase,
+&nbsp;    private val getTransferCounterpart: GetTransferCounterpartUseCase,
+&nbsp;    private val getSplitLegs: GetSplitLegsUseCase,
+&nbsp;    private val deleteWithUndo: DeleteTransactionWithUndo,
+&nbsp;) : MviViewModel&lt;TransactionDetailsState, TransactionDetailsEvent, TransactionDetailsEffect&gt;(
+&nbsp;    initialState = TransactionDetailsState.Loading(transactionId),
 &nbsp;) {
-&nbsp;    /**
-&nbsp;     * Whether [row] survives these filters.
-&nbsp;     *
-&nbsp;     * The date window is *not* checked here — it is applied by the query (see [resolveWindow]), so
-&nbsp;     * re-checking it would only duplicate a bound the database already honoured.
-&nbsp;     *
-&nbsp;     * `accountIds` is expected to be empty when the list is already scoped to one account; the
-&nbsp;     * ViewModel clears it there, because intersecting a per-account list with a different account
-&nbsp;     * would silently show nothing.
-&nbsp;     */
-&nbsp;    fun matches(row: CategorizedTransaction): Boolean {
-<b class="fc">&nbsp;        val transaction = row.transaction</b>
-<b class="fc">&nbsp;        return matchesType(transaction) &amp;&amp;</b>
-<b class="fc">&nbsp;            (filters.accountIds.isEmpty() || transaction.accountId in filters.accountIds) &amp;&amp;</b>
-<b class="pc">&nbsp;            (filters.categoryIds.isEmpty() || transaction.categoryId in filters.categoryIds) &amp;&amp;</b>
-<b class="fc">&nbsp;            matchesAmountBounds(transaction) &amp;&amp;</b>
-<b class="fc">&nbsp;            (!filters.recurringOnly || transaction.recurringRuleId != null) &amp;&amp;</b>
-<b class="fc">&nbsp;            (!filters.plannedOnly || transaction.status == TransactionStatus.PLANNED) &amp;&amp;</b>
-<b class="fc">&nbsp;            matchesQuery(row)</b>
+&nbsp;
+&nbsp;    init {
+&nbsp;        loadData()
 &nbsp;    }
 &nbsp;
-&nbsp;    /**
-&nbsp;     * The stored type alone cannot answer this: both legs of a transfer are an ordinary
-&nbsp;     * `EXPENSE`/`INCOME` pair, so reading only [Transaction.type] would leave `Expenses` showing
-&nbsp;     * the outgoing leg the user picked the segment to hide. `transferId` is what separates money
-&nbsp;     * that left the books from money that only moved sideways, and it keeps the four segments
-&nbsp;     * disjoint.
-&nbsp;     */
-&nbsp;    private fun matchesType(transaction: Transaction): Boolean {
-<b class="fc">&nbsp;        val isTransferLeg = transaction.transferId != null</b>
-<b class="fc">&nbsp;        return when (filters.type) {</b>
-<b class="fc">&nbsp;            TransactionTypeFilter.All -&gt; true</b>
-<b class="pc">&nbsp;            TransactionTypeFilter.Expenses -&gt; !isTransferLeg &amp;&amp; transaction.type == TransactionType.EXPENSE</b>
-<b class="fc">&nbsp;            TransactionTypeFilter.Income -&gt; !isTransferLeg &amp;&amp; transaction.type == TransactionType.INCOME</b>
-<b class="fc">&nbsp;            TransactionTypeFilter.Transfer -&gt; isTransferLeg</b>
+&nbsp;    override fun onEvent(event: TransactionDetailsEvent) {
+&nbsp;        when (event) {
+&nbsp;            TransactionDetailsEvent.OnBackClick -&gt;
+&nbsp;                postSideEffect(TransactionDetailsEffect.NavigateBack)
+&nbsp;            TransactionDetailsEvent.OnEditClick -&gt;
+&nbsp;                postSideEffect(TransactionDetailsEffect.NavigateToEdit(currentState.transactionId))
+&nbsp;            TransactionDetailsEvent.OnDuplicateClick -&gt;
+&nbsp;                postSideEffect(TransactionDetailsEffect.NavigateToDuplicate(currentState.transactionId))
+&nbsp;            TransactionDetailsEvent.OnDeleteClick -&gt;
+&nbsp;                updateState {
+&nbsp;                    TransactionDetailsState.content.showDeleteConfirmation.modify(this) { true }
+&nbsp;                }
+&nbsp;            TransactionDetailsEvent.OnDeleteConfirmed -&gt; handleDelete()
+&nbsp;            TransactionDetailsEvent.OnDeleteDismissed -&gt;
+&nbsp;                updateState {
+&nbsp;                    TransactionDetailsState.content.showDeleteConfirmation.modify(this) { false }
+&nbsp;                }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadData() {
+&nbsp;        launch {
+&nbsp;            val transactionId = currentState.transactionId
+&nbsp;            val transaction = getTransactionById(transactionId) ?: return@launch
+&nbsp;            val account = getAccountById(transaction.accountId)
+&nbsp;            val categories = getCategories().first()
+&nbsp;            val category = categories.find { it.id == transaction.categoryId }
+&nbsp;            val parentCategory = category?.parentId?.let { parentId -&gt; categories.find { it.id == parentId } }
+&nbsp;            val transfer = resolveTransferLeg(transaction, account)
+&nbsp;            val split = resolveSplit(transaction, categories)
+&nbsp;
+&nbsp;            updateState {
+&nbsp;                TransactionDetailsState.Content(
+&nbsp;                    transactionId = transactionId,
+&nbsp;                    formattedAmount = formatAmount(transaction, isTransfer = transfer != null),
+&nbsp;                    type = transaction.type,
+&nbsp;                    transfer = transfer,
+&nbsp;                    split = split,
+&nbsp;                    note = transaction.note,
+&nbsp;                    merchant = transaction.merchant,
+&nbsp;                    accountName = account?.name.orEmpty(),
+&nbsp;                    categoryName = category?.name.orEmpty(),
+&nbsp;                    parentCategoryName = parentCategory?.name,
+&nbsp;                    categorySystemKind = category?.systemKind?.name,
+&nbsp;                    categoryId = category?.id?.value.orEmpty(),
+&nbsp;                    categoryIconKey = category?.iconKey.orEmpty(),
+&nbsp;                    categoryHue = category?.hue ?: CategoryAppearance.UNSET_HUE,
+&nbsp;                    tags = transaction.tags,
+&nbsp;                    reference = transactionId.reference,
+&nbsp;                    formattedDate = formatDate(transaction.operationDate),
+&nbsp;                    isPlanned = transaction.status == TransactionStatus.PLANNED,
+&nbsp;                    showDeleteConfirmation = false,
+&nbsp;                )
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Bounds compare against the *magnitude*: the sign is the type filter&#39;s business, and a user
-&nbsp;     * asking for &quot;at least 50&quot; means fifty of money, not −50 being below the bound.
-&nbsp;     *
-&nbsp;     * An unparseable bound is ignored rather than treated as zero, and a trailing separator reads
-&nbsp;     * as the digits before it, so neither nonsense nor a half-typed &quot;12.&quot; empties the list.
+&nbsp;     * Null unless [transaction] is one leg of a transfer. Neither leg stores the other account,
+&nbsp;     * so the sibling has to be resolved through the shared `transferId` — and the pair may be
+&nbsp;     * missing, in which case the screen still renders as a transfer with one side blank rather
+&nbsp;     * than silently degrading to an expense.
 &nbsp;     */
-&nbsp;    private fun matchesAmountBounds(transaction: Transaction): Boolean {
-<b class="fc">&nbsp;        val minor = transaction.money.abs().minor</b>
-<b class="fc">&nbsp;        return (minMinor == null || minor &gt;= minMinor) &amp;&amp; (maxMinor == null || minor &lt;= maxMinor)</b>
+&nbsp;    private suspend fun resolveTransferLeg(transaction: Transaction, account: Account?): TransferLeg? {
+&nbsp;        if (transaction.transferId == null) return null
+&nbsp;        val counterpartName = getTransferCounterpart(transaction)
+&nbsp;            ?.let { getAccountById(it.accountId) }
+&nbsp;            ?.name
+&nbsp;            .orEmpty()
+&nbsp;        val ownName = account?.name.orEmpty()
+&nbsp;        return if (transaction.type == TransactionType.INCOME) {
+&nbsp;            TransferLeg(fromAccountName = counterpartName, toAccountName = ownName)
+&nbsp;        } else {
+&nbsp;            TransferLeg(fromAccountName = ownName, toAccountName = counterpartName)
+&nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Free-text search over what the user can actually see or remember about a row: merchant, note,
-&nbsp;     * category, tags — and the amount, which is matched numerically rather than as text so that
-&nbsp;     * &quot;12&quot; finds €12.40 without also finding every note containing &quot;12&quot;.
+&nbsp;     * The receipt [transaction] is one leg of, or null when it is an ordinary single-category row.
+&nbsp;     *
+&nbsp;     * A group of one is treated as no split at all: a leg can reach this device from sync or a CSV
+&nbsp;     * import before (or without) its siblings, and there is nothing to break down until they land.
 &nbsp;     */
-&nbsp;    private fun matchesQuery(row: CategorizedTransaction): Boolean {
-<b class="fc">&nbsp;        if (needle.isEmpty()) return true</b>
-<b class="fc">&nbsp;        val transaction = row.transaction</b>
-<b class="pc">&nbsp;        val textHit = sequenceOf(transaction.merchant, transaction.note, row.categoryName.orEmpty())</b>
-<b class="fc">&nbsp;            .plus(transaction.tags)</b>
-<b class="fc">&nbsp;            .any { it.contains(needle, ignoreCase = true) }</b>
-<b class="fc">&nbsp;        val amountHit = queryAmount != null &amp;&amp;</b>
-<b class="fc">&nbsp;            transaction.money.abs().minor in queryAmount.fromMinor..queryAmount.toMinor</b>
-<b class="fc">&nbsp;        return textHit || amountHit</b>
+&nbsp;    private suspend fun resolveSplit(
+&nbsp;        transaction: Transaction,
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;    ): SplitBreakdown? {
+&nbsp;        val legs = getSplitLegs(transaction)
+&nbsp;        if (legs.size &lt; MIN_SPLIT_LEGS) return null
+&nbsp;        val total = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.money.abs() }
+&nbsp;        return SplitBreakdown(
+&nbsp;            formattedTotal = MoneyFormatter.format(total, transaction.currencyCode),
+&nbsp;            legs = legs.map { leg -&gt;
+&nbsp;                SplitLegUi(
+&nbsp;                    transactionId = leg.id,
+&nbsp;                    categoryName = categories.find { it.id == leg.categoryId }?.name.orEmpty(),
+&nbsp;                    formattedAmount = MoneyFormatter.format(leg.money.abs(), leg.currencyCode),
+&nbsp;                    isCurrent = leg.id == transaction.id,
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Transfers stay unsigned — money moved sideways, it neither arrived nor left. Only the
+&nbsp;     * income/expense variants carry a sign, matching the transaction list.
+&nbsp;     */
+&nbsp;    private fun formatAmount(transaction: Transaction, isTransfer: Boolean): String {
+&nbsp;        val formatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode)
+&nbsp;        if (isTransfer) return formatted
+&nbsp;        return when (transaction.type) {
+&nbsp;            TransactionType.INCOME -&gt; &quot;+$formatted&quot;
+&nbsp;            TransactionType.EXPENSE -&gt; &quot;−$formatted&quot;
+&nbsp;            TransactionType.OPENING_BALANCE -&gt; formatted
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun formatDate(date: kotlinx.datetime.LocalDate): String {
+&nbsp;        val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)
+&nbsp;        val day = date.day.toString().padStart(2, &#39;0&#39;)
+&nbsp;        return &quot;$day $month ${date.year}&quot;
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun handleDelete() {
+&nbsp;        launch {
+&nbsp;            deleteWithUndo(
+&nbsp;                transactionId = currentState.transactionId,
+&nbsp;                message = Res.string.transaction_details_deleted_snackbar,
+&nbsp;                undoLabel = Res.string.transaction_details_delete_undo,
+&nbsp;            )
+&nbsp;            postSideEffect(TransactionDetailsEffect.NavigateBack)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        /** Below this a group is not a split — see [resolveSplit]. */
+&nbsp;        const val MIN_SPLIT_LEGS = 2
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Parses the amount fields once so a per-row loop only compares — see [CompiledFilters]. */
-&nbsp;fun TransactionFilters.compile(): CompiledFilters {
-&nbsp;    val trimmed = query.trim()
-&nbsp;    return CompiledFilters(
-&nbsp;        filters = this,
-&nbsp;        minMinor = parseAmountQuery(minAmount)?.fromMinor,
-&nbsp;        maxMinor = parseAmountQuery(maxAmount)?.toMinor,
-&nbsp;        queryAmount = trimmed.takeIf { it.isNotEmpty() }?.let(::parseAmountQuery),
-&nbsp;        needle = trimmed,
-&nbsp;    )
+&nbsp;/**
+&nbsp; * The legs one receipt was split across, as the details screen draws them under the amount.
+&nbsp; *
+&nbsp; * Present only when the group really has several legs; [SplitLegUi.isCurrent] marks the one the
+&nbsp; * screen was opened on, so the reader can see which slice of the receipt they navigated to.
+&nbsp; */
+<b class="fc">&nbsp;data class SplitBreakdown(</b>
+<b class="fc">&nbsp;    val formattedTotal: String,</b>
+<b class="fc">&nbsp;    val legs: List&lt;SplitLegUi&gt;,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/** One leg of a split: where it was filed, how much of the receipt it took. */
+&nbsp;data class SplitLegUi(
+&nbsp;    val transactionId: TransactionId,
+&nbsp;    /** Blank when the leg is uncategorized — the screen substitutes its own label. */
+&nbsp;    val categoryName: String,
+&nbsp;    val formattedAmount: String,
+&nbsp;    val isCurrent: Boolean,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The two accounts a transfer moves money between, already oriented for display: [fromAccountName]
+&nbsp; * is always the source regardless of which leg is on screen. Either name is blank when the account
+&nbsp; * (or the paired leg) could not be resolved.
+&nbsp; */
+&nbsp;data class TransferLeg(
+&nbsp;    val fromAccountName: String,
+&nbsp;    val toAccountName: String,
+&nbsp;)
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface TransactionDetailsState {
+&nbsp;    val transactionId: TransactionId
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Loading(override val transactionId: TransactionId) : TransactionDetailsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Content(
+&nbsp;        override val transactionId: TransactionId,
+&nbsp;        val formattedAmount: String,
+&nbsp;        /**
+&nbsp;         * The stored type. A transfer is not a type of its own — both its legs are an ordinary
+&nbsp;         * `EXPENSE`/`INCOME` pair — so [transfer] is what tells the transfer variant apart.
+&nbsp;         */
+&nbsp;        val type: TransactionType,
+&nbsp;        /** Non-null when this transaction is one leg of a transfer. */
+&nbsp;        val transfer: TransferLeg? = null,
+&nbsp;        /** Non-null when this transaction is one leg of a receipt split across categories. */
+&nbsp;        val split: SplitBreakdown? = null,
+&nbsp;        val note: String,
+&nbsp;        val merchant: String = &quot;&quot;,
+&nbsp;        val accountName: String,
+&nbsp;        val categoryName: String,
+&nbsp;        /** Parent of [categoryName] when the category is nested, else null. */
+&nbsp;        val parentCategoryName: String? = null,
+&nbsp;        val categorySystemKind: String? = null,
+&nbsp;        /** Stored appearance of the transaction&#39;s category, fed to the shared bubble resolver. */
+&nbsp;        val categoryId: String = &quot;&quot;,
+&nbsp;        val categoryIconKey: String = &quot;&quot;,
+&nbsp;        val categoryHue: Int = CategoryAppearance.UNSET_HUE,
+&nbsp;        val tags: List&lt;String&gt; = emptyList(),
+&nbsp;        /** Derived short label (`TX-8A13`), see [com.georgeci.moneysurfer.domain.model.reference]. */
+&nbsp;        val reference: String = &quot;&quot;,
+&nbsp;        val formattedDate: String,
+&nbsp;        val isPlanned: Boolean,
+&nbsp;        val showDeleteConfirmation: Boolean,
+&nbsp;    ) : TransactionDetailsState {
+&nbsp;
+&nbsp;        val isTransfer: Boolean get() = transfer != null
+&nbsp;
+&nbsp;        val isIncome: Boolean get() = !isTransfer &amp;&amp; type == TransactionType.INCOME
+&nbsp;
+&nbsp;        val isSplit: Boolean get() = split != null
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Duplicating one leg of a transfer would produce a half-transfer, duplicating one leg of a
+&nbsp;         * split would produce a fragment of a receipt with no group to belong to, and an opening
+&nbsp;         * balance is an account artefact rather than something a user re-enters — none of the three
+&nbsp;         * offers the action.
+&nbsp;         */
+&nbsp;        val canDuplicate: Boolean
+&nbsp;            get() = !isTransfer &amp;&amp; !isSplit &amp;&amp; type != TransactionType.OPENING_BALANCE
+&nbsp;
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
 &nbsp;}
 &nbsp;
-&nbsp;/** Single-row convenience — compiles then tests. For a page of rows, [compile] once and reuse. */
-&nbsp;fun TransactionFilters.matches(row: CategorizedTransaction): Boolean = compile().matches(row)
+&nbsp;sealed interface TransactionDetailsEvent {
+&nbsp;    data object OnBackClick : TransactionDetailsEvent
+&nbsp;    data object OnEditClick : TransactionDetailsEvent
+&nbsp;    data object OnDuplicateClick : TransactionDetailsEvent
+&nbsp;    data object OnDeleteClick : TransactionDetailsEvent
+&nbsp;    data object OnDeleteConfirmed : TransactionDetailsEvent
+&nbsp;    data object OnDeleteDismissed : TransactionDetailsEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface TransactionDetailsEffect {
+&nbsp;    data object NavigateBack : TransactionDetailsEffect
+&nbsp;    data class NavigateToEdit(val transactionId: TransactionId) : TransactionDetailsEffect
+&nbsp;
+&nbsp;    /** Open the creation screen prefilled from [transactionId], as a brand-new transaction. */
+&nbsp;    data class NavigateToDuplicate(val transactionId: TransactionId) : TransactionDetailsEffect
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -357,7 +408,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

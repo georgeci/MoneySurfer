@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConfigEntryDao</title>
+  <title>MoneySurfer Coverage Report > CategoryDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: ConfigEntryDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: CategoryDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConfigEntryDao</td>
+  <td class="name">CategoryDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,85 +47,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.dao
 &nbsp;
 &nbsp;import androidx.room.Dao
+&nbsp;import androidx.room.Insert
 &nbsp;import androidx.room.Query
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.ConfigEntryEntity
+&nbsp;import androidx.room.Update
+&nbsp;import androidx.room.Upsert
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Access to the synced-settings table.
-&nbsp; *
-&nbsp; * Reads are whole-table: the synced set is a handful of rows, both consumers (the in-memory mirror
-&nbsp; * behind `ConfigSource.peek`, and the reconciliation) want all of them, and a per-key query would
-&nbsp; * buy nothing. The writes, by contrast, are deliberately three narrow statements rather than one
-&nbsp; * `@Upsert`, because each has to leave a *different* column alone — see each one.
-&nbsp; */
 &nbsp;@Dao
-&nbsp;interface ConfigEntryDao {
+&nbsp;interface CategoryDao {
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Every row, re-emitted on any write to the table — including one made by the pull, which is
-&nbsp;     * what lets a setting changed on another device retheme this one&#39;s UI without any extra wiring.
-&nbsp;     */
-&nbsp;    @Query(&quot;SELECT * FROM config_entry&quot;)
-&nbsp;    fun observeAll(): Flow&lt;List&lt;ConfigEntryEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM categories&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;CategoryEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM config_entry&quot;)
-&nbsp;    suspend fun getAll(): List&lt;ConfigEntryEntity&gt;
+&nbsp;    @Query(&quot;SELECT * FROM categories WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;CategoryEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM config_entry WHERE `key` = :key&quot;)
-&nbsp;    suspend fun getByKey(key: String): ConfigEntryEntity?
+&nbsp;    @Query(&quot;SELECT * FROM categories WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): CategoryEntity?
 &nbsp;
-&nbsp;    /**
-&nbsp;     * A local write. `lastPushedAt` is *not* in the update list, so an existing row keeps whatever
-&nbsp;     * it was: the row now reads newer than its last push, which is exactly what makes the
-&nbsp;     * reconciliation pick it up if the outbox refused the enqueue.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        INSERT INTO config_entry (`key`, `value`, `updatedAt`, `lastPushedAt`)
-&nbsp;        VALUES (:key, :value, :updatedAt, NULL)
-&nbsp;        ON CONFLICT(`key`) DO UPDATE SET
-&nbsp;            `value` = :value,
-&nbsp;            `updatedAt` = :updatedAt
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun write(key: String, value: String, updatedAt: Long)
+&nbsp;    @Insert
+&nbsp;    suspend fun insert(entity: CategoryEntity)
 &nbsp;
-&nbsp;    /**
-&nbsp;     * A pulled value. Stamps `lastPushedAt = updatedAt` because the server is where this value came
-&nbsp;     * from — leaving it null would make the next reconciliation push the value straight back.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        INSERT INTO config_entry (`key`, `value`, `updatedAt`, `lastPushedAt`)
-&nbsp;        VALUES (:key, :value, :updatedAt, :updatedAt)
-&nbsp;        ON CONFLICT(`key`) DO UPDATE SET
-&nbsp;            `value` = :value,
-&nbsp;            `updatedAt` = :updatedAt,
-&nbsp;            `lastPushedAt` = :updatedAt
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun applyRemote(key: String, value: String, updatedAt: Long)
+&nbsp;    @Insert
+&nbsp;    suspend fun insertAll(entities: List&lt;CategoryEntity&gt;)
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Records a successful push. Scoped to `updatedAt = :pushedUpdatedAt` so a local write that
-&nbsp;     * landed *after* the push read the row is not marked as pushed — that write must still be
-&nbsp;     * reconciled, and the value the server holds is the older one.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        UPDATE config_entry
-&nbsp;        SET `lastPushedAt` = :pushedUpdatedAt
-&nbsp;        WHERE `key` = :key AND `updatedAt` = :pushedUpdatedAt
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun markPushed(key: String, pushedUpdatedAt: Long)
+&nbsp;    @Update
+&nbsp;    suspend fun update(entity: CategoryEntity)
 &nbsp;
-&nbsp;    /** Keys whose current value has never reached the server. */
-&nbsp;    @Query(&quot;SELECT `key` FROM config_entry WHERE `lastPushedAt` IS NULL OR `updatedAt` &gt; `lastPushedAt`&quot;)
-&nbsp;    suspend fun keysPendingPush(): List&lt;String&gt;
+&nbsp;    @Upsert
+&nbsp;    suspend fun upsertAll(entities: List&lt;CategoryEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM config_entry&quot;)
+&nbsp;    @Query(&quot;DELETE FROM categories WHERE id = :id&quot;)
+&nbsp;    suspend fun delete(id: String)
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM categories&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -151,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

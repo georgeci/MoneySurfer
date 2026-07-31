@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > NavigationSection</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+</div>
+
+<h1>Coverage Summary for Class: NavigationSection (com.georgeci.moneysurfer.navigation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">NavigationSection</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+&nbsp;
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import moneysurfer.navigation.generated.resources.Res
+&nbsp;import moneysurfer.navigation.generated.resources.nav_accounts
+&nbsp;import moneysurfer.navigation.generated.resources.nav_budgets
+&nbsp;import moneysurfer.navigation.generated.resources.nav_categories
+&nbsp;import moneysurfer.navigation.generated.resources.nav_dashboard
+&nbsp;import moneysurfer.navigation.generated.resources.nav_goals
+&nbsp;import moneysurfer.navigation.generated.resources.nav_insights
+&nbsp;import moneysurfer.navigation.generated.resources.nav_section_manage
+&nbsp;import moneysurfer.navigation.generated.resources.nav_settings
+&nbsp;import moneysurfer.navigation.generated.resources.nav_transactions
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * The groups the navigation drawer draws its destinations in — everyday surfaces first, then the
+&nbsp; * things you set up once and revisit rarely.
+&nbsp; *
+&nbsp; * Only the drawer renders [label]; the rail shows one flat list, because a `NavigationRail` has
+&nbsp; * no room for a caption and no grouping affordance to hang one on.
+&nbsp; */
+<b class="fc">&nbsp;internal enum class NavigationSection(val label: StringResource?) {</b>
+&nbsp;    /** No caption — the primary group leads the drawer and needs no naming. */
+<b class="fc">&nbsp;    Primary(label = null),</b>
+<b class="fc">&nbsp;    Manage(label = Res.string.nav_section_manage),</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The app&#39;s top-level destinations, in the order every width presents them.
+&nbsp; *
+&nbsp; * This list is authoritative for all three widths (issue #389): the drawer groups it by
+&nbsp; * [NavigationSection], the rail flattens it, and Compact deliberately presents none of it — see
+&nbsp; * [navigationPresentation].
+&nbsp; *
+&nbsp; * The taxonomy resolves §G7 of `md/tablet-desktop-responsive.md` towards the design&#39;s
+&nbsp; * `Home · Accounts · Activity · Budgets · Goals` + `Manage`, keeping the app&#39;s own names for the
+&nbsp; * two that differ only in wording (Dashboard, Transactions). Categories was primary and is now a
+&nbsp; * Manage entry — it is a setup surface, not a daily one — and the design&#39;s &quot;Bills&quot; is left out
+&nbsp; * because it has no route or screen behind it, only a dashboard widget.
+&nbsp; *
+&nbsp; * Entries must stay grouped by section, since the drawer renders each group as one contiguous
+&nbsp; * block in declaration order.
+&nbsp; */
+&nbsp;internal enum class TopLevelDestination(
+&nbsp;    val route: Route.TopLevel,
+&nbsp;    val icon: ImageVector,
+&nbsp;    val label: StringResource,
+&nbsp;    val section: NavigationSection = NavigationSection.Primary,
+&nbsp;) {
+&nbsp;    Dashboard(Route.Dashboard, SurferIcons.Dashboard, Res.string.nav_dashboard),
+&nbsp;    Accounts(Route.AccountsManage, SurferIcons.Wallet, Res.string.nav_accounts),
+&nbsp;    Transactions(
+&nbsp;        route = Route.TransactionsByAccount(accountId = null),
+&nbsp;        icon = SurferIcons.SwapHoriz,
+&nbsp;        label = Res.string.nav_transactions,
+&nbsp;    ),
+&nbsp;    Insights(Route.Insights, SurferIcons.Insights, Res.string.nav_insights),
+&nbsp;    Budgets(Route.Budgets, SurferIcons.Savings, Res.string.nav_budgets),
+&nbsp;    Goals(Route.Goals, SurferIcons.Flag, Res.string.nav_goals),
+&nbsp;    Categories(
+&nbsp;        route = Route.CategoriesManage,
+&nbsp;        icon = SurferIcons.Category,
+&nbsp;        label = Res.string.nav_categories,
+&nbsp;        section = NavigationSection.Manage,
+&nbsp;    ),
+&nbsp;    Settings(
+&nbsp;        route = Route.Settings,
+&nbsp;        icon = SurferIcons.Settings,
+&nbsp;        label = Res.string.nav_settings,
+&nbsp;        section = NavigationSection.Manage,
+&nbsp;    ),
+&nbsp;    ;
+&nbsp;
+&nbsp;    fun matches(current: Route.TopLevel?): Boolean = when (this) {
+&nbsp;        Dashboard -&gt; current is Route.Dashboard
+&nbsp;        Accounts -&gt; current is Route.AccountsManage
+&nbsp;        Transactions -&gt; current is Route.TransactionsByAccount
+&nbsp;        Insights -&gt; current is Route.Insights
+&nbsp;        Budgets -&gt; current is Route.Budgets
+&nbsp;        Goals -&gt; current is Route.Goals
+&nbsp;        Categories -&gt; current is Route.CategoriesManage
+&nbsp;        Settings -&gt; current is Route.Settings
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
+</div>
+</body>
+</html>

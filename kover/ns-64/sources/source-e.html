@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteTransactionWithUndo</title>
+  <title>MoneySurfer Coverage Report > WorkspaceManageScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.members</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteTransactionWithUndo (com.georgeci.moneysurfer.navigation)</h1>
+<h1>Coverage Summary for Class: WorkspaceManageScreenKt (com.georgeci.moneysurfer.feature.workspace.members)</h1>
 
 <table class="coverageStats">
 
@@ -46,104 +46,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DeleteTransactionWithUndo</td>
+  <td class="name">WorkspaceManageScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/67)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (9/9)
+    (0/73)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (51/51)
+    (0/1023)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">DeleteTransactionWithUndo$invoke$1</td>
+    <td class="name">WorkspaceManageScreenKt$WhenMappings</td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">DeleteTransactionWithUndo$invoke$2</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (25/25)
-  </span>
-</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (3/3)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/67)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (10/10)
+    (0/73)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (76/76)
+    (0/1023)
   </span>
 </td>
 </tr>
@@ -154,50 +126,174 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.members
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.workspace.generated.resources.Res
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_back_content_description
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_editor_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_owner_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_unknown_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_viewer_format
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_members_title_format
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
 &nbsp;/**
-&nbsp; * Deletes a transaction and offers it back through the app-level snackbar.
-&nbsp; *
-&nbsp; * Three lists can now delete a row by swiping it — transactions, an account&#39;s history, a
-&nbsp; * category&#39;s history — and the delete is only half the interaction: without the Undo beside it a
-&nbsp; * gesture that destroys data on a single sideways drag is not one users can afford to make. Both
-&nbsp; * halves live here so the three ViewModels cannot drift into three different answers about what
-&nbsp; * a swipe destroys or how long the way back stays open.
-&nbsp; *
-&nbsp; * The Undo runs on [SnackbarController]&#39;s app-scoped coroutine, so it still works after the user
-&nbsp; * navigates away from the list that produced the message.
-&nbsp; *
-&nbsp; * Each caller passes its own [message] and [undoLabel] because the wording belongs to the screen,
-&nbsp; * not to the delete.
+&nbsp; * Full-screen host for [WorkspaceMembersScreen]. Reuses the same view-model as the bottom-sheet
+&nbsp; * variant — only the surrounding chrome differs. Used from Settings → Members entry, where a
+&nbsp; * dedicated screen reads better than a modal sheet.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class DeleteTransactionWithUndo(
-<b class="fc">&nbsp;    private val deleteTransaction: DeleteTransactionUseCase,</b>
-<b class="fc">&nbsp;    private val restoreTransactions: RestoreTransactionsUseCase,</b>
-<b class="fc">&nbsp;    private val snackbar: SnackbarController,</b>
-&nbsp;) {
+&nbsp;@Composable
+<b class="nc">&nbsp;fun WorkspaceManageScreen(</b>
+&nbsp;    workspaceId: WorkspaceId,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToInvite: (WorkspaceId) -&gt; Unit,
+&nbsp;    onNavigateToMemberActions: (WorkspaceId, UserId) -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: WorkspaceMembersViewModel = koinViewModel(</b>
+<b class="nc">&nbsp;        key = workspaceId.value,</b>
+<b class="nc">&nbsp;    ) { parametersOf(workspaceId) },</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
 &nbsp;
-&nbsp;    suspend operator fun invoke(
-&nbsp;        transactionId: TransactionId,
-&nbsp;        message: StringResource,
-&nbsp;        undoLabel: StringResource,
-&nbsp;    ) {
-&nbsp;        // Both legs of a transfer, when that is what was swiped — see DeleteTransactionUseCase.
-<b class="fc">&nbsp;        val deleted = deleteTransaction(transactionId)</b>
-&nbsp;        // Nothing was removed (the row is already gone), so there is nothing to undo and a
-&nbsp;        // &quot;Deleted&quot; message would be a lie.
-<b class="fc">&nbsp;        if (deleted.isEmpty()) return</b>
-<b class="fc">&nbsp;        snackbar.show(</b>
-<b class="fc">&nbsp;            message = message,</b>
-<b class="fc">&nbsp;            actionLabel = undoLabel,</b>
-<b class="fc">&nbsp;            onAction = { restoreTransactions(deleted) },</b>
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            WorkspaceMembersEffect.Dismiss -&gt; onNavigateBack()</b>
+<b class="nc">&nbsp;            WorkspaceMembersEffect.OpenInvite -&gt; onNavigateToInvite(workspaceId)</b>
+<b class="nc">&nbsp;            is WorkspaceMembersEffect.OpenMemberActions -&gt;</b>
+<b class="nc">&nbsp;                onNavigateToMemberActions(effect.workspaceId, effect.targetUserId)</b>
+<b class="nc">&nbsp;            WorkspaceMembersEffect.LeftWorkspace -&gt; onNavigateBack()</b>
+<b class="nc">&nbsp;            is WorkspaceMembersEffect.ShowError -&gt; Unit</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    WorkspaceManageScreenContent(</b>
+<b class="nc">&nbsp;        state = state,</b>
+<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
+<b class="nc">&nbsp;        onBack = onNavigateBack,</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun WorkspaceManageScreenContent(
+&nbsp;    state: WorkspaceMembersState,
+&nbsp;    onEvent: (WorkspaceMembersEvent) -&gt; Unit,
+&nbsp;    onBack: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val content = state as? WorkspaceMembersState.Content</b>
+<b class="nc">&nbsp;    val title = content?.workspaceName</b>
+<b class="nc">&nbsp;        ?.takeIf { it.isNotEmpty() }</b>
+<b class="nc">&nbsp;        ?.let { stringResource(Res.string.workspace_members_title_format, it) }</b>
+<b class="nc">&nbsp;        .orEmpty()</b>
+<b class="nc">&nbsp;    val subtitle = content?.let { roleSubtitle(it.viewerRole, it.activeCount) }.orEmpty()</b>
+<b class="nc">&nbsp;    Scaffold(</b>
+<b class="nc">&nbsp;        modifier = Modifier.surferSafeInsets(),</b>
+<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
+<b class="nc">&nbsp;        topBar = {</b>
+<b class="nc">&nbsp;            SurferToolbar(</b>
+<b class="nc">&nbsp;                navigationIcon = {</b>
+<b class="nc">&nbsp;                    IconButton(onClick = onBack) {</b>
+&nbsp;                        Icon(
+&nbsp;                            imageVector = SurferIcons.Back,
+&nbsp;                            contentDescription = stringResource(Res.string.workspace_members_back_content_description),
+&nbsp;                            tint = AppTheme.materialColors.onSurface,
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                },
+<b class="nc">&nbsp;                colors = TopAppBarDefaults.topAppBarColors(</b>
+<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.surface,</b>
+<b class="nc">&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                title = {</b>
+<b class="nc">&nbsp;                    Column {</b>
+<b class="nc">&nbsp;                        Text(</b>
+<b class="nc">&nbsp;                            text = title,</b>
+<b class="nc">&nbsp;                            style = AppTheme.typography.titleMedium,</b>
+<b class="nc">&nbsp;                            color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                            maxLines = 1,</b>
+<b class="nc">&nbsp;                            overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        if (subtitle.isNotEmpty()) {</b>
+<b class="nc">&nbsp;                            Text(</b>
+<b class="nc">&nbsp;                                text = subtitle,</b>
+<b class="nc">&nbsp;                                style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                                maxLines = 1,</b>
+<b class="nc">&nbsp;                                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+<b class="nc">&nbsp;    ) { padding -&gt;</b>
+<b class="nc">&nbsp;        Column(</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .fillMaxSize()</b>
+<b class="nc">&nbsp;                .surferContentContainer()</b>
+<b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding())</b>
+<b class="nc">&nbsp;                .verticalScroll(rememberScrollState()),</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            WorkspaceMembersScreen(</b>
+<b class="nc">&nbsp;                state = state,</b>
+<b class="nc">&nbsp;                onEvent = onEvent,</b>
+<b class="nc">&nbsp;                showHeader = false,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding()))</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun roleSubtitle(role: WorkspaceRole?, memberCount: Int): String = when (role) {</b>
+&nbsp;    WorkspaceRole.OWNER -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_owner_format, memberCount, memberCount)</b>
+&nbsp;    WorkspaceRole.EDITOR -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_editor_format, memberCount, memberCount)</b>
+&nbsp;    WorkspaceRole.VIEWER -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_viewer_format, memberCount, memberCount)</b>
+&nbsp;    null -&gt;
+<b class="nc">&nbsp;        pluralStringResource(Res.plurals.workspace_members_subtitle_unknown_format, memberCount, memberCount)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;// ── Previews ─────────────────────────────────────────────────────────────────
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun WorkspaceManageScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        WorkspaceManageScreenContent(
+&nbsp;            state = previewState(WorkspaceRole.OWNER),
+&nbsp;            onEvent = {},
+&nbsp;            onBack = {},
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
@@ -224,7 +320,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

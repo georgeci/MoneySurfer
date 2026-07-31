@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountSlot</title>
+  <title>MoneySurfer Coverage Report > SyncEffect</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountSlot (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: SyncEffect (com.georgeci.moneysurfer.feature.settings.sync)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,16 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">AccountSlot</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <tr>
+    <td class="name">SyncEffect$NavigateBack</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,11 +69,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,78 +108,248 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;
-&nbsp;sealed interface TransactionCreationEvent {
-&nbsp;    data class OnAmountChanged(val amount: String) : TransactionCreationEvent
-&nbsp;    data class OnToAmountChanged(val amount: String) : TransactionCreationEvent
-&nbsp;    data class OnNoteChanged(val note: String) : TransactionCreationEvent
-&nbsp;    data class OnAccountSelected(val account: Account) : TransactionCreationEvent
-&nbsp;    data class OnCategorySelected(val category: Category) : TransactionCreationEvent
-&nbsp;    data class OnCategoryPicked(val id: CategoryId) : TransactionCreationEvent
-&nbsp;    data class OnAccountPicked(val id: AccountId) : TransactionCreationEvent
-&nbsp;    data class OnTypeChanged(val type: TransactionTypeUi) : TransactionCreationEvent
-&nbsp;    data class OnDateChanged(val timestamp: Long) : TransactionCreationEvent
-&nbsp;    data object OnTodayClick : TransactionCreationEvent
-&nbsp;    data object OnOpenCategoryChooser : TransactionCreationEvent
-&nbsp;    data object OnOpenCategoryCreation : TransactionCreationEvent
-&nbsp;    data object OnOpenAccountChooser : TransactionCreationEvent
-&nbsp;    data object OnOpenFromAccountChooser : TransactionCreationEvent
-&nbsp;    data object OnOpenToAccountChooser : TransactionCreationEvent
-&nbsp;    data object OnSwapAccountsClick : TransactionCreationEvent
-&nbsp;
-&nbsp;    /** Turn the split editor on (seeded with two lines) or off, discarding its lines. */
-&nbsp;    data object OnSplitToggled : TransactionCreationEvent
-&nbsp;    data object OnSplitLineAdded : TransactionCreationEvent
-&nbsp;    data class OnSplitLineRemoved(val key: Int) : TransactionCreationEvent
-&nbsp;    data class OnSplitLineAmountChanged(val key: Int, val amount: String) : TransactionCreationEvent
-&nbsp;
-&nbsp;    /** Open the category chooser for one split line rather than for the transaction as a whole. */
-&nbsp;    data class OnOpenSplitLineCategoryChooser(val key: Int) : TransactionCreationEvent
-&nbsp;    data object OnSaveClick : TransactionCreationEvent
-&nbsp;    data object OnDeleteClick : TransactionCreationEvent
-&nbsp;    data object OnDeleteConfirmed : TransactionCreationEvent
-&nbsp;    data object OnDeleteDismissed : TransactionCreationEvent
-&nbsp;    data object OnBackClick : TransactionCreationEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface TransactionCreationEffect {
-&nbsp;    data object NavigateBack : TransactionCreationEffect
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The edited transaction is gone, so the screen that opened this one — the details of that very
-&nbsp;     * row — must not be returned to. Distinct from [NavigateBack] because only the caller knows how
-&nbsp;     * far back that is.
-&nbsp;     */
-&nbsp;    data object NavigateBackAfterDelete : TransactionCreationEffect
-&nbsp;    data class NavigateToCategoryChooser(
-&nbsp;        val selectedCategoryId: CategoryId?,
-&nbsp;        val filterType: CategoryType,
-&nbsp;    ) : TransactionCreationEffect
-&nbsp;    data object NavigateToCategoryCreation : TransactionCreationEffect
-&nbsp;    data class NavigateToAccountChooser(
-&nbsp;        val selectedAccountId: AccountId?,
-&nbsp;        val excludeAccountId: AccountId? = null,
-&nbsp;        val showTransferShortcut: Boolean = false,
-&nbsp;    ) : TransactionCreationEffect
-&nbsp;}
-&nbsp;
-<b class="fc">&nbsp;internal enum class AccountSlot { Single, From, To }</b>
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.config.SyncSettings
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.sync.api.LastSyncOutcome
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncStep
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMeta
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.collect
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.onEach
+&nbsp;import kotlinx.coroutines.withTimeoutOrNull
+&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import kotlin.time.Instant
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncState as LiveSyncState
 &nbsp;
 &nbsp;/**
-&nbsp; * Where a category coming back from the chooser belongs: the transaction itself, or one line of the
-&nbsp; * split editor. The chooser returns only an id, so the screen has to remember what it was opened
-&nbsp; * for — the same shape [AccountSlot] serves for the account chooser&#39;s three slots.
+&nbsp; * Read model for the sync diagnostics screen.
+&nbsp; *
+&nbsp; * Every piece was already exposed as a flow somewhere — live coordinator state, the persisted last
+&nbsp; * outcome, the outbox, the per-collection cursors — but nothing put them on one screen, so the
+&nbsp; * question &quot;why did the pull bring nothing back&quot; had to be answered from logs. The cursors answer
+&nbsp; * it directly (see docs/architecture/cloud-login-hydration.md and issue #356), which is why they
+&nbsp; * are here rather than in a debug-only panel.
+&nbsp; *
+&nbsp; * The screen only reads and re-renders; the two write actions are a manual sync and a cursor reset.
 &nbsp; */
-&nbsp;internal sealed interface CategorySlot {
-&nbsp;    data object Single : CategorySlot
-&nbsp;    data class SplitLine(val key: Int) : CategorySlot
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;@KoinViewModel
+&nbsp;class SyncViewModel(
+&nbsp;    private val syncCoordinator: SyncCoordinator,
+&nbsp;    private val syncSettings: SyncSettings,
+&nbsp;    private val pendingMutationQueue: PendingMutationQueue,
+&nbsp;    private val syncMetaRepository: SyncMetaRepository,
+&nbsp;    private val session: SessionPointers,
+&nbsp;) : MviViewModel&lt;SyncState, SyncEvent, SyncEffect&gt;(
+&nbsp;    initialState = SyncState(),
+&nbsp;) {
+&nbsp;
+&nbsp;    private val log = Logger.withTag(TAG)
+&nbsp;
+&nbsp;    init {
+&nbsp;        observeCoordinator()
+&nbsp;        observeOutbox()
+&nbsp;        observeCursors()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onEvent(event: SyncEvent) {
+&nbsp;        when (event) {
+&nbsp;            SyncEvent.OnBackClick -&gt; postSideEffect(SyncEffect.NavigateBack)
+&nbsp;            SyncEvent.OnSyncClick -&gt; sync()
+&nbsp;            SyncEvent.OnResetCursorsClick -&gt; updateState { copy(showResetCursorsConfirm = true) }
+&nbsp;            SyncEvent.OnResetCursorsDismissed -&gt; updateState { copy(showResetCursorsConfirm = false) }
+&nbsp;            SyncEvent.OnResetCursorsConfirmed -&gt; {
+&nbsp;                updateState { copy(showResetCursorsConfirm = false) }
+&nbsp;                resetCursors()
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeCoordinator() {
+&nbsp;        launch {
+&nbsp;            combine(syncCoordinator.state, syncCoordinator.lastOutcome, ::Pair)
+&nbsp;                .onEach { (live, outcome) -&gt; updateState { copy(live = live, lastOutcome = outcome) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeOutbox() {
+&nbsp;        // Sync off → the outbox can&#39;t drain and nothing on this screen can act on it, so don&#39;t hold
+&nbsp;        // the Flow open. `flatMapLatest` rather than an early return because the server kill switch
+&nbsp;        // can retract mid-session — same shape as SettingsViewModel&#39;s badge. The screen renders the
+&nbsp;        // resulting empty list as &quot;not read&quot; rather than &quot;nothing queued&quot;: rows survive the switch
+&nbsp;        // flipping, so reporting an empty outbox here would be reporting a fact nobody checked.
+&nbsp;        launch {
+&nbsp;            syncSettings.isEnabled
+&nbsp;                .onEach { enabled -&gt; updateState { copy(syncEnabled = enabled) } }
+&nbsp;                .flatMapLatest { enabled -&gt;
+&nbsp;                    // One row past the render limit, so &quot;there are more&quot; is something the screen
+&nbsp;                    // observes rather than infers from a full page.
+&nbsp;                    if (enabled) pendingMutationQueue.observeOutbox(OUTBOX_QUERY_LIMIT) else flowOf(emptyList())
+&nbsp;                }
+&nbsp;                .onEach { rows -&gt; updateState { copy(outbox = rows) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeCursors() {
+&nbsp;        launch {
+&nbsp;            session.currentWorkspaceId
+&nbsp;                .onEach { workspaceId -&gt; updateState { copy(workspaceId = workspaceId) } }
+&nbsp;                .flatMapLatest { workspaceId -&gt;
+&nbsp;                    if (workspaceId == null) flowOf(emptyList()) else syncMetaRepository.observe(workspaceId.value)
+&nbsp;                }
+&nbsp;                .onEach { rows -&gt; updateState { copy(cursors = rows.sortedBy { it.collection }) } }
+&nbsp;                .collect()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun sync() {
+&nbsp;        launch {
+&nbsp;            // Defensive: SettingsScreen no longer surfaces a way here when sync is off, but the
+&nbsp;            // navigation entry stays registered — bail out so a deep link or a stale back stack
+&nbsp;            // can&#39;t trigger an actual sync against Firestore.
+&nbsp;            if (!syncSettings.isEnabled.first()) {
+&nbsp;                log.i { &quot;[sync] disabled — ignoring manual sync request&quot; }
+&nbsp;                return@launch
+&nbsp;            }
+&nbsp;            log.i { &quot;[sync] requesting MANUAL sync via coordinator&quot; }
+&nbsp;            // Fire and forget: the coordinator&#39;s own `state` / `lastOutcome` flows are what this
+&nbsp;            // screen renders, so awaiting the handle here would only duplicate them — and would
+&nbsp;            // drop the result if the screen left composition mid-sync.
+&nbsp;            syncCoordinator.requestSync(reason = SyncReason.MANUAL)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Drops every `lastPulledAt` for the active workspace and immediately re-syncs. Without the
+&nbsp;     * sync the reset looks like a no-op — the cursors are only re-read on the next pull, and it is
+&nbsp;     * that full re-pull, not the empty cursor table, that the user came here for.
+&nbsp;     *
+&nbsp;     * The wipe has to wait for the coordinator to go idle first. A pull in flight writes
+&nbsp;     * `setCursor(now)` per collection as it finishes each one, and a request made now would queue
+&nbsp;     * *behind* that pull rather than merge into it — so clearing immediately would have the running
+&nbsp;     * sync restore fresh cursors and the queued &quot;full&quot; re-pull would then filter on them and bring
+&nbsp;     * nothing back. Cancelling and waiting is what makes the action mean what it says.
+&nbsp;     */
+&nbsp;    private fun resetCursors() {
+&nbsp;        val workspaceId = currentState.workspaceId
+&nbsp;        if (workspaceId == null) {
+&nbsp;            log.w { &quot;[sync] no active workspace — ignoring cursor reset&quot; }
+&nbsp;            return
+&nbsp;        }
+&nbsp;        launch {
+&nbsp;            syncCoordinator.cancelAll()
+&nbsp;            val idle = withTimeoutOrNull(IDLE_WAIT_MS) {
+&nbsp;                syncCoordinator.state.first { it is LiveSyncState.Idle }
+&nbsp;            }
+&nbsp;            if (idle == null) {
+&nbsp;                // Cancellation is cooperative: an SDK call already in flight finishes first. Going
+&nbsp;                // ahead is still better than dropping the user&#39;s action — worst case the reset is
+&nbsp;                // partly overwritten, which is exactly the state they will retry from.
+&nbsp;                log.w { &quot;[sync] coordinator still busy after ${IDLE_WAIT_MS}ms — clearing cursors anyway&quot; }
+&nbsp;            }
+&nbsp;            log.i { &quot;[sync] clearing pull cursors for workspace ${workspaceId.value}&quot; }
+&nbsp;            syncMetaRepository.clearScope(workspaceId.value)
+&nbsp;            if (syncSettings.isEnabled.first()) {
+&nbsp;                syncCoordinator.requestSync(reason = SyncReason.MANUAL)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;SyncVM&quot;
+&nbsp;
+&nbsp;        /** How long a cursor reset waits for a cancelled sync to actually stop. */
+&nbsp;        const val IDLE_WAIT_MS = 5_000L
+&nbsp;
+&nbsp;        /** One past what the screen renders — the extra row is how truncation is detected. */
+&nbsp;        const val OUTBOX_QUERY_LIMIT = PendingMutationQueue.DEFAULT_OUTBOX_LIMIT + 1
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;data class SyncState(
+&nbsp;    val live: LiveSyncState = LiveSyncState.Idle,
+&nbsp;    val lastOutcome: LastSyncOutcome = LastSyncOutcome.None,
+&nbsp;    val outbox: List&lt;PendingMutation&gt; = emptyList(),
+&nbsp;    val cursors: List&lt;SyncMeta&gt; = emptyList(),
+&nbsp;    val workspaceId: WorkspaceId? = null,
+&nbsp;    val syncEnabled: Boolean = false,
+&nbsp;    val showResetCursorsConfirm: Boolean = false,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hero summary, derived rather than stored. Precedence is live activity, then a missing
+&nbsp;     * workspace, then the last terminal outcome: a sync in flight is the most useful thing to say,
+&nbsp;     * but once nothing is running, &quot;no active workspace&quot; outranks any earlier result — the actions
+&nbsp;     * below are inert without one, and a hero reading &quot;Up to date&quot; from a sync that happened before
+&nbsp;     * the workspace went away would leave that unexplained.
+&nbsp;     *
+&nbsp;     * Cancelled reads as [SyncStatus.Idle] on purpose: the user cancelled, so there is no result to
+&nbsp;     * report back to them.
+&nbsp;     */
+&nbsp;    val syncStatus: SyncStatus
+&nbsp;        get() = when (val current = live) {
+&nbsp;            is LiveSyncState.Running -&gt; SyncStatus.Running(current.currentStep)
+&nbsp;            is LiveSyncState.Queued -&gt; SyncStatus.Queued(current.count)
+&nbsp;            LiveSyncState.Idle -&gt; when {
+&nbsp;                workspaceId == null -&gt; SyncStatus.NoWorkspace
+&nbsp;                else -&gt; when (val outcome = lastOutcome) {
+&nbsp;                    LastSyncOutcome.None -&gt; SyncStatus.Idle
+&nbsp;                    is LastSyncOutcome.Success -&gt; SyncStatus.Done(outcome.summary, outcome.at)
+&nbsp;                    is LastSyncOutcome.Failed -&gt; SyncStatus.Failed(outcome.error, outcome.at)
+&nbsp;                    is LastSyncOutcome.Cancelled -&gt; SyncStatus.Idle
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    /** The cursor reset needs a workspace to scope the wipe to; a manual sync does not. */
+&nbsp;    val canResetCursors: Boolean get() = workspaceId != null
+&nbsp;
+&nbsp;    /** Rows the outbox section renders; anything past this is reported as truncated. */
+&nbsp;    val visibleOutbox: List&lt;PendingMutation&gt;
+&nbsp;        get() = outbox.take(PendingMutationQueue.DEFAULT_OUTBOX_LIMIT)
+&nbsp;
+&nbsp;    /** True only when the queue actually held more rows than [visibleOutbox] shows. */
+&nbsp;    val outboxTruncated: Boolean
+&nbsp;        get() = outbox.size &gt; PendingMutationQueue.DEFAULT_OUTBOX_LIMIT
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface SyncStatus {
+&nbsp;    data object Idle : SyncStatus
+&nbsp;    data object NoWorkspace : SyncStatus
+&nbsp;    data class Queued(val count: Int) : SyncStatus
+&nbsp;    data class Running(val step: SyncStep) : SyncStatus
+&nbsp;    data class Done(val summary: SyncSummary, val at: Instant) : SyncStatus
+&nbsp;    data class Failed(val error: SyncError, val at: Instant) : SyncStatus
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface SyncEvent {
+&nbsp;    data object OnBackClick : SyncEvent
+&nbsp;    data object OnSyncClick : SyncEvent
+&nbsp;    data object OnResetCursorsClick : SyncEvent
+&nbsp;    data object OnResetCursorsDismissed : SyncEvent
+&nbsp;    data object OnResetCursorsConfirmed : SyncEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface SyncEffect {
+<b class="fc">&nbsp;    data object NavigateBack : SyncEffect</b>
 &nbsp;}
 </code>
 </pre>
@@ -188,7 +374,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

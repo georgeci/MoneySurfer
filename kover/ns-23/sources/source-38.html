@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteAppConfig</title>
+  <title>MoneySurfer Coverage Report > RecurringSchedule</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteAppConfig (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: RecurringSchedule (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteAppConfig</td>
+  <td class="name">RecurringSchedule</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (22/22)
+    (33/33)
   </span>
 </td>
 </tr>
@@ -94,20 +94,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;/**
-&nbsp; * Server-driven configuration backing the app-version gate.
-&nbsp; *
-&nbsp; * Lives in Firestore at `appConfig/mobile`; pulled fresh on demand via
-&nbsp; * [com.georgeci.moneysurfer.domain.repositories.AppConfigRepository].
-&nbsp; *
-&nbsp; * See block.md.
-&nbsp; */
-<b class="fc">&nbsp;data class RemoteAppConfig(</b>
-<b class="fc">&nbsp;    val minSupportedAppVersionCode: Int,</b>
-<b class="fc">&nbsp;    val latestAppVersionCode: Int,</b>
-<b class="fc">&nbsp;    val forceUpdate: Boolean,</b>
-<b class="fc">&nbsp;    val message: String?,</b>
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.datetime.DayOfWeek
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;data class RecurringRule(
+&nbsp;    val id: RecurringRuleId = RecurringRuleId.uuid(),
+&nbsp;    /**
+&nbsp;     * Workspace the rule belongs to. Every co-member sees the same rule, so
+&nbsp;     * [com.georgeci.moneysurfer.domain.model.Transaction.recurringRuleId] resolves on
+&nbsp;     * every device rather than dangling on the ones that never created it.
+&nbsp;     */
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;    val title: String,
+&nbsp;    val amount: Money,
+&nbsp;    val categoryId: CategoryId,
+&nbsp;    val schedule: RecurringSchedule,
+&nbsp;    val startDate: LocalDate,
+&nbsp;    val nextRunAt: Instant?,
+&nbsp;    val autoCreate: Boolean = true,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    val createdAt: Instant = Instant.fromEpochMilliseconds(0),
+&nbsp;    val updatedAt: Instant = createdAt,
 &nbsp;)
+&nbsp;
+&nbsp;data class RecurringSchedule(
+<b class="fc">&nbsp;    val frequency: RecurringFrequency,</b>
+<b class="fc">&nbsp;    val interval: Int = 1,</b>
+<b class="fc">&nbsp;    val daysOfWeek: Set&lt;DayOfWeek&gt; = emptySet(),</b>
+<b class="fc">&nbsp;    val daysOfMonth: Set&lt;Int&gt; = emptySet(),</b>
+<b class="fc">&nbsp;    val missingDayPolicy: MissingDayPolicy = MissingDayPolicy.LAST_DAY_OF_MONTH,</b>
+&nbsp;)
+&nbsp;
+&nbsp;enum class RecurringFrequency {
+&nbsp;    DAILY,
+&nbsp;    WEEKLY,
+&nbsp;    MONTHLY,
+&nbsp;    YEARLY,
+&nbsp;}
+&nbsp;
+&nbsp;enum class MissingDayPolicy {
+&nbsp;    SKIP,
+&nbsp;    LAST_DAY_OF_MONTH,
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -131,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

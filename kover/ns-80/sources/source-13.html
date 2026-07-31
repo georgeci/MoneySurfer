@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSectionLabelKt</title>
+  <title>MoneySurfer Coverage Report > SurferDropdownKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSectionLabelKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferDropdownKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSectionLabelKt</td>
+  <td class="name">SurferDropdownKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    66.7%
   </span>
   <span class="absValue">
-    (1/2)
+    (6/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    27.8%
   </span>
   <span class="absValue">
-    (3/4)
+    (5/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    75.9%
   </span>
   <span class="absValue">
-    (8/8)
+    (22/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    78.5%
   </span>
   <span class="absValue">
-    (131/131)
+    (426/543)
   </span>
 </td>
 </tr>
@@ -99,49 +99,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.material3.DropdownMenuItem
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.ExposedDropdownMenuAnchorType
+&nbsp;import androidx.compose.material3.ExposedDropdownMenuBox
+&nbsp;import androidx.compose.material3.ExposedDropdownMenuDefaults
+&nbsp;import androidx.compose.material3.OutlinedTextField
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;/**
-&nbsp; * Caption above a form control or a group of them (&quot;Type&quot;, &quot;Colour&quot;, &quot;Opening balance&quot;).
-&nbsp; *
-&nbsp; * Every creation and edit screen had grown its own private copy of this, and they had drifted
-&nbsp; * apart — `labelLarge` in most, `titleSmall` in the goal editor, `labelMedium` in the category
-&nbsp; * sheet. This is the majority style; the two outliers now match it.
-&nbsp; *
-&nbsp; * For a header over a *list* section, with an optional trailing hint, use [SurferSectionHeader].
-&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-&nbsp;fun SurferSectionLabel(
-&nbsp;    text: String,
+&nbsp;fun &lt;T&gt; SurferDropdown(
+&nbsp;    items: List&lt;T&gt;,
+&nbsp;    selected: T?,
+&nbsp;    label: String,
+&nbsp;    itemName: (T) -&gt; String,
+&nbsp;    onItemSelected: (T) -&gt; Unit,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Text(</b>
-<b class="fc">&nbsp;        text = text,</b>
-<b class="fc">&nbsp;        style = AppTheme.typography.labelLarge,</b>
-<b class="fc">&nbsp;        color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
+<b class="fc">&nbsp;    val expanded = remember { mutableStateOf(false) }</b>
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferSectionLabelPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.large)) {
-&nbsp;            SurferSectionLabel(text = &quot;Account type&quot;)
-&nbsp;            SurferSectionLabel(text = &quot;Colour&quot;)
+<b class="fc">&nbsp;    ExposedDropdownMenuBox(</b>
+<b class="fc">&nbsp;        expanded = expanded.value,</b>
+<b class="fc">&nbsp;        onExpandedChange = { expanded.value = it },</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        OutlinedTextField(</b>
+<b class="pc">&nbsp;            value = selected?.let(itemName).orEmpty(),</b>
+<b class="fc">&nbsp;            onValueChange = {},</b>
+<b class="fc">&nbsp;            readOnly = true,</b>
+<b class="fc">&nbsp;            label = { Text(label) },</b>
+<b class="fc">&nbsp;            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth()</b>
+<b class="fc">&nbsp;                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        ExposedDropdownMenu(</b>
+<b class="fc">&nbsp;            expanded = expanded.value,</b>
+<b class="fc">&nbsp;            onDismissRequest = { expanded.value = false },</b>
+<b class="fc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            items.forEach { item -&gt;</b>
+<b class="nc">&nbsp;                DropdownMenuItem(</b>
+<b class="nc">&nbsp;                    text = { Text(itemName(item)) },</b>
+<b class="nc">&nbsp;                    onClick = {</b>
+<b class="nc">&nbsp;                        onItemSelected(item)</b>
+<b class="nc">&nbsp;                        expanded.value = false</b>
+&nbsp;                    },
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -165,7 +180,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SignInState</title>
+  <title>MoneySurfer Coverage Report > InsightsScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.insights</a>
 </div>
 
-<h1>Coverage Summary for Class: SignInState (com.georgeci.moneysurfer.feature.login)</h1>
+<h1>Coverage Summary for Class: InsightsScreenKt (com.georgeci.moneysurfer.feature.insights)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,159 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SignInState</td>
+  <td class="name">InsightsScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    83.3%
   </span>
   <span class="absValue">
-    (1/1)
+    (25/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    53.9%
   </span>
   <span class="absValue">
-    (8/8)
+    (41/76)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    97.7%
+    95.4%
   </span>
   <span class="absValue">
-    (43/44)
+    (187/196)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    84.1%
   </span>
   <span class="absValue">
-    (24/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (216/216)
+    (1420/1689)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">InsightsScreenKt$categoryBreakdown$$inlined$itemsIndexed$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsScreenKt$categoryBreakdown$$inlined$itemsIndexed$default$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsScreenKt$categoryBreakdown$$inlined$itemsIndexed$default$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsScreenKt$merchantList$$inlined$items$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsScreenKt$merchantList$$inlined$items$default$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsScreenKt$merchantList$$inlined$items$default$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsScreenKt$merchantList$$inlined$items$default$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    67.6%
+  </span>
+  <span class="absValue">
+    (25/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.9%
+  </span>
+  <span class="absValue">
+    (41/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.4%
+  </span>
+  <span class="absValue">
+    (187/196)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.1%
+  </span>
+  <span class="absValue">
+    (1420/1689)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,259 +206,436 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.insights
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
-&nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.AnonymousLoginUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.LoginUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.PostAuthBootstrapUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.SignupUseCase
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.LazyListScope
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.foundation.lazy.itemsIndexed
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.alpha
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendInsights
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferNetTrendCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferNetTrendColumn
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.insights.generated.resources.Res
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_empty_center
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_empty_legend
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_total
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_category_share
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_currency_excluded
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_currency_filtered_subtitle
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_currency_filtered_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_empty_subtitle
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_empty_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_merchant_transactions
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_merchants_empty
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_merchants_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_months_short
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_column_a11y
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_expense
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_income
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_months
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_uncategorized
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringArrayResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;@KoinViewModel
-&nbsp;class SignInViewModel(
-&nbsp;    private val login: LoginUseCase,
-&nbsp;    private val signup: SignupUseCase,
-&nbsp;    private val anonymousLogin: AnonymousLoginUseCase,
-&nbsp;    private val demoLogin: DemoLoginUseCase,
-&nbsp;    hostCapabilities: HostCapabilities,
-&nbsp;) : MviViewModel&lt;SignInState, SignInEvent, SignInEffect&gt;(
-&nbsp;    initialState = SignInState(
-&nbsp;        emailPasswordEnabled = hostCapabilities.signInEmailPassword,
-&nbsp;        anonymousEnabled = hostCapabilities.signInAnonymous,
-&nbsp;        demoEnabled = hostCapabilities.signInDemo,
-&nbsp;    ),
-&nbsp;) {
+&nbsp;/** Stable selectors for the Insights screen — see docs/testing/testing-strategy.md. */
+&nbsp;object InsightsTestTags {
+&nbsp;    const val Root = &quot;insights:root&quot;
+&nbsp;    const val List = &quot;insights:list&quot;
+&nbsp;    const val Donut = &quot;insights:donut&quot;
+&nbsp;    const val Trend = &quot;insights:trend&quot;
+&nbsp;    const val Empty = &quot;insights:empty&quot;
+&nbsp;    const val CurrencyFiltered = &quot;insights:currencyFiltered&quot;
+&nbsp;}
 &nbsp;
-&nbsp;    private val log = Logger.withTag(TAG)
+&nbsp;/** How far the figures fade while the next period&#39;s rollups are still in flight. */
+&nbsp;private const val InFlightAlpha = 0.4f
 &nbsp;
-&nbsp;    override fun onEvent(event: SignInEvent) {
-&nbsp;        when (event) {
-&nbsp;            is SignInEvent.OnEmailChanged -&gt;
-&nbsp;                updateState { copy(email = event.email, error = null) }
-&nbsp;            is SignInEvent.OnPasswordChanged -&gt;
-&nbsp;                updateState { copy(password = event.password, error = null) }
-&nbsp;            SignInEvent.OnToggleModeClick -&gt; updateState {
-&nbsp;                copy(
-&nbsp;                    mode = when (mode) {
-&nbsp;                        AuthMode.SignIn -&gt; AuthMode.SignUp
-&nbsp;                        AuthMode.SignUp -&gt; AuthMode.SignIn
-&nbsp;                    },
-&nbsp;                    error = null,
-&nbsp;                )
-&nbsp;            }
-&nbsp;            SignInEvent.OnSubmitClick -&gt; submit()
-&nbsp;            SignInEvent.OnAnonymousLoginClick -&gt; runAuth(&quot;anon&quot;) { anonymousLogin() }
-&nbsp;            SignInEvent.OnLoginClick -&gt; runAuth(&quot;demo&quot;) { demoLogin() }
-&nbsp;            SignInEvent.OnErrorDismiss -&gt; updateState { copy(error = null) }
-&nbsp;            SignInEvent.OnTermsClick -&gt; postSideEffect(SignInEffect.NavigateToLegal)
+&nbsp;/** The &quot;never stored&quot; hue sentinel — anything off the colour wheel falls back to hashing the id. */
+&nbsp;private const val NoStoredHue = -1
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;fun InsightsScreen(</b>
+&nbsp;    onNavigateBack: () -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: InsightsViewModel = koinViewModel(),</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+&nbsp;
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            InsightsEffect.NavigateBack -&gt; onNavigateBack()</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun submit() {
-&nbsp;        val state = currentState
-&nbsp;        if (state.isLoading) return
-&nbsp;        val invalid = state.validate()
-&nbsp;        if (invalid != null) {
-&nbsp;            log.i { &quot;[submit] rejected: $invalid (mode=${state.mode})&quot; }
-&nbsp;            updateState { copy(error = invalid, errorPresentation = SignInErrorPresentation.Inline) }
-&nbsp;            return
-&nbsp;        }
-&nbsp;        val email = state.email
-&nbsp;        val password = state.password
-&nbsp;        val label = when (state.mode) {
-&nbsp;            AuthMode.SignIn -&gt; &quot;login&quot;
-&nbsp;            AuthMode.SignUp -&gt; &quot;signup&quot;
-&nbsp;        }
-&nbsp;        runAuth(label) {
-&nbsp;            when (state.mode) {
-&nbsp;                AuthMode.SignIn -&gt; login(email, password)
-&nbsp;                AuthMode.SignUp -&gt; signup(email, password)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
+<b class="nc">&nbsp;    InsightsContent(state = state, onEvent = viewModel::onEvent)</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;    // `Any?` rather than a star projection: the success value is inspected, and a star-projected
-&nbsp;    // right side is only usable as `Nothing`.
-&nbsp;    private fun runAuth(label: String, block: suspend () -&gt; Either&lt;AuthError, Any?&gt;) {
-&nbsp;        if (currentState.isLoading) {
-&nbsp;            log.d { &quot;[$label] ignored: already loading&quot; }
-&nbsp;            return
-&nbsp;        }
-&nbsp;        log.i { &quot;[$label] start&quot; }
-&nbsp;        launch(
-&nbsp;            onError = { err -&gt;
-&nbsp;                log.w(err) { &quot;[$label] failed with exception&quot; }
-&nbsp;                updateState {
-&nbsp;                    copy(
-&nbsp;                        isLoading = false,
-&nbsp;                        error = SignInError.Unknown,
-&nbsp;                        errorPresentation = SignInErrorPresentation.Dialog,
+&nbsp;/**
+&nbsp; * The stateless half of the screen. Public, like `DashboardContent`, because the desktop UI tests in
+&nbsp; * `:composeApp` mount it with an injected state — see docs/testing/testing-strategy.md.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun InsightsContent(
+&nbsp;    state: InsightsState,
+&nbsp;    onEvent: (InsightsEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Scaffold(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .surferSafeInsets()</b>
+<b class="fc">&nbsp;            .testTag(InsightsTestTags.Root)</b>
+<b class="fc">&nbsp;            .surferTestTagAsId(),</b>
+<b class="fc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
+<b class="fc">&nbsp;        topBar = {</b>
+<b class="fc">&nbsp;            SurferToolbar(</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.insights_title),</b>
+<b class="fc">&nbsp;                onBack = { onEvent(InsightsEvent.OnBackClick) },</b>
+&nbsp;            )
+&nbsp;        },
+<b class="fc">&nbsp;    ) { padding -&gt;</b>
+<b class="fc">&nbsp;        val content = state as? InsightsState.Content</b>
+<b class="fc">&nbsp;        if (content == null) {</b>
+<b class="fc">&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))</b>
+&nbsp;            return@Scaffold
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        LazyColumn(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxSize()</b>
+<b class="fc">&nbsp;                .surferContentContainer()</b>
+<b class="fc">&nbsp;                .padding(top = padding.calculateTopPadding())</b>
+<b class="fc">&nbsp;                .testTag(InsightsTestTags.List),</b>
+<b class="fc">&nbsp;            contentPadding = PaddingValues(</b>
+<b class="fc">&nbsp;                start = AppTheme.spacing.default,</b>
+<b class="fc">&nbsp;                end = AppTheme.spacing.default,</b>
+<b class="fc">&nbsp;                top = AppTheme.spacing.medium,</b>
+<b class="fc">&nbsp;                bottom = padding.calculateBottomPadding() + AppTheme.spacing.xxxLarge,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+<b class="fc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;            item(key = &quot;period&quot;) {</b>
+<b class="fc">&nbsp;                InsightsPeriodPager(state = content, onEvent = onEvent)</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Everything below is the answer for the period above, so it fades as one block while
+&nbsp;            // the next one is queried rather than each card blinking on its own.
+<b class="pc">&nbsp;            val bodyModifier = Modifier.alpha(if (content.inFlight) InFlightAlpha else 1f)</b>
+&nbsp;
+&nbsp;            // Nothing else is drawn in this case on purpose: charts under a message explaining why
+&nbsp;            // there is nothing to chart would read as the message being about something else.
+<b class="fc">&nbsp;            if (content.hiddenByBaseCurrency) {</b>
+<b class="fc">&nbsp;                item(key = &quot;currency-filtered&quot;) {</b>
+<b class="fc">&nbsp;                    CurrencyFilteredState(state = content, modifier = bodyModifier)</b>
+&nbsp;                }
+&nbsp;                return@LazyColumn
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (content.isEmpty) {</b>
+<b class="fc">&nbsp;                item(key = &quot;empty&quot;) {</b>
+<b class="fc">&nbsp;                    SurferEmptyState(</b>
+<b class="fc">&nbsp;                        title = stringResource(Res.string.insights_empty_title),</b>
+<b class="fc">&nbsp;                        subtitle = stringResource(Res.string.insights_empty_subtitle),</b>
+<b class="fc">&nbsp;                        icon = SurferIcons.Receipt,</b>
+<b class="fc">&nbsp;                        modifier = bodyModifier.testTag(InsightsTestTags.Empty),</b>
 &nbsp;                    )
 &nbsp;                }
-&nbsp;            },
-&nbsp;        ) {
-&nbsp;            updateState { copy(isLoading = true, error = null) }
-&nbsp;            block().fold(
-&nbsp;                ifLeft = { err -&gt;
-&nbsp;                    val mapped = err.toSignInError()
-&nbsp;                    log.w(AuthNonFatalException(label, err)) {
-&nbsp;                        &quot;[$label] failed -&gt; $mapped (${err.message})&quot;
-&nbsp;                    }
-&nbsp;                    updateState {
-&nbsp;                        copy(
-&nbsp;                            isLoading = false,
-&nbsp;                            error = mapped,
-&nbsp;                            errorPresentation = SignInErrorPresentation.Dialog,
-&nbsp;                            // The account already exists, so put the user one tap from the action
-&nbsp;                            // the message advises. This is also the way out of a half-finished
-&nbsp;                            // sign-up: `SignupUseCase` creates the Firebase user before the local
-&nbsp;                            // and Firestore bootstrap steps, so if one of those fails the address
-&nbsp;                            // is taken from then on and re-trying sign-up can never succeed.
-&nbsp;                            mode = if (mapped == SignInError.EmailAlreadyInUse) AuthMode.SignIn else mode,
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                },
-&nbsp;                ifRight = { result -&gt;
-&nbsp;                    // Auth succeeded either way; the bootstrap just could not find the account&#39;s
-&nbsp;                    // workspaces locally, and the selector has to say so rather than render an
-&nbsp;                    // empty list that reads as &quot;you have no workspaces&quot; (issue #342).
-&nbsp;                    val cloudDataUnavailable =
-&nbsp;                        result is PostAuthBootstrapUseCase.Result.CloudDataUnavailable
-&nbsp;                    log.i { &quot;[$label] ok -&gt; navigate (cloudDataUnavailable=$cloudDataUnavailable)&quot; }
-&nbsp;                    postSideEffect(SignInEffect.NavigateToWorkspaceSelector(cloudDataUnavailable))
-&nbsp;                    updateState { copy(isLoading = false) }
-&nbsp;                },
+&nbsp;            } else {
+<b class="fc">&nbsp;                categoryBreakdown(content, bodyModifier)</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // The trend stays: it spans six months, so it has something to say about a period that
+&nbsp;            // holds nothing. The merchant list does not — it reads the same window the breakdown
+&nbsp;            // does, and its rows are a subset of the breakdown&#39;s, so an empty breakdown guarantees
+&nbsp;            // an empty merchant list. Drawing its &quot;nobody is named&quot; line under the empty state
+&nbsp;            // would answer the same question twice.
+<b class="fc">&nbsp;            item(key = &quot;trend&quot;) {</b>
+<b class="fc">&nbsp;                NetTrendCard(state = content, modifier = bodyModifier)</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (!content.isEmpty) merchantList(content, bodyModifier)</b>
+&nbsp;        }
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The donut at full size plus every category behind it.
+&nbsp; *
+&nbsp; * The donut&#39;s own legend tops out at five entries by design; a screen whose whole job is the full
+&nbsp; * picture lists the rest under it rather than rounding them into an implicit &quot;other&quot;.
+&nbsp; */
+&nbsp;private fun LazyListScope.categoryBreakdown(
+&nbsp;    state: InsightsState.Content,
+&nbsp;    modifier: Modifier,
+&nbsp;) {
+<b class="fc">&nbsp;    item(key = &quot;categories-header&quot;) {</b>
+<b class="fc">&nbsp;        SurferSectionHeader(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.insights_categories_title),</b>
+<b class="fc">&nbsp;            modifier = modifier,</b>
+&nbsp;        )
+&nbsp;    }
+<b class="fc">&nbsp;    item(key = &quot;donut&quot;) {</b>
+<b class="fc">&nbsp;        CategoriesDonut(state = state, modifier = modifier.testTag(InsightsTestTags.Donut))</b>
+&nbsp;    }
+&nbsp;    // Keyed by position as well as id, because the id is not guaranteed unique: a slice whose
+&nbsp;    // stored `categoryId` names no category row — a dangling reference, or a workspace that has not
+&nbsp;    // pulled the category yet — arrives here indistinguishable from the genuinely uncategorized
+&nbsp;    // bucket, and two rows sharing a key is a `LazyColumn` crash rather than a cosmetic clash.
+<b class="fc">&nbsp;    itemsIndexed(</b>
+<b class="fc">&nbsp;        state.categories,</b>
+<b class="fc">&nbsp;        key = { index, category -&gt; &quot;category:$index:${category.id}&quot; },</b>
+&nbsp;    ) { _, category -&gt;
+<b class="fc">&nbsp;        val name = category.name ?: stringResource(Res.string.insights_uncategorized)</b>
+<b class="fc">&nbsp;        InsightsAmountRow(</b>
+<b class="fc">&nbsp;            title = name,</b>
+<b class="fc">&nbsp;            amount = category.spentFormatted,</b>
+<b class="fc">&nbsp;            caption = stringResource(Res.string.insights_category_share, category.sharePercent),</b>
+<b class="fc">&nbsp;            leadingTint = category.tint(),</b>
+<b class="fc">&nbsp;            modifier = modifier,</b>
+<b class="fc">&nbsp;        )</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    if (state.hiddenCurrencies.isNotEmpty()) {</b>
+<b class="fc">&nbsp;        item(key = &quot;categories-excluded&quot;) {</b>
+<b class="fc">&nbsp;            SectionCaption(</b>
+<b class="fc">&nbsp;                text = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.insights_currency_excluded,</b>
+<b class="fc">&nbsp;                    state.hiddenCurrencies.joinToString(&quot;, &quot;),</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                modifier = modifier,</b>
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;SignInVM&quot;
+&nbsp;/** Who took the most, or the line that says why nobody is named. */
+&nbsp;private fun LazyListScope.merchantList(
+&nbsp;    state: InsightsState.Content,
+&nbsp;    modifier: Modifier,
+&nbsp;) {
+<b class="fc">&nbsp;    item(key = &quot;merchants-header&quot;) {</b>
+<b class="fc">&nbsp;        SurferSectionHeader(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.insights_merchants_title),</b>
+<b class="fc">&nbsp;            modifier = modifier,</b>
+&nbsp;        )
 &nbsp;    }
+<b class="fc">&nbsp;    if (state.merchants.isEmpty()) {</b>
+<b class="fc">&nbsp;        item(key = &quot;merchants-empty&quot;) {</b>
+<b class="fc">&nbsp;            SectionCaption(</b>
+<b class="fc">&nbsp;                text = stringResource(Res.string.insights_merchants_empty),</b>
+<b class="fc">&nbsp;                modifier = modifier,</b>
+&nbsp;            )
+&nbsp;        }
+&nbsp;        return
+&nbsp;    }
+<b class="fc">&nbsp;    items(state.merchants, key = { &quot;merchant:${it.merchant}&quot; }) { merchant -&gt;</b>
+<b class="fc">&nbsp;        InsightsAmountRow(</b>
+<b class="fc">&nbsp;            title = merchant.merchant,</b>
+<b class="fc">&nbsp;            amount = merchant.spentFormatted,</b>
+<b class="fc">&nbsp;            caption = pluralStringResource(</b>
+<b class="fc">&nbsp;                Res.plurals.insights_merchant_transactions,</b>
+<b class="fc">&nbsp;                merchant.transactionCount,</b>
+<b class="fc">&nbsp;                merchant.transactionCount,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            modifier = modifier,</b>
+<b class="fc">&nbsp;        )</b>
+<b class="fc">&nbsp;    }</b>
 &nbsp;}
 &nbsp;
-&nbsp;private fun AuthError.toSignInError(): SignInError = when (type) {
-&nbsp;    AuthError.Type.WeakPassword -&gt; SignInError.WeakPassword
-&nbsp;    AuthError.Type.EmailAlreadyInUse -&gt; SignInError.EmailAlreadyInUse
-&nbsp;    AuthError.Type.InvalidEmail -&gt; SignInError.EmailInvalid
-&nbsp;    AuthError.Type.InvalidCredentials -&gt; SignInError.InvalidCredentials
-&nbsp;    AuthError.Type.PermissionDenied -&gt; SignInError.PermissionDenied
-&nbsp;    // Only the account-deletion flow can produce this; a sign-in never does.
-&nbsp;    AuthError.Type.RequiresRecentLogin -&gt; SignInError.Unknown
-&nbsp;    AuthError.Type.Unknown -&gt; SignInError.Unknown
-&nbsp;}
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun CategoriesDonut(state: InsightsState.Content, modifier: Modifier = Modifier) {</b>
+<b class="fc">&nbsp;    val uncategorized = stringResource(Res.string.insights_uncategorized)</b>
+<b class="fc">&nbsp;    SurferCategoriesDonutWidget(</b>
+<b class="fc">&nbsp;        segments = state.categories.map { category -&gt;</b>
+<b class="fc">&nbsp;            SurferDonutSegment(</b>
+<b class="fc">&nbsp;                label = category.name ?: uncategorized,</b>
+<b class="fc">&nbsp;                percent = category.share,</b>
+<b class="fc">&nbsp;                color = category.tint(),</b>
+<b class="fc">&nbsp;            )</b>
+<b class="fc">&nbsp;        },</b>
+&nbsp;        // The screen is the full-size view of the dashboard&#39;s widget, so it asks for the hero
+&nbsp;        // layout explicitly rather than inheriting whatever the surrounding composition provides.
+<b class="fc">&nbsp;        size = SurferWidgetSize.Expanded,</b>
+<b class="fc">&nbsp;        centerLabel = stringResource(Res.string.insights_categories_total),</b>
+<b class="fc">&nbsp;        centerValue = state.totalFormatted,</b>
+<b class="fc">&nbsp;        emptyCenterText = stringResource(Res.string.insights_categories_empty_center),</b>
+<b class="fc">&nbsp;        emptyLegendText = stringResource(Res.string.insights_categories_empty_legend),</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth().height(DonutHeight),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;enum class AuthMode { SignIn, SignUp }
-&nbsp;
-&nbsp;/** Which control an error belongs under, so the UI can anchor it to the offending input. */
-&nbsp;enum class SignInField { Email, Password, Form }
-&nbsp;
-&nbsp;enum class SignInErrorPresentation { Inline, Dialog }
-&nbsp;
-&nbsp;enum class SignInError(val field: SignInField) {
-&nbsp;    EmailRequired(SignInField.Email),
-&nbsp;    EmailInvalid(SignInField.Email),
-&nbsp;    EmailAlreadyInUse(SignInField.Email),
-&nbsp;    PasswordRequired(SignInField.Password),
-&nbsp;    PasswordTooShort(SignInField.Password),
-&nbsp;    WeakPassword(SignInField.Password),
-&nbsp;    InvalidCredentials(SignInField.Form),
-&nbsp;    PermissionDenied(SignInField.Form),
-&nbsp;    Unknown(SignInField.Form),
-&nbsp;}
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun NetTrendCard(state: InsightsState.Content, modifier: Modifier = Modifier) {</b>
+<b class="fc">&nbsp;    val shortMonths = stringArrayResource(Res.array.insights_months_short)</b>
+<b class="fc">&nbsp;    SurferNetTrendCard(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.insights_trend_title),</b>
+<b class="fc">&nbsp;        trailingLabel = stringResource(Res.string.insights_trend_months, SpendInsights.MONTH_COLUMNS),</b>
+<b class="fc">&nbsp;        incomeLabel = stringResource(Res.string.insights_trend_income),</b>
+<b class="fc">&nbsp;        expenseLabel = stringResource(Res.string.insights_trend_expense),</b>
+<b class="fc">&nbsp;        columns = state.months.map { month -&gt;</b>
+<b class="fc">&nbsp;            val name = shortMonths[month.monthNumber - 1]</b>
+<b class="fc">&nbsp;            SurferNetTrendColumn(</b>
+<b class="fc">&nbsp;                label = name,</b>
+<b class="fc">&nbsp;                income = month.income,</b>
+<b class="fc">&nbsp;                expense = month.expense,</b>
+<b class="fc">&nbsp;                contentDescription = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.insights_trend_column_a11y,</b>
+<b class="fc">&nbsp;                    name,</b>
+<b class="fc">&nbsp;                    month.year,</b>
+<b class="fc">&nbsp;                    month.incomeFormatted,</b>
+<b class="fc">&nbsp;                    month.expenseFormatted,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;            )</b>
+<b class="fc">&nbsp;        },</b>
+<b class="fc">&nbsp;        modifier = modifier.testTag(InsightsTestTags.Trend),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * Firebase&#39;s own floor for `createUserWithEmailAndPassword`. Enforced locally so sign-up shows a
-&nbsp; * concrete hint under the field instead of relying on a server round-trip.
+&nbsp; * The empty state that names the base-currency filter as the reason.
+&nbsp; *
+&nbsp; * A blank donut in a mixed-currency workspace reads as a bug rather than as the policy it is, so the
+&nbsp; * copy states which currency counts and which ones were left out — the one thing no chart on the
+&nbsp; * screen can express, because the aggregates applied the filter before the figures got here.
 &nbsp; */
-&nbsp;const val MIN_PASSWORD_LENGTH = 6
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun CurrencyFilteredState(state: InsightsState.Content, modifier: Modifier = Modifier) {</b>
+<b class="fc">&nbsp;    SurferEmptyState(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.insights_currency_filtered_title, state.baseCurrency),</b>
+<b class="fc">&nbsp;        subtitle = stringResource(</b>
+<b class="fc">&nbsp;            Res.string.insights_currency_filtered_subtitle,</b>
+<b class="fc">&nbsp;            state.hiddenCurrencies.joinToString(&quot;, &quot;),</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        icon = SurferIcons.Globe,</b>
+<b class="fc">&nbsp;        modifier = modifier.testTag(InsightsTestTags.CurrencyFiltered),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;// Deliberately permissive — the only job is to catch typos the provider would reject anyway
-&nbsp;// (missing @, missing dot, stray whitespace). Firebase remains the authority.
-&nbsp;private val EMAIL_PATTERN = Regex(&quot;&quot;&quot;^[^@\s]+@[^@\s]+\.[^@\s]{2,}$&quot;&quot;&quot;)
+&nbsp;/** One amount line: an optional tint dot, a name, what it took, and what that is a share of. */
+&nbsp;@Composable
+&nbsp;private fun InsightsAmountRow(
+&nbsp;    title: String,
+&nbsp;    amount: String,
+&nbsp;    caption: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    leadingTint: Color? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(vertical = AppTheme.spacing.xSmall),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (leadingTint != null) {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .size(DotSize)</b>
+<b class="fc">&nbsp;                    .clip(CircleShape)</b>
+<b class="fc">&nbsp;                    .background(leadingTint),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = title,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodyLarge,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = caption,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelSmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = amount,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;data class SignInState(
-<b class="fc">&nbsp;    val email: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val password: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val mode: AuthMode = AuthMode.SignIn,</b>
-<b class="fc">&nbsp;    val isLoading: Boolean = false,</b>
-<b class="fc">&nbsp;    val error: SignInError? = null,</b>
-<b class="fc">&nbsp;    val errorPresentation: SignInErrorPresentation = SignInErrorPresentation.Inline,</b>
-&nbsp;    /**
-&nbsp;     * Which auth entry points this build offers, from `HostCapabilities`. Flat booleans on the state
-&nbsp;     * rather than a config object: the screen only ever asks &quot;is this button there?&quot;, and the host
-&nbsp;     * is the single place that answers it.
-&nbsp;     */
-<b class="fc">&nbsp;    val emailPasswordEnabled: Boolean = true,</b>
-<b class="fc">&nbsp;    val anonymousEnabled: Boolean = true,</b>
-<b class="fc">&nbsp;    val demoEnabled: Boolean = true,</b>
-&nbsp;) {
-&nbsp;    /** True when the screen should render only the demo CTA — the offline build&#39;s shape. */
-&nbsp;    val demoOnly: Boolean
-<b class="pc">&nbsp;        get() = demoEnabled &amp;&amp; !emailPasswordEnabled &amp;&amp; !anonymousEnabled</b>
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SectionCaption(text: String, modifier: Modifier = Modifier) {</b>
+<b class="fc">&nbsp;    Text(</b>
+<b class="fc">&nbsp;        text = text,</b>
+<b class="fc">&nbsp;        style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;        color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Only gated on [isLoading]. Blank or malformed input no longer disables the button — a dead
-&nbsp;     * grey button explains nothing, whereas submitting surfaces a message under the offending
-&nbsp;     * field (that silence was the original &quot;I can&#39;t sign up&quot; report).
-&nbsp;     */
-&nbsp;    val canSubmit: Boolean
-<b class="fc">&nbsp;        get() = !isLoading</b>
+&nbsp;/**
+&nbsp; * The same resolver every category bubble goes through: the stored hue snapped to the palette,
+&nbsp; * falling back to hashing the id for a row that stored none — so a category keeps one colour across
+&nbsp; * every screen, and the uncategorized bucket keeps its own when the user switches language.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun InsightsCategoryUi.tint(): Color =
+<b class="pc">&nbsp;    SurferCategoryPalette.tintForHue(hue ?: NoStoredHue) ?: SurferCategoryPalette.tintFor(id)</b>
 &nbsp;
-&nbsp;    val emailError: SignInError?
-<b class="fc">&nbsp;        get() = error?.takeIf {</b>
-<b class="fc">&nbsp;            errorPresentation == SignInErrorPresentation.Inline &amp;&amp; it.field == SignInField.Email</b>
-&nbsp;        }
-&nbsp;    val passwordError: SignInError?
-<b class="fc">&nbsp;        get() = error?.takeIf {</b>
-<b class="fc">&nbsp;            errorPresentation == SignInErrorPresentation.Inline &amp;&amp; it.field == SignInField.Password</b>
-&nbsp;        }
-&nbsp;    val formError: SignInError?
-<b class="fc">&nbsp;        get() = error?.takeIf {</b>
-<b class="fc">&nbsp;            errorPresentation == SignInErrorPresentation.Inline &amp;&amp; it.field == SignInField.Form</b>
-&nbsp;        }
-&nbsp;    val dialogError: SignInError?
-<b class="fc">&nbsp;        get() = error?.takeIf { errorPresentation == SignInErrorPresentation.Dialog }</b>
+<b class="fc">&nbsp;private val DonutHeight = 200.dp</b>
+<b class="fc">&nbsp;private val DotSize = 10.dp</b>
 &nbsp;
-&nbsp;    /** First client-side problem with the current input, or null when it is worth a network call. */
-<b class="fc">&nbsp;    fun validate(): SignInError? = when {</b>
-<b class="fc">&nbsp;        email.isBlank() -&gt; SignInError.EmailRequired</b>
-<b class="fc">&nbsp;        !EMAIL_PATTERN.matches(email.trim()) -&gt; SignInError.EmailInvalid</b>
-<b class="fc">&nbsp;        password.isEmpty() -&gt; SignInError.PasswordRequired</b>
-<b class="fc">&nbsp;        mode == AuthMode.SignUp &amp;&amp; password.length &lt; MIN_PASSWORD_LENGTH -&gt; SignInError.PasswordTooShort</b>
-<b class="fc">&nbsp;        else -&gt; null</b>
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun InsightsContentPreview() {
+&nbsp;    AppTheme {
+&nbsp;        InsightsContent(state = previewInsightsContent(), onEvent = {})
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface SignInEvent {
-&nbsp;    data class OnEmailChanged(val email: String) : SignInEvent
-&nbsp;    data class OnPasswordChanged(val password: String) : SignInEvent
-&nbsp;    data object OnToggleModeClick : SignInEvent
-&nbsp;    data object OnSubmitClick : SignInEvent
-&nbsp;    data object OnLoginClick : SignInEvent
-&nbsp;    data object OnAnonymousLoginClick : SignInEvent
-&nbsp;    data object OnErrorDismiss : SignInEvent
-&nbsp;    data object OnTermsClick : SignInEvent
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun InsightsCurrencyFilteredPreview() {
+&nbsp;    AppTheme {
+&nbsp;        InsightsContent(state = previewCurrencyFilteredContent(), onEvent = {})
+&nbsp;    }
 &nbsp;}
-&nbsp;
-&nbsp;sealed interface SignInEffect {
-&nbsp;    data class NavigateToWorkspaceSelector(
-&nbsp;        val cloudDataUnavailable: Boolean = false,
-&nbsp;    ) : SignInEffect
-&nbsp;
-&nbsp;    data object NavigateToLegal : SignInEffect
-&nbsp;}
-&nbsp;
-&nbsp;private class AuthNonFatalException(
-&nbsp;    label: String,
-&nbsp;    error: AuthError,
-&nbsp;) : RuntimeException(&quot;Auth $label failed: ${error.type}&quot;, error.cause)
 </code>
 </pre>
 </div>
@@ -375,7 +659,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountRepository</title>
+  <title>MoneySurfer Coverage Report > Plurals0_commonMainKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">moneysurfer.feature.workspace.generated.resources</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: Plurals0_commonMainKt (moneysurfer.feature.workspace.generated.resources)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">AccountRepository</td>
+  <td class="name">Plurals0_commonMainKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/288)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,57 +92,77 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;package moneysurfer.feature.workspace.generated.resources
 &nbsp;
-&nbsp;// Ten operations, and the tenth trips the interface threshold. Splitting them would only move the
-&nbsp;// line: every one is a single-column write on the same row, and the callers — use cases that own
-&nbsp;// one account action each — would then have to name two repositories to do one thing.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface AccountRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Account&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Account&gt;&gt;
-&nbsp;    suspend fun getById(id: AccountId): Account?
-&nbsp;    suspend fun insert(account: Account)
-&nbsp;    suspend fun update(account: Account)
-&nbsp;    suspend fun delete(id: AccountId)
+&nbsp;import kotlin.OptIn
+&nbsp;import kotlin.String
+&nbsp;import kotlin.collections.MutableMap
+&nbsp;import org.jetbrains.compose.resources.InternalResourceApi
+&nbsp;import org.jetbrains.compose.resources.LanguageQualifier
+&nbsp;import org.jetbrains.compose.resources.PluralStringResource
+&nbsp;import org.jetbrains.compose.resources.ResourceContentHash
+&nbsp;import org.jetbrains.compose.resources.ResourceItem
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Increment the cached `balance` of [accountId] by [delta]. Used by total-calc to keep
-&nbsp;     * `Account.balance` in sync with transaction changes without rewriting the whole row.
-&nbsp;     *
-&nbsp;     * Negative delta is allowed (subtracts). The repository writes the result and bumps
-&nbsp;     * `updatedAt`. Does NOT enqueue an outbox row — balance is a derived projection that
-&nbsp;     * Firestore recomputes server-side from its own tx state (see md/totatl_calc.md §6).
-&nbsp;     */
-&nbsp;    suspend fun applyDelta(accountId: AccountId, delta: Money)
+&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.workspace.generated.resources/&quot;
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Overwrite the cached balance with [balance]. Used by `RecalculateAccountBalanceUseCase`
-&nbsp;     * to repair the cache from authoritative transaction history. Like [applyDelta], does
-&nbsp;     * not enqueue an outbox row.
-&nbsp;     */
-&nbsp;    suspend fun setBalance(accountId: AccountId, balance: Money)
+&nbsp;@delegate:ResourceContentHash(864_548_337)
+<b class="nc">&nbsp;internal val Res.plurals.workspace_creation_preview_subtitle_format: PluralStringResource by lazy {</b>
+<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:workspace_creation_preview_subtitle_format&quot;, &quot;workspace_creation_preview_subtitle_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 10, 321),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 10, 142),</b>
+&nbsp;      ))
+&nbsp;    }
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
-&nbsp;     * Archived accounts keep their transactions but are hidden from active lists and excluded
-&nbsp;     * from total/budget rollups. No-op if [accountId] is unknown locally.
-&nbsp;     */
-&nbsp;    suspend fun setArchived(accountId: AccountId, archived: Boolean)
+&nbsp;@delegate:ResourceContentHash(-1_106_342_910)
+<b class="nc">&nbsp;internal val Res.plurals.workspace_incoming_header_title_format: PluralStringResource by lazy {</b>
+<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:workspace_incoming_header_title_format&quot;, &quot;workspace_incoming_header_title_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 332, 277),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 153, 146),</b>
+&nbsp;      ))
+&nbsp;    }
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Rewrite `sortOrder` so the accounts named in [orderedIds] sit in exactly that order,
-&nbsp;     * starting at 0. Ids the workspace does not know are ignored; accounts left out keep the
-&nbsp;     * value they had. Only the rows whose position actually changed are written and enqueued
-&nbsp;     * for sync, so dropping a row back where it started costs nothing.
-&nbsp;     */
-&nbsp;    suspend fun reorder(orderedIds: List&lt;AccountId&gt;)
+&nbsp;@delegate:ResourceContentHash(-589_611_666)
+<b class="nc">&nbsp;internal val Res.plurals.workspace_members_subtitle_editor_format: PluralStringResource by lazy {</b>
+<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:workspace_members_subtitle_editor_format&quot;, &quot;workspace_members_subtitle_editor_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 610, 419),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 300, 148),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(225_784_948)
+<b class="nc">&nbsp;internal val Res.plurals.workspace_members_subtitle_owner_format: PluralStringResource by lazy {</b>
+<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:workspace_members_subtitle_owner_format&quot;, &quot;workspace_members_subtitle_owner_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 1030, 334),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 449, 163),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_597_573_230)
+<b class="nc">&nbsp;internal val Res.plurals.workspace_members_subtitle_unknown_format: PluralStringResource by lazy {</b>
+<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:workspace_members_subtitle_unknown_format&quot;, &quot;workspace_members_subtitle_unknown_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 1365, 204),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 613, 93),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_127_633_636)
+<b class="nc">&nbsp;internal val Res.plurals.workspace_members_subtitle_viewer_format: PluralStringResource by lazy {</b>
+<b class="nc">&nbsp;      PluralStringResource(&quot;plurals:workspace_members_subtitle_viewer_format&quot;, &quot;workspace_members_subtitle_viewer_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 1570, 379),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 707, 148),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@InternalResourceApi
+&nbsp;internal fun _collectCommonMainPlurals0Resources(map: MutableMap&lt;String, PluralStringResource&gt;) {
+<b class="nc">&nbsp;  map.put(&quot;workspace_creation_preview_subtitle_format&quot;, Res.plurals.workspace_creation_preview_subtitle_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;workspace_incoming_header_title_format&quot;, Res.plurals.workspace_incoming_header_title_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;workspace_members_subtitle_editor_format&quot;, Res.plurals.workspace_members_subtitle_editor_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;workspace_members_subtitle_owner_format&quot;, Res.plurals.workspace_members_subtitle_owner_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;workspace_members_subtitle_unknown_format&quot;, Res.plurals.workspace_members_subtitle_unknown_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;workspace_members_subtitle_viewer_format&quot;, Res.plurals.workspace_members_subtitle_viewer_format)</b>
 &nbsp;}
 </code>
 </pre>
@@ -119,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

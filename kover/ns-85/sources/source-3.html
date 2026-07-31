@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSwipeToDeleteTransactionKt</title>
+  <title>MoneySurfer Coverage Report > SurferBarColumnsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.transaction</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.chart</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSwipeToDeleteTransactionKt (com.georgeci.moneysurfer.uikit.components.transaction)</h1>
+<h1>Coverage Summary for Class: SurferBarColumnsKt (com.georgeci.moneysurfer.uikit.components.chart)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSwipeToDeleteTransactionKt</td>
+  <td class="name">SurferBarColumnsKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    88.9%
   </span>
   <span class="absValue">
-    (5/8)
+    (8/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    66.2%
   </span>
   <span class="absValue">
-    (6/18)
+    (45/68)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75.8%
+    100%
   </span>
   <span class="absValue">
-    (25/33)
+    (98/98)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78%
+    97.3%
   </span>
   <span class="absValue">
-    (387/496)
+    (1138/1170)
   </span>
 </td>
 </tr>
@@ -99,103 +99,251 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.transaction
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.chart
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.saveable.rememberSaveable
-&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.semantics.clearAndSetSemantics
+&nbsp;import androidx.compose.ui.semantics.contentDescription
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAccessibilityAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/** One bar inside a [SurferBarColumn]: a magnitude and the tint it is drawn in. */
+&nbsp;data class SurferBar(
+&nbsp;    val value: Long,
+&nbsp;    val tint: Color,
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Total swipe travel: one 72dp action button plus the reveal row&#39;s 6dp gutters. Narrower than the
-&nbsp; * manage screens&#39; two-action track, because a transaction row reveals only Delete.
+&nbsp; * One column of [SurferBarColumns]: its axis tick, the bars drawn side by side inside it, and
+&nbsp; * whether it is the column the others exist to give context to.
+&nbsp; *
+&nbsp; * [contentDescription] is what a screen reader says for the whole column — the bars themselves are
+&nbsp; * shapes with no text of their own, so the caller has to spell the column out once, in its own copy
+&nbsp; * and its own currency.
+&nbsp; *
+&nbsp; * [valueLabel] prints above the column. Leave it null on every column a phone-width chart would
+&nbsp; * stack numerals in; the bar heights already carry the comparison.
 &nbsp; */
-<b class="fc">&nbsp;private val REVEAL_WIDTH = 84.dp</b>
+&nbsp;data class SurferBarColumn(
+&nbsp;    val label: String,
+&nbsp;    val bars: List&lt;SurferBar&gt;,
+&nbsp;    val contentDescription: String,
+&nbsp;    val valueLabel: String? = null,
+&nbsp;    val emphasised: Boolean = false,
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * A transaction row that can be swiped left to delete, with the deletion routed through a
-&nbsp; * confirmation dialog and (via the caller) an Undo snackbar.
+&nbsp; * Bar columns scaled against the tallest bar in the set — the treatment `SurferCategoryTrendCard`
+&nbsp; * was built with, generalised to any number of bars per column so an income-vs-expense chart can
+&nbsp; * reuse it instead of reaching for a charting library. KoalaPlot stays confined to
+&nbsp; * `SurferBalanceChartCard`, the one line/area component that needs it.
 &nbsp; *
-&nbsp; * Two details that are easy to get wrong and are handled here rather than at each call site:
+&nbsp; * Scaling against the set&#39;s own maximum rather than an absolute ceiling is what lets a quiet
+&nbsp; * category (or a quiet half-year) still read as a shape instead of a flat line. A set that is
+&nbsp; * entirely zero draws every bar at the floor height instead of dividing by zero, which is the honest
+&nbsp; * picture for a period nothing was booked in.
 &nbsp; *
-&nbsp; * - The row is filled with the surface colour. [SurferTransactionLine] draws no background of its
-&nbsp; *   own, so without this the Delete button underneath shows straight through the text as the row
-&nbsp; *   slides.
-&nbsp; * - The gesture is also published as a custom accessibility action, since a horizontal drag is not
-&nbsp; *   something a screen reader user can perform. That is the non-gesture equivalent — no extra
-&nbsp; *   visible affordance is added for it.
-&nbsp; *
-&nbsp; * The confirmation is kept even though an Undo follows it: deleting is confirmed everywhere else
-&nbsp; * in the app, and a swipe is easy enough to trigger by accident while scrolling that the dialog is
-&nbsp; * also what tells a mis-swipe apart from an intent.
-&nbsp; *
-&nbsp; * @param transactionTitle the row&#39;s title, shown in the dialog so the user can see which row is
-&nbsp; *   about to go; blank falls back to the dialog&#39;s generic wording.
-&nbsp; * @param isTransfer whether the row is one leg of a transfer, which both legs of are deleted
-&nbsp; *   together — the dialog says so.
-&nbsp; * @param isSplit whether the row stands for a receipt split across categories, every leg of which
-&nbsp; *   is deleted together — the dialog says so.
+&nbsp; * A column&#39;s bars are drawn solid when it is [SurferBarColumn.emphasised] and tinted back behind an
+&nbsp; * outline when it is not, so emphasis survives at any number of bars per column.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferSwipeToDeleteTransaction(
-&nbsp;    transactionTitle: String,
-&nbsp;    onDelete: () -&gt; Unit,
+&nbsp;fun SurferBarColumns(
+&nbsp;    columns: List&lt;SurferBarColumn&gt;,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    isTransfer: Boolean = false,</b>
-<b class="fc">&nbsp;    isSplit: Boolean = false,</b>
-&nbsp;    content: @Composable () -&gt; Unit,
 <b class="pc">&nbsp;) {</b>
-&nbsp;    // Survives configuration changes and process death: the dialog is a question already put to
-&nbsp;    // the user, and re-asking it (or worse, dropping it) on rotation loses their place.
-<b class="fc">&nbsp;    var showConfirmation by rememberSaveable { mutableStateOf(false) }</b>
-<b class="fc">&nbsp;    val deleteLabel = stringResource(Res.string.uikit_transaction_delete)</b>
-&nbsp;
-<b class="fc">&nbsp;    SurferSwipeRevealRow(</b>
-<b class="fc">&nbsp;        revealWidth = REVEAL_WIDTH,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        accessibilityActions = listOf(</b>
-<b class="fc">&nbsp;            SurferSwipeAccessibilityAction(label = deleteLabel) { showConfirmation = true },</b>
-&nbsp;        ),
-<b class="fc">&nbsp;        actions = {</b>
-<b class="fc">&nbsp;            SurferSwipeAction(</b>
-<b class="fc">&nbsp;                icon = SurferIcons.Delete,</b>
-<b class="fc">&nbsp;                label = deleteLabel,</b>
-<b class="fc">&nbsp;                onClick = { showConfirmation = true },</b>
-<b class="fc">&nbsp;                destructive = true,</b>
+<b class="pc">&nbsp;    val max = columns.maxOfOrNull { column -&gt; column.bars.maxOfOrNull { it.value } ?: 0L } ?: 0L</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth().height(ChartHeight),</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(ColumnSpacing),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.Bottom,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        columns.forEach { column -&gt;</b>
+<b class="fc">&nbsp;            BarColumn(</b>
+<b class="fc">&nbsp;                column = column,</b>
+<b class="fc">&nbsp;                max = max,</b>
+<b class="fc">&nbsp;                modifier = Modifier.weight(1f).fillMaxHeight(),</b>
 &nbsp;            )
-&nbsp;        },
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        Box(modifier = Modifier.background(AppTheme.materialColors.surface)) {</b>
-<b class="fc">&nbsp;            content()</b>
 <b class="fc">&nbsp;        }</b>
-&nbsp;    }
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
-<b class="pc">&nbsp;    if (showConfirmation) {</b>
-<b class="nc">&nbsp;        SurferDeleteTransactionDialog(</b>
-<b class="nc">&nbsp;            titleOrNull = transactionTitle.takeIf { it.isNotBlank() },</b>
-<b class="nc">&nbsp;            onConfirm = {</b>
-<b class="nc">&nbsp;                showConfirmation = false</b>
-<b class="nc">&nbsp;                onDelete()</b>
-&nbsp;            },
-<b class="nc">&nbsp;            onDismiss = { showConfirmation = false },</b>
-<b class="nc">&nbsp;            isTransfer = isTransfer,</b>
-<b class="nc">&nbsp;            isSplit = isSplit,</b>
+&nbsp;@Composable
+&nbsp;private fun BarColumn(
+&nbsp;    column: SurferBarColumn,
+&nbsp;    max: Long,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val labelColor = if (column.emphasised) {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSurface</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSurfaceVariant</b>
+&nbsp;    }
+<b class="fc">&nbsp;    Column(</b>
+<b class="pc">&nbsp;        modifier = modifier.clearAndSetSemantics {</b>
+<b class="fc">&nbsp;            contentDescription = column.contentDescription</b>
+&nbsp;        },
+<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;        verticalArrangement = Arrangement.Bottom,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (column.valueLabel != null) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = column.valueLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelSmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                fontWeight = FontWeight.SemiBold,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Spacer(Modifier.height(ValueSpacing))</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Row(</b>
+<b class="fc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;            horizontalArrangement = Arrangement.spacedBy(BarSpacing),</b>
+<b class="fc">&nbsp;            verticalAlignment = Alignment.Bottom,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            column.bars.forEach { bar -&gt;</b>
+<b class="fc">&nbsp;                Bar(</b>
+<b class="fc">&nbsp;                    bar = bar,</b>
+<b class="fc">&nbsp;                    fraction = if (max &gt; 0L) bar.value.toFloat() / max else 0f,</b>
+<b class="fc">&nbsp;                    emphasised = column.emphasised,</b>
+<b class="fc">&nbsp;                    modifier = Modifier.weight(1f),</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Spacer(Modifier.height(LabelSpacing))</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = column.label,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelSmall,</b>
+<b class="fc">&nbsp;            color = labelColor,</b>
+<b class="fc">&nbsp;            fontWeight = if (column.emphasised) FontWeight.SemiBold else FontWeight.Normal,</b>
+<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
 &nbsp;        )
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun Bar(
+&nbsp;    bar: SurferBar,
+&nbsp;    fraction: Float,
+&nbsp;    emphasised: Boolean,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .height(barHeight(fraction))</b>
+<b class="fc">&nbsp;            .clip(AppTheme.shapes.extraSmall)</b>
+<b class="fc">&nbsp;            .background(if (emphasised) bar.tint else bar.tint.copy(alpha = InactiveBarAlpha))</b>
+<b class="fc">&nbsp;            .then(</b>
+<b class="fc">&nbsp;                if (emphasised) {</b>
+<b class="fc">&nbsp;                    Modifier</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    Modifier.border(</b>
+<b class="fc">&nbsp;                        width = 1.dp,</b>
+<b class="fc">&nbsp;                        color = bar.tint.copy(alpha = InactiveBorderAlpha),</b>
+<b class="fc">&nbsp;                        shape = AppTheme.shapes.extraSmall,</b>
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            ),
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Header every chart card shares: the title, and an optional caption pinned to its baseline —
+&nbsp; * an average, a total, whatever one number frames the shape below it.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SurferChartCardHeader(
+&nbsp;    title: String,
+&nbsp;    trailingLabel: String?,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Row(modifier = modifier, verticalAlignment = Alignment.Bottom) {</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = title,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        if (trailingLabel != null) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = trailingLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** Keeps an empty column visible as a stub rather than collapsing it to nothing. */
+&nbsp;private fun barHeight(fraction: Float) =
+<b class="fc">&nbsp;    MinBarHeight + (MaxBarHeight - MinBarHeight) * fraction.coerceIn(0f, 1f)</b>
+&nbsp;
+&nbsp;/** Gap between the header and the columns — shared so two chart cards cannot drift apart. */
+<b class="fc">&nbsp;internal val ChartHeaderSpacing = 14.dp</b>
+&nbsp;
+<b class="fc">&nbsp;private val ChartHeight = 132.dp</b>
+<b class="fc">&nbsp;private val MinBarHeight = 3.dp</b>
+<b class="fc">&nbsp;private val MaxBarHeight = 92.dp</b>
+<b class="fc">&nbsp;private val ColumnSpacing = 8.dp</b>
+<b class="fc">&nbsp;private val BarSpacing = 3.dp</b>
+<b class="fc">&nbsp;private val LabelSpacing = 6.dp</b>
+<b class="fc">&nbsp;private val ValueSpacing = 4.dp</b>
+&nbsp;private const val InactiveBarAlpha = 0.28f
+&nbsp;private const val InactiveBorderAlpha = 0.45f
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferBarColumnsPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.fillMaxWidth(),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(24.dp),
+&nbsp;        ) {
+&nbsp;            SurferBarColumns(
+&nbsp;                columns = listOf(20_500L, 19_200L, 24_000L, 16_855L).mapIndexed { index, value -&gt;
+&nbsp;                    SurferBarColumn(
+&nbsp;                        label = &quot;M$index&quot;,
+&nbsp;                        bars = listOf(SurferBar(value, AppTheme.semanticColors.expense)),
+&nbsp;                        contentDescription = &quot;M$index: $value&quot;,
+&nbsp;                        emphasised = index == 3,
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;            SurferBarColumns(
+&nbsp;                columns = List(4) { index -&gt;
+&nbsp;                    SurferBarColumn(
+&nbsp;                        label = &quot;M$index&quot;,
+&nbsp;                        bars = listOf(
+&nbsp;                            SurferBar(30_000L, AppTheme.semanticColors.income),
+&nbsp;                            SurferBar(12_000L * (index + 1), AppTheme.semanticColors.expense),
+&nbsp;                        ),
+&nbsp;                        contentDescription = &quot;M$index&quot;,
+&nbsp;                        emphasised = index == 3,
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -219,7 +367,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

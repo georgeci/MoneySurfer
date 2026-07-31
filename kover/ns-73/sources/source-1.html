@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > KermitSyncTelemetry</title>
+  <title>MoneySurfer Coverage Report > NetworkWaitMode</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.telemetry</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.network</a>
 </div>
 
-<h1>Coverage Summary for Class: KermitSyncTelemetry (com.georgeci.moneysurfer.sync.internal.telemetry)</h1>
+<h1>Coverage Summary for Class: NetworkWaitMode (com.georgeci.moneysurfer.sync.internal.network)</h1>
 
 <table class="coverageStats">
 
@@ -45,37 +45,61 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">KermitSyncTelemetry</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (12/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (88/88)
-  </span>
-</td>
-</tr>
   <tr>
-    <td class="name">KermitSyncTelemetry$Companion</td>
+    <td class="name">NetworkWaitMode$Bounded</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NetworkWaitMode$Indefinite</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -84,7 +108,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -93,7 +117,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -101,7 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (88/88)
+    (9/9)
   </span>
 </td>
 </tr>
@@ -112,70 +136,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.telemetry
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.network
 &nbsp;
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncRequestId
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncStep
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
-&nbsp;import com.georgeci.moneysurfer.sync.telemetry.SyncTelemetry
-&nbsp;import org.koin.core.annotation.Single
 &nbsp;import kotlin.time.Duration
+&nbsp;import kotlin.time.Duration.Companion.minutes
+&nbsp;import kotlin.time.Duration.Companion.seconds
 &nbsp;
 &nbsp;/**
-&nbsp; * Structured logging via Kermit. Tag `SyncTelemetry`, prefix
-&nbsp; * `[req=…]` so a single sync run can be grep&#39;d across noisy logs.
+&nbsp; * Policy for how long the coordinator should wait for the network to come back
+&nbsp; * before failing with [com.georgeci.moneysurfer.sync.api.SyncError.NetworkUnavailable].
 &nbsp; *
-&nbsp; * Step-level events go to debug; lifecycle (started / completed / failed /
-&nbsp; * cancelled) goes to info. Failure carries the typed [SyncError] for grepping
-&nbsp; * by class.
+&nbsp; * - [Indefinite] — wait forever; the user can cancel via [com.georgeci.moneysurfer.sync.coordinator.SyncHandle.cancel].
+&nbsp; * - [Bounded] — fail after `timeout` elapses.
+&nbsp; *
+&nbsp; * See SyncCoordinatorFAQ.md №9.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [SyncTelemetry::class])</b>
-&nbsp;class KermitSyncTelemetry : SyncTelemetry {
+&nbsp;sealed interface NetworkWaitMode {
+<b class="fc">&nbsp;    data object Indefinite : NetworkWaitMode</b>
+<b class="fc">&nbsp;    data class Bounded(val timeout: Duration) : NetworkWaitMode</b>
+&nbsp;}
 &nbsp;
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;fun SyncReason.toNetworkWaitMode(): NetworkWaitMode = when (this) {
+&nbsp;    SyncReason.BACKGROUND -&gt; NetworkWaitMode.Bounded(5.minutes)
+&nbsp;    SyncReason.APP_START -&gt; NetworkWaitMode.Bounded(30.seconds)
+&nbsp;    SyncReason.FOREGROUND,
+&nbsp;    SyncReason.MANUAL,
+&nbsp;    SyncReason.SWIPE_REFRESH,
+&nbsp;    SyncReason.LOCAL_CHANGE,
+&nbsp;    -&gt; NetworkWaitMode.Indefinite
+&nbsp;}
 &nbsp;
-&nbsp;    override fun onSyncStarted(
-&nbsp;        requestId: SyncRequestId,
-&nbsp;        reasons: Set&lt;SyncReason&gt;,
-&nbsp;        scope: SyncScope,
-&nbsp;    ) {
-<b class="fc">&nbsp;        log.i { &quot;[req=${requestId.value}] started reasons=$reasons scope=$scope&quot; }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun onStepEntered(requestId: SyncRequestId, step: SyncStep) {
-<b class="fc">&nbsp;        log.d { &quot;[req=${requestId.value}] step=${step::class.simpleName}&quot; }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun onSyncCompleted(
-&nbsp;        requestId: SyncRequestId,
-&nbsp;        summary: SyncSummary,
-&nbsp;        duration: Duration,
-&nbsp;    ) {
-<b class="fc">&nbsp;        log.i {</b>
-<b class="fc">&nbsp;            &quot;[req=${requestId.value}] completed in $duration &quot; +</b>
-<b class="fc">&nbsp;                &quot;uploaded=${summary.uploadedCount} downloaded=${summary.downloadedCount} &quot; +</b>
-<b class="fc">&nbsp;                &quot;conflicts=${summary.conflictCount} recalculated=${summary.recalculatedCount}&quot;</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun onSyncFailed(requestId: SyncRequestId, error: SyncError, duration: Duration) {
-<b class="fc">&nbsp;        log.w {</b>
-<b class="fc">&nbsp;            &quot;[req=${requestId.value}] failed in $duration &quot; +</b>
-<b class="fc">&nbsp;                &quot;error=${error::class.simpleName} retryable=${error.isRetryable}&quot;</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun onSyncCancelled(requestId: SyncRequestId, duration: Duration) {
-<b class="fc">&nbsp;        log.i { &quot;[req=${requestId.value}] cancelled after $duration&quot; }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;SyncTelemetry&quot;
-&nbsp;    }
+&nbsp;/**
+&nbsp; * Merges wait modes from a set of reasons (when multiple sync requests are merged):
+&nbsp; * picks the strictest (smallest) bounded timeout, otherwise [Indefinite].
+&nbsp; */
+&nbsp;fun Set&lt;SyncReason&gt;.toNetworkWaitMode(): NetworkWaitMode {
+&nbsp;    val boundedMin = this
+&nbsp;        .map { it.toNetworkWaitMode() }
+&nbsp;        .filterIsInstance&lt;NetworkWaitMode.Bounded&gt;()
+&nbsp;        .minByOrNull { it.timeout.inWholeMilliseconds }
+&nbsp;    return boundedMin ?: NetworkWaitMode.Indefinite
 &nbsp;}
 </code>
 </pre>
@@ -200,7 +201,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

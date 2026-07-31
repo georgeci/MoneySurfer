@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > AppShellViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+</div>
+
+<h1>Coverage Summary for Class: AppShellViewModel (com.georgeci.moneysurfer.navigation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">AppShellViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (41/41)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AppShellViewModel$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AppShellViewModel$identity$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (50/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+&nbsp;
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import androidx.lifecycle.viewModelScope
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.User
+&nbsp;import com.georgeci.moneysurfer.domain.model.Workspace
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import kotlinx.coroutines.flow.SharingStarted
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.stateIn
+&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;
+&nbsp;/** Who the navigation drawer&#39;s footer names. Both lines are absent until the session resolves. */
+&nbsp;data class AppShellIdentity(
+&nbsp;    val userName: String? = null,
+&nbsp;    val workspaceName: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The identity block the wide-window drawer pins to its bottom (issue #389).
+&nbsp; *
+&nbsp; * Only the drawer presentation collects it, so on a phone or a rail the repositories below are
+&nbsp; * never subscribed. Both tables hold a handful of rows, so the whole-table flows are cheaper than
+&nbsp; * they look and keep the footer reactive to a rename — the suspend `getById` pair would only
+&nbsp; * re-read when a session pointer changed.
+&nbsp; */
+<b class="fc">&nbsp;@KoinViewModel</b>
+&nbsp;class AppShellViewModel(
+&nbsp;    session: SessionPointers,
+&nbsp;    userRepository: UserRepository,
+&nbsp;    workspaceRepository: WorkspaceRepository,
+<b class="fc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
+&nbsp;) : ViewModel() {
+&nbsp;
+<b class="fc">&nbsp;    val identity: StateFlow&lt;AppShellIdentity&gt; = combine(</b>
+<b class="fc">&nbsp;        session.currentUserId,</b>
+<b class="fc">&nbsp;        session.currentWorkspaceId,</b>
+<b class="fc">&nbsp;        userRepository.getAll(),</b>
+<b class="fc">&nbsp;        workspaceRepository.getAll(),</b>
+&nbsp;    ) { userId, workspaceId, users, workspaces -&gt;
+<b class="fc">&nbsp;        resolveShellIdentity(</b>
+<b class="fc">&nbsp;            userId = userId,</b>
+<b class="fc">&nbsp;            workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;            users = users,</b>
+<b class="fc">&nbsp;            workspaces = workspaces,</b>
+<b class="fc">&nbsp;            providerEmail = authRemoteRepository.currentEmail(),</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }.stateIn(</b>
+<b class="fc">&nbsp;        scope = viewModelScope,</b>
+<b class="fc">&nbsp;        started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MILLIS),</b>
+<b class="fc">&nbsp;        initialValue = AppShellIdentity(),</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The footer&#39;s two lines from one snapshot of the session — the policy on its own, so it can be
+&nbsp; * tested without a view model scope, as [resolveStartRoute] is.
+&nbsp; *
+&nbsp; * The local user row is a cache and an FK target, so it reliably carries only the display name;
+&nbsp; * the email is the auth provider&#39;s to answer for, which is where `SettingsViewModel` reads it too.
+&nbsp; * Both null — an anonymous session that never picked a name — leaves [AppShellIdentity.userName]
+&nbsp; * null, and the drawer names the user itself rather than rendering an empty line.
+&nbsp; */
+&nbsp;internal fun resolveShellIdentity(
+&nbsp;    userId: UserId?,
+&nbsp;    workspaceId: WorkspaceId?,
+&nbsp;    users: List&lt;User&gt;,
+&nbsp;    workspaces: List&lt;Workspace&gt;,
+&nbsp;    providerEmail: String?,
+&nbsp;): AppShellIdentity = AppShellIdentity(
+&nbsp;    userName = users.firstOrNull { it.id == userId }?.displayName?.takeIf { it.isNotBlank() }
+&nbsp;        ?: providerEmail?.takeIf { it.isNotBlank() },
+&nbsp;    workspaceName = workspaces.firstOrNull { it.id == workspaceId }?.name,
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
+</div>
+</body>
+</html>

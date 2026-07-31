@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SelectWorkspaceUseCase</title>
+  <title>MoneySurfer Coverage Report > RestoreTransactionsUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: SelectWorkspaceUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: RestoreTransactionsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SelectWorkspaceUseCase</td>
+  <td class="name">RestoreTransactionsUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,12 +55,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,24 +69,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (121/121)
+    (42/42)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SelectWorkspaceUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SelectWorkspaceUseCase$invoke$1</td>
+    <td class="name">RestoreTransactionsUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -98,12 +87,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,15 +101,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (121/121)
+    (42/42)
   </span>
 </td>
 </tr>
@@ -132,57 +114,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
-&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Pins [workspaceId] as the active workspace.
+&nbsp; * Puts back what [DeleteTransactionUseCase] removed — the Undo half of a delete.
 &nbsp; *
-&nbsp; *  1. Local: writes `session.currentWorkspaceId` (DataStore). This is what `Get*UseCase`s
-&nbsp; *     observe; the active screens repaint immediately.
-&nbsp; *  2. Remote (best-effort): pushes `users/{uid}.defaultWorkspaceId` so a fresh device after
-&nbsp; *     re-login lands on the same workspace without prompting the selector. Skipped for the
-&nbsp; *     local/demo session (no Firebase uid). Network failures are swallowed — the local
-&nbsp; *     pointer remains source of truth for the running session.
+&nbsp; * Since issue #346 a delete only tombstones the row, so this lifts the tombstone rather than
+&nbsp; * re-inserting anything: one UPDATE per row, no round trip through insert, and the id, the
+&nbsp; * `createdAt` and every field the user typed come back untouched because they never left. Only the
+&nbsp; * ids of [transactions] are read — the copies themselves are how the caller remembers *which* rows
+&nbsp; * to bring back, not the data being restored.
+&nbsp; *
+&nbsp; * Going through [ApplyTransactionChangeUseCase] rather than the repository is still the point:
+&nbsp; * account balances, the outbox and the search index all move with the row, exactly as they did on
+&nbsp; * the way out. Restoring a transfer therefore restores both of its legs together, because the
+&nbsp; * delete handed both of them over.
+&nbsp; *
+&nbsp; * A row that is no longer tombstoned — already restored, or purged once its retention window ran
+&nbsp; * out — is skipped rather than recreated, so a doubled Undo cannot credit an account twice.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class SelectWorkspaceUseCase(
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
-<b class="fc">&nbsp;    private val userRemoteRepository: UserRemoteRepository,</b>
+&nbsp;class RestoreTransactionsUseCase(
+<b class="fc">&nbsp;    private val applyTransactionChange: ApplyTransactionChangeUseCase,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
 &nbsp;
-&nbsp;    suspend operator fun invoke(workspaceId: WorkspaceId) {
-<b class="fc">&nbsp;        sessionMutator.setCurrentWorkspace(workspaceId)</b>
-&nbsp;
-<b class="fc">&nbsp;        val firebaseUid = session.currentFirebaseUid.first()</b>
-<b class="fc">&nbsp;        if (firebaseUid != null) {</b>
-<b class="fc">&nbsp;            Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, workspaceId) }</b>
-<b class="fc">&nbsp;                .onLeft {</b>
-<b class="fc">&nbsp;                    log.w(it) {</b>
-<b class="fc">&nbsp;                        &quot;[remote] setDefaultWorkspace failed uid=${firebaseUid.redactUid()} wid=${workspaceId.value}&quot;</b>
-&nbsp;                    }
-<b class="fc">&nbsp;                }</b>
-<b class="fc">&nbsp;                .onRight {</b>
-<b class="fc">&nbsp;                    log.i {</b>
-<b class="fc">&nbsp;                        &quot;[remote] setDefaultWorkspace ok uid=${firebaseUid.redactUid()} wid=${workspaceId.value}&quot;</b>
-&nbsp;                    }
-<b class="fc">&nbsp;                }</b>
-&nbsp;        } else {
-<b class="fc">&nbsp;            log.i { &quot;[remote] skipped (no Firebase uid — local/demo session)&quot; }</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;SelectWorkspace&quot;
+&nbsp;    suspend operator fun invoke(transactions: List&lt;Transaction&gt;) {
+<b class="fc">&nbsp;        transactions.forEach { applyTransactionChange.restore(it.id) }</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -208,7 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

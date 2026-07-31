@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncSummaryBuilder</title>
+  <title>MoneySurfer Coverage Report > SyncDatabaseBuilder_androidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncSummaryBuilder (com.georgeci.moneysurfer.sync.internal)</h1>
+<h1>Coverage Summary for Class: SyncDatabaseBuilder_androidKt (com.georgeci.moneysurfer.sync.db)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncSummaryBuilder</td>
+  <td class="name">SyncDatabaseBuilder_androidKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (10/10)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (37/37)
+    (0/13)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">SyncDatabaseBuilder_androidKt$getSyncDatabaseBuilder$$inlined$databaseBuilder$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,27 +120,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
+&nbsp;import android.content.Context
+&nbsp;import androidx.room.Room
+&nbsp;import androidx.room.RoomDatabase
 &nbsp;
-<b class="fc">&nbsp;internal class SyncSummaryBuilder {</b>
-&nbsp;    private var uploadedCount: Int = 0
-&nbsp;    private var downloadedCount: Int = 0
-&nbsp;    private var conflictCount: Int = 0
-&nbsp;    private var recalculatedCount: Int = 0
-&nbsp;
-<b class="fc">&nbsp;    fun addUpload(count: Int) { uploadedCount += count }</b>
-<b class="fc">&nbsp;    fun addDownload(count: Int) { downloadedCount += count }</b>
-<b class="fc">&nbsp;    fun addConflicts(count: Int) { conflictCount += count }</b>
-<b class="fc">&nbsp;    fun addRecalculated(count: Int) { recalculatedCount += count }</b>
-&nbsp;
-<b class="fc">&nbsp;    fun build(): SyncSummary = SyncSummary(</b>
-<b class="fc">&nbsp;        uploadedCount = uploadedCount,</b>
-<b class="fc">&nbsp;        downloadedCount = downloadedCount,</b>
-<b class="fc">&nbsp;        conflictCount = conflictCount,</b>
-<b class="fc">&nbsp;        recalculatedCount = recalculatedCount,</b>
-&nbsp;    )
+&nbsp;fun getSyncDatabaseBuilder(context: Context): RoomDatabase.Builder&lt;SyncDatabase&gt; {
+<b class="nc">&nbsp;    val dbPath = context.getDatabasePath(SYNC_DB_NAME).absolutePath</b>
+<b class="nc">&nbsp;    return Room.databaseBuilder&lt;SyncDatabase&gt;(context, dbPath)</b>
 &nbsp;}
 </code>
 </pre>
@@ -137,7 +153,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

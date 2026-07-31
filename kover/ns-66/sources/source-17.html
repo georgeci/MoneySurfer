@@ -1,0 +1,435 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferPaneSceneStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferPaneSceneStrategy (com.georgeci.moneysurfer.navigation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferPaneSceneStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.5%
+  </span>
+  <span class="absValue">
+    (2/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.2%
+  </span>
+  <span class="absValue">
+    (10/160)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SurferPaneSceneStrategy$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (56/56)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.7%
+  </span>
+  <span class="absValue">
+    (12/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.6%
+  </span>
+  <span class="absValue">
+    (66/216)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.WindowInsets
+&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
+&nbsp;import androidx.compose.foundation.layout.only
+&nbsp;import androidx.compose.foundation.layout.safeDrawing
+&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
+&nbsp;import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+&nbsp;import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+&nbsp;import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
+&nbsp;import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
+&nbsp;import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+&nbsp;import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.CompositionLocalProvider
+&nbsp;import androidx.compose.runtime.Immutable
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.navigation3.runtime.NavEntry
+&nbsp;import androidx.navigation3.scene.Scene
+&nbsp;import androidx.navigation3.scene.SceneStrategy
+&nbsp;import androidx.navigation3.scene.SceneStrategyScope
+&nbsp;import com.georgeci.moneysurfer.uikit.window.LocalSurferPane
+&nbsp;import com.georgeci.moneysurfer.uikit.window.SurferPane
+&nbsp;import com.georgeci.moneysurfer.uikit.window.SurferPaneRole
+&nbsp;import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+&nbsp;import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
+&nbsp;
+&nbsp;/** Horizontal partitions the scaffold is allowed when the inline panel is on screen. */
+&nbsp;private const val InlinePanelPartitions = 3
+&nbsp;
+&nbsp;/**
+&nbsp; * Creates and remembers the app&#39;s [SurferPaneSceneStrategy].
+&nbsp; *
+&nbsp; * Two delegates rather than one: the Material directive derived from the window caps the scaffold
+&nbsp; * at two horizontal partitions (its default breakpoint set stops at Expanded, so the third
+&nbsp; * partition it would grant a Large window never materialises), and raising that cap unconditionally
+&nbsp; * would hand every section a third column it has nothing to put in. The wider directive is
+&nbsp; * therefore used only for the scenes that actually carry an inline panel.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+&nbsp;@Composable
+&nbsp;fun &lt;T : Any&gt; rememberSurferPaneSceneStrategy(): SurferPaneSceneStrategy&lt;T&gt; {
+&nbsp;    val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
+&nbsp;    val delegate = rememberListDetailSceneStrategy&lt;T&gt;(directive = directive)
+&nbsp;    val inlinePanelDelegate = rememberListDetailSceneStrategy&lt;T&gt;(
+&nbsp;        directive = directive.copy(maxHorizontalPartitions = InlinePanelPartitions),
+&nbsp;    )
+&nbsp;    val inlinePanelSupported = currentSurferWindowSize() &gt;= SurferWindowSize.Large
+&nbsp;    return remember(delegate, inlinePanelDelegate, inlinePanelSupported) {
+&nbsp;        SurferPaneSceneStrategy(
+&nbsp;            delegate = delegate,
+&nbsp;            inlinePanelDelegate = inlinePanelDelegate,
+&nbsp;            inlinePanelSupported = inlinePanelSupported,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The app&#39;s list-detail pane host: [ListDetailSceneStrategy] plus the two things the screens
+&nbsp; * inside it cannot work out for themselves (issue #388).
+&nbsp; *
+&nbsp; * 1. It tells every entry which pane it landed in, through [LocalSurferPane], so the detail pane
+&nbsp; *    stops drawing a second top app bar, a second back arrow and a second FAB next to the list
+&nbsp; *    pane that already draws all three.
+&nbsp; * 2. It pads the horizontal `safeDrawing` insets once, around the whole scaffold, and thereby
+&nbsp; *    consumes them for both panes. Applied per pane — which is what `surferSafeInsets()` used to
+&nbsp; *    do — the list pane padded its right edge and the detail pane its left, interior edges with
+&nbsp; *    no system inset behind them.
+&nbsp; *
+&nbsp; * Below the two-pane breakpoint the delegate declines the scene (it is constructed with
+&nbsp; * `shouldHandleSinglePaneLayout = false`), this strategy declines with it, and nothing above is
+&nbsp; * applied — compact-width behaviour is untouched, down to the composition local&#39;s default.
+&nbsp; *
+&nbsp; * @param inlinePanelDelegate the delegate used for scenes carrying an [extraPane] entry, which
+&nbsp; *   needs a third horizontal partition the plain [delegate] does not grant.
+&nbsp; * @param inlinePanelSupported whether the window is wide enough for that third column. Below it an
+&nbsp; *   [extraPane] entry makes this strategy decline the whole scene, so the panel falls through to
+&nbsp; *   the next strategy and renders as the full-screen route it is on a phone.
+&nbsp; */
+<b class="nc">&nbsp;@OptIn(ExperimentalMaterial3AdaptiveApi::class)</b>
+&nbsp;class SurferPaneSceneStrategy&lt;T : Any&gt;(
+<b class="nc">&nbsp;    private val delegate: ListDetailSceneStrategy&lt;T&gt;,</b>
+<b class="nc">&nbsp;    private val inlinePanelDelegate: ListDetailSceneStrategy&lt;T&gt; = delegate,</b>
+<b class="nc">&nbsp;    private val inlinePanelSupported: Boolean = false,</b>
+&nbsp;) : SceneStrategy&lt;T&gt; {
+&nbsp;
+&nbsp;    override fun SceneStrategyScope&lt;T&gt;.calculateScene(entries: List&lt;NavEntry&lt;T&gt;&gt;): Scene&lt;T&gt;? {
+<b class="nc">&nbsp;        val roles = entries.surferPaneGroup().mapNotNull { it.declaredPaneRole() }</b>
+<b class="nc">&nbsp;        val hasInlinePanel = SurferPaneRole.Extra in roles</b>
+&nbsp;        // The panel is the third column of a list + detail + panel layout. Anything less — a
+&nbsp;        // narrow window, or a panel opened without both of the others behind it — has no place to
+&nbsp;        // put it, and it is better off as the full-screen form it already is everywhere else.
+<b class="nc">&nbsp;        val panelFits = inlinePanelSupported &amp;&amp;</b>
+<b class="nc">&nbsp;            SurferPaneRole.List in roles &amp;&amp;</b>
+<b class="nc">&nbsp;            SurferPaneRole.Detail in roles</b>
+<b class="nc">&nbsp;        if (hasInlinePanel &amp;&amp; !panelFits) return null</b>
+&nbsp;
+<b class="nc">&nbsp;        val panes = entries.calculateSurferPanes()</b>
+<b class="nc">&nbsp;        val decorated = entries.map { entry -&gt;</b>
+<b class="nc">&nbsp;            val pane = panes[entry.contentKey] ?: return@map entry</b>
+<b class="nc">&nbsp;            NavEntry(navEntry = entry) {</b>
+<b class="nc">&nbsp;                CompositionLocalProvider(LocalSurferPane provides pane) { entry.Content() }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        val strategy = if (hasInlinePanel) inlinePanelDelegate else delegate</b>
+<b class="nc">&nbsp;        val scene = calculateScene(strategy, decorated) ?: return null</b>
+<b class="nc">&nbsp;        return SurferPaneScene(delegate = scene, originals = entries.associateBy { it.contentKey })</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /**
+&nbsp;         * Preferred width of a list pane, pinned to the design&#39;s 270–320 dp range (wireframe 270,
+&nbsp;         * hi-fi 300, direction D 320) instead of the 360 dp the Material directive defaults to.
+&nbsp;         */
+<b class="fc">&nbsp;        val ListPanePreferredWidth: Dp = 300.dp</b>
+&nbsp;
+&nbsp;        /** Preferred width of an [extraPane], from the design&#39;s 300–340 dp add-panel column. */
+<b class="fc">&nbsp;        val InlinePanelPreferredWidth: Dp = 340.dp</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Marks a [NavEntry] as the list pane of a list-detail layout, showing [detailPlaceholder]
+&nbsp;         * beside it while nothing is selected.
+&nbsp;         */
+&nbsp;        @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+<b class="fc">&nbsp;        fun listPane(</b>
+&nbsp;            detailPlaceholder: @Composable ThreePaneScaffoldScope.() -&gt; Unit = {},
+&nbsp;        ): Map&lt;String, Any&gt; =
+<b class="fc">&nbsp;            ListDetailSceneStrategy.listPane(detailPlaceholder = detailPlaceholder) +</b>
+<b class="fc">&nbsp;                ListDetailSceneStrategy.preferredPaneSize(width = ListPanePreferredWidth) +</b>
+<b class="fc">&nbsp;                (PaneRoleKey to SurferPaneRole.List)</b>
+&nbsp;
+&nbsp;        /** Marks a [NavEntry] as a detail pane of a list-detail layout. */
+&nbsp;        @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+&nbsp;        fun detailPane(): Map&lt;String, Any&gt; =
+<b class="fc">&nbsp;            ListDetailSceneStrategy.detailPane() + (PaneRoleKey to SurferPaneRole.Detail)</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Marks a [NavEntry] as the inline panel displayed beside the detail pane it was opened
+&nbsp;         * from — the design&#39;s &quot;inline add panel (no modal)&quot; (issue #391).
+&nbsp;         *
+&nbsp;         * Only honoured on a window wide enough for three columns, and only on top of a full list
+&nbsp;         * plus detail stack; everywhere else the entry is presented as an ordinary route.
+&nbsp;         */
+&nbsp;        @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+&nbsp;        fun extraPane(): Map&lt;String, Any&gt; =
+<b class="fc">&nbsp;            ListDetailSceneStrategy.extraPane() +</b>
+<b class="fc">&nbsp;                ListDetailSceneStrategy.preferredPaneSize(width = InlinePanelPreferredWidth) +</b>
+<b class="fc">&nbsp;                (PaneRoleKey to SurferPaneRole.Extra)</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Our own copy of the pane role. The delegate&#39;s metadata carries the same information, but
+&nbsp;         * in `internal` classes this module cannot read.
+&nbsp;         */
+&nbsp;        internal const val PaneRoleKey = &quot;com.georgeci.moneysurfer.navigation.SurferPaneRole&quot;
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The [SurferPane] each entry belongs to, keyed by `contentKey`, for the entries
+&nbsp; * [ListDetailSceneStrategy] will group into one scaffold — mirroring its own grouping: walk back
+&nbsp; * from the top while entries keep declaring a pane, and stop at the first one that does not.
+&nbsp; *
+&nbsp; * Entries outside that group, and every entry of a group with no list pane in it (a creation form
+&nbsp; * pushed straight from the dashboard, say), are left out of the map and keep the default
+&nbsp; * [SurferPane] — a detail pane with nothing beside it still needs its own chrome to be usable.
+&nbsp; */
+&nbsp;internal fun &lt;T : Any&gt; List&lt;NavEntry&lt;T&gt;&gt;.calculateSurferPanes(): Map&lt;Any, SurferPane&gt; {
+&nbsp;    val group = surferPaneGroup()
+&nbsp;    if (group.none { it.declaredPaneRole() == SurferPaneRole.List }) return emptyMap()
+&nbsp;    var detailSeen = false
+&nbsp;    return group.mapIndexed { index, entry -&gt;
+&nbsp;        val role = requireNotNull(entry.declaredPaneRole())
+&nbsp;        val hasBackStack = when (role) {
+&nbsp;            // Dismissing the panel leaves the list and the detail it was opened from on screen,
+&nbsp;            // so its affordance always goes somewhere.
+&nbsp;            SurferPaneRole.Extra -&gt; true
+&nbsp;            // A detail pane gives up its back affordance when popping would do nothing but swap
+&nbsp;            // it for the placeholder. It keeps one if there is an earlier detail to return to, or
+&nbsp;            // an entry stacked above it that displaced its own list — a list route can be pushed
+&nbsp;            // from a detail (Accounts&#39; &quot;See all&quot; pushes the transactions list), which leaves the
+&nbsp;            // detail beside a list that is not its own, and that still needs a way out. An inline
+&nbsp;            // panel stacked above it does not displace anything and does not count.
+&nbsp;            SurferPaneRole.Detail -&gt; detailSeen || group.displacesFrom(index)
+&nbsp;            SurferPaneRole.List, SurferPaneRole.Single -&gt; false
+&nbsp;        }
+&nbsp;        if (role == SurferPaneRole.Detail) detailSeen = true
+&nbsp;        entry.contentKey to SurferPane(role = role, hasPaneBackStack = hasBackStack)
+&nbsp;    }.toMap()
+&nbsp;}
+&nbsp;
+&nbsp;/** The entries [ListDetailSceneStrategy] will group into one scaffold, oldest first. */
+&nbsp;private fun &lt;T : Any&gt; List&lt;NavEntry&lt;T&gt;&gt;.surferPaneGroup(): List&lt;NavEntry&lt;T&gt;&gt; =
+&nbsp;    takeLastWhile { it.declaredPaneRole() != null }
+&nbsp;
+&nbsp;/** Whether any entry above [index] takes the place of the pane at [index]. */
+&nbsp;private fun &lt;T : Any&gt; List&lt;NavEntry&lt;T&gt;&gt;.displacesFrom(index: Int): Boolean =
+&nbsp;    (index + 1..lastIndex).any { this[it].declaredPaneRole() != SurferPaneRole.Extra }
+&nbsp;
+&nbsp;private fun NavEntry&lt;*&gt;.declaredPaneRole(): SurferPaneRole? =
+&nbsp;    metadata[SurferPaneSceneStrategy.PaneRoleKey] as? SurferPaneRole
+&nbsp;
+&nbsp;/**
+&nbsp; * Calls [strategy]&#39;s scene calculation from inside another strategy&#39;s, naming the delegate
+&nbsp; * explicitly — a plain `with(strategy) { calculateScene(entries) }` inside the caller would have
+&nbsp; * two implicit dispatch receivers carrying that member extension, and the wrong one recurses.
+&nbsp; */
+&nbsp;private fun &lt;T : Any&gt; SceneStrategyScope&lt;T&gt;.calculateScene(
+&nbsp;    strategy: SceneStrategy&lt;T&gt;,
+&nbsp;    entries: List&lt;NavEntry&lt;T&gt;&gt;,
+&nbsp;): Scene&lt;T&gt;? = with(strategy) { calculateScene(entries) }
+&nbsp;
+&nbsp;/**
+&nbsp; * Wraps a list-detail [Scene] to pad the horizontal `safeDrawing` insets once, around both panes.
+&nbsp; *
+&nbsp; * [windowInsetsPadding] also *consumes* what it applies, so the per-screen `surferSafeInsets()`
+&nbsp; * inside each pane contributes nothing horizontally — no change needed in the screens, and no
+&nbsp; * padding on the edge where the two panes meet.
+&nbsp; *
+&nbsp; * @param originals the undecorated entries by `contentKey`. [previousEntries] is fed back through
+&nbsp; *   the strategy chain to build the predictive-back scene; handing back the decorated entries
+&nbsp; *   would wrap them a second time and the stale inner value would win.
+&nbsp; */
+&nbsp;@Immutable
+&nbsp;private class SurferPaneScene&lt;T : Any&gt;(
+&nbsp;    private val delegate: Scene&lt;T&gt;,
+&nbsp;    private val originals: Map&lt;Any, NavEntry&lt;T&gt;&gt;,
+&nbsp;) : Scene&lt;T&gt; {
+&nbsp;
+&nbsp;    override val key: Any get() = delegate.key
+&nbsp;
+&nbsp;    override val entries: List&lt;NavEntry&lt;T&gt;&gt; get() = delegate.entries
+&nbsp;
+&nbsp;    override val previousEntries: List&lt;NavEntry&lt;T&gt;&gt;
+&nbsp;        get() = delegate.previousEntries.map { originals[it.contentKey] ?: it }
+&nbsp;
+&nbsp;    override val metadata: Map&lt;String, Any&gt; get() = delegate.metadata
+&nbsp;
+&nbsp;    override val content: @Composable () -&gt; Unit = {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier.windowInsetsPadding(
+&nbsp;                WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal),
+&nbsp;            ),
+&nbsp;        ) {
+&nbsp;            delegate.content()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun equals(other: Any?): Boolean =
+&nbsp;        this === other || (other is SurferPaneScene&lt;*&gt; &amp;&amp; delegate == other.delegate)
+&nbsp;
+&nbsp;    override fun hashCode(): Int = delegate.hashCode()
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
+</div>
+</body>
+</html>

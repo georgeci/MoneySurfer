@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSafeInsetsKt</title>
+  <title>MoneySurfer Coverage Report > SurferSwipeToDeleteTransactionKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.transaction</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSafeInsetsKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
+<h1>Coverage Summary for Class: SurferSwipeToDeleteTransactionKt (com.georgeci.moneysurfer.uikit.components.transaction)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSafeInsetsKt</td>
+  <td class="name">SurferSwipeToDeleteTransactionKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,27 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    62.5%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    33.3%
   </span>
   <span class="absValue">
-    (27/27)
+    (6/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75.8%
+  </span>
+  <span class="absValue">
+    (25/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78%
+  </span>
+  <span class="absValue">
+    (387/496)
   </span>
 </td>
 </tr>
@@ -92,22 +99,103 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.transaction
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
-&nbsp;import androidx.compose.foundation.layout.only
-&nbsp;import androidx.compose.foundation.layout.safeDrawing
-&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.saveable.rememberSaveable
+&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAccessibilityAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.uikit.generated.resources.Res
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
+&nbsp;/**
+&nbsp; * Total swipe travel: one 72dp action button plus the reveal row&#39;s 6dp gutters. Narrower than the
+&nbsp; * manage screens&#39; two-action track, because a transaction row reveals only Delete.
+&nbsp; */
+<b class="fc">&nbsp;private val REVEAL_WIDTH = 84.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * A transaction row that can be swiped left to delete, with the deletion routed through a
+&nbsp; * confirmation dialog and (via the caller) an Undo snackbar.
+&nbsp; *
+&nbsp; * Two details that are easy to get wrong and are handled here rather than at each call site:
+&nbsp; *
+&nbsp; * - The row is filled with the surface colour. [SurferTransactionLine] draws no background of its
+&nbsp; *   own, so without this the Delete button underneath shows straight through the text as the row
+&nbsp; *   slides.
+&nbsp; * - The gesture is also published as a custom accessibility action, since a horizontal drag is not
+&nbsp; *   something a screen reader user can perform. That is the non-gesture equivalent — no extra
+&nbsp; *   visible affordance is added for it.
+&nbsp; *
+&nbsp; * The confirmation is kept even though an Undo follows it: deleting is confirmed everywhere else
+&nbsp; * in the app, and a swipe is easy enough to trigger by accident while scrolling that the dialog is
+&nbsp; * also what tells a mis-swipe apart from an intent.
+&nbsp; *
+&nbsp; * @param transactionTitle the row&#39;s title, shown in the dialog so the user can see which row is
+&nbsp; *   about to go; blank falls back to the dialog&#39;s generic wording.
+&nbsp; * @param isTransfer whether the row is one leg of a transfer, which both legs of are deleted
+&nbsp; *   together — the dialog says so.
+&nbsp; * @param isSplit whether the row stands for a receipt split across categories, every leg of which
+&nbsp; *   is deleted together — the dialog says so.
+&nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;fun Modifier.surferSafeInsets(): Modifier = windowInsetsPadding(</b>
-<b class="fc">&nbsp;    WindowInsets.safeDrawing.only(</b>
-<b class="fc">&nbsp;        WindowInsetsSides.Top + WindowInsetsSides.Horizontal,</b>
-&nbsp;    ),
-&nbsp;)
+&nbsp;fun SurferSwipeToDeleteTransaction(
+&nbsp;    transactionTitle: String,
+&nbsp;    onDelete: () -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    isTransfer: Boolean = false,</b>
+<b class="fc">&nbsp;    isSplit: Boolean = false,</b>
+&nbsp;    content: @Composable () -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+&nbsp;    // Survives configuration changes and process death: the dialog is a question already put to
+&nbsp;    // the user, and re-asking it (or worse, dropping it) on rotation loses their place.
+<b class="fc">&nbsp;    var showConfirmation by rememberSaveable { mutableStateOf(false) }</b>
+<b class="fc">&nbsp;    val deleteLabel = stringResource(Res.string.uikit_transaction_delete)</b>
+&nbsp;
+<b class="fc">&nbsp;    SurferSwipeRevealRow(</b>
+<b class="fc">&nbsp;        revealWidth = REVEAL_WIDTH,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        accessibilityActions = listOf(</b>
+<b class="fc">&nbsp;            SurferSwipeAccessibilityAction(label = deleteLabel) { showConfirmation = true },</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        actions = {</b>
+<b class="fc">&nbsp;            SurferSwipeAction(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Delete,</b>
+<b class="fc">&nbsp;                label = deleteLabel,</b>
+<b class="fc">&nbsp;                onClick = { showConfirmation = true },</b>
+<b class="fc">&nbsp;                destructive = true,</b>
+&nbsp;            )
+&nbsp;        },
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        Box(modifier = Modifier.background(AppTheme.materialColors.surface)) {</b>
+<b class="fc">&nbsp;            content()</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="pc">&nbsp;    if (showConfirmation) {</b>
+<b class="nc">&nbsp;        SurferDeleteTransactionDialog(</b>
+<b class="nc">&nbsp;            titleOrNull = transactionTitle.takeIf { it.isNotBlank() },</b>
+<b class="nc">&nbsp;            onConfirm = {</b>
+<b class="nc">&nbsp;                showConfirmation = false</b>
+<b class="nc">&nbsp;                onDelete()</b>
+&nbsp;            },
+<b class="nc">&nbsp;            onDismiss = { showConfirmation = false },</b>
+<b class="nc">&nbsp;            isTransfer = isTransfer,</b>
+<b class="nc">&nbsp;            isSplit = isSplit,</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -131,7 +219,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionRowUi</title>
+  <title>MoneySurfer Coverage Report > TransactionSort</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.filter</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionRowUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: TransactionSort (com.georgeci.moneysurfer.feature.transaction.filter)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionRowUi</td>
+  <td class="name">TransactionSort</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (89/89)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -92,93 +92,103 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.filter
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
-&nbsp;data class TransactionGroupUi(
-&nbsp;    val date: LocalDate,
-&nbsp;    val dateLabel: TransactionDateUi,
-&nbsp;    val netFormatted: String,
-&nbsp;    val netPositive: Boolean,
-&nbsp;    val transactions: List&lt;TransactionRowUi&gt;,
-&nbsp;)
+&nbsp;/**
+&nbsp; * The type segment. Shared by the list&#39;s chip rail and the filter screen&#39;s segmented control —
+&nbsp; * both edit the same field of [TransactionFilters], so there is one enum, not two.
+&nbsp; *
+&nbsp; * [Transfer] is not a stored transaction type: a transfer is a paired `EXPENSE`/`INCOME` couple,
+&nbsp; * told apart by its `transferId` (see `CompiledFilters.matchesType`). The four values still
+&nbsp; * partition the list, because the two money-moved-sideways legs are what [Expenses] and [Income]
+&nbsp; * exclude.
+&nbsp; */
+&nbsp;enum class TransactionTypeFilter { All, Expenses, Income, Transfer }
 &nbsp;
-&nbsp;/** Day-header label, resolved to text by the screen. */
-&nbsp;sealed interface TransactionDateUi {
-&nbsp;    data object Today : TransactionDateUi
-&nbsp;    data object Yesterday : TransactionDateUi
-&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi
-&nbsp;}
+&nbsp;/**
+&nbsp; * The sort order set implied by the design&#39;s `Sort: Newest` chip.
+&nbsp; *
+&nbsp; * Deliberately only the two date directions. The list is grouped under day headers, and an
+&nbsp; * amount-ordered list has no coherent day grouping — it would either repeat a header per row or
+&nbsp; * silently drop the grouping the rest of the screen is built on. Amount ordering is a flat-list
+&nbsp; * mode, which is a larger change than this screen owns.
+&nbsp; */
+<b class="fc">&nbsp;enum class TransactionSort { Newest, Oldest }</b>
 &nbsp;
-&nbsp;/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
-&nbsp;sealed interface TransactionPeriodUi {
-&nbsp;    data class Month(val monthNumber: Int, val year: Int) : TransactionPeriodUi
-&nbsp;    data class Week(
-&nbsp;        val from: LocalDate,
-&nbsp;        val to: LocalDate,
-&nbsp;        val weekNumber: Int,
-&nbsp;        val weekYear: Int,
-&nbsp;    ) : TransactionPeriodUi
+&nbsp;/** The presets on the filter screen&#39;s date row. `Custom` is [TransactionDateRange.Custom]. */
+&nbsp;enum class TransactionDatePreset { Today, Yesterday, ThisWeek, ThisMonth, LastMonth, ThisYear }
 &nbsp;
-&nbsp;    data object AllTime : TransactionPeriodUi
+&nbsp;/**
+&nbsp; * Where the list&#39;s date window comes from.
+&nbsp; *
+&nbsp; * There is exactly one source at a time: [FollowPeriod] hands the window to the period pager,
+&nbsp; * anything else takes it over and the pager is hidden. Letting both drive it would produce two
+&nbsp; * controls silently overwriting each other&#39;s window — see `resolveWindow`.
+&nbsp; */
+&nbsp;sealed interface TransactionDateRange {
+&nbsp;    /** The pager owns the window: its mode and anchor decide the bounds. */
+&nbsp;    data object FollowPeriod : TransactionDateRange
+&nbsp;
+&nbsp;    data class Preset(val preset: TransactionDatePreset) : TransactionDateRange
+&nbsp;
+&nbsp;    /** Either bound may be null — an open-ended range is a legitimate thing to ask for. */
+&nbsp;    data class Custom(val from: LocalDate?, val to: LocalDate?) : TransactionDateRange
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The filter chip rail&#39;s contents. Every chip is a shortcut into the filter screen, so these carry
-&nbsp; * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
+&nbsp; * Everything the transactions list is narrowed by, hoisted above both the list and the filter
+&nbsp; * screen (see [TransactionFilterStore]).
+&nbsp; *
+&nbsp; * Amount bounds stay as raw text rather than parsed numbers: the field content is what the filter
+&nbsp; * screen re-renders when the user comes back to it, and a half-typed &quot;12.&quot; must survive that
+&nbsp; * round trip. Parsing happens at match time, in `parseAmountQuery`.
 &nbsp; */
-&nbsp;data class TransactionFilterChipsUi(
-&nbsp;    val dateRange: TransactionDateRange,
-&nbsp;    val type: TransactionTypeFilter,
-&nbsp;    val accountCount: Int,
-&nbsp;    val accountName: String?,
-&nbsp;    val categoryCount: Int,
-&nbsp;    val categoryName: String?,
-&nbsp;    val sort: TransactionSort,
-&nbsp;)
+&nbsp;data class TransactionFilters(
+&nbsp;    val query: String = &quot;&quot;,
+&nbsp;    val dateRange: TransactionDateRange = TransactionDateRange.FollowPeriod,
+&nbsp;    val type: TransactionTypeFilter = TransactionTypeFilter.All,
+&nbsp;    val accountIds: Set&lt;AccountId&gt; = emptySet(),
+&nbsp;    val categoryIds: Set&lt;CategoryId&gt; = emptySet(),
+&nbsp;    val minAmount: String = &quot;&quot;,
+&nbsp;    val maxAmount: String = &quot;&quot;,
+&nbsp;    val recurringOnly: Boolean = false,
+&nbsp;    val plannedOnly: Boolean = false,
+&nbsp;    val sort: TransactionSort = TransactionSort.Newest,
+&nbsp;) {
 &nbsp;
-<b class="fc">&nbsp;data class TransactionRowUi(</b>
-<b class="fc">&nbsp;    val id: TransactionId,</b>
-<b class="fc">&nbsp;    val title: String,</b>
-<b class="fc">&nbsp;    val subtitle: String,</b>
-<b class="fc">&nbsp;    val formattedAmount: String,</b>
-<b class="fc">&nbsp;    val isExpense: Boolean,</b>
-<b class="fc">&nbsp;    val categoryHueSeed: String,</b>
-&nbsp;    /** Name of the owning account, rendered only where the list mixes several — may be blank. */
-<b class="fc">&nbsp;    val accountName: String = &quot;&quot;,</b>
-&nbsp;    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
-<b class="fc">&nbsp;    val isTransfer: Boolean = false,</b>
 &nbsp;    /**
-&nbsp;     * How many categories a collapsed split row covers, or `0` when the row is an ordinary
-&nbsp;     * transaction. Non-zero replaces [subtitle] with the &quot;N categories&quot; badge: a receipt split
-&nbsp;     * across several categories has no single category name to show, and [formattedAmount] is the
-&nbsp;     * whole receipt rather than any one leg. [id] is the leg the row opens — its details screen
-&nbsp;     * carries the breakdown.
-&nbsp;     */
-<b class="fc">&nbsp;    val splitCategoryCount: Int = 0,</b>
-&nbsp;    /**
-&nbsp;     * Whether the row belongs to a receipt split across categories — true for a collapsed row and
-&nbsp;     * for a lone leg alike.
+&nbsp;     * What the badge on the filter button counts.
 &nbsp;     *
-&nbsp;     * Deliberately separate from [splitCategoryCount], which is only non-zero once a group is
-&nbsp;     * collapsed: a page that holds part of a group renders its legs individually, and deleting one
-&nbsp;     * of those still takes the whole receipt. The delete confirmation keys off this, so what the
-&nbsp;     * dialog promises matches what the delete does at every window size.
+&nbsp;     * [query] is excluded on purpose: the search field is visible right next to the badge and
+&nbsp;     * shows its own state, so counting it would double-report the same fact. The amount bounds
+&nbsp;     * count as one filter — they are one row on the filter screen.
 &nbsp;     */
-<b class="fc">&nbsp;    val isSplitLeg: Boolean = false,</b>
-&nbsp;)
+&nbsp;    val activeCount: Int
+&nbsp;        get() = listOf(
+&nbsp;            dateRange != TransactionDateRange.FollowPeriod,
+&nbsp;            type != TransactionTypeFilter.All,
+&nbsp;            accountIds.isNotEmpty(),
+&nbsp;            categoryIds.isNotEmpty(),
+&nbsp;            minAmount.isNotBlank() || maxAmount.isNotBlank(),
+&nbsp;            recurringOnly,
+&nbsp;            plannedOnly,
+&nbsp;            sort != TransactionSort.Newest,
+&nbsp;        ).count { it }
 &nbsp;
-&nbsp;data class TransactionSummaryUi(
-&nbsp;    val incomeFormatted: String,
-&nbsp;    val expenseFormatted: String,
-&nbsp;    val netFormatted: String,
-&nbsp;    val netPositive: Boolean,
-&nbsp;)
+&nbsp;    /** Whether an empty list is the filters&#39; doing rather than an empty account. */
+&nbsp;    val isNarrowed: Boolean get() = activeCount &gt; 0 || query.isNotBlank()
+&nbsp;
+&nbsp;    /** `Reset` on the filter screen, and what the list falls back to. Keeps the search text. */
+&nbsp;    fun cleared(): TransactionFilters = TransactionFilters(query = query)
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        val Empty = TransactionFilters()
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -202,7 +212,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Effect</title>
+  <title>MoneySurfer Coverage Report > AppSpacing</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.utils</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.tokens</a>
 </div>
 
-<h1>Coverage Summary for Class: Effect (com.georgeci.moneysurfer.utils)</h1>
+<h1>Coverage Summary for Class: AppSpacing (com.georgeci.moneysurfer.uikit.tokens)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Effect</td>
+  <td class="name">AppSpacing</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,10 +60,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    90.9%
   </span>
   <span class="absValue">
-    (2/2)
+    (10/11)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (60/60)
   </span>
 </td>
 </tr>
@@ -92,21 +92,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.utils
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.tokens
 &nbsp;
-&nbsp;import kotlinx.coroutines.channels.Channel
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.receiveAsFlow
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;
-<b class="fc">&nbsp;class Effect&lt;SIDE_EFFECT : Any&gt; {</b>
-&nbsp;
-<b class="fc">&nbsp;    private val channel = Channel&lt;SIDE_EFFECT&gt;(Channel.UNLIMITED)</b>
-&nbsp;
-<b class="fc">&nbsp;    val effectFlow: Flow&lt;SIDE_EFFECT&gt; = channel.receiveAsFlow()</b>
-&nbsp;
-&nbsp;    fun post(sideEffect: SIDE_EFFECT) {
-<b class="fc">&nbsp;        channel.trySend(sideEffect)</b>
-&nbsp;    }
+&nbsp;object AppSpacing {
+<b class="fc">&nbsp;    val None: Dp = 0.dp</b>
+<b class="fc">&nbsp;    val XXSmall: Dp = 2.dp</b>
+<b class="fc">&nbsp;    val XSmall: Dp = 4.dp</b>
+<b class="fc">&nbsp;    val Small: Dp = 8.dp</b>
+<b class="fc">&nbsp;    val Medium: Dp = 12.dp</b>
+<b class="fc">&nbsp;    val Default: Dp = 16.dp</b>
+<b class="fc">&nbsp;    val Large: Dp = 24.dp</b>
+<b class="fc">&nbsp;    val XLarge: Dp = 32.dp</b>
+<b class="fc">&nbsp;    val XXLarge: Dp = 48.dp</b>
+<b class="fc">&nbsp;    val XXXLarge: Dp = 64.dp</b>
 &nbsp;}
 </code>
 </pre>
@@ -131,7 +132,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

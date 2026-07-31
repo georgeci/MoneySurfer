@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferNavigationDrawerKt</title>
+  <title>MoneySurfer Coverage Report > SurferFilledContainerDefaults</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.atom</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferNavigationDrawerKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferFilledContainerDefaults (com.georgeci.moneysurfer.uikit.atom)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferNavigationDrawerKt</td>
+  <td class="name">SurferFilledContainerDefaults</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    0%
   </span>
   <span class="absValue">
-    (6/8)
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62%
+    0%
   </span>
   <span class="absValue">
-    (31/50)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    98%
-  </span>
-  <span class="absValue">
-    (149/152)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    95.1%
-  </span>
-  <span class="absValue">
-    (1374/1445)
+    (0/85)
   </span>
 </td>
 </tr>
@@ -99,336 +92,367 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.atom
 &nbsp;
-&nbsp;import androidx.compose.foundation.Image
+&nbsp;import androidx.compose.foundation.BorderStroke
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.border
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.WindowInsets
-&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.only
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.safeDrawing
-&nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.selection.selectable
-&nbsp;import androidx.compose.foundation.selection.selectableGroup
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.HorizontalDivider
 &nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.LocalContentColor
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.VerticalDivider
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.CompositionLocalProvider
 &nbsp;import androidx.compose.runtime.Immutable
+&nbsp;import androidx.compose.runtime.ReadOnlyComposable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.semantics.Role
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.graphics.Shape
+&nbsp;import androidx.compose.ui.graphics.compositeOver
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_app_icon
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_brand
-&nbsp;import org.jetbrains.compose.resources.painterResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/** One destination row of [SurferNavigationDrawer]. */
+&nbsp;// ─── Filled ──────────────────────────────────────────────────────────
+&nbsp;
 &nbsp;@Immutable
-&nbsp;data class SurferDrawerItem(
-&nbsp;    val label: String,
-&nbsp;    val icon: ImageVector,
-&nbsp;    val selected: Boolean,
-&nbsp;    val onClick: () -&gt; Unit,
+&nbsp;internal data class SurferFilledContainerTokens(
+&nbsp;    val background: Color,
+&nbsp;    val contentColor: Color,
+&nbsp;    val shape: Shape,
+&nbsp;    val contentPadding: PaddingValues,
 &nbsp;)
 &nbsp;
-&nbsp;/**
-&nbsp; * A group of [items] under an optional caption.
-&nbsp; *
-&nbsp; * [label] is rendered uppercase by the drawer, so pass it in its natural case (&quot;Manage&quot;) — the
-&nbsp; * same string is what a screen reader announces and what a rail would show if it ever grew
-&nbsp; * grouping.
-&nbsp; */
-&nbsp;@Immutable
-&nbsp;data class SurferDrawerSection(
-&nbsp;    val items: List&lt;SurferDrawerItem&gt;,
-&nbsp;    val label: String? = null,
-&nbsp;)
+&nbsp;internal object SurferFilledContainerDefaults {
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+<b class="nc">&nbsp;    fun default(): SurferFilledContainerTokens = SurferFilledContainerTokens(</b>
+<b class="nc">&nbsp;        background = AppTheme.materialColors.surfaceContainer,</b>
+<b class="nc">&nbsp;        contentColor = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;        shape = AppTheme.shapes.large,</b>
+<b class="nc">&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),</b>
+&nbsp;    )
 &nbsp;
-&nbsp;/**
-&nbsp; * The permanent navigation drawer for wide windows: brand header, grouped destinations, and a
-&nbsp; * user/workspace block pinned to the bottom.
-&nbsp; *
-&nbsp; * `NavigationSuiteScaffold`&#39;s own drawer models none of those three (issue #389, gap G5) — it
-&nbsp; * takes a flat item list and nothing else — which is why this is a component rather than a
-&nbsp; * configuration of it. It is deliberately presentational: it knows nothing about routes, so the
-&nbsp; * caller maps its destinations onto [sections] and keeps the selection rule.
-&nbsp; *
-&nbsp; * Sized to the design&#39;s 210 dp sidebar. The destination list scrolls if the window is too short
-&nbsp; * to hold every group, so the footer stays reachable rather than being pushed off the bottom.
-&nbsp; *
-&nbsp; * @param userName primary line of the footer — a display name, an email, or a placeholder.
-&nbsp; * @param workspaceName secondary line; omitted when no workspace is selected yet.
-&nbsp; * @param onUserClick makes the footer a button (the workspace switcher). Null leaves it inert.
-&nbsp; * @param windowInsets the insets the drawer keeps its content clear of. Owned here rather than by
-&nbsp; *   the host for the same reason `NavigationRail` owns its own: the surface has to paint edge to
-&nbsp; *   edge — under the status bar and any start-edge cutout — while the brand header and the user
-&nbsp; *   footer stay out from under them. The default matches `NavigationRailDefaults.windowInsets`.
-&nbsp; */
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SurferNavigationDrawer(</b>
-&nbsp;    sections: List&lt;SurferDrawerSection&gt;,
-&nbsp;    userName: String,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    brand: String = stringResource(Res.string.uikit_brand),</b>
-<b class="fc">&nbsp;    workspaceName: String? = null,</b>
-<b class="fc">&nbsp;    onUserClick: (() -&gt; Unit)? = null,</b>
-&nbsp;    windowInsets: WindowInsets =
-<b class="fc">&nbsp;        WindowInsets.safeDrawing.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical),</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Row(modifier = modifier.fillMaxHeight().width(DrawerWidth)) {</b>
-<b class="fc">&nbsp;        Column(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .weight(1f)</b>
-<b class="fc">&nbsp;                .fillMaxHeight()</b>
-<b class="fc">&nbsp;                .background(AppTheme.materialColors.surfaceContainerLow)</b>
-&nbsp;                // Inside the background, so the surface still reaches the window edge.
-<b class="fc">&nbsp;                .windowInsetsPadding(windowInsets)</b>
-<b class="fc">&nbsp;                .testTag(SurferNavigationDrawerTestTags.Root),</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            BrandHeader(brand = brand)</b>
-<b class="fc">&nbsp;            Column(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .weight(1f)</b>
-<b class="fc">&nbsp;                    .verticalScroll(rememberScrollState())</b>
-<b class="fc">&nbsp;                    .selectableGroup(),</b>
-&nbsp;            ) {
-<b class="fc">&nbsp;                sections.forEach { section -&gt; DrawerSection(section = section) }</b>
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;            UserFooter(</b>
-<b class="fc">&nbsp;                userName = userName,</b>
-<b class="fc">&nbsp;                workspaceName = workspaceName,</b>
-<b class="fc">&nbsp;                onClick = onUserClick,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        VerticalDivider(color = AppTheme.materialColors.outlineVariant)</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Stable selectors for [SurferNavigationDrawer] — see docs/testing/testing-strategy.md. */
-&nbsp;object SurferNavigationDrawerTestTags {
-&nbsp;    const val Root = &quot;drawer:root&quot;
-&nbsp;    const val User = &quot;drawer:user&quot;
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+<b class="nc">&nbsp;    fun selected(): SurferFilledContainerTokens = SurferFilledContainerTokens(</b>
+<b class="nc">&nbsp;        background = AppTheme.materialColors.primary,</b>
+<b class="nc">&nbsp;        contentColor = Color.White,</b>
+<b class="nc">&nbsp;        shape = AppTheme.shapes.large,</b>
+<b class="nc">&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),</b>
+&nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun BrandHeader(brand: String) {</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(horizontal = HorizontalInset, vertical = AppTheme.spacing.default),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+&nbsp;internal fun SurferFilledContainer(
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    interactionModifier: Modifier = Modifier,
+&nbsp;    tokens: SurferFilledContainerTokens = SurferFilledContainerDefaults.default(),
+&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .clip(tokens.shape)
+&nbsp;            .then(interactionModifier)
+&nbsp;            .background(tokens.background)
+&nbsp;            .padding(tokens.contentPadding),
 &nbsp;    ) {
-<b class="fc">&nbsp;        Image(</b>
-<b class="fc">&nbsp;            painter = painterResource(Res.drawable.uikit_app_icon),</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(BrandLogoSize)</b>
-<b class="fc">&nbsp;                .clip(RoundedCornerShape(BrandLogoCorner)),</b>
-&nbsp;        )
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = brand,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun DrawerSection(section: SurferDrawerSection) {</b>
-<b class="fc">&nbsp;    if (section.label != null) {</b>
-<b class="fc">&nbsp;        Text(</b>
-&nbsp;            // Uppercased here rather than by the caller so the label stays readable at its
-&nbsp;            // source and in the accessibility tree.
-<b class="fc">&nbsp;            text = section.label.uppercase(),</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.labelSmall,</b>
-<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="fc">&nbsp;            modifier = Modifier.padding(</b>
-<b class="fc">&nbsp;                start = HorizontalInset + ItemInset,</b>
-<b class="fc">&nbsp;                end = HorizontalInset,</b>
-<b class="fc">&nbsp;                top = AppTheme.spacing.default,</b>
-<b class="fc">&nbsp;                bottom = AppTheme.spacing.xSmall,</b>
-&nbsp;            ),
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;    section.items.forEach { item -&gt; DrawerItemRow(item = item) }</b>
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="pc">&nbsp;private fun DrawerItemRow(item: SurferDrawerItem) {</b>
-<b class="fc">&nbsp;    val contentColor = if (item.selected) {</b>
-<b class="fc">&nbsp;        AppTheme.materialColors.onSecondaryContainer</b>
-<b class="fc">&nbsp;    } else {</b>
-<b class="fc">&nbsp;        AppTheme.materialColors.onSurfaceVariant</b>
+&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
+&nbsp;            content()
+&nbsp;        }
 &nbsp;    }
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(horizontal = HorizontalInset, vertical = ItemGap)</b>
-<b class="fc">&nbsp;            .clip(RoundedCornerShape(ItemCorner))</b>
-<b class="fc">&nbsp;            .background(</b>
-<b class="fc">&nbsp;                if (item.selected) AppTheme.materialColors.secondaryContainer else Color.Transparent,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            .selectable(</b>
-<b class="fc">&nbsp;                selected = item.selected,</b>
-<b class="fc">&nbsp;                role = Role.Tab,</b>
-<b class="fc">&nbsp;                onClick = item.onClick,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            .height(ItemHeight)</b>
-<b class="fc">&nbsp;            .padding(horizontal = ItemInset),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = item.icon,</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            tint = contentColor,</b>
-<b class="fc">&nbsp;            modifier = Modifier.size(ItemIconSize),</b>
+&nbsp;}
+&nbsp;
+&nbsp;// ─── Outlined ────────────────────────────────────────────────────────
+&nbsp;
+&nbsp;@Immutable
+&nbsp;internal data class SurferOutlinedContainerTokens(
+&nbsp;    val background: Color,
+&nbsp;    val stroke: Color,
+&nbsp;    val strokeWidth: Dp,
+&nbsp;    val contentColor: Color,
+&nbsp;    val shape: Shape,
+&nbsp;    val contentPadding: PaddingValues,
+&nbsp;)
+&nbsp;
+&nbsp;internal object SurferOutlinedContainerDefaults {
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+&nbsp;    fun default(): SurferOutlinedContainerTokens = SurferOutlinedContainerTokens(
+&nbsp;        background = Color.Transparent,
+&nbsp;        stroke = AppTheme.materialColors.outlineVariant,
+&nbsp;        strokeWidth = 1.dp,
+&nbsp;        contentColor = AppTheme.materialColors.onSurface,
+&nbsp;        shape = AppTheme.shapes.large,
+&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
+&nbsp;    )
+&nbsp;
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+&nbsp;    fun selected(): SurferOutlinedContainerTokens {
+&nbsp;        val cs = AppTheme.materialColors
+&nbsp;        return SurferOutlinedContainerTokens(
+&nbsp;            background = cs.primary.copy(alpha = 0.08f).compositeOver(cs.surface),
+&nbsp;            stroke = cs.primary,
+&nbsp;            strokeWidth = 1.dp,
+&nbsp;            contentColor = cs.onSurface,
+&nbsp;            shape = AppTheme.shapes.large,
+&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
 &nbsp;        )
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = item.label,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.labelLarge,</b>
-<b class="fc">&nbsp;            color = contentColor,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;private fun UserFooter(
-&nbsp;    userName: String,
-&nbsp;    workspaceName: String?,
-&nbsp;    onClick: (() -&gt; Unit)?,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    HorizontalDivider(color = AppTheme.materialColors.outlineVariant)</b>
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)</b>
-<b class="fc">&nbsp;            .padding(horizontal = HorizontalInset, vertical = AppTheme.spacing.medium)</b>
-<b class="fc">&nbsp;            .testTag(SurferNavigationDrawerTestTags.User),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+&nbsp;internal fun SurferOutlinedContainer(
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    interactionModifier: Modifier = Modifier,
+&nbsp;    tokens: SurferOutlinedContainerTokens = SurferOutlinedContainerDefaults.default(),
+&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .clip(tokens.shape)
+&nbsp;            .then(interactionModifier)
+&nbsp;            .background(tokens.background)
+&nbsp;            .border(BorderStroke(tokens.strokeWidth, tokens.stroke), shape = tokens.shape)
+&nbsp;            .padding(tokens.contentPadding),
 &nbsp;    ) {
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(AvatarSize)</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(AppTheme.materialColors.primaryContainer),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Text(</b>
-<b class="pc">&nbsp;                text = userName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.labelLarge,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onPrimaryContainer,</b>
+&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
+&nbsp;            content()
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;// ─── Card ────────────────────────────────────────────────────────────
+&nbsp;
+&nbsp;@Immutable
+&nbsp;internal data class SurferContainerTokens(
+&nbsp;    val background: Color,
+&nbsp;    val stroke: Color,
+&nbsp;    val strokeWidth: Dp,
+&nbsp;    val shadowElevation: Dp,
+&nbsp;    val contentColor: Color,
+&nbsp;    val shape: Shape,
+&nbsp;    val contentPadding: PaddingValues,
+&nbsp;)
+&nbsp;
+&nbsp;internal object SurferContainerDefaults {
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+&nbsp;    fun default(): SurferContainerTokens = SurferContainerTokens(
+&nbsp;        background = AppTheme.materialColors.surfaceContainerLowest,
+&nbsp;        stroke = Color.Transparent,
+&nbsp;        strokeWidth = 0.dp,
+&nbsp;        shadowElevation = 2.dp,
+&nbsp;        contentColor = AppTheme.materialColors.onSurface,
+&nbsp;        shape = AppTheme.shapes.large,
+&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+&nbsp;    )
+&nbsp;
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+&nbsp;    fun selected(): SurferContainerTokens = SurferContainerTokens(
+&nbsp;        background = AppTheme.materialColors.surfaceContainerLowest,
+&nbsp;        stroke = AppTheme.materialColors.primary,
+&nbsp;        strokeWidth = 1.dp,
+&nbsp;        shadowElevation = 8.dp,
+&nbsp;        contentColor = AppTheme.materialColors.onSurface,
+&nbsp;        shape = AppTheme.shapes.large,
+&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun SurferContainer(
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    interactionModifier: Modifier = Modifier,
+&nbsp;    tokens: SurferContainerTokens = SurferContainerDefaults.default(),
+&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .shadow(elevation = tokens.shadowElevation, shape = tokens.shape)
+&nbsp;            .clip(tokens.shape)
+&nbsp;            .then(interactionModifier)
+&nbsp;            .background(tokens.background)
+&nbsp;            .border(BorderStroke(tokens.strokeWidth, tokens.stroke), shape = tokens.shape)
+&nbsp;            .padding(tokens.contentPadding),
+&nbsp;    ) {
+&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
+&nbsp;            content()
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;// ─── AddAction ───────────────────────────────────────────────────────
+&nbsp;
+&nbsp;@Immutable
+&nbsp;internal data class SurferAddActionContainerTokens(
+&nbsp;    val background: Color,
+&nbsp;    val stroke: Color,
+&nbsp;    val strokeWidth: Dp,
+&nbsp;    val dashLength: Dp,
+&nbsp;    val dashGap: Dp,
+&nbsp;    val contentColor: Color,
+&nbsp;    val shape: Shape,
+&nbsp;    val contentPadding: PaddingValues,
+&nbsp;)
+&nbsp;
+&nbsp;internal object SurferAddActionContainerDefaults {
+&nbsp;    @Composable
+&nbsp;    @ReadOnlyComposable
+&nbsp;    fun default(): SurferAddActionContainerTokens {
+&nbsp;        val cs = AppTheme.materialColors
+&nbsp;        return SurferAddActionContainerTokens(
+&nbsp;            background = Color.Transparent,
+&nbsp;            stroke = cs.outline,
+&nbsp;            strokeWidth = 1.5.dp,
+&nbsp;            dashLength = 6.dp,
+&nbsp;            dashGap = 4.dp,
+&nbsp;            contentColor = cs.primary,
+&nbsp;            shape = AppTheme.shapes.large,
+&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun SurferAddActionContainer(
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    interactionModifier: Modifier = Modifier,
+&nbsp;    tokens: SurferAddActionContainerTokens = SurferAddActionContainerDefaults.default(),
+&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .clip(tokens.shape)
+&nbsp;            .then(interactionModifier)
+&nbsp;            .background(tokens.background)
+&nbsp;            .surferDashedBorder(
+&nbsp;                color = tokens.stroke,
+&nbsp;                shape = tokens.shape,
+&nbsp;                strokeWidth = tokens.strokeWidth,
+&nbsp;                dashLength = tokens.dashLength,
+&nbsp;                dashGap = tokens.dashGap,
 &nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = userName,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;                maxLines = 1,</b>
-<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            if (workspaceName != null) {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = workspaceName,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;                    maxLines = 1,</b>
-<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;            .padding(tokens.contentPadding),
+&nbsp;    ) {
+&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
+&nbsp;            content()
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;/** The design&#39;s 210 dp sidebar, divider included. */
-<b class="fc">&nbsp;private val DrawerWidth: Dp = 210.dp</b>
-<b class="fc">&nbsp;private val BrandLogoSize: Dp = 34.dp</b>
-<b class="fc">&nbsp;private val BrandLogoCorner: Dp = 10.dp</b>
-<b class="fc">&nbsp;private val HorizontalInset: Dp = 10.dp</b>
-<b class="fc">&nbsp;private val ItemInset: Dp = 10.dp</b>
-<b class="fc">&nbsp;private val ItemGap: Dp = 2.dp</b>
-&nbsp;
-&nbsp;/** The 48 dp minimum touch target — `Modifier.selectable` does not expand one of its own. */
-<b class="fc">&nbsp;private val ItemHeight: Dp = 48.dp</b>
-<b class="fc">&nbsp;private val ItemCorner: Dp = 10.dp</b>
-<b class="fc">&nbsp;private val ItemIconSize: Dp = 20.dp</b>
-<b class="fc">&nbsp;private val AvatarSize: Dp = 32.dp</b>
-&nbsp;
-&nbsp;private fun previewItem(
-&nbsp;    label: String,
-&nbsp;    icon: ImageVector,
-<b class="nc">&nbsp;    selected: Boolean = false,</b>
-<b class="nc">&nbsp;) = SurferDrawerItem(label = label, icon = icon, selected = selected, onClick = {})</b>
+&nbsp;// ─── Previews ────────────────────────────────────────────────────────
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferNavigationDrawerPreview() {
+&nbsp;private fun SurferFilledContainerPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        Box(modifier = Modifier.height(520.dp)) {
-&nbsp;            SurferNavigationDrawer(
-&nbsp;                sections = listOf(
-&nbsp;                    SurferDrawerSection(
-&nbsp;                        items = listOf(
-&nbsp;                            previewItem(&quot;Dashboard&quot;, SurferIcons.Dashboard, selected = true),
-&nbsp;                            previewItem(&quot;Accounts&quot;, SurferIcons.Wallet),
-&nbsp;                            previewItem(&quot;Transactions&quot;, SurferIcons.SwapHoriz),
-&nbsp;                            previewItem(&quot;Budgets&quot;, SurferIcons.Savings),
-&nbsp;                            previewItem(&quot;Goals&quot;, SurferIcons.Flag),
-&nbsp;                        ),
-&nbsp;                    ),
-&nbsp;                    SurferDrawerSection(
-&nbsp;                        label = &quot;Manage&quot;,
-&nbsp;                        items = listOf(
-&nbsp;                            previewItem(&quot;Categories&quot;, SurferIcons.Category),
-&nbsp;                            previewItem(&quot;Settings&quot;, SurferIcons.Settings),
-&nbsp;                        ),
-&nbsp;                    ),
-&nbsp;                ),
-&nbsp;                userName = &quot;Georgy&quot;,
-&nbsp;                workspaceName = &quot;Household budget&quot;,
-&nbsp;                onUserClick = {},
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
+&nbsp;        ) {
+&nbsp;            SurferFilledContainer(modifier = Modifier.fillMaxWidth()) {
+&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
+&nbsp;            }
+&nbsp;            SurferFilledContainer(
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;                tokens = SurferFilledContainerDefaults.selected(),
+&nbsp;            ) {
+&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferOutlinedContainerPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
+&nbsp;        ) {
+&nbsp;            SurferOutlinedContainer(modifier = Modifier.fillMaxWidth()) {
+&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
+&nbsp;            }
+&nbsp;            SurferOutlinedContainer(
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;                tokens = SurferOutlinedContainerDefaults.selected(),
+&nbsp;            ) {
+&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferContainerPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
+&nbsp;        ) {
+&nbsp;            SurferContainer(modifier = Modifier.fillMaxWidth()) {
+&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
+&nbsp;            }
+&nbsp;            SurferContainer(
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;                tokens = SurferContainerDefaults.selected(),
+&nbsp;            ) {
+&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferAddActionContainerPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+&nbsp;            SurferAddActionContainer(modifier = Modifier.fillMaxWidth()) {
+&nbsp;                Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
+&nbsp;                    Spacer(Modifier.width(8.dp))
+&nbsp;                    Text(text = &quot;Add account&quot;, style = AppTheme.typography.labelLarge)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun PreviewRowBody(label: String, hint: String, amount: String) {
+&nbsp;    Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(text = label, style = AppTheme.typography.titleSmall)
+&nbsp;            Spacer(Modifier.padding(top = 2.dp))
+&nbsp;            Text(
+&nbsp;                text = hint,
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = LocalContentColor.current.copy(alpha = 0.7f),
 &nbsp;            )
 &nbsp;        }
+&nbsp;        Text(text = amount, style = AppTheme.typography.titleSmall)
 &nbsp;    }
 &nbsp;}
 </code>
@@ -454,7 +478,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

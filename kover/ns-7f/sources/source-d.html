@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferPeriodPagerKt</title>
+  <title>MoneySurfer Coverage Report > SurferSelectionRadioKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.atom</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferPeriodPagerKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferSelectionRadioKt (com.georgeci.moneysurfer.uikit.atom)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferPeriodPagerKt</td>
+  <td class="name">SurferSelectionRadioKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     66.7%
   </span>
   <span class="absValue">
-    (4/6)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    60%
   </span>
   <span class="absValue">
-    (11/22)
+    (6/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (62/62)
+    (25/25)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    97.8%
+    97.4%
   </span>
   <span class="absValue">
-    (618/632)
+    (190/195)
   </span>
 </td>
 </tr>
@@ -99,163 +99,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.atom
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.border
 &nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.text.font.FontWeight
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-<b class="fc">&nbsp;private val PagerHeight = 40.dp</b>
-<b class="fc">&nbsp;private val PagerShape = RoundedCornerShape(20.dp)</b>
-<b class="fc">&nbsp;private val ArrowSize = 32.dp</b>
-<b class="fc">&nbsp;private val ArrowIconSize = 18.dp</b>
-&nbsp;
-&nbsp;/** Alpha the arrows fade to when there is nothing to page to — from the design&#39;s `PeriodPager`. */
-&nbsp;private const val DISABLED_ARROW_ALPHA = 0.4f
-&nbsp;
 &nbsp;/**
-&nbsp; * One pager arrow&#39;s behaviour: what tapping it does, whether it is live, and its a11y label.
-&nbsp; * Bundling the three keeps [SurferPeriodPager]&#39;s own parameter list readable rather than fanning
-&nbsp; * every arrow property out into a `previousX` / `nextX` pair.
-&nbsp; */
-&nbsp;data class SurferPeriodArrow(
-&nbsp;    val onClick: () -&gt; Unit,
-&nbsp;    val enabled: Boolean = true,
-&nbsp;    val contentDescription: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Compact pager pill for stepping through a period: `‹ March 2025 ›`.
+&nbsp; * Selection dot for a row that is already clickable as a whole.
 &nbsp; *
-&nbsp; * Stateless — the caller advances via [previous] / [next]. [sublabel] is the smaller trailing
-&nbsp; * caption (the year, an ISO week, &quot;No date filter&quot;); [onLabelClick] makes the centre tappable for
-&nbsp; * callers that hang a period-mode menu off it.
+&nbsp; * Purely a visual indicator: it takes no click of its own and carries no semantics, because the
+&nbsp; * row around it owns both. Where the control itself must be focusable, use Material&#39;s
+&nbsp; * `RadioButton`.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferPeriodPager(
-&nbsp;    label: String,
-&nbsp;    previous: SurferPeriodArrow,
-&nbsp;    next: SurferPeriodArrow,
+&nbsp;fun SurferSelectionRadio(
+&nbsp;    selected: Boolean,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    sublabel: String? = null,</b>
-<b class="fc">&nbsp;    onLabelClick: (() -&gt; Unit)? = null,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;    Box(</b>
 <b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .height(PagerHeight)</b>
-<b class="fc">&nbsp;            .clip(PagerShape)</b>
-<b class="fc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)</b>
-<b class="fc">&nbsp;            .padding(horizontal = 6.dp),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.SpaceBetween,</b>
+<b class="fc">&nbsp;            .size(OuterSize)</b>
+<b class="fc">&nbsp;            .clip(CircleShape)</b>
+<b class="fc">&nbsp;            .border(</b>
+<b class="fc">&nbsp;                width = 2.dp,</b>
+<b class="fc">&nbsp;                color = if (selected) {</b>
+<b class="fc">&nbsp;                    AppTheme.materialColors.primary</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    AppTheme.materialColors.outline</b>
+&nbsp;                },
+<b class="fc">&nbsp;                shape = CircleShape,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
 &nbsp;    ) {
-<b class="fc">&nbsp;        PagerArrow(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.ChevronLeft,</b>
-<b class="fc">&nbsp;            contentDescription = previous.contentDescription,</b>
-<b class="fc">&nbsp;            enabled = previous.enabled,</b>
-<b class="fc">&nbsp;            onClick = previous.onClick,</b>
-&nbsp;        )
-<b class="fc">&nbsp;        Row(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .clip(PagerShape)</b>
-<b class="pc">&nbsp;                .then(if (onLabelClick != null) Modifier.clickable(onClick = onLabelClick) else Modifier)</b>
-<b class="fc">&nbsp;                .padding(horizontal = 8.dp, vertical = 4.dp),</b>
-<b class="fc">&nbsp;            verticalAlignment = Alignment.Bottom,</b>
-<b class="fc">&nbsp;            horizontalArrangement = Arrangement.spacedBy(6.dp),</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = label,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
-<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;        if (selected) {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .size(InnerSize)</b>
+<b class="fc">&nbsp;                    .clip(CircleShape)</b>
+<b class="fc">&nbsp;                    .background(AppTheme.materialColors.primary),</b>
 &nbsp;            )
-<b class="pc">&nbsp;            if (sublabel != null) {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = sublabel,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.labelSmall,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;                    maxLines = 1,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
 <b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        PagerArrow(</b>
-<b class="fc">&nbsp;            icon = SurferIcons.ChevronRight,</b>
-<b class="fc">&nbsp;            contentDescription = next.contentDescription,</b>
-<b class="fc">&nbsp;            enabled = next.enabled,</b>
-<b class="fc">&nbsp;            onClick = next.onClick,</b>
-&nbsp;        )
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun PagerArrow(
-&nbsp;    icon: ImageVector,
-&nbsp;    contentDescription: String?,
-&nbsp;    enabled: Boolean,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    IconButton(</b>
-<b class="fc">&nbsp;        onClick = onClick,</b>
-<b class="fc">&nbsp;        enabled = enabled,</b>
-<b class="fc">&nbsp;        modifier = Modifier.size(ArrowSize),</b>
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = icon,</b>
-<b class="fc">&nbsp;            contentDescription = contentDescription,</b>
-<b class="fc">&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant.copy(</b>
-<b class="fc">&nbsp;                alpha = if (enabled) 1f else DISABLED_ARROW_ALPHA,</b>
-&nbsp;            ),
-<b class="fc">&nbsp;            modifier = Modifier.size(ArrowIconSize),</b>
-&nbsp;        )
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
+<b class="fc">&nbsp;private val OuterSize = 22.dp</b>
+<b class="fc">&nbsp;private val InnerSize = 10.dp</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferPeriodPagerPreview() {
+&nbsp;private fun SurferSelectionRadioPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        SurferPeriodPager(
-&nbsp;            modifier = Modifier.padding(all = 16.dp),
-&nbsp;            label = &quot;March&quot;,
-&nbsp;            sublabel = &quot;2025&quot;,
-&nbsp;            previous = SurferPeriodArrow(onClick = {}),
-&nbsp;            next = SurferPeriodArrow(onClick = {}),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferPeriodPagerAllTimePreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferPeriodPager(
-&nbsp;            modifier = Modifier.padding(all = 16.dp),
-&nbsp;            label = &quot;All time&quot;,
-&nbsp;            sublabel = &quot;No date filter&quot;,
-&nbsp;            previous = SurferPeriodArrow(onClick = {}, enabled = false),
-&nbsp;            next = SurferPeriodArrow(onClick = {}, enabled = false),
-&nbsp;        )
+&nbsp;        Row(horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium)) {
+&nbsp;            SurferSelectionRadio(selected = true)
+&nbsp;            SurferSelectionRadio(selected = false)
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 </code>
@@ -281,7 +191,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

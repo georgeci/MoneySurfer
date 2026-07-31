@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionTags</title>
+  <title>MoneySurfer Coverage Report > TransactionReferenceKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionTags (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: TransactionReferenceKt (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionTags</td>
+  <td class="name">TransactionReferenceKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -68,10 +68,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    93.8%
   </span>
   <span class="absValue">
-    (2/2)
+    (15/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    96.5%
   </span>
   <span class="absValue">
-    (58/58)
+    (55/57)
   </span>
 </td>
 </tr>
@@ -101,45 +101,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;
+&nbsp;private const val REFERENCE_PREFIX = &quot;TX-&quot;
+&nbsp;private const val REFERENCE_DIGITS = 4
+&nbsp;
 &nbsp;/**
-&nbsp; * Normalization for [Transaction.tags].
+&nbsp; * Short human-facing label for a transaction (`TX-8A13`), shown on the details screen.
 &nbsp; *
-&nbsp; * Tags are an embedded list, not a join table: they are free-form labels with no identity
-&nbsp; * of their own — nothing renames, merges or counts them across transactions yet. A single
-&nbsp; * column costs one migration now; a join table would cost one anyway once a tag manager
-&nbsp; * exists, and buys nothing before then.
+&nbsp; * Derived, never stored: it is a pure function of [TransactionId], so there is no column to
+&nbsp; * migrate, no wire field for the rules to validate, and nothing that can drift from the id it
+&nbsp; * labels. [TransactionId] is UUID-backed, so its trailing hex digits are already uniformly
+&nbsp; * distributed and no hashing is needed.
 &nbsp; *
-&nbsp; * That storage choice is why normalization is mandatory rather than cosmetic. Room keeps the
-&nbsp; * list as one CSV column, so a comma inside a tag would silently split it in two on the next
-&nbsp; * read. Stripping the separator is the only round-trip-safe option — rejecting the input
-&nbsp; * would surface a storage detail in the UI, and escaping would make the column unreadable
-&nbsp; * in a SQL browser for no gain.
+&nbsp; * This is a display label, not a key: four hex digits collide, and nothing looks a transaction
+&nbsp; * up by it. If a bank-supplied reference ever has to survive a statement import, that is a
+&nbsp; * *stored* field with different semantics — add it then, next to this one, not instead of it.
 &nbsp; */
-&nbsp;object TransactionTags {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Upper bound on tags per transaction. Bounds both the CSV column and the Firestore doc,
-&nbsp;     * and no design surface shows more than a handful.
-&nbsp;     */
-&nbsp;    const val MAX_TAGS: Int = 10
-&nbsp;
-&nbsp;    private const val SEPARATOR = &#39;,&#39;
-<b class="fc">&nbsp;    private val WHITESPACE_RUN = Regex(&quot;\\s+&quot;)</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Strips separators, trims, drops blanks, removes case-insensitive duplicates keeping the
-&nbsp;     * first spelling the user typed, and caps at [MAX_TAGS].
-&nbsp;     */
-&nbsp;    fun normalize(raw: List&lt;String&gt;): List&lt;String&gt; {
-<b class="fc">&nbsp;        val seen = mutableSetOf&lt;String&gt;()</b>
-<b class="fc">&nbsp;        return raw.asSequence()</b>
-<b class="fc">&nbsp;            .map { it.replace(SEPARATOR, &#39; &#39;).replace(WHITESPACE_RUN, &quot; &quot;).trim() }</b>
-<b class="fc">&nbsp;            .filter { it.isNotEmpty() }</b>
-<b class="fc">&nbsp;            .filter { seen.add(it.lowercase()) }</b>
-<b class="fc">&nbsp;            .take(MAX_TAGS)</b>
-<b class="fc">&nbsp;            .toList()</b>
+&nbsp;val TransactionId.reference: String
+&nbsp;    get() {
+<b class="fc">&nbsp;        val digits = value.filter(Char::isReferenceDigit)</b>
+<b class="fc">&nbsp;            .takeLast(REFERENCE_DIGITS)</b>
+<b class="fc">&nbsp;            .padStart(REFERENCE_DIGITS, &#39;0&#39;)</b>
+<b class="fc">&nbsp;        return REFERENCE_PREFIX + digits.uppercase()</b>
 &nbsp;    }
-&nbsp;}
+&nbsp;
+&nbsp;// Ids reaching us from an import may not be UUIDs; keeping only hex digits guarantees a
+&nbsp;// stable, printable label for any id shape rather than echoing stray punctuation.
+&nbsp;private fun Char.isReferenceDigit(): Boolean =
+<b class="pc">&nbsp;    this in &#39;0&#39;..&#39;9&#39; || this in &#39;a&#39;..&#39;f&#39; || this in &#39;A&#39;..&#39;F&#39;</b>
 </code>
 </pre>
 </div>
@@ -163,7 +153,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

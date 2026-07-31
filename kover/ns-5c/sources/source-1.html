@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > EmptyReason</title>
+  <title>MoneySurfer Coverage Report > AmountRange</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.filter</a>
 </div>
 
-<h1>Coverage Summary for Class: EmptyReason (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: AmountRange (com.georgeci.moneysurfer.feature.transaction.filter)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">EmptyReason</td>
+  <td class="name">AmountRange</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -92,229 +92,214 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.filter
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
-&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_cta
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered_cta
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered_title
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search_cta
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_title
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_split_categories
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.util.periodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.util.startOfIsoWeek
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
 &nbsp;
-&nbsp;/** Alpha of the transfer tile&#39;s tint wash — the same weight the category bubbles use. */
-&nbsp;private const val TRANSFER_TILE_ALPHA = 0.18f
+&nbsp;private const val MINOR_PER_MAJOR = 100L
+&nbsp;private const val MAX_DECIMALS = 2
+&nbsp;private const val DAYS_PER_WEEK = 7
 &nbsp;
-&nbsp;/** Alpha of the income amount pill behind the row&#39;s amount. */
-&nbsp;private const val INCOME_PILL_ALPHA = 0.14f
+&nbsp;/** `Money.MAX_MINOR` is 10^15 minor units, i.e. 13 digits of major units. */
+&nbsp;private const val MAX_WHOLE_DIGITS = 13
 &nbsp;
-&nbsp;private const val META_SEPARATOR = &quot; · &quot;
+&nbsp;private const val DECEMBER = 12
+&nbsp;private const val DAYS_IN_DECEMBER = 31
+&nbsp;private const val DECIMAL_RADIX = 10
 &nbsp;
 &nbsp;/**
-&nbsp; * One transaction line, with the three variants the list can render, swipeable to delete.
+&nbsp; * The one date window the list loads, whoever asked for it.
 &nbsp; *
-&nbsp; * A transfer leg is deliberately neither of the other two: it carries the swap glyph on a neutral
-&nbsp; * transfer tint and no amount pill, because the money did not leave or arrive — it moved sideways,
-&nbsp; * and drawing it as a plain expense is exactly what made the two legs unreadable.
-&nbsp; *
-&nbsp; * The row&#39;s gap to the next one is on the swipe wrapper while its inset stays on the line: the
-&nbsp; * Delete button is measured against the wrapper, so a bottom padding inside it would push the
-&nbsp; * button off the line&#39;s centre, and a horizontal one would leave a dead 16dp strip at the edge
-&nbsp; * where the swipe starts.
+&nbsp; * [TransactionDateRange.FollowPeriod] defers to the pager ([mode] + [anchor]); every other range
+&nbsp; * takes over completely. The pager is hidden while it is not the source, so the two can never end
+&nbsp; * up as competing windows.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun TransactionRow(
-&nbsp;    row: TransactionRowUi,
-&nbsp;    showAccount: Boolean,
-&nbsp;    untitled: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    onDelete: () -&gt; Unit,
-&nbsp;) {
-&nbsp;    val title = row.title.ifBlank { untitled }
-&nbsp;    // Resolved here rather than in the mapping: only a composable can reach the string table, and
-&nbsp;    // a collapsed receipt&#39;s meta is a count, not the name of any one of its categories.
-&nbsp;    val subtitle = if (row.splitCategoryCount &gt; 0) {
-&nbsp;        stringResource(Res.string.transactions_list_split_categories, row.splitCategoryCount)
-&nbsp;    } else {
-&nbsp;        row.subtitle
-&nbsp;    }
-&nbsp;    SurferSwipeToDeleteTransaction(
-&nbsp;        transactionTitle = title,
-&nbsp;        onDelete = onDelete,
-&nbsp;        modifier = Modifier.padding(bottom = 12.dp),
-&nbsp;        isTransfer = row.isTransfer,
-&nbsp;        // Any leg of a receipt, not just a collapsed row: the swipe takes the whole group either
-&nbsp;        // way, and a page holding part of a group renders its legs individually.
-&nbsp;        isSplit = row.isSplitLeg,
-&nbsp;    ) {
-&nbsp;        TransactionLine(
-&nbsp;            row = row,
-&nbsp;            showAccount = showAccount,
-&nbsp;            title = title,
-&nbsp;            subtitle = subtitle,
-&nbsp;            onClick = onClick,
+&nbsp;fun resolveWindow(
+&nbsp;    dateRange: TransactionDateRange,
+&nbsp;    mode: TransactionPeriodMode,
+&nbsp;    anchor: LocalDate,
+&nbsp;    today: LocalDate,
+&nbsp;): TransactionPeriodWindow = when (dateRange) {
+&nbsp;    TransactionDateRange.FollowPeriod -&gt; periodWindow(mode, anchor)
+&nbsp;    is TransactionDateRange.Preset -&gt; presetWindow(dateRange.preset, today)
+&nbsp;    is TransactionDateRange.Custom -&gt; TransactionPeriodWindow(from = dateRange.from, to = dateRange.to)
+&nbsp;}
+&nbsp;
+&nbsp;private fun presetWindow(preset: TransactionDatePreset, today: LocalDate): TransactionPeriodWindow =
+&nbsp;    when (preset) {
+&nbsp;        TransactionDatePreset.Today -&gt; TransactionPeriodWindow(today, today)
+&nbsp;        TransactionDatePreset.Yesterday -&gt; today.minus(1, DateTimeUnit.DAY)
+&nbsp;            .let { TransactionPeriodWindow(it, it) }
+&nbsp;        TransactionDatePreset.ThisWeek -&gt; today.startOfIsoWeek()
+&nbsp;            .let { TransactionPeriodWindow(it, it.plus(DAYS_PER_WEEK - 1, DateTimeUnit.DAY)) }
+&nbsp;        TransactionDatePreset.ThisMonth -&gt; periodWindow(TransactionPeriodMode.Month, today)
+&nbsp;        TransactionDatePreset.LastMonth -&gt; periodWindow(
+&nbsp;            TransactionPeriodMode.Month,
+&nbsp;            LocalDate(today.year, today.month, 1).minus(1, DateTimeUnit.MONTH),
+&nbsp;        )
+&nbsp;        TransactionDatePreset.ThisYear -&gt; TransactionPeriodWindow(
+&nbsp;            from = LocalDate(today.year, 1, 1),
+&nbsp;            to = LocalDate(today.year, DECEMBER, DAYS_IN_DECEMBER),
 &nbsp;        )
 &nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun TransactionLine(
-&nbsp;    row: TransactionRowUi,
-&nbsp;    showAccount: Boolean,
-&nbsp;    title: String,
-&nbsp;    subtitle: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;) {
-&nbsp;    val transferTint = AppTheme.semanticColors.transfer
-&nbsp;    SurferTransactionLine(
-&nbsp;        modifier = Modifier.padding(horizontal = 16.dp),
-&nbsp;        icon = when {
-&nbsp;            row.isTransfer -&gt; SurferCategoryPalette.TransferIcon
-&nbsp;            // A collapsed split is several categories at once, so the category glyph says more
-&nbsp;            // about it than the generic receipt every expense row carries.
-&nbsp;            row.splitCategoryCount &gt; 0 -&gt; SurferIcons.Category
-&nbsp;            row.isExpense -&gt; SurferIcons.Receipt
-&nbsp;            else -&gt; SurferIcons.Wallet
-&nbsp;        },
-&nbsp;        title = title,
-&nbsp;        formattedAmount = row.formattedAmount,
-&nbsp;        categoryHueSeed = row.categoryHueSeed,
-&nbsp;        meta = row.metaLine(subtitle, showAccount),
-&nbsp;        iconTint = if (row.isTransfer) transferTint else AppTheme.materialColors.onSurfaceVariant,
-&nbsp;        iconBackground = if (row.isTransfer) {
-&nbsp;            transferTint.copy(alpha = TRANSFER_TILE_ALPHA)
-&nbsp;        } else {
-&nbsp;            AppTheme.materialColors.surfaceContainerHighest
-&nbsp;        },
-&nbsp;        amountColor = when {
-&nbsp;            row.isTransfer -&gt; AppTheme.materialColors.onSurfaceVariant
-&nbsp;            row.isExpense -&gt; AppTheme.materialColors.onSurface
-&nbsp;            else -&gt; AppTheme.semanticColors.income
-&nbsp;        },
-&nbsp;        amountPillBackground = if (row.isExpense || row.isTransfer) {
-&nbsp;            null
-&nbsp;        } else {
-&nbsp;            AppTheme.semanticColors.income.copy(alpha = INCOME_PILL_ALPHA)
-&nbsp;        },
-&nbsp;        onClick = onClick,
-&nbsp;    )
-&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * `Groceries · Everyday` — the row&#39;s category, then the account that owns it once the list is not
-&nbsp; * scoped to one. Either half may be missing (an uncategorised row, a single-account list), so the
-&nbsp; * separator is joined in rather than baked into a string.
-&nbsp; */
-&nbsp;private fun TransactionRowUi.metaLine(subtitle: String, showAccount: Boolean): String? = listOf(
-&nbsp;    subtitle,
-&nbsp;    accountName.takeIf { showAccount }.orEmpty(),
-&nbsp;).filter { it.isNotBlank() }
-&nbsp;    .joinToString(META_SEPARATOR)
-&nbsp;    .takeIf { it.isNotBlank() }
-&nbsp;
-&nbsp;/**
-&nbsp; * Why the list is empty, which is what every word and the CTA on the empty state follow from.
+&nbsp; * An amount the user typed, as an inclusive range of minor units.
 &nbsp; *
-&nbsp; * Resolved from [TransactionsByAccountState.Content.activeFilterCount] rather than from
-&nbsp; * `isFiltered`: the latter already counts a non-blank query, so it cannot tell [Search] from
-&nbsp; * [Filtered] — and only a real filter may be offered for clearing.
+&nbsp; * Typed precision is the tolerance: &quot;12&quot; means &quot;twelve-something&quot; (1200..1299), &quot;12.5&quot; means
+&nbsp; * &quot;twelve fifty-something&quot; (1250..1259), &quot;12.50&quot; is exact. Without that rule a search for the
+&nbsp; * amount on a receipt would only ever hit whole-unit transactions, and the min/max fields would
+&nbsp; * exclude a €12.99 charge from a &quot;max 12&quot; bound the user meant as &quot;no more than twelve-ish&quot;.
 &nbsp; */
-<b class="fc">&nbsp;private enum class EmptyReason { FirstRun, Search, Filtered }</b>
+<b class="fc">&nbsp;data class AmountRange(val fromMinor: Long, val toMinor: Long)</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * Whether the empty state on screen already offers &quot;add a transaction&quot;. The FAB is the same
-&nbsp; * action, and two add buttons a thumb apart is one too many — the screen hides the FAB while this
-&nbsp; * is true. Filtered and search empties do not count: their CTA clears the filter, not adds a row.
+&nbsp; * Parses [raw] as an amount, or returns null when it is not one.
+&nbsp; *
+&nbsp; * Currency symbols, spaces and thousands separators are dropped, and both `.` and `,` read as the
+&nbsp; * decimal separator — a filter field is not the place to be strict about how a number is written.
+&nbsp; * More than [MAX_DECIMALS] fraction digits is rejected rather than rounded: it is not an amount
+&nbsp; * this app can hold, so silently matching a truncated one would be a lie.
 &nbsp; */
-&nbsp;internal val TransactionsByAccountState.Content.showsAddCta: Boolean
-&nbsp;    get() = isEmpty &amp;&amp; emptyReason() == EmptyReason.FirstRun
-&nbsp;
-&nbsp;private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {
-&nbsp;    activeFilterCount &gt; 0 -&gt; EmptyReason.Filtered
-&nbsp;    query.isNotBlank() -&gt; EmptyReason.Search
-&nbsp;    else -&gt; EmptyReason.FirstRun
+&nbsp;fun parseAmountQuery(raw: String): AmountRange? {
+&nbsp;    val normalized = normalizeAmountInput(raw) ?: return null
+&nbsp;    val whole = normalized.substringBefore(&#39;.&#39;)
+&nbsp;    val fraction = normalized.substringAfter(&#39;.&#39;, missingDelimiterValue = &quot;&quot;)
+&nbsp;    val from = whole.toLong() * MINOR_PER_MAJOR + fraction.padEnd(MAX_DECIMALS, &#39;0&#39;).toLong()
+&nbsp;    // Everything the untyped digits could still be: &quot;12&quot; covers 12.00 through 12.99.
+&nbsp;    val slack = pow10(MAX_DECIMALS - fraction.length) - 1
+&nbsp;    return AmountRange(fromMinor = from, toMinor = from + slack)
 &nbsp;}
 &nbsp;
-&nbsp;/** Everything the empty state renders, so each reason names its copy in one place. */
-&nbsp;private data class EmptyStateSpec(
-&nbsp;    val title: StringResource,
-&nbsp;    val guidance: StringResource,
-&nbsp;    val actionLabel: StringResource,
-&nbsp;    val icon: ImageVector,
-&nbsp;    val actionIcon: ImageVector,
-&nbsp;    val action: TransactionsByAccountEvent,
-&nbsp;)
-&nbsp;
-&nbsp;private fun EmptyReason.spec(): EmptyStateSpec = when (this) {
-&nbsp;    // Nothing to show *yet*: the next step is the first transaction.
-&nbsp;    EmptyReason.FirstRun -&gt; EmptyStateSpec(
-&nbsp;        title = Res.string.transactions_list_empty_title,
-&nbsp;        guidance = Res.string.transactions_list_empty,
-&nbsp;        actionLabel = Res.string.transactions_list_empty_cta,
-&nbsp;        icon = SurferIcons.Receipt,
-&nbsp;        actionIcon = SurferIcons.Add,
-&nbsp;        action = TransactionsByAccountEvent.OnAddTransactionClick,
-&nbsp;    )
-&nbsp;    // Rows exist and are hidden, so the CTA is the way back rather than a way forward. &quot;Clear
-&nbsp;    // filters&quot; would name a control the search-only user never touched, hence the two variants.
-&nbsp;    EmptyReason.Search -&gt; EmptyStateSpec(
-&nbsp;        title = Res.string.transactions_list_empty_filtered_title,
-&nbsp;        guidance = Res.string.transactions_list_empty_search,
-&nbsp;        actionLabel = Res.string.transactions_list_empty_search_cta,
-&nbsp;        icon = SurferIcons.Search,
-&nbsp;        actionIcon = SurferIcons.Close,
-&nbsp;        action = TransactionsByAccountEvent.OnClearFiltersClick,
-&nbsp;    )
-&nbsp;    EmptyReason.Filtered -&gt; EmptyStateSpec(
-&nbsp;        title = Res.string.transactions_list_empty_filtered_title,
-&nbsp;        guidance = Res.string.transactions_list_empty_filtered,
-&nbsp;        actionLabel = Res.string.transactions_list_empty_filtered_cta,
-&nbsp;        icon = SurferIcons.Search,
-&nbsp;        actionIcon = SurferIcons.Close,
-&nbsp;        action = TransactionsByAccountEvent.OnClearFiltersClick,
-&nbsp;    )
+&nbsp;/**
+&nbsp; * `raw` reduced to `digits[.digits]`, or null when it is not an amount at all. Rejects rather
+&nbsp; * than clamps anything wider than the domain&#39;s own cap ([MAX_WHOLE_DIGITS] major units), so the
+&nbsp; * arithmetic above cannot overflow on a pasted wall of digits.
+&nbsp; */
+&nbsp;private fun normalizeAmountInput(raw: String): String? {
+&nbsp;    val cleaned = raw.trim()
+&nbsp;        .filterNot { it.isWhitespace() || it == &#39;\&#39;&#39; || it == &#39;_&#39; }
+&nbsp;        .removePrefix(&quot;+&quot;)
+&nbsp;        .replace(&#39;,&#39;, &#39;.&#39;)
+&nbsp;    val whole = cleaned.substringBefore(&#39;.&#39;)
+&nbsp;    val fraction = cleaned.substringAfter(&#39;.&#39;, missingDelimiterValue = &quot;&quot;)
+&nbsp;    val wellFormed = cleaned.all { it.isDigit() || it == &#39;.&#39; } &amp;&amp;
+&nbsp;        cleaned.count { it == &#39;.&#39; } &lt;= 1 &amp;&amp;
+&nbsp;        whole.isNotEmpty() &amp;&amp;
+&nbsp;        whole.length &lt;= MAX_WHOLE_DIGITS &amp;&amp;
+&nbsp;        fraction.length &lt;= MAX_DECIMALS
+&nbsp;    return cleaned.takeIf { wellFormed }
 &nbsp;}
 &nbsp;
-&nbsp;/** Title, one line of guidance and a single CTA, per the design system&#39;s empty-state rule. */
-&nbsp;@Composable
-&nbsp;internal fun EmptyState(
-&nbsp;    state: TransactionsByAccountState.Content,
-&nbsp;    onEvent: (TransactionsByAccountEvent) -&gt; Unit,
+&nbsp;private fun pow10(exponent: Int): Long = generateSequence(1L) { it * DECIMAL_RADIX }.elementAt(exponent)
+&nbsp;
+&nbsp;/**
+&nbsp; * A [TransactionFilters] with its three free-text amount fields parsed exactly once, ready to test
+&nbsp; * many rows.
+&nbsp; *
+&nbsp; * The min/max bounds and the search-amount are constant across a whole page, so parsing them per
+&nbsp; * row (as a naive `matches` loop would) repeats the same parse hundreds of times per rebuild.
+&nbsp; * [TransactionFilters.compile] does it once; the per-row [matches] then only compares.
+&nbsp; */
+&nbsp;class CompiledFilters internal constructor(
+&nbsp;    private val filters: TransactionFilters,
+&nbsp;    private val minMinor: Long?,
+&nbsp;    private val maxMinor: Long?,
+&nbsp;    private val queryAmount: AmountRange?,
+&nbsp;    private val needle: String,
 &nbsp;) {
-&nbsp;    val spec = state.emptyReason().spec()
-&nbsp;    Box(
-&nbsp;        modifier = Modifier.fillMaxSize(),
-&nbsp;        contentAlignment = Alignment.Center,
-&nbsp;    ) {
-&nbsp;        SurferEmptyState(
-&nbsp;            title = stringResource(spec.title),
-&nbsp;            subtitle = stringResource(spec.guidance),
-&nbsp;            icon = spec.icon,
-&nbsp;            actionLabel = stringResource(spec.actionLabel),
-&nbsp;            actionIcon = spec.actionIcon,
-&nbsp;            onActionClick = { onEvent(spec.action) },
-&nbsp;        )
+&nbsp;    /**
+&nbsp;     * Whether [row] survives these filters.
+&nbsp;     *
+&nbsp;     * The date window is *not* checked here — it is applied by the query (see [resolveWindow]), so
+&nbsp;     * re-checking it would only duplicate a bound the database already honoured.
+&nbsp;     *
+&nbsp;     * `accountIds` is expected to be empty when the list is already scoped to one account; the
+&nbsp;     * ViewModel clears it there, because intersecting a per-account list with a different account
+&nbsp;     * would silently show nothing.
+&nbsp;     */
+&nbsp;    fun matches(row: CategorizedTransaction): Boolean {
+&nbsp;        val transaction = row.transaction
+&nbsp;        return matchesType(transaction) &amp;&amp;
+&nbsp;            (filters.accountIds.isEmpty() || transaction.accountId in filters.accountIds) &amp;&amp;
+&nbsp;            (filters.categoryIds.isEmpty() || transaction.categoryId in filters.categoryIds) &amp;&amp;
+&nbsp;            matchesAmountBounds(transaction) &amp;&amp;
+&nbsp;            (!filters.recurringOnly || transaction.recurringRuleId != null) &amp;&amp;
+&nbsp;            (!filters.plannedOnly || transaction.status == TransactionStatus.PLANNED) &amp;&amp;
+&nbsp;            matchesQuery(row)
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The stored type alone cannot answer this: both legs of a transfer are an ordinary
+&nbsp;     * `EXPENSE`/`INCOME` pair, so reading only [Transaction.type] would leave `Expenses` showing
+&nbsp;     * the outgoing leg the user picked the segment to hide. `transferId` is what separates money
+&nbsp;     * that left the books from money that only moved sideways, and it keeps the four segments
+&nbsp;     * disjoint.
+&nbsp;     */
+&nbsp;    private fun matchesType(transaction: Transaction): Boolean {
+&nbsp;        val isTransferLeg = transaction.transferId != null
+&nbsp;        return when (filters.type) {
+&nbsp;            TransactionTypeFilter.All -&gt; true
+&nbsp;            TransactionTypeFilter.Expenses -&gt; !isTransferLeg &amp;&amp; transaction.type == TransactionType.EXPENSE
+&nbsp;            TransactionTypeFilter.Income -&gt; !isTransferLeg &amp;&amp; transaction.type == TransactionType.INCOME
+&nbsp;            TransactionTypeFilter.Transfer -&gt; isTransferLeg
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Bounds compare against the *magnitude*: the sign is the type filter&#39;s business, and a user
+&nbsp;     * asking for &quot;at least 50&quot; means fifty of money, not −50 being below the bound.
+&nbsp;     *
+&nbsp;     * An unparseable bound is ignored rather than treated as zero, and a trailing separator reads
+&nbsp;     * as the digits before it, so neither nonsense nor a half-typed &quot;12.&quot; empties the list.
+&nbsp;     */
+&nbsp;    private fun matchesAmountBounds(transaction: Transaction): Boolean {
+&nbsp;        val minor = transaction.money.abs().minor
+&nbsp;        return (minMinor == null || minor &gt;= minMinor) &amp;&amp; (maxMinor == null || minor &lt;= maxMinor)
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Free-text search over what the user can actually see or remember about a row: merchant, note,
+&nbsp;     * category, tags — and the amount, which is matched numerically rather than as text so that
+&nbsp;     * &quot;12&quot; finds €12.40 without also finding every note containing &quot;12&quot;.
+&nbsp;     */
+&nbsp;    private fun matchesQuery(row: CategorizedTransaction): Boolean {
+&nbsp;        if (needle.isEmpty()) return true
+&nbsp;        val transaction = row.transaction
+&nbsp;        val textHit = sequenceOf(transaction.merchant, transaction.note, row.categoryName.orEmpty())
+&nbsp;            .plus(transaction.tags)
+&nbsp;            .any { it.contains(needle, ignoreCase = true) }
+&nbsp;        val amountHit = queryAmount != null &amp;&amp;
+&nbsp;            transaction.money.abs().minor in queryAmount.fromMinor..queryAmount.toMinor
+&nbsp;        return textHit || amountHit
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/** Parses the amount fields once so a per-row loop only compares — see [CompiledFilters]. */
+&nbsp;fun TransactionFilters.compile(): CompiledFilters {
+&nbsp;    val trimmed = query.trim()
+&nbsp;    return CompiledFilters(
+&nbsp;        filters = this,
+&nbsp;        minMinor = parseAmountQuery(minAmount)?.fromMinor,
+&nbsp;        maxMinor = parseAmountQuery(maxAmount)?.toMinor,
+&nbsp;        queryAmount = trimmed.takeIf { it.isNotEmpty() }?.let(::parseAmountQuery),
+&nbsp;        needle = trimmed,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Single-row convenience — compiles then tests. For a page of rows, [compile] once and reuse. */
+&nbsp;fun TransactionFilters.matches(row: CategorizedTransaction): Boolean = compile().matches(row)
 </code>
 </pre>
 </div>
@@ -338,7 +323,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

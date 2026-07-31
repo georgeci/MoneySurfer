@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferStatusHeroTone</title>
+  <title>MoneySurfer Coverage Report > SurferCategoryTrendCardKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferStatusHeroTone (com.georgeci.moneysurfer.uikit.components.settings)</h1>
+<h1>Coverage Summary for Class: SurferCategoryTrendCardKt (com.georgeci.moneysurfer.uikit.components.category)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferStatusHeroTone</td>
+  <td class="name">SurferCategoryTrendCardKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,27 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    66.7%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/3)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    98.2%
   </span>
   <span class="absValue">
-    (24/24)
+    (273/278)
   </span>
 </td>
 </tr>
@@ -92,116 +99,101 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.category
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
 &nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.draw.shadow
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.ChartHeaderSpacing
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferBar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferBarColumn
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferBarColumns
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferChartCardHeader
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-<b class="fc">&nbsp;enum class SurferStatusHeroTone { Primary, Secondary, Tertiary }</b>
+&nbsp;/** One bar of [SurferCategoryTrendCard]. [value] is a magnitude; [label] is the axis tick. */
+&nbsp;data class SurferCategoryTrendBar(
+&nbsp;    val label: String,
+&nbsp;    val value: Long,
+&nbsp;    val formattedValue: String,
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Tinted hero card with a circular icon, title, and optional supporting line.
-&nbsp; * Generic enough to power sync status, last-backup, and similar surfaces.
+&nbsp; * Month-by-month spend for one category, drawn as bar columns in the category&#39;s [tint].
+&nbsp; *
+&nbsp; * Bars are scaled against the tallest bar in the set rather than against an absolute ceiling, so a
+&nbsp; * quiet category still reads as a shape instead of a flat line — see [SurferBarColumns], which owns
+&nbsp; * that treatment and the zero-set floor along with it. The final column is the current month and is
+&nbsp; * emphasised: it is the one number the rest exist to give context to.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferStatusHeroCard(
+&nbsp;fun SurferCategoryTrendCard(
 &nbsp;    title: String,
-&nbsp;    icon: ImageVector,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    supporting: String? = null,
-&nbsp;    tone: SurferStatusHeroTone = SurferStatusHeroTone.Tertiary,
-&nbsp;) {
-&nbsp;    val colors = AppTheme.materialColors
-&nbsp;    val (bg, fg) = when (tone) {
-&nbsp;        SurferStatusHeroTone.Primary -&gt; colors.primaryContainer to colors.onPrimaryContainer
-&nbsp;        SurferStatusHeroTone.Secondary -&gt; colors.secondaryContainer to colors.onSecondaryContainer
-&nbsp;        SurferStatusHeroTone.Tertiary -&gt; colors.tertiaryContainer to colors.onTertiaryContainer
-&nbsp;    }
-&nbsp;    val shape = RoundedCornerShape(20.dp)
-&nbsp;    Row(
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .shadow(elevation = 2.dp, shape = shape)
-&nbsp;            .clip(shape)
-&nbsp;            .background(bg)
-&nbsp;            .padding(18.dp),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(48.dp)
-&nbsp;                .clip(CircleShape)
-&nbsp;                .background(Color.White.copy(alpha = 0.2f)),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = icon,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = fg,
-&nbsp;                modifier = Modifier.size(24.dp),
+&nbsp;    bars: List&lt;SurferCategoryTrendBar&gt;,
+&nbsp;    tint: Color,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    trailingLabel: String? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferCard(modifier = modifier.fillMaxWidth()) {</b>
+<b class="fc">&nbsp;        Column(modifier = Modifier.padding(16.dp)) {</b>
+<b class="fc">&nbsp;            SurferChartCardHeader(title = title, trailingLabel = trailingLabel)</b>
+&nbsp;
+<b class="fc">&nbsp;            Spacer(Modifier.height(ChartHeaderSpacing))</b>
+&nbsp;
+<b class="fc">&nbsp;            SurferBarColumns(</b>
+<b class="fc">&nbsp;                columns = bars.mapIndexed { index, bar -&gt;</b>
+<b class="fc">&nbsp;                    val emphasised = index == bars.lastIndex</b>
+<b class="fc">&nbsp;                    SurferBarColumn(</b>
+<b class="fc">&nbsp;                        label = bar.label,</b>
+<b class="fc">&nbsp;                        bars = listOf(SurferBar(value = bar.value, tint = tint)),</b>
+<b class="fc">&nbsp;                        contentDescription = &quot;${bar.label}: ${bar.formattedValue}&quot;,</b>
+&nbsp;                        // Only the current column carries its value — six stacked numerals on a
+&nbsp;                        // phone-width chart collide, and the other five are readable from the bar
+&nbsp;                        // heights.
+<b class="fc">&nbsp;                        valueLabel = bar.formattedValue.takeIf { emphasised },</b>
+<b class="fc">&nbsp;                        emphasised = emphasised,</b>
+<b class="fc">&nbsp;                    )</b>
+&nbsp;                },
 &nbsp;            )
-&nbsp;        }
-&nbsp;        Column(modifier = Modifier.weight(1f)) {
-&nbsp;            Text(
-&nbsp;                text = title,
-&nbsp;                style = AppTheme.typography.titleMedium,
-&nbsp;                color = fg,
-&nbsp;            )
-&nbsp;            if (supporting != null) {
-&nbsp;                Text(
-&nbsp;                    text = supporting,
-&nbsp;                    style = AppTheme.typography.bodySmall,
-&nbsp;                    color = fg.copy(alpha = 0.85f),
-&nbsp;                    modifier = Modifier.padding(top = 2.dp),
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
+<b class="fc">&nbsp;        }</b>
 &nbsp;    }
-&nbsp;}
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferStatusHeroCardPreview() {
+&nbsp;private fun SurferCategoryTrendCardPreview() {
 &nbsp;    SurferComponentPreview {
 &nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
 &nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
 &nbsp;        ) {
-&nbsp;            SurferStatusHeroCard(
-&nbsp;                title = &quot;Up to date&quot;,
-&nbsp;                supporting = &quot;Last sync: today, 14:02&quot;,
-&nbsp;                icon = SurferIcons.Sync,
-&nbsp;                tone = SurferStatusHeroTone.Tertiary,
+&nbsp;            SurferCategoryTrendCard(
+&nbsp;                title = &quot;Last 6 months&quot;,
+&nbsp;                trailingLabel = &quot;Avg €190&quot;,
+&nbsp;                tint = SurferCategoryPalette.tints[5],
+&nbsp;                bars = listOf(
+&nbsp;                    SurferCategoryTrendBar(&quot;Nov&quot;, 20500, &quot;€205&quot;),
+&nbsp;                    SurferCategoryTrendBar(&quot;Dec&quot;, 19200, &quot;€192&quot;),
+&nbsp;                    SurferCategoryTrendBar(&quot;Jan&quot;, 24000, &quot;€240&quot;),
+&nbsp;                    SurferCategoryTrendBar(&quot;Feb&quot;, 19800, &quot;€198&quot;),
+&nbsp;                    SurferCategoryTrendBar(&quot;Mar&quot;, 17600, &quot;€176&quot;),
+&nbsp;                    SurferCategoryTrendBar(&quot;Apr&quot;, 16855, &quot;€168.55&quot;),
+&nbsp;                ),
 &nbsp;            )
-&nbsp;            SurferStatusHeroCard(
-&nbsp;                title = &quot;Last backup · today&quot;,
-&nbsp;                supporting = &quot;14:02 · 18 MB · 2,341 transactions&quot;,
-&nbsp;                icon = SurferIcons.Cloud,
-&nbsp;                tone = SurferStatusHeroTone.Primary,
+&nbsp;            SurferCategoryTrendCard(
+&nbsp;                title = &quot;Last 6 months&quot;,
+&nbsp;                tint = SurferCategoryPalette.tints[3],
+&nbsp;                bars = List(6) { SurferCategoryTrendBar(&quot;M$it&quot;, 0, &quot;€0&quot;) },
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
@@ -229,7 +221,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

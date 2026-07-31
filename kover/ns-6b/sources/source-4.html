@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncDatabaseBuilder_jvmKt</title>
+  <title>MoneySurfer Coverage Report > NoOpCrashReporter</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncDatabaseBuilder_jvmKt (com.georgeci.moneysurfer.sync.db)</h1>
+<h1>Coverage Summary for Class: NoOpCrashReporter (com.georgeci.moneysurfer.offline.noop)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncDatabaseBuilder_jvmKt</td>
+  <td class="name">NoOpCrashReporter</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -55,13 +58,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/1)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,50 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/14)
+    (0/4)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">SyncDatabaseBuilder_jvmKt$getSyncDatabaseBuilder$$inlined$databaseBuilder$default$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/14)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -120,16 +92,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
 &nbsp;
-&nbsp;import androidx.room.Room
-&nbsp;import androidx.room.RoomDatabase
-&nbsp;import com.georgeci.moneysurfer.domain.storage.appDataDir
-&nbsp;import java.io.File
+&nbsp;import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
 &nbsp;
-&nbsp;fun getSyncDatabaseBuilder(): RoomDatabase.Builder&lt;SyncDatabase&gt; {
-<b class="nc">&nbsp;    val dbFile = File(appDataDir(), SYNC_DB_NAME)</b>
-<b class="nc">&nbsp;    return Room.databaseBuilder&lt;SyncDatabase&gt;(dbFile.absolutePath)</b>
+<b class="nc">&nbsp;class NoOpCrashReporter : CrashReporter {</b>
+<b class="nc">&nbsp;    override fun log(message: String) = Unit</b>
+<b class="nc">&nbsp;    override fun record(error: Throwable) = Unit</b>
+<b class="nc">&nbsp;    override fun setUserId(userId: String?) = Unit</b>
+<b class="nc">&nbsp;    override fun setKey(key: String, value: String) = Unit</b>
+<b class="nc">&nbsp;    override fun setKey(key: String, value: Boolean) = Unit</b>
+<b class="nc">&nbsp;    override fun setCollectionEnabled(enabled: Boolean) = Unit</b>
 &nbsp;}
 </code>
 </pre>
@@ -154,7 +127,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

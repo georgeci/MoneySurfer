@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncDatabaseBuilderKt</title>
+  <title>MoneySurfer Coverage Report > LastSyncOutcome</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncDatabaseBuilderKt (com.georgeci.moneysurfer.sync.db)</h1>
+<h1>Coverage Summary for Class: LastSyncOutcome (com.georgeci.moneysurfer.sync.api)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,43 +45,146 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SyncDatabaseBuilderKt</td>
+  <tr>
+    <td class="name">LastSyncOutcome$Cancelled</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/13)
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LastSyncOutcome$Failed</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LastSyncOutcome$None</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LastSyncOutcome$Success</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,21 +192,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
 &nbsp;
-&nbsp;import androidx.room.RoomDatabase
-&nbsp;import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-&nbsp;import kotlinx.coroutines.Dispatchers
-&nbsp;import kotlinx.coroutines.IO
+&nbsp;import kotlin.time.Instant
 &nbsp;
-&nbsp;fun getSyncRoomDatabase(builder: RoomDatabase.Builder&lt;SyncDatabase&gt;): SyncDatabase =
-<b class="nc">&nbsp;    builder</b>
-<b class="nc">&nbsp;        .setDriver(BundledSQLiteDriver())</b>
-<b class="nc">&nbsp;        .setQueryCoroutineContext(Dispatchers.IO)</b>
-<b class="nc">&nbsp;        .fallbackToDestructiveMigration(dropAllTables = true)</b>
-<b class="nc">&nbsp;        .build()</b>
-&nbsp;
-&nbsp;internal const val SYNC_DB_NAME = &quot;moneysurfer_sync.db&quot;
+&nbsp;/**
+&nbsp; * Persistent &quot;last sync outcome&quot; — for UI badges like &quot;last synced N min ago&quot;.
+&nbsp; * Separate from [SyncState] (live activity).
+&nbsp; * See SyncCoordinatorFAQ.md №10.
+&nbsp; */
+&nbsp;sealed interface LastSyncOutcome {
+<b class="fc">&nbsp;    data object None : LastSyncOutcome</b>
+<b class="fc">&nbsp;    data class Success(val summary: SyncSummary, val at: Instant) : LastSyncOutcome</b>
+<b class="fc">&nbsp;    data class Failed(val error: SyncError, val at: Instant) : LastSyncOutcome</b>
+<b class="fc">&nbsp;    data class Cancelled(val at: Instant) : LastSyncOutcome</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -130,7 +230,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

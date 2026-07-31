@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSwipeRevealRowKt</title>
+  <title>MoneySurfer Coverage Report > SurferSkeletonKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSwipeRevealRowKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferSkeletonKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,138 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSwipeRevealRowKt</td>
+  <td class="name">SurferSkeletonKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     66.7%
   </span>
   <span class="absValue">
-    (6/9)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    31.6%
+    66.7%
   </span>
   <span class="absValue">
-    (12/38)
+    (8/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.2%
+    100%
   </span>
   <span class="absValue">
-    (67/76)
+    (45/45)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.3%
+    99.2%
   </span>
   <span class="absValue">
-    (831/963)
+    (507/511)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">SurferSwipeRevealRowKt$SurferSwipeRevealRow$3$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/25)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">SurferSwipeRevealRowKt$SurferSwipeRevealRow$4$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/39)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    54.5%
-  </span>
-  <span class="absValue">
-    (6/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    30%
-  </span>
-  <span class="absValue">
-    (12/40)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    84.8%
-  </span>
-  <span class="absValue">
-    (67/79)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    80.9%
-  </span>
-  <span class="absValue">
-    (831/1027)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -185,238 +99,121 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
-&nbsp;import androidx.compose.animation.core.Animatable
+&nbsp;import androidx.compose.animation.core.LinearEasing
+&nbsp;import androidx.compose.animation.core.RepeatMode
+&nbsp;import androidx.compose.animation.core.animateFloat
+&nbsp;import androidx.compose.animation.core.infiniteRepeatable
+&nbsp;import androidx.compose.animation.core.rememberInfiniteTransition
+&nbsp;import androidx.compose.animation.core.tween
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.gestures.Orientation
-&nbsp;import androidx.compose.foundation.gestures.draggable
-&nbsp;import androidx.compose.foundation.gestures.rememberDraggableState
 &nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.RowScope
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
 &nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.rememberCoroutineScope
+&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.layout.layout
-&nbsp;import androidx.compose.ui.platform.LocalDensity
-&nbsp;import androidx.compose.ui.semantics.CustomAccessibilityAction
-&nbsp;import androidx.compose.ui.semantics.clearAndSetSemantics
-&nbsp;import androidx.compose.ui.semantics.customActions
-&nbsp;import androidx.compose.ui.semantics.semantics
+&nbsp;import androidx.compose.ui.geometry.Offset
+&nbsp;import androidx.compose.ui.graphics.Brush
+&nbsp;import androidx.compose.ui.graphics.Shape
+&nbsp;import androidx.compose.ui.layout.onSizeChanged
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import kotlinx.coroutines.launch
-&nbsp;import kotlin.math.roundToInt
 &nbsp;
 &nbsp;/**
-&nbsp; * One revealed action, restated for assistive technology.
-&nbsp; *
-&nbsp; * A swipe is a gesture no screen reader user can perform, so anything hidden behind one is
-&nbsp; * unreachable unless it is also published as a semantic action. Pair each entry with the
-&nbsp; * [SurferSwipeAction] it mirrors.
-&nbsp; */
-&nbsp;data class SurferSwipeAccessibilityAction(
-&nbsp;    val label: String,
-&nbsp;    val onAction: () -&gt; Unit,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Wraps a list-row style [content] with a horizontally-swipeable foreground that reveals an
-&nbsp; * [actions] layer pinned to the trailing edge. Used on the manage-accounts screen so each
-&nbsp; * account row can hide its destructive affordances behind a swipe.
-&nbsp; *
-&nbsp; * - [revealWidth] is the total horizontal travel — sized to fit the [actions] row&#39;s intrinsic
-&nbsp; *   width (e.g. two 72dp action buttons + 6dp gaps + 6dp padding ≈ 156dp).
-&nbsp; * - When [enabled] is false the wrapper short-circuits to plain [content] with no gesture and
-&nbsp; *   no action layer — useful while a list is in edit mode and swipe should be suppressed.
-&nbsp; * - [accessibilityActions] publishes the revealed actions as custom accessibility actions on the
-&nbsp; *   row. Supplying them also hides the action layer from the accessibility tree: it is composed
-&nbsp; *   whether or not the row is swiped open, so left alone a screen reader walks buttons the sighted
-&nbsp; *   user cannot see. Empty (the default) leaves existing callers exactly as they were.
+&nbsp; * A single shimmering placeholder block. Sweeps a highlight band across a muted base so a
+&nbsp; * loading screen reads as &quot;content is on the way&quot; rather than an empty void. Compose these
+&nbsp; * into screen-shaped skeletons (see [SurferSkeletonRow]).
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferSwipeRevealRow(
-&nbsp;    revealWidth: Dp,
+<b class="fc">&nbsp;fun SurferSkeleton(</b>
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    enabled: Boolean = true,</b>
-<b class="fc">&nbsp;    accessibilityActions: List&lt;SurferSwipeAccessibilityAction&gt; = emptyList(),</b>
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit,
-&nbsp;    content: @Composable () -&gt; Unit,
+<b class="fc">&nbsp;    shape: Shape = AppTheme.shapes.medium,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="pc">&nbsp;    if (!enabled) {</b>
-<b class="nc">&nbsp;        Box(modifier = modifier) { content() }</b>
-&nbsp;        return
-<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    val base = AppTheme.materialColors.onSurface.copy(alpha = 0.08f)</b>
+<b class="fc">&nbsp;    val highlight = AppTheme.materialColors.onSurface.copy(alpha = 0.16f)</b>
 &nbsp;
-<b class="fc">&nbsp;    val density = LocalDensity.current</b>
-<b class="fc">&nbsp;    val revealPx = with(density) { revealWidth.toPx() }</b>
-<b class="fc">&nbsp;    val offset = remember { Animatable(0f) }</b>
-<b class="fc">&nbsp;    val scope = rememberCoroutineScope()</b>
+<b class="fc">&nbsp;    var widthPx by remember { mutableStateOf(0f) }</b>
+<b class="fc">&nbsp;    val transition = rememberInfiniteTransition(label = &quot;surfer-skeleton&quot;)</b>
+<b class="fc">&nbsp;    val progress by transition.animateFloat(</b>
+<b class="fc">&nbsp;        initialValue = 0f,</b>
+<b class="fc">&nbsp;        targetValue = 1f,</b>
+<b class="fc">&nbsp;        animationSpec = infiniteRepeatable(</b>
+<b class="fc">&nbsp;            animation = tween(durationMillis = 1300, easing = LinearEasing),</b>
+<b class="fc">&nbsp;            repeatMode = RepeatMode.Restart,</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        label = &quot;surfer-skeleton-progress&quot;,</b>
+&nbsp;    )
 &nbsp;
-<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;    val travel = widthPx * 2f</b>
+<b class="fc">&nbsp;    val translate = progress * travel - widthPx</b>
+<b class="fc">&nbsp;    val brush = Brush.linearGradient(</b>
+<b class="fc">&nbsp;        colors = listOf(base, highlight, base),</b>
+<b class="fc">&nbsp;        start = Offset(translate, 0f),</b>
+<b class="fc">&nbsp;        end = Offset(translate + widthPx, 0f),</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;    androidx.compose.foundation.layout.Box(</b>
 <b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .semanticActions(accessibilityActions)</b>
-<b class="fc">&nbsp;            .draggable(</b>
-<b class="fc">&nbsp;                orientation = Orientation.Horizontal,</b>
-<b class="fc">&nbsp;                state = rememberDraggableState { delta -&gt;</b>
-<b class="nc">&nbsp;                    scope.launch {</b>
-<b class="nc">&nbsp;                        offset.snapTo((offset.value + delta).coerceIn(-revealPx, 0f))</b>
-&nbsp;                    }
-&nbsp;                },
-<b class="fc">&nbsp;                onDragStopped = {</b>
-<b class="nc">&nbsp;                    val target = if (offset.value &lt; -revealPx / 2f) -revealPx else 0f</b>
-<b class="nc">&nbsp;                    offset.animateTo(target)</b>
-&nbsp;                },
-&nbsp;            ),
-&nbsp;    ) {
-<b class="fc">&nbsp;        Row(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .matchParentSize()</b>
-<b class="fc">&nbsp;                .padding(6.dp)</b>
-&nbsp;                // Already offered as custom actions above; leaving the buttons in the tree as well
-&nbsp;                // would make every row read twice.
-<b class="pc">&nbsp;                .then(if (accessibilityActions.isEmpty()) Modifier else Modifier.clearAndSetSemantics {}),</b>
-<b class="fc">&nbsp;            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),</b>
-<b class="fc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
-&nbsp;            content = actions,
-&nbsp;        )
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier.layout { measurable, constraints -&gt;</b>
-<b class="fc">&nbsp;                val placeable = measurable.measure(constraints)</b>
-<b class="fc">&nbsp;                layout(placeable.width, placeable.height) {</b>
-<b class="fc">&nbsp;                    placeable.placeRelative(offset.value.roundToInt(), 0)</b>
-&nbsp;                }
-&nbsp;            },
-&nbsp;        ) {
-<b class="fc">&nbsp;            content()</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;            .clip(shape)</b>
+<b class="fc">&nbsp;            .onSizeChanged { widthPx = it.width.toFloat() }</b>
+<b class="fc">&nbsp;            .background(brush),</b>
+&nbsp;    )
 <b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * Merges the row into one accessibility node carrying [actions] as custom actions, so a screen
-&nbsp; * reader reaches them from the row itself. No-op when there are none, which keeps the semantics of
-&nbsp; * callers that have not opted in byte-for-byte unchanged.
-&nbsp; */
-&nbsp;private fun Modifier.semanticActions(actions: List&lt;SurferSwipeAccessibilityAction&gt;): Modifier =
-<b class="pc">&nbsp;    if (actions.isEmpty()) {</b>
-<b class="nc">&nbsp;        this</b>
-&nbsp;    } else {
-<b class="fc">&nbsp;        semantics(mergeDescendants = true) {</b>
-<b class="fc">&nbsp;            customActions = actions.map { action -&gt;</b>
-&nbsp;                // The `true` is the contract: it tells the accessibility framework the action was
-&nbsp;                // handled here rather than falling through.
-<b class="fc">&nbsp;                CustomAccessibilityAction(action.label) {</b>
-<b class="nc">&nbsp;                    action.onAction()</b>
-<b class="nc">&nbsp;                    true</b>
-<b class="fc">&nbsp;                }</b>
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;/**
-&nbsp; * Standard trailing action used inside [SurferSwipeRevealRow.actions]. Stacks an icon over a
-&nbsp; * label, sized to the swipe-reveal track. Pass [destructive] = true for the delete-style action
-&nbsp; * (uses the error tonal pair).
+&nbsp; * A list-row skeleton: a circular avatar placeholder beside two stacked text-line
+&nbsp; * placeholders. Drop several into a column to skeleton-out a loading list.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferSwipeAction(
-&nbsp;    icon: ImageVector,
-&nbsp;    label: String,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    destructive: Boolean = false,</b>
-<b class="fc">&nbsp;    width: Dp = 72.dp,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="pc">&nbsp;    val bg = if (destructive) {</b>
-<b class="fc">&nbsp;        AppTheme.materialColors.error</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.surfaceContainerHighest</b>
-&nbsp;    }
-<b class="pc">&nbsp;    val fg = if (destructive) {</b>
-<b class="fc">&nbsp;        AppTheme.materialColors.onError</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.onSurface</b>
-&nbsp;    }
-<b class="fc">&nbsp;    Column(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .width(width)</b>
-<b class="fc">&nbsp;            .fillMaxHeight()</b>
-<b class="fc">&nbsp;            .clip(RoundedCornerShape(12.dp))</b>
-<b class="fc">&nbsp;            .background(bg)</b>
-<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
-<b class="fc">&nbsp;            .padding(vertical = 8.dp),</b>
-<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="fc">&nbsp;        verticalArrangement = Arrangement.Center,</b>
+<b class="pc">&nbsp;fun SurferSkeletonRow(modifier: Modifier = Modifier) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
 &nbsp;    ) {
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = icon,</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            tint = fg,</b>
-<b class="fc">&nbsp;            modifier = Modifier.size(20.dp),</b>
+<b class="fc">&nbsp;        SurferSkeleton(</b>
+<b class="fc">&nbsp;            modifier = Modifier.size(44.dp),</b>
+<b class="fc">&nbsp;            shape = CircleShape,</b>
 &nbsp;        )
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = label,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;            color = fg,</b>
-&nbsp;        )
+<b class="fc">&nbsp;        Spacer(Modifier.width(AppTheme.spacing.medium))</b>
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.xSmall),</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            SurferSkeleton(modifier = Modifier.fillMaxWidth(fraction = 0.55f).height(14.dp))</b>
+<b class="fc">&nbsp;            SurferSkeleton(modifier = Modifier.fillMaxWidth(fraction = 0.35f).height(12.dp))</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Spacer(Modifier.width(AppTheme.spacing.medium))</b>
+<b class="fc">&nbsp;        SurferSkeleton(modifier = Modifier.width(64.dp).height(16.dp))</b>
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferSwipeRevealRowPreview() {
+&nbsp;private fun SurferSkeletonPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        SurferSwipeRevealRow(
-&nbsp;            revealWidth = 156.dp,
+&nbsp;        Column(
 &nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            actions = {
-&nbsp;                SurferSwipeAction(
-&nbsp;                    icon = SurferIcons.Archive,
-&nbsp;                    label = &quot;Archive&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;                SurferSwipeAction(
-&nbsp;                    icon = SurferIcons.Delete,
-&nbsp;                    label = &quot;Delete&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                    destructive = true,
-&nbsp;                )
-&nbsp;            },
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
 &nbsp;        ) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .clip(RoundedCornerShape(18.dp))
-&nbsp;                    .background(AppTheme.materialColors.surfaceContainerLow)
-&nbsp;                    .padding(16.dp),
-&nbsp;            ) {
-&nbsp;                Text(
-&nbsp;                    text = &quot;Drag me left&quot;,
-&nbsp;                    style = AppTheme.typography.bodyLarge,
-&nbsp;                    color = Color.Unspecified,
-&nbsp;                )
-&nbsp;            }
+&nbsp;            SurferSkeleton(modifier = Modifier.fillMaxWidth().height(160.dp))
+&nbsp;            SurferSkeletonRow()
+&nbsp;            SurferSkeletonRow()
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
@@ -443,7 +240,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

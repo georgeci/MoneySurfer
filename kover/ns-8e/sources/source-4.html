@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferWindowSize</title>
+  <title>MoneySurfer Coverage Report > ContainerStyleKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.window</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferWindowSize (com.georgeci.moneysurfer.uikit.window)</h1>
+<h1>Coverage Summary for Class: ContainerStyleKt (com.georgeci.moneysurfer.uikit.theme)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferWindowSize</td>
+  <td class="name">ContainerStyleKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -61,55 +72,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (50/50)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SurferWindowSize$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (26/26)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -118,31 +83,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (5/5)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (15/15)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (76/76)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,77 +92,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.window
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
 &nbsp;
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.platform.LocalDensity
-&nbsp;import androidx.compose.ui.platform.LocalWindowInfo
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.compose.runtime.staticCompositionLocalOf
 &nbsp;
-&nbsp;/**
-&nbsp; * The Material 3 window *width* breakpoints, named once for the whole app.
-&nbsp; *
-&nbsp; * Before this existed every caller reached for `androidx.window.core.layout` constants directly,
-&nbsp; * so &quot;wide&quot; meant whatever each screen happened to compare against. Features depend on this enum
-&nbsp; * instead; `androidx.window` stays an implementation detail of the windowing libraries.
-&nbsp; *
-&nbsp; * Entries are declared narrow-to-wide, so the natural enum ordering is also the width ordering:
-&nbsp; * `currentSurferWindowSize() &gt;= SurferWindowSize.Medium` reads as &quot;at least Medium&quot;.
-&nbsp; *
-&nbsp; * Height breakpoints are deliberately absent — nothing in the app branches on window height yet,
-&nbsp; * and an unused axis is one more thing to keep honest.
-&nbsp; */
-&nbsp;enum class SurferWindowSize {
-&nbsp;    /** `&lt; 600 dp` — phones in portrait, and the narrow pane of a split-screen window. */
-<b class="fc">&nbsp;    Compact,</b>
-&nbsp;
-&nbsp;    /** `600–839 dp` — large phones in landscape, small tablets, resized desktop windows. */
-<b class="fc">&nbsp;    Medium,</b>
-&nbsp;
-&nbsp;    /** `840–1199 dp` — tablets in landscape, most desktop windows. */
-<b class="fc">&nbsp;    Expanded,</b>
-&nbsp;
-&nbsp;    /** `&gt;= 1200 dp` — maximised desktop windows and large external displays. */
-<b class="fc">&nbsp;    Large,</b>
-&nbsp;
-&nbsp;    ;
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Lower bound of [Medium]. */
-<b class="fc">&nbsp;        val MediumLowerBound: Dp = 600.dp</b>
-&nbsp;
-&nbsp;        /** Lower bound of [Expanded]. */
-<b class="fc">&nbsp;        val ExpandedLowerBound: Dp = 840.dp</b>
-&nbsp;
-&nbsp;        /** Lower bound of [Large]. */
-<b class="fc">&nbsp;        val LargeLowerBound: Dp = 1200.dp</b>
-&nbsp;
-&nbsp;        /** Buckets a window [width] into a breakpoint. Widest bound first — the order matters. */
-<b class="fc">&nbsp;        fun ofWidth(width: Dp): SurferWindowSize = when {</b>
-<b class="fc">&nbsp;            width &gt;= LargeLowerBound -&gt; Large</b>
-<b class="fc">&nbsp;            width &gt;= ExpandedLowerBound -&gt; Expanded</b>
-<b class="fc">&nbsp;            width &gt;= MediumLowerBound -&gt; Medium</b>
-<b class="fc">&nbsp;            else -&gt; Compact</b>
-&nbsp;        }
-&nbsp;    }
+&nbsp;enum class SurferContainerStyle {
+&nbsp;    Filled,
+&nbsp;    Outlined,
+&nbsp;    Card,
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The [SurferWindowSize] of the window this composition is hosted in, recomposing when the window
-&nbsp; * is resized.
-&nbsp; *
-&nbsp; * Measures `LocalWindowInfo.containerSize` in the current density — the same input
-&nbsp; * `currentWindowAdaptiveInfo()` derives its `WindowSizeClass` from, minus the dependency on the
-&nbsp; * `androidx.window` breakpoint sets (whose default set stops at Expanded and would collapse
-&nbsp; * [SurferWindowSize.Large] into it).
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun currentSurferWindowSize(): SurferWindowSize {
-&nbsp;    val containerWidth = LocalWindowInfo.current.containerSize.width
-&nbsp;    val widthDp = with(LocalDensity.current) { containerWidth.toDp() }
-&nbsp;    return SurferWindowSize.ofWidth(widthDp)
-&nbsp;}
+<b class="fc">&nbsp;internal val LocalContainerStyle = staticCompositionLocalOf { SurferContainerStyle.Card }</b>
 </code>
 </pre>
 </div>
@@ -244,7 +126,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>

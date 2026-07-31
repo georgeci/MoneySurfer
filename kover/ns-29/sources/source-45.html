@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetUpcomingRecurringUseCaseKt</title>
+  <title>MoneySurfer Coverage Report > GetTransferCounterpartUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetUpcomingRecurringUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetTransferCounterpartUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetUpcomingRecurringUseCaseKt</td>
+  <td class="name">GetTransferCounterpartUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -63,16 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +68,57 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (39/39)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">GetTransferCounterpartUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (39/39)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,108 +128,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.UpcomingRecurring
-&nbsp;import com.georgeci.moneysurfer.domain.model.upcomingOccurrences
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.RecurringRuleRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
-&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
-&nbsp;import kotlinx.coroutines.delay
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.combine
-&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
-&nbsp;import kotlinx.coroutines.flow.flatMapLatest
-&nbsp;import kotlinx.coroutines.flow.flow
-&nbsp;import kotlinx.coroutines.flow.flowOf
-&nbsp;import kotlinx.coroutines.flow.map
-&nbsp;import kotlinx.datetime.DateTimeUnit
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.TimeZone
-&nbsp;import kotlinx.datetime.atStartOfDayIn
-&nbsp;import kotlinx.datetime.plus
-&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 &nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Duration
-&nbsp;import kotlin.time.Duration.Companion.minutes
 &nbsp;
 &nbsp;/**
-&nbsp; * The next few scheduled payments of the active workspace, soonest first — what the dashboard&#39;s
-&nbsp; * upcoming card lists.
+&nbsp; * The other leg of the transfer [transaction] belongs to, or `null` when it is not a transfer
+&nbsp; * at all or its pair is missing.
 &nbsp; *
-&nbsp; * Every occurrence is computed from the rule&#39;s own schedule (see
-&nbsp; * [com.georgeci.moneysurfer.domain.model.nextOccurrenceOnOrAfter]), so the list is right as soon as
-&nbsp; * the rules themselves are: a device that has pulled a rule can date it without waiting for the
-&nbsp; * generator to run. Empty — not absent — while no workspace is selected or its base currency has
-&nbsp; * not arrived yet, which is the card&#39;s own &quot;nothing scheduled&quot; state.
+&nbsp; * A transfer is two ordinary rows sharing a `transferId` — an `EXPENSE` on the source account
+&nbsp; * and an `INCOME` on the destination (see `CreateTransferUseCase`). Neither row knows the other
+&nbsp; * account, so anything that wants to say &quot;from X to Y&quot; has to resolve the sibling first.
+&nbsp; *
+&nbsp; * A missing pair is a legitimate state, not a bug to throw on: a leg can arrive from sync or a
+&nbsp; * CSV import before (or without) its counterpart.
 &nbsp; */
-&nbsp;@Single
-&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class GetUpcomingRecurringUseCase(
-&nbsp;    private val recurringRuleRepository: RecurringRuleRepository,
-&nbsp;    private val workspaceRepository: WorkspaceRepository,
-&nbsp;    private val session: SessionPointers,
-&nbsp;    private val clock: ClockUseCase,
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class GetTransferCounterpartUseCase(
+<b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    operator fun invoke(
-&nbsp;        limit: Int = UPCOMING_LIMIT,
-&nbsp;        timeZone: TimeZone = TimeZone.currentSystemDefault(),
-&nbsp;    ): Flow&lt;List&lt;UpcomingRecurring&gt;&gt; =
-&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;
-&nbsp;            workspaceId ?: return@flatMapLatest flowOf(emptyList())
-&nbsp;
-&nbsp;            combine(
-&nbsp;                recurringRuleRepository.getByWorkspaceId(workspaceId),
-&nbsp;                baseCurrency(workspaceId),
-&nbsp;                today(timeZone),
-&nbsp;            ) { rules, currency, today -&gt;
-&nbsp;                // Rules carry an amount but no currency of their own — they are the workspace&#39;s, so
-&nbsp;                // they are quoted in its base currency. A workspace row that has not arrived yet
-&nbsp;                // leaves nothing to quote them in, and an invented currency would print the wrong
-&nbsp;                // symbol beside a real amount.
-&nbsp;                currency ?: return@combine emptyList()
-&nbsp;                rules.upcomingOccurrences(today = today, currency = currency, limit = limit)
-&nbsp;            }.distinctUntilChanged()
-&nbsp;        }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The workspace base currency, live — observed rather than read once for the reason
-&nbsp;     * [GenerateInsightsUseCase] documents: the session pointer is restored independently of the
-&nbsp;     * `workspaces` row, so a latched `null` would leave the card empty for as long as the caller
-&nbsp;     * stayed subscribed.
-&nbsp;     */
-&nbsp;    private fun baseCurrency(workspaceId: WorkspaceId): Flow&lt;CurrencyCode?&gt; =
-&nbsp;        workspaceRepository.getAll()
-&nbsp;            .map { workspaces -&gt; workspaces.firstOrNull { it.id == workspaceId }?.baseCurrency }
-&nbsp;            .distinctUntilChanged()
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Today&#39;s date, re-emitted when the calendar rolls over. Same shape and the same reason as
-&nbsp;     * [GenerateInsightsUseCase.today]: nothing else in this chain moves at midnight, so a dashboard
-&nbsp;     * left open overnight would keep calling yesterday &quot;Today&quot; — on the one widget whose whole job
-&nbsp;     * is to say how close a payment is.
-&nbsp;     */
-&nbsp;    private fun today(timeZone: TimeZone): Flow&lt;LocalDate&gt; = flow {
-&nbsp;        while (true) {
-&nbsp;            val now = clock.now()
-&nbsp;            val today = now.toLocalDateTime(timeZone).date
-&nbsp;            emit(today)
-&nbsp;            val nextMidnight = today.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
-&nbsp;            // Floored: a clock that jumps backwards must cost a minute of staleness, not a busy
-&nbsp;            // loop re-dating every rule as fast as the dispatcher allows.
-&nbsp;            delay((nextMidnight - now).coerceAtLeast(MIN_ROLLOVER_SLEEP))
-&nbsp;        }
+&nbsp;    suspend operator fun invoke(transaction: Transaction): Transaction? {
+<b class="fc">&nbsp;        val transferId = transaction.transferId ?: return null</b>
+<b class="fc">&nbsp;        return transactionRepository.getByTransferId(transferId)</b>
+<b class="fc">&nbsp;            .firstOrNull { it.id != transaction.id }</b>
 &nbsp;    }
 &nbsp;}
-&nbsp;
-&nbsp;/** Three rows is what the full-size card draws; the compact one keeps the first two. */
-&nbsp;private const val UPCOMING_LIMIT = 3
-&nbsp;
-&nbsp;/** See [GetUpcomingRecurringUseCase.today] — the floor that keeps a backwards clock jump cheap. */
-<b class="fc">&nbsp;private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes</b>
 </code>
 </pre>
 </div>
@@ -219,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:06</div>
 </div>
 </body>
 </html>
