@@ -124,13 +124,7 @@ fun AppNavGraph(
     // but rebuilds the composition, and a flag that reset there would replay the splash.
     val launchRouteApplied by appLaunchViewModel.launchRouteApplied.collectAsStateWithLifecycle()
     LaunchedEffect(targetRoute) {
-        val route = targetRoute ?: return@LaunchedEffect
-        applyLaunchRoute(
-            route = route,
-            navigator = navigator,
-            currentTop = backStack.lastOrNull(),
-            onApplied = appLaunchViewModel::onRouteApplied,
-        )
+        navigator.applyLaunchRoute(targetRoute, backStack.lastOrNull(), appLaunchViewModel::onRouteApplied)
     }
 
     // Server-owned flags, pulled here rather than from the view model's `init` because this is the
@@ -221,20 +215,31 @@ fun AppNavGraph(
 
 /**
  * Puts a launch decision on the back stack and reports it back through [onApplied], which is what
- * stops the same decision from being replayed — the composition that runs this is rebuilt on every
+ * stops the same decision from being replayed — the composition that calls this is rebuilt on every
  * configuration change while the view model behind [onApplied] is not.
+ *
+ * A null [route] is the "no decision yet" state, and also the state right after one was consumed:
+ * both mean leave the back stack exactly as it is. That second case is the whole point on a
+ * rotation, where the stack has just been restored and the decision that built it is long spent.
  *
  * Skipping the reset when [currentTop] already is [route] keeps that destination's entry — and the
  * view models scoped to it — alive, instead of tearing it down and rebuilding it for a decision
- * that lands where the user already is. The policy sits outside the composable so it is testable.
+ * that lands where the user already is.
+ *
+ * Whole policy outside the composable, taking the two values it needs rather than reading them: the
+ * navigation host has no test harness in this module, so anything left inside it is untested.
  */
-internal fun applyLaunchRoute(
-    route: Route,
-    navigator: AppNavigator,
+internal fun AppNavigator.applyLaunchRoute(
+    route: Route?,
     currentTop: NavKey?,
     onApplied: (Route) -> Unit,
 ) {
-    if (currentTop != route) navigator.resetTo(route)
+    if (route == null) {
+        return
+    }
+    if (currentTop != route) {
+        resetTo(route)
+    }
     onApplied(route)
 }
 
