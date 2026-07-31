@@ -35,12 +35,24 @@ internal fun installDesktopAppCheck(
     env: (String) -> String? = System::getenv,
     exchange: DebugTokenExchange = DebugTokenExchange(::postJson),
 ) {
-    val debugToken = env(ENV_APPCHECK_DEBUG_TOKEN)?.takeIf { it.isNotBlank() } ?: return
+    val provider = desktopAppCheckProvider(options, env, exchange) ?: return
     // `AppCheckProviderFactory` has a single method, so a lambda is the whole factory — the
     // FirebaseApp it is handed carries nothing this provider needs.
-    FirebaseAppCheck.getInstance().installAppCheckProviderFactory {
-        DesktopAppCheckProvider(options, debugToken, exchange)
-    }
+    FirebaseAppCheck.getInstance().installAppCheckProviderFactory { provider }
+}
+
+/**
+ * Whether this host has anything to attest with, split from installing it so the decision can be
+ * tested: the install itself needs a live `FirebaseApp` and cannot run outside the desktop host.
+ * `null` means no debug secret is configured, which leaves App Check uninstalled.
+ */
+internal fun desktopAppCheckProvider(
+    options: FirebaseOptions,
+    env: (String) -> String? = System::getenv,
+    exchange: DebugTokenExchange = DebugTokenExchange(::postJson),
+): DesktopAppCheckProvider? {
+    val debugToken = env(ENV_APPCHECK_DEBUG_TOKEN)?.takeIf { it.isNotBlank() } ?: return null
+    return DesktopAppCheckProvider(options, debugToken, exchange)
 }
 
 /**

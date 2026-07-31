@@ -4,6 +4,9 @@ import dev.gitlive.firebase.FirebaseOptions
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.longs.shouldBeGreaterThan
+import io.kotest.matchers.longs.shouldBeLessThanOrEqual
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 
@@ -89,9 +92,26 @@ class DesktopAppCheckJvmTest : StringSpec({
         provider.exchangeDebugToken().token shouldBe "attested"
     }
 
-    "without a debug token nothing is installed, so the host keeps working as before" {
-        // A throwing exchange proves no network call is attempted, and reaching
-        // FirebaseAppCheck.getInstance() would fail here since no FirebaseApp exists.
+    "without a debug token there is nothing to attest with, so App Check stays off" {
+        desktopAppCheckProvider(
+            options = options,
+            env = { null },
+            exchange = { _, _ -> error("must not be called") },
+        ).shouldBeNull()
+    }
+
+    "a blank debug token is treated as absent rather than sent" {
+        desktopAppCheckProvider(
+            options = options,
+            env = { "   " },
+            exchange = { _, _ -> error("must not be called") },
+        ).shouldBeNull()
+    }
+
+    // Installing must be a no-op rather than a crash: reaching FirebaseAppCheck.getInstance()
+    // here would fail, since a bare test JVM has no FirebaseApp — so returning early is the
+    // behaviour that keeps an unconfigured desktop host bootable.
+    "installing without a debug token returns before touching the SDK" {
         installDesktopAppCheck(
             options = options,
             env = { null },
@@ -99,11 +119,37 @@ class DesktopAppCheckJvmTest : StringSpec({
         )
     }
 
-    "a blank debug token is treated as absent rather than sent" {
-        installDesktopAppCheck(
+    "a configured debug token yields a provider that carries it" {
+        var seenBody = ""
+        val provider = desktopAppCheckProvider(
             options = options,
-            env = { "   " },
-            exchange = { _, _ -> error("must not be called") },
+            env = { name -> "secret-123".takeIf { name == "MS_FIREBASE_APPCHECK_DEBUG_TOKEN" } },
+            exchange = { _, body ->
+                seenBody = body
+                """{"token":"attested","ttl":"60s"}"""
+            },
         )
+
+        provider.shouldNotBeNull().exchangeDebugToken().token shouldBe "attested"
+        seenBody shouldContain "secret-123"
+    }
+
+    // `1::android:x` parses into segments but the project number is empty, which would otherwise
+    // build a request against `/projects//apps/...` and fail as a confusing 404.
+    "an app id with an empty project-number segment is rejected" {
+        val failure = shouldThrow<IllegalStateException> { projectNumberOf("1::android:x") }
+
+        failure.message.orEmpty() shouldContain "MS_FIREBASE_APP_ID"
+    }
+
+    "a response without a ttl expires immediately rather than never" {
+        val provider = DesktopAppCheckProvider(
+            options = options,
+            debugToken = "secret-123",
+            exchange = { _, _ -> """{"token":"attested"}""" },
+        )
+
+        provider.exchangeDebugToken().expireTimeMillis shouldBeLessThanOrEqual
+            System.currentTimeMillis()
     }
 })
