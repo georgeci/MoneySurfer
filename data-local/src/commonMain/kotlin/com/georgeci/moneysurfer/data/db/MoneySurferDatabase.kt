@@ -38,6 +38,22 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
  */
 const val MONEY_SURFER_DB_VERSION: Int = 36
 
+/**
+ * The oldest schema version a released build must be able to upgrade *from*. Nothing below this
+ * number can exist on a user's device, so those paths may stay unimplemented; every version *at
+ * or above* it must be reachable by a hand-written [androidx.room.migration.Migration] chain, and
+ * the `verifyRoomMigrations` Gradle task fails the build when a newly exported schema arrives
+ * without one. See `docs/architecture/persistence.md` → "Room schema versioning".
+ *
+ * **The first release has not shipped yet, so this number is still provisional.** Until it does,
+ * no database exists outside a developer machine and the baseline may legitimately move up with
+ * [MONEY_SURFER_DB_VERSION] — a pre-release schema change can raise it instead of adding a
+ * migration. The moment the first build reaches users this becomes a historical marker and must
+ * never be raised again: raising it then would excuse exactly the migrations that real installs
+ * depend on. Whoever cuts that release freezes this constant as part of it.
+ */
+const val MONEY_SURFER_DB_RELEASE_BASELINE_VERSION: Int = 36
+
 @Database(
     entities = [
         UserEntity::class,

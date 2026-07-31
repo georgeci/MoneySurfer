@@ -269,7 +269,7 @@
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 26-46
+- Lines: 31-51
 - Tasks: persistence, room, firestore, datastore
 
 ## pr-check-fan-out
@@ -289,6 +289,12 @@
 - File: docs/testing/qa-runbook.md
 - Lines: 49-376
 - Tasks: testing, qa, reports, tooling
+
+## room-schema-versioning
+- Title: Room schema versioning
+- File: docs/architecture/persistence.md
+- Lines: 53-121
+- Tasks: persistence, room, migration
 
 ## rules-bug-1
 - Title: #1 — clientVersionCode >= 1 is a no-op gate

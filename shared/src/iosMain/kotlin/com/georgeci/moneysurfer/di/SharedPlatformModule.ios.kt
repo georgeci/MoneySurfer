@@ -14,10 +14,19 @@ import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import platform.Foundation.NSBundle
+import kotlin.experimental.ExperimentalNativeApi
 
+@OptIn(ExperimentalNativeApi::class)
 actual val sharedPlatformModule: Module = module {
     includes(applicationScopeModule)
-    single<MoneySurferDatabase> { getRoomDatabase(getDatabaseBuilder()) }
+    // Debug binaries may drop the local database on a schema change; release builds must
+    // migrate. See docs/architecture/persistence.md → "Room schema versioning".
+    single<MoneySurferDatabase> {
+        getRoomDatabase(
+            builder = getDatabaseBuilder(),
+            allowDestructiveMigration = kotlin.native.Platform.isDebugBinary,
+        )
+    }
     single { createDataStore() }
     // Own DataStore file, created in the factory rather than bound — see the Android actual.
     single<DebugConfigSource> { createDebugConfigSource(scope = get()) }

@@ -10,10 +10,12 @@ import io.kotest.matchers.shouldBe
 /**
  * The v36 addition against a real SQLite.
  *
- * Worth pinning despite being a one-line `ALTER TABLE`: the builder ends in
- * `fallbackToDestructiveMigration(dropAllTables = true)`, so a migration that does not leave the
+ * Worth pinning despite being a one-line `ALTER TABLE`: on debuggable hosts the builder still ends
+ * in `fallbackToDestructiveMigration(dropAllTables = true)`, so a migration that does not leave the
  * schema Room expects does not fail loudly — it drops every table on the next launch, taking the
- * user's ledger with it. The column's type and nullability are checked because Room validates both
+ * user's ledger with it. Release builds opt out of that fallback and crash on open instead (see
+ * `docs/architecture/persistence.md` → "Room schema versioning").
+ * The column's type and nullability are checked because Room validates both
  * at open time, and every existing row is checked to still be live, because a backfill that
  * accidentally set `deletedAt` would hide the entire history behind the new filter.
  */

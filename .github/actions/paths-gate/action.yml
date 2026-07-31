@@ -121,11 +121,17 @@ runs:
           # references under <module>/screenshots/ that `qaAndroidHost` asserts
           # against. Both of those live in the `junit` job — omit either path
           # and a strings-only PR merges green while main goes red.
+          # schemas/ holds the exported Room schema JSON. It is an input to the
+          # `verifyRoomMigrations` gate in the `junit` job, and it is the one
+          # input that can change on its own — a stray export committed without
+          # the entity edit that produced it. Omit it and the gate never runs on
+          # exactly the PR it exists to catch.
           kotlin:
             - *plumbing
             - '**/*.kt'
             - '**/*.kts'
             - 'config/detekt/**'
+            - '**/schemas/**'
             - '**/src/**/resources/**'
             - '**/src/**/composeResources/**'
             - '**/screenshots/**'

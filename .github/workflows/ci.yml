@@ -137,6 +137,14 @@ jobs:
           path: build/reports/cpd/
           if-no-files-found: ignore
 
+      # Room migration policy gate (issue #80). Configuration-only + a couple of file
+      # reads, so it is near-free and runs before the slow test lane: a schema version
+      # exported without a matching hand-written Migration fails the PR here rather
+      # than on a user's device during an upgrade.
+      # Policy: docs/architecture/persistence.md → "Room schema versioning".
+      - name: Verify Room migration policy
+        run: ./gradlew :data-local:verifyRoomMigrations --stacktrace
+
       # qaCommon = common (JVM) scope; qaAndroidHost = Android host/unit scope
       # (kotest on the JVM, no device). Host tests are cheap on ubuntu and were
       # previously run nowhere in CI (issue #172 §5) — one invocation keeps the
