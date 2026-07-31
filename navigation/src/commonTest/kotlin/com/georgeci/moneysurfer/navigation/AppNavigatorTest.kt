@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.navigation
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
@@ -87,6 +88,54 @@ class AppNavigatorTest : StringSpec({
         AppNavigator(stack).resetTo(Route.Onboarding)
 
         stack shouldContainExactly listOf(Route.Onboarding)
+    }
+
+    "applying a launch decision roots the stack at it and reports it back" {
+        val stack = backStack(Route.SignIn)
+        val applied = mutableListOf<Route>()
+
+        AppNavigator(stack).applyLaunchRoute(
+            route = Route.Onboarding,
+            currentTop = stack.lastOrNull(),
+            onApplied = applied::add,
+        )
+
+        stack shouldContainExactly listOf(Route.Onboarding)
+        applied shouldContainExactly listOf(Route.Onboarding)
+    }
+
+    // The decision the user is already looking at: resetting would rebuild the entry — and drop the
+    // view models scoped to it — for no navigation at all.
+    "a launch decision the stack already sits on leaves it untouched" {
+        val stack = backStack(Route.Dashboard)
+        val applied = mutableListOf<Route>()
+
+        AppNavigator(stack).applyLaunchRoute(
+            route = Route.Dashboard,
+            currentTop = stack.lastOrNull(),
+            onApplied = applied::add,
+        )
+
+        stack shouldContainExactly listOf(Route.Dashboard)
+        // Still reported: the host has to consume the decision either way, or it replays.
+        applied shouldContainExactly listOf(Route.Dashboard)
+    }
+
+    // What a rotation looks like from here: the stack is restored, the view model is still alive
+    // and its decision already spent, so there is nothing to apply. Replaying one here is exactly
+    // what sent a signed-in user back to onboarding.
+    "no launch decision leaves the restored stack alone" {
+        val stack = backStack(Route.Dashboard, Route.AccountsManage)
+        val applied = mutableListOf<Route>()
+
+        AppNavigator(stack).applyLaunchRoute(
+            route = null,
+            currentTop = stack.lastOrNull(),
+            onApplied = applied::add,
+        )
+
+        stack shouldContainExactly listOf(Route.Dashboard, Route.AccountsManage)
+        applied.shouldBeEmpty()
     }
 })
 

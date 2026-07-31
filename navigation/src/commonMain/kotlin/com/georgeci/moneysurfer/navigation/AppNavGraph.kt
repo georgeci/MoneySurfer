@@ -18,10 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -121,12 +119,12 @@ fun AppNavGraph(
     val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()
     // The launch decision lands in a `LaunchedEffect`, i.e. one frame *after* the composition that
     // first sees a non-null `targetRoute`. Without this flag that frame renders the back stack's
-    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding.
-    var launchRouteApplied by remember { mutableStateOf(false) }
+    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding. It is
+    // held by the view model, not this composition: a configuration change restores the back stack
+    // but rebuilds the composition, and a flag that reset there would replay the splash.
+    val launchRouteApplied by appLaunchViewModel.launchRouteApplied.collectAsStateWithLifecycle()
     LaunchedEffect(targetRoute) {
-        val route = targetRoute ?: return@LaunchedEffect
-        if (backStack.lastOrNull() != route) navigator.resetTo(route)
-        launchRouteApplied = true
+        navigator.applyLaunchRoute(targetRoute, backStack.lastOrNull(), appLaunchViewModel::onRouteApplied)
     }
 
     // Server-owned flags, pulled here rather than from the view model's `init` because this is the
@@ -213,6 +211,36 @@ fun AppNavGraph(
             }
         }
     }
+}
+
+/**
+ * Puts a launch decision on the back stack and reports it back through [onApplied], which is what
+ * stops the same decision from being replayed — the composition that calls this is rebuilt on every
+ * configuration change while the view model behind [onApplied] is not.
+ *
+ * A null [route] is the "no decision yet" state, and also the state right after one was consumed:
+ * both mean leave the back stack exactly as it is. That second case is the whole point on a
+ * rotation, where the stack has just been restored and the decision that built it is long spent.
+ *
+ * Skipping the reset when [currentTop] already is [route] keeps that destination's entry — and the
+ * view models scoped to it — alive, instead of tearing it down and rebuilding it for a decision
+ * that lands where the user already is.
+ *
+ * Whole policy outside the composable, taking the two values it needs rather than reading them: the
+ * navigation host has no test harness in this module, so anything left inside it is untested.
+ */
+internal fun AppNavigator.applyLaunchRoute(
+    route: Route?,
+    currentTop: NavKey?,
+    onApplied: (Route) -> Unit,
+) {
+    if (route == null) {
+        return
+    }
+    if (currentTop != route) {
+        resetTo(route)
+    }
+    onApplied(route)
 }
 
 /** App-level [SnackbarHost] state that renders one-shot messages posted to [controller]. */

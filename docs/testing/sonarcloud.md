@@ -86,6 +86,19 @@ Two further filters narrow what is counted, and they sit on different sides:
   `sonar.sources` does hand those files to Sonar — which then scores them 0% and
   drags "Coverage on New Code" down on every iOS-side change.
 
+  The key is sent for **every** module, `**/build/**` standing in where there is
+  nothing to exclude. SonarCloud resolves the key server-side when the scanner
+  omits it, and the value it serves this project is `**/*` — so a module that
+  said nothing had its whole coverage dropped on import while the analysis
+  stayed green. That is what kept `:navigation`, `:utils`, `:sync-surfer`,
+  `:app-config:*` and most of `:feature:*` at *no* coverage in SonarCloud (not
+  0% — no measure at all) long after issue #272; the modules that looked healthy
+  were the ones that happened to own an `src/iosMain` and therefore sent a value
+  of their own. `scripts/ci/verify-sonar-coverage.sh` now fails the `sonar` job
+  on a push to `main` if any module in the Kover aggregation arrives without
+  coverage, because nothing else notices: the report is complete, Codecov agrees,
+  and only SonarCloud's copy is empty.
+
 Verify a filter actually bit before trusting it — patterns are matched against
 bytecode names and fail silently:
 
@@ -110,8 +123,22 @@ Reports land at:
 - **"SonarCloud sees only 3 folders"** — Automatic Analysis is still on, or
   someone re-added `sonar.sources` at the root project. Fix per "Required
   setup" #2 and the per-subproject discovery block.
-- **No coverage shown** — `koverXmlReport` didn't run before `sonar`, or the
-  module under inspection isn't in the root `kover(projects.*)` list.
+- **No coverage shown** — `koverXmlReport` didn't run before `sonar`, the
+  module under inspection isn't in the root `kover(projects.*)` list, or it is
+  sending no `sonar.coverage.exclusions` and inherited the server-side `**/*`.
+  Ask SonarCloud what it stored rather than guessing — a file with no coverage
+  at all carries no `coverage` measure, while a genuinely uncovered one reports
+  `0.0` next to a non-zero `lines_to_cover`:
+
+  ```bash
+  curl -s "https://sonarcloud.io/api/measures/component?component=georgeci_MoneySurfer:navigation/src/commonMain/kotlin/com/georgeci/moneysurfer/navigation/AppNavigator.kt&metricKeys=coverage,lines_to_cover"
+  ```
+
+  The effective server-side value is visible the same way:
+
+  ```bash
+  curl -s "https://sonarcloud.io/api/settings/values?component=georgeci_MoneySurfer&keys=sonar.coverage.exclusions"
+  ```
 - **`SONAR_TOKEN` not set** — job logs show
   `Not authorized. Please check the property sonar.token`. Add the secret.
 - **Fork PRs skipped** — by design (`if:` guard on the job). Push to a

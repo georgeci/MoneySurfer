@@ -240,4 +240,54 @@ class AppLaunchViewModelTest : StringSpec({
             viewModel.targetRoute.value shouldBe Route.Dashboard
         }
     }
+
+    // A rotation rebuilds the host's composition while this view model survives, so an unconsumed
+    // decision would be re-applied on top of the restored back stack — which is how a user who had
+    // signed in was sent back to onboarding by one rotation.
+    "the launch decision is cleared once the host has applied it" {
+        runTest {
+            val viewModel = launchViewModel(onboardingCompleted = false)
+            viewModel.targetRoute.value shouldBe Route.Onboarding
+            viewModel.launchRouteApplied.value shouldBe false
+
+            viewModel.onRouteApplied(Route.Onboarding)
+
+            viewModel.targetRoute.value shouldBe null
+            // The splash gate stays down across the rotation the cleared route no longer survives.
+            viewModel.launchRouteApplied.value shouldBe true
+        }
+    }
+
+    "the logout bounce still reaches the host after the launch decision was applied" {
+        runTest {
+            val session = InMemorySessionPointers(
+                currentUserId = USER,
+                currentWorkspaceId = WORKSPACE,
+            )
+            val viewModel = launchViewModel(session = session)
+            viewModel.onRouteApplied(Route.Dashboard)
+            viewModel.targetRoute.value shouldBe null
+
+            session.setCurrentUser(null)
+
+            viewModel.targetRoute.value shouldBe Route.SignIn
+        }
+    }
+
+    // Applying a stale route must not swallow a decision the host has not seen yet.
+    "a route applied late does not clear a newer decision" {
+        runTest {
+            val session = InMemorySessionPointers(
+                currentUserId = USER,
+                currentWorkspaceId = WORKSPACE,
+            )
+            val viewModel = launchViewModel(session = session)
+            session.setCurrentUser(null)
+            viewModel.targetRoute.value shouldBe Route.SignIn
+
+            viewModel.onRouteApplied(Route.Dashboard)
+
+            viewModel.targetRoute.value shouldBe Route.SignIn
+        }
+    }
 })

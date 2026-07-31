@@ -64,8 +64,24 @@ class AppLaunchViewModel(
 
     private val log = Logger.withTag(TAG)
 
+    /**
+     * The route the navigation host still has to put on the back stack, or `null` once it has.
+     *
+     * Consumed rather than left standing: a configuration change recreates the host's composition
+     * but not this view model, so a value kept here would be re-applied to the *restored* back
+     * stack on every rotation — which reset a signed-in user back to the launch decision (one
+     * rotation after signing in sent the user back to onboarding).
+     */
     val targetRoute: StateFlow<Route?>
         field = MutableStateFlow<Route?>(null)
+
+    /**
+     * Whether the launch decision has already reached the back stack — the splash gate. Owned here
+     * rather than by the composition so it survives a configuration change; a fresh process starts
+     * over at `false` and holds the splash until the decision in `init` is made and applied.
+     */
+    val launchRouteApplied: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
     init {
         viewModelScope.launch {
@@ -110,6 +126,17 @@ class AppLaunchViewModel(
 
         startPeriodicSyncTicker()
         purgeExpiredTombstones()
+    }
+
+    /**
+     * Called by the navigation host once [route] is on the back stack. Clears it so the same
+     * decision is not replayed onto a back stack that outlived the composition which applied it
+     * (rotation), while a later decision — the logout bounce below — still gets through:
+     * `compareAndSet` only clears the value the host actually applied.
+     */
+    fun onRouteApplied(route: Route) {
+        targetRoute.compareAndSet(route, null)
+        launchRouteApplied.value = true
     }
 
     /**
