@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SpendInsightsKt</title>
+  <title>MoneySurfer Coverage Report > SpendInsights</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SpendInsightsKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SpendInsights (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,21 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SpendInsightsKt</td>
+  <td class="name">SpendInsights</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,11 +76,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (33/33)
+    (43/43)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">SpendInsights$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (43/43)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -145,16 +172,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * only knew &quot;no spend&quot; could not tell an empty period from a workspace whose spending is all in
 &nbsp; * another currency.
 &nbsp; */
-&nbsp;data class SpendInsights(
-&nbsp;    val selection: InsightsSelection,
-&nbsp;    val currency: CurrencyCode,
-&nbsp;    val breakdown: SpentByCategory,
+<b class="fc">&nbsp;data class SpendInsights(</b>
+<b class="fc">&nbsp;    val selection: InsightsSelection,</b>
+<b class="fc">&nbsp;    val currency: CurrencyCode,</b>
+<b class="fc">&nbsp;    val breakdown: SpentByCategory,</b>
 &nbsp;    /** One entry per column, oldest first, gaps filled — always [MONTH_COLUMNS] long. */
-&nbsp;    val months: List&lt;MonthlyNet&gt;,
+<b class="fc">&nbsp;    val months: List&lt;MonthlyNet&gt;,</b>
 &nbsp;    /** Largest first, at most [TOP_MERCHANTS] entries. */
-&nbsp;    val merchants: List&lt;MerchantSpend&gt;,
+<b class="fc">&nbsp;    val merchants: List&lt;MerchantSpend&gt;,</b>
 &nbsp;    /** Per-currency spend the [currency] filter left out, largest first. */
-&nbsp;    val excludedByCurrency: List&lt;CurrencyTotal&gt;,
+<b class="fc">&nbsp;    val excludedByCurrency: List&lt;CurrencyTotal&gt;,</b>
 &nbsp;) {
 &nbsp;
 &nbsp;    /**
@@ -166,7 +193,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * already applied the filter, so what it removed is only visible here.
 &nbsp;     */
 &nbsp;    val hiddenByBaseCurrency: Boolean
-&nbsp;        get() = breakdown.entries.isEmpty() &amp;&amp; excludedByCurrency.isNotEmpty()
+<b class="fc">&nbsp;        get() = breakdown.entries.isEmpty() &amp;&amp; excludedByCurrency.isNotEmpty()</b>
 &nbsp;
 &nbsp;    companion object {
 &nbsp;        /**
@@ -198,9 +225,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * cannot add a column the chart never asked for.
 &nbsp; */
 &nbsp;fun buildNetTrend(months: List&lt;YearMonth&gt;, rows: List&lt;MonthlyNet&gt;): List&lt;MonthlyNet&gt; {
-<b class="fc">&nbsp;    val byMonth = rows.associateBy { it.month }</b>
-<b class="fc">&nbsp;    return months.map { month -&gt;</b>
-<b class="fc">&nbsp;        byMonth[month] ?: MonthlyNet(month = month, income = Money.zero(), expense = Money.zero())</b>
+&nbsp;    val byMonth = rows.associateBy { it.month }
+&nbsp;    return months.map { month -&gt;
+&nbsp;        byMonth[month] ?: MonthlyNet(month = month, income = Money.zero(), expense = Money.zero())
 &nbsp;    }
 &nbsp;}
 </code>
@@ -226,7 +253,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

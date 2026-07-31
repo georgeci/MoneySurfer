@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > JvmBackupStorageLocatorKt</title>
+  <title>MoneySurfer Coverage Report > BackupExporterImplKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: JvmBackupStorageLocatorKt (com.georgeci.moneysurfer.data.backup)</h1>
+<h1>Coverage Summary for Class: BackupExporterImplKt (com.georgeci.moneysurfer.data.backup)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">JvmBackupStorageLocatorKt</td>
+  <td class="name">BackupExporterImplKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,25 +46,135 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
+&nbsp;import androidx.room.useWriterConnection
+&nbsp;import com.georgeci.moneysurfer.data.backup.crypto.EncryptedBackupCodec
+&nbsp;import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
+&nbsp;import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
+&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupEncryptionInfo
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupExporter
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupManifest
 &nbsp;import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
-&nbsp;import okio.Path
-&nbsp;import okio.Path.Companion.toPath
-&nbsp;import java.io.File
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import kotlinx.coroutines.CancellationException
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.IO
+&nbsp;import kotlinx.coroutines.sync.Mutex
+&nbsp;import kotlinx.coroutines.sync.withLock
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import kotlinx.serialization.json.Json
+&nbsp;import okio.Buffer
+&nbsp;import okio.BufferedSink
+&nbsp;import okio.FileSystem
+&nbsp;import okio.SYSTEM
+&nbsp;import okio.buffer
+&nbsp;import okio.use
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;private const val MAIN_DB_FILE = &quot;moneysurfer.db&quot;
-&nbsp;private const val SYNC_DB_FILE = &quot;moneysurfer_sync.db&quot;
-&nbsp;private const val DATASTORE_FILE = &quot;moneysurfer_settings.preferences_pb&quot;
-&nbsp;private const val APP_DIR = &quot;.moneysurfer&quot;
+&nbsp;@Single(binds = [BackupExporter::class])
+&nbsp;class BackupExporterImpl(
+&nbsp;    private val database: MoneySurferDatabase,
+&nbsp;    private val locator: BackupStorageLocator,
+&nbsp;    private val appInfo: AppInfo,
+&nbsp;    private val clock: ClockUseCase,
+&nbsp;) : BackupExporter {
 &nbsp;
-&nbsp;class JvmBackupStorageLocator : BackupStorageLocator {
-&nbsp;    override val platformName: String = &quot;jvm&quot;
-&nbsp;    override fun moneySurferDbFile(): Path = appFile(MAIN_DB_FILE).toPath()
-&nbsp;    override fun syncDbFile(): Path = appFile(SYNC_DB_FILE).toPath()
-&nbsp;    override fun dataStoreFile(): Path = appFile(DATASTORE_FILE).toPath()
+&nbsp;    private val mutex = Mutex()
+&nbsp;    private val fs: FileSystem = FileSystem.SYSTEM
 &nbsp;
-&nbsp;    private fun appFile(name: String): String =
-&nbsp;        File(System.getProperty(&quot;java.io.tmpdir&quot;), &quot;$APP_DIR/$name&quot;).absolutePath
+&nbsp;    override suspend fun exportTo(sink: BufferedSink, passphrase: String?): Result&lt;BackupManifest&gt; =
+&nbsp;        mutex.withLock {
+&nbsp;            try {
+&nbsp;                Result.success(withContext(Dispatchers.IO) { runExport(sink, passphrase) })
+&nbsp;            } catch (ce: CancellationException) {
+&nbsp;                throw ce
+&nbsp;            } catch (be: BackupError) {
+&nbsp;                Result.failure(be)
+&nbsp;            } catch (
+&nbsp;                @Suppress(&quot;TooGenericExceptionCaught&quot;) t: Throwable,
+&nbsp;            ) {
+&nbsp;                Result.failure(BackupError.Io(t))
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    private suspend fun runExport(sink: BufferedSink, passphrase: String?): BackupManifest {
+&nbsp;        checkpointMainDatabase()
+&nbsp;        return if (passphrase.isNullOrEmpty()) {
+&nbsp;            writePlainArchive(sink, buildManifest())
+&nbsp;        } else {
+&nbsp;            writeEncryptedArchive(sink, passphrase)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun writePlainArchive(sink: BufferedSink, manifest: BackupManifest): BackupManifest {
+&nbsp;        val zip = ZipStoredWriter(sink)
+&nbsp;        zip.writeEntry(BackupManifest.MANIFEST_ENTRY_NAME, manifestSource(manifest))
+&nbsp;        fs.source(locator.moneySurferDbFile()).buffer().use {
+&nbsp;            zip.writeEntry(BackupManifest.MAIN_DB_ENTRY_NAME, it)
+&nbsp;        }
+&nbsp;        fs.source(locator.dataStoreFile()).buffer().use {
+&nbsp;            zip.writeEntry(BackupManifest.DATASTORE_ENTRY_NAME, it)
+&nbsp;        }
+&nbsp;        zip.finish()
+&nbsp;        return manifest
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The outer container stays a valid plain ZIP (same `.zip` extension and
+&nbsp;     * MIME type): a readable manifest that flags the encryption scheme, plus a
+&nbsp;     * single sealed `payload.enc` entry. Inside the sealed blob sits a full
+&nbsp;     * plain backup archive — including its own manifest, which is the
+&nbsp;     * authenticated copy the importer trusts after decryption.
+&nbsp;     */
+&nbsp;    private fun writeEncryptedArchive(sink: BufferedSink, passphrase: String): BackupManifest {
+&nbsp;        val innerZip = Buffer()
+&nbsp;        val innerManifest = writePlainArchive(innerZip, buildManifest())
+&nbsp;        val sealed = EncryptedBackupCodec.seal(innerZip.readByteArray(), passphrase)
+&nbsp;
+&nbsp;        val outerManifest = innerManifest.copy(
+&nbsp;            files = listOf(BackupManifest.ENCRYPTED_PAYLOAD_ENTRY_NAME),
+&nbsp;            encryption = BackupEncryptionInfo(BackupEncryptionInfo.SCHEME_V1),
+&nbsp;        )
+&nbsp;        val zip = ZipStoredWriter(sink)
+&nbsp;        zip.writeEntry(BackupManifest.MANIFEST_ENTRY_NAME, manifestSource(outerManifest))
+&nbsp;        zip.writeEntry(BackupManifest.ENCRYPTED_PAYLOAD_ENTRY_NAME, Buffer().apply { write(sealed) })
+&nbsp;        zip.finish()
+&nbsp;        return outerManifest
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun checkpointMainDatabase() {
+&nbsp;        // wal_checkpoint(TRUNCATE) needs exclusive access to truncate the WAL,
+&nbsp;        // so we run it through the writer connection (which serialises against
+&nbsp;        // ongoing reads / writes) rather than a reader.
+&nbsp;        database.useWriterConnection { connection -&gt;
+&nbsp;            connection.usePrepared(PRAGMA_WAL_CHECKPOINT) { statement -&gt;
+&nbsp;                statement.step()
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun buildManifest(): BackupManifest = BackupManifest(
+&nbsp;        backupFormatVersion = BackupManifest.CURRENT_FORMAT_VERSION,
+&nbsp;        moneySurferDbVersion = MONEY_SURFER_DB_VERSION,
+&nbsp;        appVersion = appInfo.version,
+&nbsp;        appVersionCode = appInfo.versionCode,
+&nbsp;        sourcePlatform = locator.platformName,
+&nbsp;        createdAtEpochMillis = clock.now().toEpochMilliseconds(),
+&nbsp;        files = listOf(
+&nbsp;            BackupManifest.MAIN_DB_ENTRY_NAME,
+&nbsp;            BackupManifest.DATASTORE_ENTRY_NAME,
+&nbsp;        ),
+&nbsp;    )
+&nbsp;
+&nbsp;    private fun manifestSource(manifest: BackupManifest): Buffer {
+&nbsp;        val json = Json.encodeToString(BackupManifest.serializer(), manifest)
+&nbsp;        return Buffer().apply { writeUtf8(json) }
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;private const val PRAGMA_WAL_CHECKPOINT = &quot;PRAGMA wal_checkpoint(TRUNCATE)&quot;
 </code>
 </pre>
 </div>
@@ -88,7 +198,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

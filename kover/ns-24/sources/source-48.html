@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncProgressKt</title>
+  <title>MoneySurfer Coverage Report > SyncProgress</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncProgressKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SyncProgress (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 
@@ -45,8 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SyncProgressKt</td>
+  <tr>
+    <td class="name">SyncProgress$Completed</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -69,12 +69,40 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/7)
   </span>
 </td>
-</tr>
+  </tr>
   <tr>
-    <td class="name">SyncProgressKt$awaitReport$$inlined$filterIsInstance$1</td>
+    <td class="name">SyncProgress$InProgress</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -84,48 +112,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncProgressKt$awaitReport$$inlined$filterIsInstance$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncProgressKt$awaitReport$$inlined$filterIsInstance$1$2</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncProgressKt$awaitReport$$inlined$filterIsInstance$1$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncProgressKt$awaitReport$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -133,7 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/14)
   </span>
 </td>
 </tr>
@@ -156,8 +148,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * [Completed] carrying the aggregated [SyncReport]. Errors are propagated as flow exceptions.
 &nbsp; */
 &nbsp;sealed interface SyncProgress {
-&nbsp;    data class InProgress(val step: SyncStep) : SyncProgress
-&nbsp;    data class Completed(val report: SyncReport) : SyncProgress
+<b class="nc">&nbsp;    data class InProgress(val step: SyncStep) : SyncProgress</b>
+<b class="nc">&nbsp;    data class Completed(val report: SyncReport) : SyncProgress</b>
 &nbsp;}
 &nbsp;
 &nbsp;enum class SyncStep {
@@ -190,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;suspend fun Flow&lt;SyncProgress&gt;.awaitReport(): SyncReport =
-<b class="nc">&nbsp;    filterIsInstance&lt;SyncProgress.Completed&gt;().first().report</b>
+&nbsp;    filterIsInstance&lt;SyncProgress.Completed&gt;().first().report
 </code>
 </pre>
 </div>
@@ -214,7 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

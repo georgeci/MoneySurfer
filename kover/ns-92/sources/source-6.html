@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > StateHolder</title>
+  <title>MoneySurfer Coverage Report > SurferWindowSizeKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.utils</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.window</a>
 </div>
 
-<h1>Coverage Summary for Class: StateHolder (com.georgeci.moneysurfer.utils)</h1>
+<h1>Coverage Summary for Class: SurferWindowSizeKt (com.georgeci.moneysurfer.uikit.window)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">StateHolder</td>
+  <td class="name">SurferWindowSizeKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (81/81)
   </span>
 </td>
 </tr>
@@ -92,29 +92,104 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.utils
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.window
 &nbsp;
-&nbsp;import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
-&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
-&nbsp;import kotlinx.coroutines.flow.StateFlow
-&nbsp;import kotlinx.coroutines.flow.asStateFlow
-&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.platform.LocalDensity
+&nbsp;import androidx.compose.ui.platform.LocalWindowInfo
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;
-<b class="fc">&nbsp;@OptIn(ExperimentalForInheritanceCoroutinesApi::class)</b>
-&nbsp;class StateHolder&lt;STATE&gt; private constructor(
-<b class="fc">&nbsp;    private val mutableStateFlow: MutableStateFlow&lt;STATE&gt;,</b>
-<b class="fc">&nbsp;    private val stateFlow: StateFlow&lt;STATE&gt; = mutableStateFlow.asStateFlow(),</b>
-&nbsp;) : StateFlow&lt;STATE&gt; by stateFlow {
-&nbsp;    constructor(
-&nbsp;        initialState: STATE,
-<b class="fc">&nbsp;    ) : this(</b>
-<b class="fc">&nbsp;        MutableStateFlow(initialState),</b>
-&nbsp;    )
+&nbsp;/**
+&nbsp; * The Material 3 window *width* breakpoints, named once for the whole app.
+&nbsp; *
+&nbsp; * Before this existed every caller reached for `androidx.window.core.layout` constants directly,
+&nbsp; * so &quot;wide&quot; meant whatever each screen happened to compare against. Features depend on this enum
+&nbsp; * instead; `androidx.window` stays an implementation detail of the windowing libraries.
+&nbsp; *
+&nbsp; * Entries are declared narrow-to-wide, so the natural enum ordering is also the width ordering:
+&nbsp; * `currentSurferWindowSize() &gt;= SurferWindowSize.Medium` reads as &quot;at least Medium&quot;.
+&nbsp; *
+&nbsp; * Height breakpoints are deliberately absent: Material scales layouts by width, and a second set of
+&nbsp; * named bands would double the vocabulary for no screen that wants it. The one thing height *is*
+&nbsp; * needed for — telling a wide-because-landscape window from a wide-because-large one — is the
+&nbsp; * single [SurferWindowGeometry.isLandscape] flag rather than a band of its own.
+&nbsp; */
+&nbsp;enum class SurferWindowSize {
+&nbsp;    /** `&lt; 600 dp` — phones in portrait, and the narrow pane of a split-screen window. */
+&nbsp;    Compact,
 &nbsp;
-&nbsp;    fun updateState(updater: (STATE) -&gt; STATE) {
-<b class="fc">&nbsp;        mutableStateFlow.update(updater)</b>
+&nbsp;    /** `600–839 dp` — large phones in landscape, small tablets, resized desktop windows. */
+&nbsp;    Medium,
+&nbsp;
+&nbsp;    /** `840–1199 dp` — tablets in landscape, most desktop windows. */
+&nbsp;    Expanded,
+&nbsp;
+&nbsp;    /** `&gt;= 1200 dp` — maximised desktop windows and large external displays. */
+&nbsp;    Large,
+&nbsp;
+&nbsp;    ;
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /** Lower bound of [Medium]. */
+&nbsp;        val MediumLowerBound: Dp = 600.dp
+&nbsp;
+&nbsp;        /** Lower bound of [Expanded]. */
+&nbsp;        val ExpandedLowerBound: Dp = 840.dp
+&nbsp;
+&nbsp;        /** Lower bound of [Large]. */
+&nbsp;        val LargeLowerBound: Dp = 1200.dp
+&nbsp;
+&nbsp;        /** Buckets a window [width] into a breakpoint. Widest bound first — the order matters. */
+&nbsp;        fun ofWidth(width: Dp): SurferWindowSize = when {
+&nbsp;            width &gt;= LargeLowerBound -&gt; Large
+&nbsp;            width &gt;= ExpandedLowerBound -&gt; Expanded
+&nbsp;            width &gt;= MediumLowerBound -&gt; Medium
+&nbsp;            else -&gt; Compact
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Both axes of the window, for the few layouts that cannot decide on width alone.
+&nbsp; *
+&nbsp; * Reach for [sizeClass] by default. [isLandscape] exists because &quot;expanded&quot; answers *how much* room
+&nbsp; * there is but not *what shape* it is: a 1024 dp tablet reports the same width lying down and stood
+&nbsp; * up, and a layout that puts two columns side by side wants the first and not the second.
+&nbsp; */
+&nbsp;data class SurferWindowGeometry(val width: Dp, val height: Dp) {
+&nbsp;
+&nbsp;    /** The width band, i.e. what [currentSurferWindowSize] returns. */
+&nbsp;    val sizeClass: SurferWindowSize = SurferWindowSize.ofWidth(width)
+&nbsp;
+&nbsp;    /** Whether the window is wider than it is tall. */
+&nbsp;    val isLandscape: Boolean = width &gt; height
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The [SurferWindowGeometry] of the window this composition is hosted in, recomposing when the
+&nbsp; * window is resized.
+&nbsp; *
+&nbsp; * Measures `LocalWindowInfo.containerSize` in the current density — the same input
+&nbsp; * `currentWindowAdaptiveInfo()` derives its `WindowSizeClass` from, minus the dependency on the
+&nbsp; * `androidx.window` breakpoint sets (whose default set stops at Expanded and would collapse
+&nbsp; * [SurferWindowSize.Large] into it).
+&nbsp; *
+&nbsp; * Prefer this over measuring a `BoxWithConstraints` at a screen root: the window is what both
+&nbsp; * values are about, reading it costs no subcomposition, and it does not shrink when the keyboard
+&nbsp; * opens — so a layout chosen from it cannot flip while the user is typing.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;fun currentSurferWindowGeometry(): SurferWindowGeometry {</b>
+<b class="fc">&nbsp;    val containerSize = LocalWindowInfo.current.containerSize</b>
+<b class="fc">&nbsp;    return with(LocalDensity.current) {</b>
+<b class="fc">&nbsp;        SurferWindowGeometry(width = containerSize.width.toDp(), height = containerSize.height.toDp())</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** The width band of the window this composition is hosted in. */
+&nbsp;@Composable
+<b class="fc">&nbsp;fun currentSurferWindowSize(): SurferWindowSize = currentSurferWindowGeometry().sizeClass</b>
 </code>
 </pre>
 </div>
@@ -138,7 +213,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

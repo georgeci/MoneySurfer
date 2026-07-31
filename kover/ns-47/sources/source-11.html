@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InsightsStateKt</title>
+  <title>MoneySurfer Coverage Report > InsightsTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.insights</a>
 </div>
 
-<h1>Coverage Summary for Class: InsightsStateKt (com.georgeci.moneysurfer.feature.insights)</h1>
+<h1>Coverage Summary for Class: InsightsTestTags (com.georgeci.moneysurfer.feature.insights)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">InsightsStateKt</td>
+  <td class="name">InsightsTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,109 +46,433 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.insights
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
-&nbsp;import kotlin.math.roundToInt
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.LazyListScope
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.foundation.lazy.itemsIndexed
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.alpha
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendInsights
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferNetTrendCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.chart.SurferNetTrendColumn
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.insights.generated.resources.Res
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_empty_center
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_empty_legend
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_categories_total
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_category_share
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_currency_excluded
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_currency_filtered_subtitle
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_currency_filtered_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_empty_subtitle
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_empty_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_merchant_transactions
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_merchants_empty
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_merchants_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_months_short
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_column_a11y
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_expense
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_income
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_months
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_trend_title
+&nbsp;import moneysurfer.feature.insights.generated.resources.insights_uncategorized
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringArrayResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/** [share] is a fraction; this is it as whole percent. */
-&nbsp;private const val PERCENT = 100
+&nbsp;/** Stable selectors for the Insights screen — see docs/testing/testing-strategy.md. */
+&nbsp;object InsightsTestTags {
+&nbsp;    const val Root = &quot;insights:root&quot;
+&nbsp;    const val List = &quot;insights:list&quot;
+&nbsp;    const val Donut = &quot;insights:donut&quot;
+&nbsp;    const val Trend = &quot;insights:trend&quot;
+&nbsp;    const val Empty = &quot;insights:empty&quot;
+&nbsp;    const val CurrencyFiltered = &quot;insights:currencyFiltered&quot;
+&nbsp;}
 &nbsp;
-&nbsp;@optics
-&nbsp;sealed interface InsightsState {
-&nbsp;    data object Loading : InsightsState
+&nbsp;/** How far the figures fade while the next period&#39;s rollups are still in flight. */
+&nbsp;private const val InFlightAlpha = 0.4f
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Everything the screen draws for the period the pager is on, already formatted against the
-&nbsp;     * workspace base currency — `domain` owns no copy and `MoneyFormatter` needs a currency the
-&nbsp;     * composable has no business resolving.
-&nbsp;     *
-&nbsp;     * [inFlight] covers the one thing the user can wait for here: paging or re-cadencing the period
-&nbsp;     * re-runs four `GROUP BY` rollups, and on a large workspace the answer does not arrive in the
-&nbsp;     * same frame as the new label. One flag rather than one per control, per AGENTS.md — the pager
-&nbsp;     * only ever has one change in the air.
-&nbsp;     */
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        val mode: DashboardPeriod,
-&nbsp;        val period: InsightsPeriodUi,
-&nbsp;        /** False once the period contains today; there is nothing to page forward into. */
-&nbsp;        val canGoToNextPeriod: Boolean,
-&nbsp;        val baseCurrency: String,
-&nbsp;        val totalFormatted: String,
-&nbsp;        val categories: List&lt;InsightsCategoryUi&gt;,
-&nbsp;        val months: List&lt;InsightsMonthUi&gt;,
-&nbsp;        val merchants: List&lt;InsightsMerchantUi&gt;,
-&nbsp;        /** Currency codes the base-currency filter left out of every figure above, largest first. */
-&nbsp;        val hiddenCurrencies: List&lt;String&gt;,
-&nbsp;        /** Whether [hiddenCurrencies] is *why* the period looks empty — see `SpendInsights`. */
-&nbsp;        val hiddenByBaseCurrency: Boolean,
-&nbsp;        val inFlight: Boolean = false,
-&nbsp;    ) : InsightsState {
+&nbsp;/** The &quot;never stored&quot; hue sentinel — anything off the colour wheel falls back to hashing the id. */
+&nbsp;private const val NoStoredHue = -1
 &nbsp;
-&nbsp;        val isEmpty: Boolean get() = categories.isEmpty()
+&nbsp;@Composable
+&nbsp;fun InsightsScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    viewModel: InsightsViewModel = koinViewModel(),
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
-&nbsp;        companion object
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            InsightsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    companion object
+&nbsp;    InsightsContent(state = state, onEvent = viewModel::onEvent)
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The pager&#39;s label reduced to the numbers its copy needs, so the composable resolves month names
-&nbsp; * and week wording from its own resources and the view model stays free of `@Composable`.
+&nbsp; * The stateless half of the screen. Public, like `DashboardContent`, because the desktop UI tests in
+&nbsp; * `:composeApp` mount it with an injected state — see docs/testing/testing-strategy.md.
 &nbsp; */
-&nbsp;sealed interface InsightsPeriodUi {
-&nbsp;    /** [monthNumber] is 1-based, matching `Month.number`. */
-&nbsp;    data class Month(val monthNumber: Int, val year: Int) : InsightsPeriodUi
-&nbsp;
-&nbsp;    /** ISO week; [weekYear] can differ from the calendar year around New Year. */
-&nbsp;    data class Week(val weekNumber: Int, val weekYear: Int) : InsightsPeriodUi
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * One row of the category breakdown, and one slice of the donut above it.
-&nbsp; *
-&nbsp; * [name] and [hue] are null for the uncategorized bucket, which has no stored appearance and no
-&nbsp; * name of its own — the screen supplies both, so the bucket keeps its colour when the user switches
-&nbsp; * language.
-&nbsp; */
-&nbsp;data class InsightsCategoryUi(
-&nbsp;    val id: String,
-&nbsp;    val name: String?,
-&nbsp;    val hue: Int?,
-&nbsp;    val spentFormatted: String,
-&nbsp;    val share: Float,
+&nbsp;@Composable
+&nbsp;fun InsightsContent(
+&nbsp;    state: InsightsState,
+&nbsp;    onEvent: (InsightsEvent) -&gt; Unit,
 &nbsp;) {
-&nbsp;    val sharePercent: Int get() = (share * PERCENT).roundToInt()
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(InsightsTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.insights_title),
+&nbsp;                onBack = { onEvent(InsightsEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        val content = state as? InsightsState.Content
+&nbsp;        if (content == null) {
+&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;            return@Scaffold
+&nbsp;        }
+&nbsp;
+&nbsp;        LazyColumn(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .testTag(InsightsTestTags.List),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                start = AppTheme.spacing.default,
+&nbsp;                end = AppTheme.spacing.default,
+&nbsp;                top = AppTheme.spacing.medium,
+&nbsp;                bottom = padding.calculateBottomPadding() + AppTheme.spacing.xxxLarge,
+&nbsp;            ),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;        ) {
+&nbsp;            item(key = &quot;period&quot;) {
+&nbsp;                InsightsPeriodPager(state = content, onEvent = onEvent)
+&nbsp;            }
+&nbsp;
+&nbsp;            // Everything below is the answer for the period above, so it fades as one block while
+&nbsp;            // the next one is queried rather than each card blinking on its own.
+&nbsp;            val bodyModifier = Modifier.alpha(if (content.inFlight) InFlightAlpha else 1f)
+&nbsp;
+&nbsp;            // Nothing else is drawn in this case on purpose: charts under a message explaining why
+&nbsp;            // there is nothing to chart would read as the message being about something else.
+&nbsp;            if (content.hiddenByBaseCurrency) {
+&nbsp;                item(key = &quot;currency-filtered&quot;) {
+&nbsp;                    CurrencyFilteredState(state = content, modifier = bodyModifier)
+&nbsp;                }
+&nbsp;                return@LazyColumn
+&nbsp;            }
+&nbsp;
+&nbsp;            if (content.isEmpty) {
+&nbsp;                item(key = &quot;empty&quot;) {
+&nbsp;                    SurferEmptyState(
+&nbsp;                        title = stringResource(Res.string.insights_empty_title),
+&nbsp;                        subtitle = stringResource(Res.string.insights_empty_subtitle),
+&nbsp;                        icon = SurferIcons.Receipt,
+&nbsp;                        modifier = bodyModifier.testTag(InsightsTestTags.Empty),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                categoryBreakdown(content, bodyModifier)
+&nbsp;            }
+&nbsp;
+&nbsp;            // The trend stays: it spans six months, so it has something to say about a period that
+&nbsp;            // holds nothing. The merchant list does not — it reads the same window the breakdown
+&nbsp;            // does, and its rows are a subset of the breakdown&#39;s, so an empty breakdown guarantees
+&nbsp;            // an empty merchant list. Drawing its &quot;nobody is named&quot; line under the empty state
+&nbsp;            // would answer the same question twice.
+&nbsp;            item(key = &quot;trend&quot;) {
+&nbsp;                NetTrendCard(state = content, modifier = bodyModifier)
+&nbsp;            }
+&nbsp;
+&nbsp;            if (!content.isEmpty) merchantList(content, bodyModifier)
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** One column of the income-vs-expense chart. The two magnitudes drive the bars, the strings the a11y copy. */
-&nbsp;data class InsightsMonthUi(
-&nbsp;    /** 1-based, matching `Month.number`. */
-&nbsp;    val monthNumber: Int,
-&nbsp;    val year: Int,
-&nbsp;    val income: Long,
-&nbsp;    val expense: Long,
-&nbsp;    val incomeFormatted: String,
-&nbsp;    val expenseFormatted: String,
-&nbsp;)
-&nbsp;
-&nbsp;/** One row of the top-merchants list. [merchant] is never blank — the aggregate excludes those rows. */
-&nbsp;data class InsightsMerchantUi(
-&nbsp;    val merchant: String,
-&nbsp;    val spentFormatted: String,
-&nbsp;    val transactionCount: Int,
-&nbsp;)
-&nbsp;
-&nbsp;sealed interface InsightsEvent {
-&nbsp;    data object OnBackClick : InsightsEvent
-&nbsp;    data object OnPreviousPeriodClick : InsightsEvent
-&nbsp;    data object OnNextPeriodClick : InsightsEvent
-&nbsp;    data class OnPeriodModeChanged(val mode: DashboardPeriod) : InsightsEvent
+&nbsp;/**
+&nbsp; * The donut at full size plus every category behind it.
+&nbsp; *
+&nbsp; * The donut&#39;s own legend tops out at five entries by design; a screen whose whole job is the full
+&nbsp; * picture lists the rest under it rather than rounding them into an implicit &quot;other&quot;.
+&nbsp; */
+&nbsp;private fun LazyListScope.categoryBreakdown(
+&nbsp;    state: InsightsState.Content,
+&nbsp;    modifier: Modifier,
+&nbsp;) {
+&nbsp;    item(key = &quot;categories-header&quot;) {
+&nbsp;        SurferSectionHeader(
+&nbsp;            title = stringResource(Res.string.insights_categories_title),
+&nbsp;            modifier = modifier,
+&nbsp;        )
+&nbsp;    }
+&nbsp;    item(key = &quot;donut&quot;) {
+&nbsp;        CategoriesDonut(state = state, modifier = modifier.testTag(InsightsTestTags.Donut))
+&nbsp;    }
+&nbsp;    // Keyed by position as well as id, because the id is not guaranteed unique: a slice whose
+&nbsp;    // stored `categoryId` names no category row — a dangling reference, or a workspace that has not
+&nbsp;    // pulled the category yet — arrives here indistinguishable from the genuinely uncategorized
+&nbsp;    // bucket, and two rows sharing a key is a `LazyColumn` crash rather than a cosmetic clash.
+&nbsp;    itemsIndexed(
+&nbsp;        state.categories,
+&nbsp;        key = { index, category -&gt; &quot;category:$index:${category.id}&quot; },
+&nbsp;    ) { _, category -&gt;
+&nbsp;        val name = category.name ?: stringResource(Res.string.insights_uncategorized)
+&nbsp;        InsightsAmountRow(
+&nbsp;            title = name,
+&nbsp;            amount = category.spentFormatted,
+&nbsp;            caption = stringResource(Res.string.insights_category_share, category.sharePercent),
+&nbsp;            leadingTint = category.tint(),
+&nbsp;            modifier = modifier,
+&nbsp;        )
+&nbsp;    }
+&nbsp;    if (state.hiddenCurrencies.isNotEmpty()) {
+&nbsp;        item(key = &quot;categories-excluded&quot;) {
+&nbsp;            SectionCaption(
+&nbsp;                text = stringResource(
+&nbsp;                    Res.string.insights_currency_excluded,
+&nbsp;                    state.hiddenCurrencies.joinToString(&quot;, &quot;),
+&nbsp;                ),
+&nbsp;                modifier = modifier,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface InsightsEffect {
-&nbsp;    data object NavigateBack : InsightsEffect
+&nbsp;/** Who took the most, or the line that says why nobody is named. */
+&nbsp;private fun LazyListScope.merchantList(
+&nbsp;    state: InsightsState.Content,
+&nbsp;    modifier: Modifier,
+&nbsp;) {
+&nbsp;    item(key = &quot;merchants-header&quot;) {
+&nbsp;        SurferSectionHeader(
+&nbsp;            title = stringResource(Res.string.insights_merchants_title),
+&nbsp;            modifier = modifier,
+&nbsp;        )
+&nbsp;    }
+&nbsp;    if (state.merchants.isEmpty()) {
+&nbsp;        item(key = &quot;merchants-empty&quot;) {
+&nbsp;            SectionCaption(
+&nbsp;                text = stringResource(Res.string.insights_merchants_empty),
+&nbsp;                modifier = modifier,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        return
+&nbsp;    }
+&nbsp;    items(state.merchants, key = { &quot;merchant:${it.merchant}&quot; }) { merchant -&gt;
+&nbsp;        InsightsAmountRow(
+&nbsp;            title = merchant.merchant,
+&nbsp;            amount = merchant.spentFormatted,
+&nbsp;            caption = pluralStringResource(
+&nbsp;                Res.plurals.insights_merchant_transactions,
+&nbsp;                merchant.transactionCount,
+&nbsp;                merchant.transactionCount,
+&nbsp;            ),
+&nbsp;            modifier = modifier,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun CategoriesDonut(state: InsightsState.Content, modifier: Modifier = Modifier) {
+&nbsp;    val uncategorized = stringResource(Res.string.insights_uncategorized)
+&nbsp;    SurferCategoriesDonutWidget(
+&nbsp;        segments = state.categories.map { category -&gt;
+&nbsp;            SurferDonutSegment(
+&nbsp;                label = category.name ?: uncategorized,
+&nbsp;                percent = category.share,
+&nbsp;                color = category.tint(),
+&nbsp;            )
+&nbsp;        },
+&nbsp;        // The screen is the full-size view of the dashboard&#39;s widget, so it asks for the hero
+&nbsp;        // layout explicitly rather than inheriting whatever the surrounding composition provides.
+&nbsp;        size = SurferWidgetSize.Expanded,
+&nbsp;        centerLabel = stringResource(Res.string.insights_categories_total),
+&nbsp;        centerValue = state.totalFormatted,
+&nbsp;        emptyCenterText = stringResource(Res.string.insights_categories_empty_center),
+&nbsp;        emptyLegendText = stringResource(Res.string.insights_categories_empty_legend),
+&nbsp;        modifier = modifier.fillMaxWidth().height(DonutHeight),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun NetTrendCard(state: InsightsState.Content, modifier: Modifier = Modifier) {
+&nbsp;    val shortMonths = stringArrayResource(Res.array.insights_months_short)
+&nbsp;    SurferNetTrendCard(
+&nbsp;        title = stringResource(Res.string.insights_trend_title),
+&nbsp;        trailingLabel = stringResource(Res.string.insights_trend_months, SpendInsights.MONTH_COLUMNS),
+&nbsp;        incomeLabel = stringResource(Res.string.insights_trend_income),
+&nbsp;        expenseLabel = stringResource(Res.string.insights_trend_expense),
+&nbsp;        columns = state.months.map { month -&gt;
+&nbsp;            val name = shortMonths[month.monthNumber - 1]
+&nbsp;            SurferNetTrendColumn(
+&nbsp;                label = name,
+&nbsp;                income = month.income,
+&nbsp;                expense = month.expense,
+&nbsp;                contentDescription = stringResource(
+&nbsp;                    Res.string.insights_trend_column_a11y,
+&nbsp;                    name,
+&nbsp;                    month.year,
+&nbsp;                    month.incomeFormatted,
+&nbsp;                    month.expenseFormatted,
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        },
+&nbsp;        modifier = modifier.testTag(InsightsTestTags.Trend),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The empty state that names the base-currency filter as the reason.
+&nbsp; *
+&nbsp; * A blank donut in a mixed-currency workspace reads as a bug rather than as the policy it is, so the
+&nbsp; * copy states which currency counts and which ones were left out — the one thing no chart on the
+&nbsp; * screen can express, because the aggregates applied the filter before the figures got here.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun CurrencyFilteredState(state: InsightsState.Content, modifier: Modifier = Modifier) {
+&nbsp;    SurferEmptyState(
+&nbsp;        title = stringResource(Res.string.insights_currency_filtered_title, state.baseCurrency),
+&nbsp;        subtitle = stringResource(
+&nbsp;            Res.string.insights_currency_filtered_subtitle,
+&nbsp;            state.hiddenCurrencies.joinToString(&quot;, &quot;),
+&nbsp;        ),
+&nbsp;        icon = SurferIcons.Globe,
+&nbsp;        modifier = modifier.testTag(InsightsTestTags.CurrencyFiltered),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** One amount line: an optional tint dot, a name, what it took, and what that is a share of. */
+&nbsp;@Composable
+&nbsp;private fun InsightsAmountRow(
+&nbsp;    title: String,
+&nbsp;    amount: String,
+&nbsp;    caption: String,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    leadingTint: Color? = null,
+&nbsp;) {
+&nbsp;    Row(
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(vertical = AppTheme.spacing.xSmall),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;    ) {
+&nbsp;        if (leadingTint != null) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .size(DotSize)
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(leadingTint),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = title,
+&nbsp;                style = AppTheme.typography.bodyLarge,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                maxLines = 1,
+&nbsp;                overflow = TextOverflow.Ellipsis,
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = caption,
+&nbsp;                style = AppTheme.typography.labelSmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                maxLines = 1,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Text(
+&nbsp;            text = amount,
+&nbsp;            style = AppTheme.typography.titleSmall,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            maxLines = 1,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SectionCaption(text: String, modifier: Modifier = Modifier) {
+&nbsp;    Text(
+&nbsp;        text = text,
+&nbsp;        style = AppTheme.typography.bodyMedium,
+&nbsp;        color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        modifier = modifier.fillMaxWidth(),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The same resolver every category bubble goes through: the stored hue snapped to the palette,
+&nbsp; * falling back to hashing the id for a row that stored none — so a category keeps one colour across
+&nbsp; * every screen, and the uncategorized bucket keeps its own when the user switches language.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun InsightsCategoryUi.tint(): Color =
+&nbsp;    SurferCategoryPalette.tintForHue(hue ?: NoStoredHue) ?: SurferCategoryPalette.tintFor(id)
+&nbsp;
+&nbsp;private val DonutHeight = 200.dp
+&nbsp;private val DotSize = 10.dp
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun InsightsContentPreview() {
+&nbsp;    AppTheme {
+&nbsp;        InsightsContent(state = previewInsightsContent(), onEvent = {})
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun InsightsCurrencyFilteredPreview() {
+&nbsp;    AppTheme {
+&nbsp;        InsightsContent(state = previewCurrencyFilteredContent(), onEvent = {})
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -173,7 +497,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

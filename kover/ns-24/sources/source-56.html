@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceMember</title>
+  <title>MoneySurfer Coverage Report > WorkspaceInvite</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceMember (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: WorkspaceInvite (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceMember</td>
+  <td class="name">WorkspaceInvite</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (113/113)
+    (77/77)
   </span>
 </td>
 </tr>
@@ -96,29 +96,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Participation of a [User] in a [Workspace].
+&nbsp; * Email-based invitation to a [Workspace].
 &nbsp; *
-&nbsp; * Snapshots ([displayName], [email]) are intentionally duplicated here so the membership
-&nbsp; * roster keeps stable history even after the user later edits their profile or deletes
-&nbsp; * their account. They are populated at the moment the row is written and never retro-updated.
+&nbsp; * Lives at `workspaces/{workspaceId}/invites/{id}` in Firestore. The invitee discovers
+&nbsp; * pending invites in-app via [email] match (no email delivery — see md/members.md decision 4).
 &nbsp; *
-&nbsp; * Soft-delete via [status] / [leftAt] / [removedAt] — see [WorkspaceMemberStatus].
+&nbsp; * - [targetUserId] is populated lazily (null when first invited unknown email; resolved on
+&nbsp; *   accept). Faster lookup for return users.
+&nbsp; * - Expiration is checked client-side: status PENDING + `now &gt; expiresAt` ⇒ display as EXPIRED.
+&nbsp; *   Persisted EXPIRED only on explicit transition.
 &nbsp; */
-<b class="fc">&nbsp;data class WorkspaceMember(</b>
-<b class="fc">&nbsp;    val userId: UserId,</b>
+<b class="fc">&nbsp;data class WorkspaceInvite(</b>
+<b class="fc">&nbsp;    val id: WorkspaceInviteId,</b>
 <b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val email: String,</b>
+<b class="fc">&nbsp;    val targetUserId: UserId?,</b>
 <b class="fc">&nbsp;    val role: WorkspaceRole,</b>
-<b class="fc">&nbsp;    val status: WorkspaceMemberStatus = WorkspaceMemberStatus.ACTIVE,</b>
-<b class="fc">&nbsp;    val displayName: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val email: String? = null,</b>
-<b class="fc">&nbsp;    val addedByUserId: UserId? = null,</b>
+<b class="fc">&nbsp;    val status: InviteStatus,</b>
+<b class="fc">&nbsp;    val invitedByUserId: UserId,</b>
 <b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-<b class="fc">&nbsp;    val leftAt: Instant? = null,</b>
-<b class="fc">&nbsp;    val removedAt: Instant? = null,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant,</b>
+<b class="fc">&nbsp;    val expiresAt: Instant,</b>
+<b class="fc">&nbsp;    val respondedAt: Instant? = null,</b>
 &nbsp;)
 </code>
 </pre>
@@ -143,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

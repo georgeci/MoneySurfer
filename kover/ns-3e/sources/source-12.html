@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (76/76)
+    (75/75)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     95.8%
   </span>
   <span class="absValue">
-    (960/1002)
+    (955/997)
   </span>
 </td>
 </tr>
@@ -215,7 +215,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (76/76)
+    (75/75)
   </span>
 </td>
 <td class="coverageStat">
@@ -223,7 +223,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     95.8%
   </span>
   <span class="absValue">
-    (960/1002)
+    (955/997)
   </span>
 </td>
 </tr>
@@ -256,19 +256,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.SurferContentMaxWidth
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.SurferWideContentMaxWidth
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 &nbsp;import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
 &nbsp;import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
-&nbsp;
-&nbsp;/**
-&nbsp; * How wide the dashboard is allowed to grow before it stops and centres, once it lays out as a grid —
-&nbsp; * the content column of the 1360 dp desktop mock, minus its navigation drawer. Wider than the default
-&nbsp; * [SurferContentMaxWidth] reading measure, because a grid divides its width between cards instead of
-&nbsp; * stretching one line of text across it.
-&nbsp; */
-<b class="fc">&nbsp;private val DASHBOARD_GRID_MAX_WIDTH = 1120.dp</b>
 &nbsp;
 &nbsp;/**
 &nbsp; * Narrowest grid cell that still gets the Expanded widget treatments. A widget&#39;s Expanded density is
@@ -300,7 +293,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val items = state.layout.enabledItems.filter { state.rendersWidget(it.type) }</b>
 <b class="fc">&nbsp;    val modifier = Modifier</b>
 <b class="fc">&nbsp;        .fillMaxSize()</b>
-<b class="fc">&nbsp;        .surferContentContainer(if (expanded) DASHBOARD_GRID_MAX_WIDTH else SurferContentMaxWidth)</b>
+<b class="fc">&nbsp;        .surferContentContainer(if (expanded) SurferWideContentMaxWidth else SurferContentMaxWidth)</b>
 <b class="fc">&nbsp;        .padding(top = topInset)</b>
 <b class="fc">&nbsp;    if (expanded) {</b>
 <b class="fc">&nbsp;        DashboardGrid(state, items, bottomInset, onEvent, modifier)</b>
@@ -456,7 +449,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

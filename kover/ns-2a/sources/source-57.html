@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoveMemberUseCase</title>
+  <title>MoneySurfer Coverage Report > RefreshIncomingInvitesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoveMemberUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: RefreshIncomingInvitesUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoveMemberUseCase</td>
+  <td class="name">RefreshIncomingInvitesUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,12 +55,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (6/8)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,53 +69,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (27/27)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    99.3%
-  </span>
-  <span class="absValue">
-    (272/274)
+    (37/37)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">RemoveMemberUseCase$Companion</td>
+    <td class="name">RefreshIncomingInvitesUseCase$invoke$1</td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">RemoveMemberUseCase$invoke$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">RemoveMemberUseCase$Params</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (12/12)
-  </span>
-</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -123,15 +84,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (6/8)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,15 +101,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    99.3%
-  </span>
-  <span class="absValue">
-    (284/286)
+    (37/37)
   </span>
 </td>
 </tr>
@@ -161,70 +115,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
-&nbsp;import arrow.core.raise.ensure
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Owner removes another member: status → REMOVED.
-&nbsp; *
-&nbsp; * Refuses to remove the last OWNER ([InviteError.OwnerCannotLeave]) — workspace must always
-&nbsp; * have at least one owner. Transferring ownership is a separate (post-v1) flow.
+&nbsp; * Triggers a full user-data sync that includes pulling invites from workspaces listed
+&nbsp; * in `users/{uid}.invitedWorkspaceIds`. Replaces the previous collectionGroup-based
+&nbsp; * [IncomingInviteRemoteRepository] approach.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class RemoveMemberUseCase(
-<b class="fc">&nbsp;    private val memberRepository: WorkspaceMemberRepository,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+&nbsp;class RefreshIncomingInvitesUseCase(
+<b class="fc">&nbsp;    private val workspaceSyncer: WorkspaceSyncer,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
-&nbsp;
-<b class="fc">&nbsp;    data class Params(</b>
-<b class="fc">&nbsp;        val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;        val targetUserId: UserId,</b>
-&nbsp;    )
-&nbsp;
-<b class="fc">&nbsp;    suspend operator fun invoke(params: Params): Either&lt;InviteError, Unit&gt; = either {</b>
-<b class="fc">&nbsp;        val (callerId, members, target) = resolveOwnerActionTarget(</b>
-<b class="fc">&nbsp;            session = session,</b>
-<b class="fc">&nbsp;            memberRepository = memberRepository,</b>
-<b class="fc">&nbsp;            workspaceId = params.workspaceId,</b>
-<b class="fc">&nbsp;            targetUserId = params.targetUserId,</b>
-&nbsp;        )
-&nbsp;
-<b class="fc">&nbsp;        if (target.role == WorkspaceRole.OWNER) {</b>
-<b class="fc">&nbsp;            val remainingOwners = members.count {</b>
-<b class="fc">&nbsp;                it.role == WorkspaceRole.OWNER &amp;&amp;</b>
-<b class="pc">&nbsp;                    it.status == WorkspaceMemberStatus.ACTIVE &amp;&amp;</b>
-<b class="fc">&nbsp;                    it.userId != params.targetUserId</b>
-&nbsp;            }
-<b class="pc">&nbsp;            ensure(remainingOwners &gt;= 1) { InviteError.OwnerCannotLeave }</b>
-&nbsp;        }
-&nbsp;
-<b class="fc">&nbsp;        Either.catch {</b>
-<b class="fc">&nbsp;            memberRepository.markRemoved(</b>
-<b class="fc">&nbsp;                userId = params.targetUserId,</b>
-<b class="fc">&nbsp;                workspaceId = params.workspaceId,</b>
-<b class="fc">&nbsp;                removedByUserId = callerId,</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;            .onLeft { log.e(it) { &quot;[local] markRemoved failed uid=${params.targetUserId.value.redactUid()}&quot; } }</b>
-<b class="fc">&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }</b>
-<b class="fc">&nbsp;            .bind()</b>
-&nbsp;
-<b class="fc">&nbsp;        log.i { &quot;[done] removed uid=${params.targetUserId.value.redactUid()} by=${callerId.value.redactUid()}&quot; }</b>
-<b class="fc">&nbsp;    }</b>
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;RemoveMember&quot;
-&nbsp;    }
+&nbsp;    suspend operator fun invoke(): Either&lt;InviteError, Int&gt; =
+<b class="fc">&nbsp;        Either.catch { workspaceSyncer.syncAll() }</b>
+<b class="fc">&nbsp;            .mapLeft { InviteError.RemoteSyncFailed(it) }</b>
+<b class="fc">&nbsp;            .map { 0 } // count not available from syncAll</b>
 &nbsp;}
 </code>
 </pre>
@@ -249,7 +155,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

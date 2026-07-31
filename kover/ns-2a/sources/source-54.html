@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecalculateAccountBalanceUseCase</title>
+  <title>MoneySurfer Coverage Report > PurgeDeletedTransactionsUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: RecalculateAccountBalanceUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: PurgeDeletedTransactionsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecalculateAccountBalanceUseCase</td>
+  <td class="name">PurgeDeletedTransactionsUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,29 +69,37 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (86/86)
+    (23/23)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">RecalculateAccountBalanceUseCase$invoke$1</td>
+    <td class="name">PurgeDeletedTransactionsUseCase$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -91,23 +108,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
     (4/4)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (86/86)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -128,38 +138,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.balanceImpact
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
-&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRetentionRepository
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Duration
+&nbsp;import kotlin.time.Duration.Companion.days
 &nbsp;
 &nbsp;/**
-&nbsp; * Repair: recompute `Account.balance` from authoritative transaction history. Used after
-&nbsp; * migration, manual repair, or when a divergence detector fires.
+&nbsp; * The retention half of soft delete (issue #346): tombstoned transactions are kept for
+&nbsp; * [RETENTION] and then dropped for good.
 &nbsp; *
-&nbsp; * Should only run when the outbox is empty for the workspace, otherwise a parallel
-&nbsp; * `applyDelta` race produces inconsistent state. The caller (sync coordinator / repair UI)
-&nbsp; * is responsible for that gate; this use case is intentionally simple.
+&nbsp; * **Who runs it.** The app itself, once per launch, from `AppLaunchViewModel` — the same place
+&nbsp; * the first-run seed repairs a half-finished install. Deliberately not a background worker: the
+&nbsp; * work is a single indexed DELETE over rows nobody is reading, there is nothing to schedule
+&nbsp; * around, and a worker would need scheduling on two platforms to do what one call at startup
+&nbsp; * already does. An app that is never launched keeps its tombstones, which costs a few rows and
+&nbsp; * loses nothing.
+&nbsp; *
+&nbsp; * **Why thirty days.** Everything that reads a tombstone is a local, short-lived interaction: the
+&nbsp; * Undo Snackbar (seconds), an edit that was already open when the row was deleted
+&nbsp; * ([UpdateTransactionUseCase]), and a CSV import, which must find the tombstone rather than insert
+&nbsp; * over a surviving id. Thirty days is far past all three and short enough that deleted rows do not
+&nbsp; * accumulate. Nothing here is waiting on another device — see below.
+&nbsp; *
+&nbsp; * **The window is measured from the delete&#39;s own timestamp**, which for a tombstone that arrived by
+&nbsp; * sync is the clock of the device that made the delete, not the moment this one heard about it. A
+&nbsp; * delete pushed by a peer that had been offline for longer than [RETENTION] therefore lands here
+&nbsp; * already expired and is collected on the next launch. That is deliberate rather than an oversight:
+&nbsp; * none of the three readers above outlives the trip, there is no UI for undoing a delete made on
+&nbsp; * another device, and a CSV import that finds no tombstone simply inserts the row instead — the
+&nbsp; * same end state.
+&nbsp; *
+&nbsp; * **What it does not do.** The remote doc keeps its `deletedAt`. Purging here says nothing about
+&nbsp; * any peer&#39;s copy — the tombstone stays on the server for them to pull, and collecting *that* is a
+&nbsp; * separate open gap (docs/architecture/sync-gaps.md).
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class RecalculateAccountBalanceUseCase(
-<b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
-<b class="fc">&nbsp;    private val accountRepository: AccountRepository,</b>
+&nbsp;class PurgeDeletedTransactionsUseCase(
+<b class="fc">&nbsp;    private val retention: TransactionRetentionRepository,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    suspend operator fun invoke(accountId: AccountId): Money {
-<b class="fc">&nbsp;        val all = transactionRepository.getByAccountId(accountId).first()</b>
-<b class="fc">&nbsp;        var sumMinor = 0L</b>
-<b class="fc">&nbsp;        for (tx in all) {</b>
-<b class="fc">&nbsp;            val impact = tx.balanceImpact()[accountId] ?: continue</b>
-<b class="fc">&nbsp;            sumMinor += impact.minor</b>
-&nbsp;        }
-<b class="fc">&nbsp;        val balance = Money.fromMinor(sumMinor)</b>
-<b class="fc">&nbsp;        accountRepository.setBalance(accountId, balance)</b>
-<b class="fc">&nbsp;        return balance</b>
+&nbsp;    /** Returns how many tombstones were dropped. */
+<b class="fc">&nbsp;    suspend operator fun invoke(): Int = retention.purgeDeletedBefore(clock.now() - RETENTION)</b>
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /** How long a deleted transaction stays recoverable before it is gone for good. */
+<b class="fc">&nbsp;        val RETENTION: Duration = 30.days</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -185,7 +210,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

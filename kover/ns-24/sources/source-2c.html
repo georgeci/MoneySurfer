@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ExchangeRateTable</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateSnapshot</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: ExchangeRateTable (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: ExchangeRateSnapshot (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ExchangeRateTable</td>
+  <td class="name">ExchangeRateSnapshot</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    76.9%
+    100%
   </span>
   <span class="absValue">
-    (20/26)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,14 +81,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
   <span class="absValue">
     (12/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    95.2%
-  </span>
-  <span class="absValue">
-    (119/125)
   </span>
 </td>
 </tr>
@@ -118,10 +111,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * only publish on business days, so a table fetched this morning can legitimately be two days old
 &nbsp; * and the UI has to be able to say so.
 &nbsp; */
-<b class="fc">&nbsp;data class ExchangeRateTable(</b>
-<b class="fc">&nbsp;    val baseCurrency: CurrencyCode,</b>
-<b class="fc">&nbsp;    val rates: Map&lt;CurrencyCode, Double&gt;,</b>
-<b class="fc">&nbsp;    val asOf: Instant,</b>
+&nbsp;data class ExchangeRateTable(
+&nbsp;    val baseCurrency: CurrencyCode,
+&nbsp;    val rates: Map&lt;CurrencyCode, Double&gt;,
+&nbsp;    val asOf: Instant,
 &nbsp;) {
 &nbsp;
 &nbsp;    /**
@@ -133,9 +126,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * balance.
 &nbsp;     */
 &nbsp;    fun rateFor(currency: CurrencyCode): Double? {
-<b class="pc">&nbsp;        if (currency == baseCurrency) return 1.0</b>
-<b class="fc">&nbsp;        val rate = rates[currency] ?: return null</b>
-<b class="pc">&nbsp;        return rate.takeIf { it.isFinite() &amp;&amp; it &gt; 0.0 }</b>
+&nbsp;        if (currency == baseCurrency) return 1.0
+&nbsp;        val rate = rates[currency] ?: return null
+&nbsp;        return rate.takeIf { it.isFinite() &amp;&amp; it &gt; 0.0 }
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -153,18 +146,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * sum. Reporting it as unconverted keeps that amount visible and the total honest.
 &nbsp;     */
 &nbsp;    fun convertToBase(money: Money, currency: CurrencyCode): Money? {
-<b class="fc">&nbsp;        val rate = rateFor(currency) ?: return null</b>
-<b class="pc">&nbsp;        if (rate == 1.0) return money</b>
-<b class="fc">&nbsp;        return (money.minor / rate)</b>
-<b class="pc">&nbsp;            .takeIf { it.isFinite() &amp;&amp; abs(it) &lt;= Money.MAX_MINOR }</b>
-<b class="fc">&nbsp;            ?.let { Money(it.roundToLong()) }</b>
+&nbsp;        val rate = rateFor(currency) ?: return null
+&nbsp;        if (rate == 1.0) return money
+&nbsp;        return (money.minor / rate)
+&nbsp;            .takeIf { it.isFinite() &amp;&amp; abs(it) &lt;= Money.MAX_MINOR }
+&nbsp;            ?.let { Money(it.roundToLong()) }
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;/** The base currency in force plus the newest rates cached for it, if any have been cached yet. */
-&nbsp;data class ExchangeRateSnapshot(
-&nbsp;    val baseCurrency: CurrencyCode,
-&nbsp;    val rates: ExchangeRateTable?,
+<b class="fc">&nbsp;data class ExchangeRateSnapshot(</b>
+<b class="fc">&nbsp;    val baseCurrency: CurrencyCode,</b>
+<b class="fc">&nbsp;    val rates: ExchangeRateTable?,</b>
 &nbsp;)
 </code>
 </pre>
@@ -189,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

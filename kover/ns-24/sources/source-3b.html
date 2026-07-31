@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SafeToSpendKt</title>
+  <title>MoneySurfer Coverage Report > SafeToSpend</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SafeToSpendKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SafeToSpend (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SafeToSpendKt</td>
+  <td class="name">SafeToSpend</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (21/21)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,81 +79,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (96/96)
+    (15/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (90/90)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">SafeToSpendKt$primaryProgress$$inlined$compareByDescending$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SafeToSpendKt$primaryProgress$$inlined$thenBy$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SafeToSpendKt$primaryProgress$$inlined$thenByDescending$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (3/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (21/21)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (96/96)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -172,32 +113,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Everything here is a projection of one [BudgetProgress] — nothing is recomputed from
 &nbsp; * transactions, so the widget and the budget screens can never disagree about the same budget.
 &nbsp; */
-&nbsp;data class SafeToSpend(
-&nbsp;    val budgetName: String,
+<b class="fc">&nbsp;data class SafeToSpend(</b>
+<b class="fc">&nbsp;    val budgetName: String,</b>
 &nbsp;    /** Negative once the budget is overspent. */
-&nbsp;    val remaining: Money,
+<b class="fc">&nbsp;    val remaining: Money,</b>
 &nbsp;    /** What is left to spend per remaining day to land on the limit. Zero when nothing is left. */
-&nbsp;    val perDay: Money,
+<b class="fc">&nbsp;    val perDay: Money,</b>
 &nbsp;    /** Days from today to the end of the window, counting today. Zero once the window is over. */
-&nbsp;    val daysLeft: Int,
-&nbsp;    val spent: Money,
+<b class="fc">&nbsp;    val daysLeft: Int,</b>
+<b class="fc">&nbsp;    val spent: Money,</b>
 &nbsp;    /** The budget amount plus any rollover carry — what [remaining] is measured against. */
-&nbsp;    val limit: Money,
-&nbsp;    val window: BudgetPeriodWindow,
-&nbsp;    val status: BudgetStatus,
+<b class="fc">&nbsp;    val limit: Money,</b>
+<b class="fc">&nbsp;    val window: BudgetPeriodWindow,</b>
+<b class="fc">&nbsp;    val status: BudgetStatus,</b>
 &nbsp;    /**
 &nbsp;     * Workspace base currency. Non-null by construction: a figure nobody can format is not a
 &nbsp;     * figure, so [safeToSpend] withholds the whole projection rather than handing the UI an
 &nbsp;     * amount it has to invent a currency for.
 &nbsp;     */
-&nbsp;    val currency: CurrencyCode,
+<b class="fc">&nbsp;    val currency: CurrencyCode,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    val isOver: Boolean get() = status == BudgetStatus.OVER
+<b class="fc">&nbsp;    val isOver: Boolean get() = status == BudgetStatus.OVER</b>
 &nbsp;
 &nbsp;    /** Spend as a fraction of [limit]; can exceed 1. A zero limit reads as 0, never as a NaN. */
 &nbsp;    val spentFraction: Float
-&nbsp;        get() = if (limit.minor &lt;= 0L) 0f else spent.minor.toFloat() / limit.minor.toFloat()
+<b class="fc">&nbsp;        get() = if (limit.minor &lt;= 0L) 0f else spent.minor.toFloat() / limit.minor.toFloat()</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * How much of the window is already behind us, today excluded. This is the tick the spend bar
@@ -209,9 +150,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 &nbsp;    val elapsedFraction: Float
 &nbsp;        get() {
-&nbsp;            val windowDays = window.startInclusive.daysUntil(window.endExclusive)
-&nbsp;            if (windowDays &lt;= 0) return 1f
-&nbsp;            return ((windowDays - daysLeft).toFloat() / windowDays).coerceIn(0f, 1f)
+<b class="fc">&nbsp;            val windowDays = window.startInclusive.daysUntil(window.endExclusive)</b>
+<b class="fc">&nbsp;            if (windowDays &lt;= 0) return 1f</b>
+<b class="fc">&nbsp;            return ((windowDays - daysLeft).toFloat() / windowDays).coerceIn(0f, 1f)</b>
 &nbsp;        }
 &nbsp;}
 &nbsp;
@@ -243,35 +184,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * name is worse than no money at all: `MoneyFormatter` is backed by `java.util.Currency`, which
 &nbsp; * rejects anything that is not a three-letter ISO code.
 &nbsp; */
-<b class="fc">&nbsp;fun List&lt;BudgetProgress&gt;.safeToSpend(preferredPeriod: BudgetPeriod? = null): SafeToSpend? =</b>
-<b class="fc">&nbsp;    primaryProgress(preferredPeriod)?.toSafeToSpend()</b>
+&nbsp;fun List&lt;BudgetProgress&gt;.safeToSpend(preferredPeriod: BudgetPeriod? = null): SafeToSpend? =
+&nbsp;    primaryProgress(preferredPeriod)?.toSafeToSpend()
 &nbsp;
 &nbsp;private fun List&lt;BudgetProgress&gt;.primaryProgress(preferredPeriod: BudgetPeriod?): BudgetProgress? {
-<b class="fc">&nbsp;    val active = filter { it.budget.isActive }</b>
-<b class="fc">&nbsp;    val general = active.filter { it.budget.categoryIds.isEmpty() }</b>
-<b class="fc">&nbsp;    return general.ifEmpty { active }</b>
-<b class="fc">&nbsp;        .sortedWith(</b>
+&nbsp;    val active = filter { it.budget.isActive }
+&nbsp;    val general = active.filter { it.budget.categoryIds.isEmpty() }
+&nbsp;    return general.ifEmpty { active }
+&nbsp;        .sortedWith(
 &nbsp;            // `preferredPeriod == null` makes every term of this comparison false, leaving the
 &nbsp;            // limit and the id to decide — the exact order this list had before periods existed.
-<b class="fc">&nbsp;            compareByDescending&lt;BudgetProgress&gt; { it.budget.period == preferredPeriod }</b>
-<b class="fc">&nbsp;                .thenByDescending { it.effectiveLimit.minor }</b>
-<b class="fc">&nbsp;                .thenBy { it.budget.id.value },</b>
+&nbsp;            compareByDescending&lt;BudgetProgress&gt; { it.budget.period == preferredPeriod }
+&nbsp;                .thenByDescending { it.effectiveLimit.minor }
+&nbsp;                .thenBy { it.budget.id.value },
 &nbsp;        )
-<b class="fc">&nbsp;        .firstOrNull()</b>
+&nbsp;        .firstOrNull()
 &nbsp;}
 &nbsp;
 &nbsp;private fun BudgetProgress.toSafeToSpend(): SafeToSpend? {
-<b class="fc">&nbsp;    val baseCurrency = currency ?: return null</b>
-<b class="fc">&nbsp;    return SafeToSpend(</b>
-<b class="fc">&nbsp;        budgetName = budget.name,</b>
-<b class="fc">&nbsp;        remaining = remaining,</b>
-<b class="fc">&nbsp;        perDay = perDayRemaining,</b>
-<b class="fc">&nbsp;        daysLeft = daysLeft,</b>
-<b class="fc">&nbsp;        spent = spent,</b>
-<b class="fc">&nbsp;        limit = effectiveLimit,</b>
-<b class="fc">&nbsp;        window = window,</b>
-<b class="fc">&nbsp;        status = status,</b>
-<b class="fc">&nbsp;        currency = baseCurrency,</b>
+&nbsp;    val baseCurrency = currency ?: return null
+&nbsp;    return SafeToSpend(
+&nbsp;        budgetName = budget.name,
+&nbsp;        remaining = remaining,
+&nbsp;        perDay = perDayRemaining,
+&nbsp;        daysLeft = daysLeft,
+&nbsp;        spent = spent,
+&nbsp;        limit = effectiveLimit,
+&nbsp;        window = window,
+&nbsp;        status = status,
+&nbsp;        currency = baseCurrency,
 &nbsp;    )
 &nbsp;}
 </code>
@@ -297,7 +238,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

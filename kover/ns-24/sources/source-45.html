@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SpentMonthDelta</title>
+  <title>MoneySurfer Coverage Report > SpentMonth</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SpentMonthDelta (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SpentMonth (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,13 +46,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SpentMonthDelta</td>
+  <td class="name">SpentMonth</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -63,28 +68,57 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
+    (17/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    97.9%
   </span>
   <span class="absValue">
-    (12/12)
+    (95/97)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">SpentMonth$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.9%
+  </span>
+  <span class="absValue">
+    (95/97)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -117,26 +151,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * the comparison [com.georgeci.moneysurfer.domain.insight] already makes (&quot;against %s by the same
 &nbsp; * day last month&quot;), and [previousSpentMonthWindow] is the window that produces it.
 &nbsp; */
-&nbsp;data class SpentMonth(
+<b class="fc">&nbsp;data class SpentMonth(</b>
 &nbsp;    /**
 &nbsp;     * The day the figures were read on. Carried rather than derived so the elapsed-day guard under
 &nbsp;     * [delta] and the window the spend was queried for can never disagree about which day it is.
 &nbsp;     */
-&nbsp;    val today: LocalDate,
+<b class="fc">&nbsp;    val today: LocalDate,</b>
 &nbsp;    /** Spend booked from the 1st of [today]&#39;s month through [today] inclusive. */
-&nbsp;    val spent: Money,
+<b class="fc">&nbsp;    val spent: Money,</b>
 &nbsp;    /** Spend booked over the same stretch of the previous month. Zero when it booked nothing. */
-&nbsp;    val previousSpent: Money,
+<b class="fc">&nbsp;    val previousSpent: Money,</b>
 &nbsp;    /**
 &nbsp;     * The monthly cap the spend is measured against, or null when no budget sets one — the
 &nbsp;     * widget&#39;s &quot;no budget set&quot; state. See [monthlySpendCap] for which budgets qualify.
 &nbsp;     */
-&nbsp;    val cap: Money?,
-&nbsp;    val currency: CurrencyCode,
+<b class="fc">&nbsp;    val cap: Money?,</b>
+<b class="fc">&nbsp;    val currency: CurrencyCode,</b>
 &nbsp;) {
 &nbsp;
 &nbsp;    /** Days of the month gone, counting [today] — what [delta] holds its comparison against. */
-&nbsp;    val elapsedDays: Int get() = today.day
+<b class="fc">&nbsp;    val elapsedDays: Int get() = today.day</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Spend against [cap] — what a progress bar is drawn from — or null while nothing caps the
@@ -146,8 +180,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * 0 instead of a NaN or an infinity, the same guard [BudgetProgress.spentFraction] applies.
 &nbsp;     */
 &nbsp;    val capFraction: Float?
-&nbsp;        get() = cap?.let {
-&nbsp;            if (it.minor &lt;= 0L) 0f else spent.minor.toFloat() / it.minor.toFloat()
+<b class="fc">&nbsp;        get() = cap?.let {</b>
+<b class="pc">&nbsp;            if (it.minor &lt;= 0L) 0f else spent.minor.toFloat() / it.minor.toFloat()</b>
 &nbsp;        }
 &nbsp;
 &nbsp;    /**
@@ -163,15 +197,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 &nbsp;    val delta: SpentMonthDelta?
 &nbsp;        get() {
-&nbsp;            if (elapsedDays &lt; MIN_COMPARISON_DAYS || !previousSpent.isPositive()) return null
-&nbsp;            val ratio = (spent - previousSpent).minor.toDouble() / previousSpent.minor.toDouble()
-&nbsp;            return SpentMonthDelta(
-&nbsp;                trend = when {
-&nbsp;                    ratio &gt;= SPENT_MONTH_CHANGE_RATIO -&gt; SpendTrend.Up
-&nbsp;                    ratio &lt;= -SPENT_MONTH_CHANGE_RATIO -&gt; SpendTrend.Down
-&nbsp;                    else -&gt; SpendTrend.Flat
+<b class="fc">&nbsp;            if (elapsedDays &lt; MIN_COMPARISON_DAYS || !previousSpent.isPositive()) return null</b>
+<b class="fc">&nbsp;            val ratio = (spent - previousSpent).minor.toDouble() / previousSpent.minor.toDouble()</b>
+<b class="fc">&nbsp;            return SpentMonthDelta(</b>
+<b class="fc">&nbsp;                trend = when {</b>
+<b class="fc">&nbsp;                    ratio &gt;= SPENT_MONTH_CHANGE_RATIO -&gt; SpendTrend.Up</b>
+<b class="fc">&nbsp;                    ratio &lt;= -SPENT_MONTH_CHANGE_RATIO -&gt; SpendTrend.Down</b>
+<b class="fc">&nbsp;                    else -&gt; SpendTrend.Flat</b>
 &nbsp;                },
-&nbsp;                changePercent = (abs(ratio) * PERCENT_SCALE).roundToInt(),
+<b class="fc">&nbsp;                changePercent = (abs(ratio) * PERCENT_SCALE).roundToInt(),</b>
 &nbsp;            )
 &nbsp;        }
 &nbsp;
@@ -189,9 +223,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Which way the month is running and by how much. [changePercent] is a magnitude — the direction
 &nbsp; * is [trend], so the widget picks one sentence rather than printing a sign into another.
 &nbsp; */
-<b class="fc">&nbsp;data class SpentMonthDelta(</b>
-<b class="fc">&nbsp;    val trend: SpendTrend,</b>
-<b class="fc">&nbsp;    val changePercent: Int,</b>
+&nbsp;data class SpentMonthDelta(
+&nbsp;    val trend: SpendTrend,
+&nbsp;    val changePercent: Int,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -262,7 +296,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

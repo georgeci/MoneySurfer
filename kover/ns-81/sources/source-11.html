@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCurrencyRowKt</title>
+  <title>MoneySurfer Coverage Report > SurferCurrencyPickerFieldKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCurrencyRowKt (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferCurrencyPickerFieldKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCurrencyRowKt</td>
+  <td class="name">SurferCurrencyPickerFieldKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,18 +60,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    50%
   </span>
   <span class="absValue">
-    (2/3)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.7%
+    41.7%
   </span>
   <span class="absValue">
-    (11/12)
+    (5/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (34/34)
+    (35/35)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    97.3%
+    96.8%
   </span>
   <span class="absValue">
-    (179/184)
+    (389/402)
   </span>
 </td>
 </tr>
@@ -101,96 +101,102 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.defaultMinSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.layout.width
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.LocalContentColor
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.semantics.Role
 &nbsp;import androidx.compose.ui.text.font.FontWeight
 &nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/**
-&nbsp; * Selectable currency card: symbol, display name over the code, and a trailing check when
-&nbsp; * [selected]. Wraps [SurferCard] so the rows inherit the active container style like every
-&nbsp; * other list in the app; the check follows `LocalContentColor` because the filled selected
-&nbsp; * variant inverts the content colour.
+&nbsp; * Outlined field that opens [SurferCurrencyBottomSheet]. Reads as a text field rather than a
+&nbsp; * card so it sits in a form next to the real [androidx.compose.material3.OutlinedTextField]s —
+&nbsp; * 56dp tall, 12dp radius, symbol badge, `{name} · {code}` value, trailing chevron. The outline
+&nbsp; * turns primary while [expanded] so the field keeps the focused-field look of the open sheet.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferCurrencyRow(
+&nbsp;fun SurferCurrencyPickerField(
 &nbsp;    symbol: String,
 &nbsp;    code: String,
 &nbsp;    name: String,
-&nbsp;    selected: Boolean,
 &nbsp;    onClick: () -&gt; Unit,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    expanded: Boolean = false,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    SurferCard(modifier = modifier.fillMaxWidth(), selected = selected, onClick = onClick) {</b>
-<b class="fc">&nbsp;        Row(</b>
-<b class="fc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-<b class="fc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;            horizontalArrangement = Arrangement.spacedBy(14.dp),</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = symbol,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),</b>
-<b class="fc">&nbsp;                textAlign = TextAlign.Center,</b>
-<b class="fc">&nbsp;                modifier = Modifier.width(28.dp),</b>
-&nbsp;            )
-<b class="fc">&nbsp;            Column(modifier = Modifier.weight(1f)) {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = name,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.bodyLarge,</b>
-<b class="fc">&nbsp;                    maxLines = 1,</b>
-<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
-&nbsp;                )
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = code,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;                    color = LocalContentColor.current.copy(alpha = 0.7f),</b>
-<b class="fc">&nbsp;                    maxLines = 1,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;            if (selected) {</b>
-<b class="fc">&nbsp;                Icon(</b>
-<b class="fc">&nbsp;                    imageVector = SurferIcons.Check,</b>
-<b class="fc">&nbsp;                    contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;                    tint = LocalContentColor.current,</b>
-<b class="fc">&nbsp;                    modifier = Modifier.size(20.dp),</b>
-&nbsp;                )
-<b class="fc">&nbsp;            } else {</b>
-<b class="fc">&nbsp;                Spacer(Modifier.width(20.dp))</b>
-&nbsp;            }
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+&nbsp;    // Same corner as SurferCard and the text fields it sits next to in a form.
+<b class="fc">&nbsp;    val shape = AppTheme.shapes.large</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .defaultMinSize(minHeight = 56.dp)</b>
+<b class="fc">&nbsp;            .clip(shape)</b>
+<b class="fc">&nbsp;            .border(1.dp, if (expanded) colors.primary else colors.outline, shape)</b>
+<b class="fc">&nbsp;            .clickable(role = Role.Button, onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp, vertical = 8.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(12.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = symbol,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),</b>
+<b class="fc">&nbsp;            color = colors.onSurface,</b>
+<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
+<b class="fc">&nbsp;            modifier = Modifier.width(24.dp),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = &quot;$name · $code&quot;,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.bodyLarge,</b>
+<b class="fc">&nbsp;            color = colors.onSurface,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
+<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        Icon(</b>
+<b class="fc">&nbsp;            imageVector = SurferIcons.DropDown,</b>
+<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;            tint = colors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;            modifier = Modifier.size(18.dp),</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferCurrencyRowPreview() {
+&nbsp;private fun SurferCurrencyPickerFieldPreview() {
 &nbsp;    SurferComponentPreview {
 &nbsp;        Column(
 &nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
 &nbsp;        ) {
-&nbsp;            SurferCurrencyRow(symbol = &quot;€&quot;, code = &quot;EUR&quot;, name = &quot;Euro&quot;, selected = true, onClick = {})
-&nbsp;            SurferCurrencyRow(symbol = &quot;$&quot;, code = &quot;USD&quot;, name = &quot;US Dollar&quot;, selected = false, onClick = {})
+&nbsp;            SurferCurrencyPickerField(symbol = &quot;€&quot;, code = &quot;EUR&quot;, name = &quot;Euro&quot;, onClick = {})
+&nbsp;            SurferCurrencyPickerField(
+&nbsp;                symbol = &quot;zł&quot;,
+&nbsp;                code = &quot;PLN&quot;,
+&nbsp;                name = &quot;Polish Zloty&quot;,
+&nbsp;                onClick = {},
+&nbsp;                expanded = true,
+&nbsp;            )
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
@@ -217,7 +223,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

@@ -60,10 +60,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    75%
   </span>
   <span class="absValue">
-    (2/3)
+    (3/4)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (35/35)
+    (41/41)
   </span>
 </td>
 </tr>
@@ -111,6 +111,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * chart, a two-column form) pass their own value to [surferContentContainer].
 &nbsp; */
 <b class="fc">&nbsp;val SurferContentMaxWidth: Dp = 840.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Cap for the layouts that genuinely use the extra room, where [SurferContentMaxWidth] would be a
+&nbsp; * straitjacket rather than a readable measure — a widget grid, a two-column form.
+&nbsp; *
+&nbsp; * A single value rather than one per screen: it was picked twice independently, for the dashboard
+&nbsp; * grid and for the sign-in split, and two hand-tuned copies of the same number drift.
+&nbsp; */
+<b class="fc">&nbsp;val SurferWideContentMaxWidth: Dp = 1120.dp</b>
 &nbsp;
 &nbsp;/**
 &nbsp; * Caps content at [maxWidth] and centres it horizontally in whatever space the parent offers.
@@ -162,7 +171,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

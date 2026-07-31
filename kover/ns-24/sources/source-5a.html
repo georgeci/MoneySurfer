@@ -1,0 +1,118 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DayPartKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+</div>
+
+<h1>Coverage Summary for Class: DayPartKt (com.georgeci.moneysurfer.domain.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">DayPartKt</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * Which greeting a screen opens with. A device-local reading of the wall clock and nothing else —
+&nbsp; * it takes no workspace, no account and no network, so it is the one line of the dashboard toolbar
+&nbsp; * that is always true.
+&nbsp; *
+&nbsp; * The part of day rather than the sentence: &quot;Good evening&quot; needs a locale no view model has, so the
+&nbsp; * screen picks its copy off this. Same split as the upcoming card&#39;s &quot;Today&quot;/&quot;Tomorrow&quot; labels.
+&nbsp; */
+&nbsp;enum class DayPart {
+&nbsp;    Morning,
+&nbsp;    Afternoon,
+&nbsp;    Evening,
+&nbsp;    Night,
+&nbsp;    ;
+&nbsp;
+&nbsp;    companion object {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The part of the day [instant] falls in, read in [timeZone].
+&nbsp;         *
+&nbsp;         * The boundaries are the conventional ones and deliberately not configurable: the greeting
+&nbsp;         * is decoration, and someone up at 03:00 is better served by &quot;Good night&quot; than by a
+&nbsp;         * setting. [Night] wraps midnight, so it is what the other three leave over rather than a
+&nbsp;         * range of its own.
+&nbsp;         */
+&nbsp;        fun at(instant: Instant, timeZone: TimeZone): DayPart =
+&nbsp;            when (instant.toLocalDateTime(timeZone).hour) {
+&nbsp;                in MORNING_FROM_HOUR until AFTERNOON_FROM_HOUR -&gt; Morning
+&nbsp;                in AFTERNOON_FROM_HOUR until EVENING_FROM_HOUR -&gt; Afternoon
+&nbsp;                in EVENING_FROM_HOUR until NIGHT_FROM_HOUR -&gt; Evening
+&nbsp;                else -&gt; Night
+&nbsp;            }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private const val MORNING_FROM_HOUR = 5
+&nbsp;private const val AFTERNOON_FROM_HOUR = 12
+&nbsp;private const val EVENING_FROM_HOUR = 17
+&nbsp;private const val NIGHT_FROM_HOUR = 22
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
+</div>
+</body>
+</html>

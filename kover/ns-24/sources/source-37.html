@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRule</title>
+  <title>MoneySurfer Coverage Report > RecurringFrequency</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRule (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: RecurringFrequency (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRule</td>
+  <td class="name">RecurringFrequency</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (110/110)
+    (30/30)
   </span>
 </td>
 </tr>
@@ -102,24 +102,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import kotlin.time.Instant
 &nbsp;
-<b class="fc">&nbsp;data class RecurringRule(</b>
-<b class="fc">&nbsp;    val id: RecurringRuleId = RecurringRuleId.uuid(),</b>
+&nbsp;data class RecurringRule(
+&nbsp;    val id: RecurringRuleId = RecurringRuleId.uuid(),
 &nbsp;    /**
 &nbsp;     * Workspace the rule belongs to. Every co-member sees the same rule, so
 &nbsp;     * [com.georgeci.moneysurfer.domain.model.Transaction.recurringRuleId] resolves on
 &nbsp;     * every device rather than dangling on the ones that never created it.
 &nbsp;     */
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val title: String,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-<b class="fc">&nbsp;    val categoryId: CategoryId,</b>
-<b class="fc">&nbsp;    val schedule: RecurringSchedule,</b>
-<b class="fc">&nbsp;    val startDate: LocalDate,</b>
-<b class="fc">&nbsp;    val nextRunAt: Instant?,</b>
-<b class="fc">&nbsp;    val autoCreate: Boolean = true,</b>
-<b class="fc">&nbsp;    val isActive: Boolean = true,</b>
-<b class="fc">&nbsp;    val createdAt: Instant = Instant.fromEpochMilliseconds(0),</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;    val title: String,
+&nbsp;    val amount: Money,
+&nbsp;    val categoryId: CategoryId,
+&nbsp;    val schedule: RecurringSchedule,
+&nbsp;    val startDate: LocalDate,
+&nbsp;    val nextRunAt: Instant?,
+&nbsp;    val autoCreate: Boolean = true,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    val createdAt: Instant = Instant.fromEpochMilliseconds(0),
+&nbsp;    val updatedAt: Instant = createdAt,
 &nbsp;)
 &nbsp;
 &nbsp;data class RecurringSchedule(
@@ -131,10 +131,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;enum class RecurringFrequency {
-&nbsp;    DAILY,
-&nbsp;    WEEKLY,
-&nbsp;    MONTHLY,
-&nbsp;    YEARLY,
+<b class="fc">&nbsp;    DAILY,</b>
+<b class="fc">&nbsp;    WEEKLY,</b>
+<b class="fc">&nbsp;    MONTHLY,</b>
+<b class="fc">&nbsp;    YEARLY,</b>
 &nbsp;}
 &nbsp;
 &nbsp;enum class MissingDayPolicy {
@@ -164,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

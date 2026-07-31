@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SpentByCategoryKt</title>
+  <title>MoneySurfer Coverage Report > SpentByCategory</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SpentByCategoryKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SpentByCategory (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,21 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SpentByCategoryKt</td>
+  <td class="name">SpentByCategory</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    92.9%
-  </span>
-  <span class="absValue">
-    (13/14)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,46 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    98.6%
-  </span>
-  <span class="absValue">
-    (139/141)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SpentByCategoryKt$buildSpentByCategory-EjHdxBI$$inlined$sortedByDescending$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    92.9%
-  </span>
-  <span class="absValue">
-    (13/14)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,18 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    98.6%
-  </span>
-  <span class="absValue">
-    (139/141)
+    (22/22)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -185,12 +143,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * three-letter ISO code. A workspace whose base currency cannot be read yields no breakdown at
 &nbsp; * all rather than one the UI has to invent a currency for — the same rule [SafeToSpend] follows.
 &nbsp; */
-&nbsp;data class SpentByCategory(
+<b class="fc">&nbsp;data class SpentByCategory(</b>
 &nbsp;    /** Largest spender first. */
-&nbsp;    val entries: List&lt;CategorySpend&gt;,
-&nbsp;    val total: Money,
-&nbsp;    val currency: CurrencyCode,
-&nbsp;    val window: TransactionPeriodWindow,
+<b class="fc">&nbsp;    val entries: List&lt;CategorySpend&gt;,</b>
+<b class="fc">&nbsp;    val total: Money,</b>
+<b class="fc">&nbsp;    val currency: CurrencyCode,</b>
+<b class="fc">&nbsp;    val window: TransactionPeriodWindow,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -228,39 +186,39 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    window: TransactionPeriodWindow,
 &nbsp;    capPeriod: BudgetPeriod,
 &nbsp;): SpentByCategory {
-<b class="fc">&nbsp;    val total = slices.fold(Money.zero()) { acc, slice -&gt; acc + slice.total }</b>
-<b class="fc">&nbsp;    val byId = categories.associateBy { it.id }</b>
+&nbsp;    val total = slices.fold(Money.zero()) { acc, slice -&gt; acc + slice.total }
+&nbsp;    val byId = categories.associateBy { it.id }
 &nbsp;    // Sorted here rather than trusted from the query: `sortedByDescending` is stable, so the
 &nbsp;    // repository&#39;s own largest-first order survives for ties, and a caller that forgot to sort
 &nbsp;    // cannot leave the widget drawing its rows in an arbitrary order.
-<b class="fc">&nbsp;    val entries = slices</b>
-<b class="fc">&nbsp;        .sortedByDescending { it.total.minor }</b>
-<b class="fc">&nbsp;        .map { slice -&gt;</b>
-<b class="fc">&nbsp;            CategorySpend(</b>
-<b class="pc">&nbsp;                category = slice.categoryId?.let(byId::get),</b>
-<b class="fc">&nbsp;                spent = slice.total,</b>
-<b class="fc">&nbsp;                share = shareOf(slice.total, total),</b>
-<b class="fc">&nbsp;                cap = capFor(slice, budgets, capPeriod),</b>
-<b class="fc">&nbsp;            )</b>
+&nbsp;    val entries = slices
+&nbsp;        .sortedByDescending { it.total.minor }
+&nbsp;        .map { slice -&gt;
+&nbsp;            CategorySpend(
+&nbsp;                category = slice.categoryId?.let(byId::get),
+&nbsp;                spent = slice.total,
+&nbsp;                share = shareOf(slice.total, total),
+&nbsp;                cap = capFor(slice, budgets, capPeriod),
+&nbsp;            )
 &nbsp;        }
-<b class="fc">&nbsp;    return SpentByCategory(entries = entries, total = total, currency = currency, window = window)</b>
+&nbsp;    return SpentByCategory(entries = entries, total = total, currency = currency, window = window)
 &nbsp;}
 &nbsp;
 &nbsp;/** A zero total reads as no share at all, never as a NaN. */
 &nbsp;private fun shareOf(spent: Money, total: Money): Float =
-<b class="fc">&nbsp;    if (total.minor &lt;= 0L) 0f else (spent.minor.toFloat() / total.minor.toFloat()).coerceIn(0f, 1f)</b>
+&nbsp;    if (total.minor &lt;= 0L) 0f else (spent.minor.toFloat() / total.minor.toFloat()).coerceIn(0f, 1f)
 &nbsp;
 &nbsp;private fun capFor(
 &nbsp;    slice: CategorySpendSlice,
 &nbsp;    budgets: List&lt;Budget&gt;,
 &nbsp;    capPeriod: BudgetPeriod,
 &nbsp;): CategoryCap? {
-<b class="fc">&nbsp;    val coverage = resolveCategoryCapCoverage(slice.categoryId, budgets)</b>
-<b class="fc">&nbsp;    val budget = (coverage as? CategoryCapCoverage.Editable)?.budget ?: return null</b>
-<b class="fc">&nbsp;    if (budget.period != capPeriod) return null</b>
-<b class="fc">&nbsp;    return CategoryCap(</b>
-<b class="fc">&nbsp;        limit = budget.amount,</b>
-<b class="fc">&nbsp;        status = budgetStatusOf(slice.total, budget.amount, budget.alertPercent),</b>
+&nbsp;    val coverage = resolveCategoryCapCoverage(slice.categoryId, budgets)
+&nbsp;    val budget = (coverage as? CategoryCapCoverage.Editable)?.budget ?: return null
+&nbsp;    if (budget.period != capPeriod) return null
+&nbsp;    return CategoryCap(
+&nbsp;        limit = budget.amount,
+&nbsp;        status = budgetStatusOf(slice.total, budget.amount, budget.alertPercent),
 &nbsp;    )
 &nbsp;}
 </code>
@@ -286,7 +244,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

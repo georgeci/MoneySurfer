@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SpentMonthKt</title>
+  <title>MoneySurfer Coverage Report > SpentMonthDelta</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SpentMonthKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SpentMonthDelta (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SpentMonthKt</td>
+  <td class="name">SpentMonthDelta</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,23 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (66/66)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -196,9 +189,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Which way the month is running and by how much. [changePercent] is a magnitude — the direction
 &nbsp; * is [trend], so the widget picks one sentence rather than printing a sign into another.
 &nbsp; */
-&nbsp;data class SpentMonthDelta(
-&nbsp;    val trend: SpendTrend,
-&nbsp;    val changePercent: Int,
+<b class="fc">&nbsp;data class SpentMonthDelta(</b>
+<b class="fc">&nbsp;    val trend: SpendTrend,</b>
+<b class="fc">&nbsp;    val changePercent: Int,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -209,7 +202,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * what makes [previousSpentMonthWindow] a like-for-like baseline.
 &nbsp; */
 &nbsp;fun spentMonthWindow(today: LocalDate): TransactionPeriodWindow =
-<b class="fc">&nbsp;    TransactionPeriodWindow(from = firstOfMonth(today), to = today)</b>
+&nbsp;    TransactionPeriodWindow(from = firstOfMonth(today), to = today)
 &nbsp;
 &nbsp;/**
 &nbsp; * The same stretch of the previous month: its 1st through its [today]-th day.
@@ -218,11 +211,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * February rather than overflowing into March — the closest same-stretch window a short month has.
 &nbsp; */
 &nbsp;fun previousSpentMonthWindow(today: LocalDate): TransactionPeriodWindow {
-<b class="fc">&nbsp;    val start = firstOfMonth(today).minus(1, DateTimeUnit.MONTH)</b>
-<b class="fc">&nbsp;    val lastDay = start.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)</b>
-<b class="fc">&nbsp;    return TransactionPeriodWindow(</b>
-<b class="fc">&nbsp;        from = start,</b>
-<b class="fc">&nbsp;        to = if (today.day &gt;= lastDay.day) lastDay else LocalDate(start.year, start.month, today.day),</b>
+&nbsp;    val start = firstOfMonth(today).minus(1, DateTimeUnit.MONTH)
+&nbsp;    val lastDay = start.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
+&nbsp;    return TransactionPeriodWindow(
+&nbsp;        from = start,
+&nbsp;        to = if (today.day &gt;= lastDay.day) lastDay else LocalDate(start.year, start.month, today.day),
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -234,9 +227,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * shapes without a null check that would then have to mean &quot;no data&quot; somewhere else.
 &nbsp; */
 &nbsp;fun List&lt;MonthlyNet&gt;.expenseTotal(): Money =
-<b class="fc">&nbsp;    fold(Money.zero()) { running, month -&gt; running + month.expense }</b>
+&nbsp;    fold(Money.zero()) { running, month -&gt; running + month.expense }
 &nbsp;
-<b class="fc">&nbsp;private fun firstOfMonth(date: LocalDate): LocalDate = LocalDate(date.year, date.month, 1)</b>
+&nbsp;private fun firstOfMonth(date: LocalDate): LocalDate = LocalDate(date.year, date.month, 1)
 &nbsp;
 &nbsp;/**
 &nbsp; * How far the month has to have moved before the change is worth a label. A whole month&#39;s spend is
@@ -269,7 +262,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

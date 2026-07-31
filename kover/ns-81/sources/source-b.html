@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoryPalette</title>
+  <title>MoneySurfer Coverage Report > SurferCategoryBubbleKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoryPalette (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferCategoryBubbleKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCategoryPalette</td>
+  <td class="name">SurferCategoryBubbleKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (19/19)
+    (16/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.3%
+    97.4%
   </span>
   <span class="absValue">
-    (18/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (47/47)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    86.2%
-  </span>
-  <span class="absValue">
-    (489/567)
+    (186/191)
   </span>
 </td>
 </tr>
@@ -134,24 +134,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;fun SurferCategoryBubble(
 &nbsp;    icon: ImageVector,
 &nbsp;    tint: Color,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    size: Dp = 44.dp,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .size(size)
-&nbsp;            .clip(CircleShape)
-&nbsp;            .background(tint.copy(alpha = 0.18f)),
-&nbsp;        contentAlignment = Alignment.Center,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    size: Dp = 44.dp,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .size(size)</b>
+<b class="fc">&nbsp;            .clip(CircleShape)</b>
+<b class="fc">&nbsp;            .background(tint.copy(alpha = 0.18f)),</b>
+<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
 &nbsp;    ) {
-&nbsp;        Icon(
-&nbsp;            imageVector = icon,
-&nbsp;            contentDescription = SurferSemantics.Decorative,
-&nbsp;            tint = tint,
-&nbsp;            modifier = Modifier.size(size * 0.5f),
+<b class="fc">&nbsp;        Icon(</b>
+<b class="fc">&nbsp;            imageVector = icon,</b>
+<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;            tint = tint,</b>
+<b class="fc">&nbsp;            modifier = Modifier.size(size * 0.5f),</b>
 &nbsp;        )
-&nbsp;    }
-&nbsp;}
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/** A category&#39;s resolved appearance: what [SurferCategoryBubble] needs and nothing else. */
 &nbsp;data class SurferCategoryVisual(
@@ -181,32 +181,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val tints: List&lt;Color&gt;
 &nbsp;        @Composable
 &nbsp;        @ReadOnlyComposable
-<b class="fc">&nbsp;        get() = AppTheme.semanticColors.categoryTints</b>
+&nbsp;        get() = AppTheme.semanticColors.categoryTints
 &nbsp;
-<b class="fc">&nbsp;    val icons: List&lt;ImageVector&gt; = listOf(</b>
-<b class="fc">&nbsp;        SurferIcons.Category,</b>
-<b class="fc">&nbsp;        SurferIcons.CreditCard,</b>
-<b class="fc">&nbsp;        SurferIcons.Savings,</b>
-<b class="fc">&nbsp;        SurferIcons.Cash,</b>
-<b class="fc">&nbsp;        SurferIcons.Wallet,</b>
-<b class="fc">&nbsp;        SurferIcons.Receipt,</b>
-<b class="fc">&nbsp;        SurferIcons.Event,</b>
-<b class="fc">&nbsp;        SurferIcons.Tag,</b>
+&nbsp;    val icons: List&lt;ImageVector&gt; = listOf(
+&nbsp;        SurferIcons.Category,
+&nbsp;        SurferIcons.CreditCard,
+&nbsp;        SurferIcons.Savings,
+&nbsp;        SurferIcons.Cash,
+&nbsp;        SurferIcons.Wallet,
+&nbsp;        SurferIcons.Receipt,
+&nbsp;        SurferIcons.Event,
+&nbsp;        SurferIcons.Tag,
 &nbsp;    )
 &nbsp;
 &nbsp;    /** Hues in degrees behind [tints], in the same order. */
-<b class="fc">&nbsp;    val hues: List&lt;Int&gt; = listOf(162, 35, 258, 68, 303, 340, 8, 90)</b>
+&nbsp;    val hues: List&lt;Int&gt; = listOf(162, 35, 258, 68, 303, 340, 8, 90)
 &nbsp;
 &nbsp;    /** Semantic keys behind [icons], in the same order. Stored on the category, unlike an index. */
-<b class="fc">&nbsp;    val iconKeys: List&lt;String&gt; = listOf(</b>
-<b class="fc">&nbsp;        &quot;category&quot;,</b>
-<b class="fc">&nbsp;        &quot;card&quot;,</b>
-<b class="fc">&nbsp;        &quot;savings&quot;,</b>
-<b class="fc">&nbsp;        &quot;cash&quot;,</b>
-<b class="fc">&nbsp;        &quot;wallet&quot;,</b>
-<b class="fc">&nbsp;        &quot;receipt&quot;,</b>
-<b class="fc">&nbsp;        &quot;event&quot;,</b>
-<b class="fc">&nbsp;        &quot;tag&quot;,</b>
+&nbsp;    val iconKeys: List&lt;String&gt; = listOf(
+&nbsp;        &quot;category&quot;,
+&nbsp;        &quot;card&quot;,
+&nbsp;        &quot;savings&quot;,
+&nbsp;        &quot;cash&quot;,
+&nbsp;        &quot;wallet&quot;,
+&nbsp;        &quot;receipt&quot;,
+&nbsp;        &quot;event&quot;,
+&nbsp;        &quot;tag&quot;,
 &nbsp;    )
 &nbsp;
 &nbsp;    /** Marker for the seeded system Transfer category — matches `CategorySystemKind.TRANSFER.name`. */
@@ -219,9 +219,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val TransferTint: Color
 &nbsp;        @Composable
 &nbsp;        @ReadOnlyComposable
-<b class="fc">&nbsp;        get() = AppTheme.semanticColors.transfer</b>
+&nbsp;        get() = AppTheme.semanticColors.transfer
 &nbsp;
-<b class="fc">&nbsp;    val TransferIcon: ImageVector = SurferIcons.SwapHoriz</b>
+&nbsp;    val TransferIcon: ImageVector = SurferIcons.SwapHoriz
 &nbsp;
 &nbsp;    /**
 &nbsp;     * The one resolver every [SurferCategoryBubble] call site goes through.
@@ -237,16 +237,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        id: String,
 &nbsp;        iconKey: String,
 &nbsp;        hue: Int,
-<b class="fc">&nbsp;        systemKind: String? = null,</b>
-<b class="pc">&nbsp;    ): SurferCategoryVisual = SurferCategoryVisual(</b>
-<b class="fc">&nbsp;        icon = iconForKey(iconKey, systemKind) ?: iconFor(id, systemKind),</b>
-<b class="pc">&nbsp;        tint = tintForHue(hue, systemKind) ?: tintFor(id, systemKind),</b>
+&nbsp;        systemKind: String? = null,
+&nbsp;    ): SurferCategoryVisual = SurferCategoryVisual(
+&nbsp;        icon = iconForKey(iconKey, systemKind) ?: iconFor(id, systemKind),
+&nbsp;        tint = tintForHue(hue, systemKind) ?: tintFor(id, systemKind),
 &nbsp;    )
 &nbsp;
 &nbsp;    /** Icon for a stored key, or null when the key is blank or unknown to this build. */
-<b class="fc">&nbsp;    fun iconForKey(iconKey: String, systemKind: String? = null): ImageVector? {</b>
-<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER || iconKey == TRANSFER_ICON_KEY) return TransferIcon</b>
-<b class="fc">&nbsp;        return icons.getOrNull(iconKeys.indexOf(iconKey))</b>
+&nbsp;    fun iconForKey(iconKey: String, systemKind: String? = null): ImageVector? {
+&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER || iconKey == TRANSFER_ICON_KEY) return TransferIcon
+&nbsp;        return icons.getOrNull(iconKeys.indexOf(iconKey))
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -255,21 +255,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 &nbsp;    @Composable
 &nbsp;    @ReadOnlyComposable
-<b class="fc">&nbsp;    fun tintForHue(hue: Int, systemKind: String? = null): Color? {</b>
-<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
-<b class="fc">&nbsp;        return tintIndexForHue(hue)?.let { tints[it] }</b>
+&nbsp;    fun tintForHue(hue: Int, systemKind: String? = null): Color? {
+&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint
+&nbsp;        return tintIndexForHue(hue)?.let { tints[it] }
 &nbsp;    }
 &nbsp;
 &nbsp;    @Composable
 &nbsp;    @ReadOnlyComposable
-<b class="pc">&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {</b>
-<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
-<b class="fc">&nbsp;        return tints[tintIndexFor(id)]</b>
+&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {
+&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint
+&nbsp;        return tints[tintIndexFor(id)]
 &nbsp;    }
 &nbsp;
-<b class="fc">&nbsp;    fun iconFor(id: String, systemKind: String? = null): ImageVector {</b>
-<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferIcon</b>
-<b class="fc">&nbsp;        return icons[nonNegativeMod(stringHash(id), icons.size)]</b>
+&nbsp;    fun iconFor(id: String, systemKind: String? = null): ImageVector {
+&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferIcon
+&nbsp;        return icons[nonNegativeMod(stringHash(id), icons.size)]
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -278,28 +278,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * Theme-free half of [tintForHue].
 &nbsp;     */
 &nbsp;    fun tintIndexForHue(hue: Int): Int? {
-<b class="pc">&nbsp;        if (hue &lt; 0 || hue &gt;= HUE_DEGREES) return null</b>
-<b class="fc">&nbsp;        return hues.indices.minBy { circularHueDistance(hues[it], hue) }</b>
+&nbsp;        if (hue &lt; 0 || hue &gt;= HUE_DEGREES) return null
+&nbsp;        return hues.indices.minBy { circularHueDistance(hues[it], hue) }
 &nbsp;    }
 &nbsp;
 &nbsp;    /** Index into [tints] for a category that stored no hue. Theme-free half of [tintFor]. */
-<b class="fc">&nbsp;    fun tintIndexFor(id: String): Int = nonNegativeMod(stringHash(id), hues.size)</b>
+&nbsp;    fun tintIndexFor(id: String): Int = nonNegativeMod(stringHash(id), hues.size)
 &nbsp;
 &nbsp;    private fun circularHueDistance(a: Int, b: Int): Int {
-<b class="fc">&nbsp;        val diff = kotlin.math.abs(a - b)</b>
-<b class="fc">&nbsp;        return minOf(diff, HUE_DEGREES - diff)</b>
+&nbsp;        val diff = kotlin.math.abs(a - b)
+&nbsp;        return minOf(diff, HUE_DEGREES - diff)
 &nbsp;    }
 &nbsp;
 &nbsp;    private const val HUE_DEGREES = 360
 &nbsp;
 &nbsp;    private fun nonNegativeMod(value: Long, size: Int): Int {
-<b class="fc">&nbsp;        val s = size.toLong()</b>
-<b class="fc">&nbsp;        val r = value % s</b>
-<b class="pc">&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()</b>
+&nbsp;        val s = size.toLong()
+&nbsp;        val r = value % s
+&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun stringHash(value: String): Long =
-<b class="fc">&nbsp;        value.fold(0L) { acc, c -&gt; acc * 31 + c.code }</b>
+&nbsp;        value.fold(0L) { acc, c -&gt; acc * 31 + c.code }
 &nbsp;}
 &nbsp;
 &nbsp;@Preview
@@ -369,7 +369,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>

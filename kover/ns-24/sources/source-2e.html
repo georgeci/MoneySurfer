@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalProgress</title>
+  <title>MoneySurfer Coverage Report > GoalContribution</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalProgress (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,42 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalProgress</td>
+  <td class="name">GoalContribution</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    75%
-  </span>
-  <span class="absValue">
-    (6/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    87.5%
-  </span>
-  <span class="absValue">
-    (7/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.7%
-  </span>
-  <span class="absValue">
-    (71/75)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">GoalProgress$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -96,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,45 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    66.7%
-  </span>
-  <span class="absValue">
-    (2/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    75%
-  </span>
-  <span class="absValue">
-    (6/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.9%
-  </span>
-  <span class="absValue">
-    (8/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    95.1%
-  </span>
-  <span class="absValue">
-    (78/82)
+    (84/84)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -152,48 +94,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * How far a [SavingsGoal] has come. [saved] is always `SUM(contributions.amount)` —
-&nbsp; * see the goal model for why it is never stored.
+&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
+&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
 &nbsp; *
-&nbsp; * [fraction] is uncapped so logic can tell &quot;exactly on target&quot; from &quot;overshot&quot;;
-&nbsp; * [percent] is clamped to `0..1` because the ring and the bar cannot draw more.
+&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
+&nbsp; * touched. It exists so the money-backed model can later store the id of a real
+&nbsp; * transfer here without a schema change on either side of the wire.
 &nbsp; */
-<b class="fc">&nbsp;data class GoalProgress(</b>
-<b class="fc">&nbsp;    val saved: Money,</b>
-<b class="fc">&nbsp;    val target: Money,</b>
-&nbsp;) {
-&nbsp;    /** Never negative: a goal past its target has nothing left to save. */
-<b class="fc">&nbsp;    val remaining: Money = if (saved &gt;= target) Money.zero() else target - saved</b>
-&nbsp;
-&nbsp;    /** Uncapped ratio of saved to target. `0.0` when the target is zero. */
-<b class="nc">&nbsp;    val fraction: Double =</b>
-<b class="pc">&nbsp;        if (target.minor &lt;= 0L) 0.0 else saved.minor.toDouble() / target.minor.toDouble()</b>
-&nbsp;
-&nbsp;    /** [fraction] clamped to `0.0..1.0`, for progress bars and rings. */
-<b class="fc">&nbsp;    val percent: Double = fraction.coerceIn(0.0, 1.0)</b>
-&nbsp;
-<b class="pc">&nbsp;    val isReached: Boolean = target.minor &gt; 0L &amp;&amp; saved &gt;= target</b>
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        fun of(goal: SavingsGoal, saved: Money): GoalProgress =
-<b class="fc">&nbsp;            GoalProgress(saved = saved, target = goal.target)</b>
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** A goal plus its derived progress — what the goals list renders. */
-&nbsp;data class SavingsGoalSummary(
-&nbsp;    val goal: SavingsGoal,
-&nbsp;    val progress: GoalProgress,
-&nbsp;)
-&nbsp;
-&nbsp;/** A goal, its progress and its full contribution history — the details screen. */
-&nbsp;data class SavingsGoalDetails(
-&nbsp;    val goal: SavingsGoal,
-&nbsp;    val progress: GoalProgress,
-&nbsp;    val contributions: List&lt;GoalContribution&gt;,
+<b class="fc">&nbsp;data class GoalContribution(</b>
+<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val goalId: GoalId,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
+<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
+<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
+<b class="fc">&nbsp;    val createdAt: Instant,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
 &nbsp;)
 </code>
 </pre>
@@ -218,7 +144,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:36</div>
+    <div style="float:right;">generated on 2026-07-31 21:23</div>
 </div>
 </body>
 </html>
