@@ -88,6 +88,39 @@ class AppNavigatorTest : StringSpec({
 
         stack shouldContainExactly listOf(Route.Onboarding)
     }
+
+    "applying a launch decision roots the stack at it and reports it back" {
+        val stack = backStack(Route.SignIn)
+        val applied = mutableListOf<Route>()
+
+        applyLaunchRoute(
+            route = Route.Onboarding,
+            navigator = AppNavigator(stack),
+            currentTop = stack.lastOrNull(),
+            onApplied = applied::add,
+        )
+
+        stack shouldContainExactly listOf(Route.Onboarding)
+        applied shouldContainExactly listOf(Route.Onboarding)
+    }
+
+    // The decision the user is already looking at: resetting would rebuild the entry — and drop the
+    // view models scoped to it — for no navigation at all.
+    "a launch decision the stack already sits on leaves it untouched" {
+        val stack = backStack(Route.Dashboard)
+        val applied = mutableListOf<Route>()
+
+        applyLaunchRoute(
+            route = Route.Dashboard,
+            navigator = AppNavigator(stack),
+            currentTop = stack.lastOrNull(),
+            onApplied = applied::add,
+        )
+
+        stack shouldContainExactly listOf(Route.Dashboard)
+        // Still reported: the host has to consume the decision either way, or it replays.
+        applied shouldContainExactly listOf(Route.Dashboard)
+    }
 })
 
 private fun NavBackStack<NavKey>.shouldBeEmptyStack() {

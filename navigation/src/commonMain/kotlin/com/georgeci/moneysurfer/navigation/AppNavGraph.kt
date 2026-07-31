@@ -125,8 +125,12 @@ fun AppNavGraph(
     val launchRouteApplied by appLaunchViewModel.launchRouteApplied.collectAsStateWithLifecycle()
     LaunchedEffect(targetRoute) {
         val route = targetRoute ?: return@LaunchedEffect
-        if (backStack.lastOrNull() != route) navigator.resetTo(route)
-        appLaunchViewModel.onRouteApplied(route)
+        applyLaunchRoute(
+            route = route,
+            navigator = navigator,
+            currentTop = backStack.lastOrNull(),
+            onApplied = appLaunchViewModel::onRouteApplied,
+        )
     }
 
     // Server-owned flags, pulled here rather than from the view model's `init` because this is the
@@ -213,6 +217,25 @@ fun AppNavGraph(
             }
         }
     }
+}
+
+/**
+ * Puts a launch decision on the back stack and reports it back through [onApplied], which is what
+ * stops the same decision from being replayed — the composition that runs this is rebuilt on every
+ * configuration change while the view model behind [onApplied] is not.
+ *
+ * Skipping the reset when [currentTop] already is [route] keeps that destination's entry — and the
+ * view models scoped to it — alive, instead of tearing it down and rebuilding it for a decision
+ * that lands where the user already is. The policy sits outside the composable so it is testable.
+ */
+internal fun applyLaunchRoute(
+    route: Route,
+    navigator: AppNavigator,
+    currentTop: NavKey?,
+    onApplied: (Route) -> Unit,
+) {
+    if (currentTop != route) navigator.resetTo(route)
+    onApplied(route)
 }
 
 /** App-level [SnackbarHost] state that renders one-shot messages posted to [controller]. */
