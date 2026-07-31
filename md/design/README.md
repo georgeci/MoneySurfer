@@ -1,4 +1,4 @@
-# Design notes — Budgets, Goals, Settings, Transactions & Accounts
+# Design notes — Sign in, Budgets, Goals, Settings, Transactions & Accounts
 
 Notes taken from the **MoneySurfer** Claude Design project:
 <https://claude.ai/design/p/019dd9e9-bcad-78f3-a4b9-49cde06a75ac>
@@ -26,6 +26,73 @@ The screens are React-UMD pages over a shared runtime: `design-canvas.jsx`,
 `*-data.jsx` / `screens-*.jsx`.
 
 Artboard width in the mockups is 412×892 (`AndroidDevice`), scaled 0.78 on the canvas.
+
+---
+
+## Sign in — screen inventory (from `Sign In.html`)
+
+`Sign In.html` loads `design-canvas.jsx`, `android-frame.jsx`, `tokens.jsx`, `icons.jsx`,
+`components.jsx`, `screens-signin.jsx`. One component, `SignInScreen`, with two boolean props.
+
+| # | Artboard | Frame | Component |
+|---|---|---|---|
+| 01 | Sign in · phone | 412 × 892 | `SignInScreen` |
+| 01b | Sign in · short phone | 412 × 740 | `SignInScreen compact` |
+| 01c | Sign in · tablet | 834 × 1040 | `SignInScreen` |
+| 01d | Sign in · small tablet, **landscape** | 1024 × 700 | `SignInScreen landscape` |
+
+The screen deliberately opts out of the seed picker — its greens are the fixed brand palette
+(`AuthColors` in the repo), which is why the canvas' Tweaks panel says so out loud.
+
+### The two layouts
+
+**Stacked** (01, 01b, 01c) — brand block at the top, flexible spacer, wave along the bottom,
+white sheet pinned above it. Note that the *tablet-portrait* artboard uses this layout unchanged:
+width alone does not earn the split.
+
+**Split** (01d) — a `flex` row over a `120deg` gradient instead of the stacked `180deg` one:
+
+- left column `flex: 1`, vertically centred, padding `48px 40px`; logo 44 px + wordmark 21 px,
+  hero title 52 px / 1.02 / 800 weight, subtitle 16 px capped at 380 px
+- right column `width: 46%`, `max-width: 460`, padding `24px 28px 24px 0`, vertically centred,
+  holding the same white sheet as a card (radius 28, the same shadow)
+- the wave still spans the full width along the bottom, so it runs *behind* the left column and
+  *under* the card rather than being covered by it
+
+Shipped as the `SignInSplitLayout` branch in
+[SignInScreen.kt](../../feature/login/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/login/SignInScreen.kt),
+selected by `SurferWindowGeometry.supportsSplitLayout()` — at least `SurferWindowSize.Expanded`
+**and** wider than tall. The height half has no counterpart in the mockups: the canvas only ever
+draws fixed artboards, so nothing there distinguishes a 1024 dp tablet lying down from the same
+tablet stood up, and splitting the upright one would leave two tall, half-empty columns.
+
+Deliberate departures from the mockup:
+
+- **Type comes from the scale, not the artboard.** The mockup measures the hero at 52 px in the
+  split and 40 px stacked; neither is on the app's type ramp. They ship as `displayMedium` (45/52)
+  and `displaySmall` (36/44), keeping only the brand's ExtraBold weight as an override. Visible
+  consequence: on a phone the hero now sets on one line rather than the mockup's hard-wrapped two.
+- **The sheet is capped, and the brand takes what is left** — the mockup's `46% / max 460` is only
+  correct at the 1024 dp it was drawn at. The cap is `ContentMaxWidth`, the same measure the
+  stacked column already used, so one number covers the form in both layouts.
+- **A max width of 1120 dp on the split row**, centred (`surferContentContainer`). Unbounded, the
+  columns keep growing and at 2560 dp the brand text and the card end up a screen apart. This is
+  `SurferWideContentMaxWidth`, shared with the dashboard grid, which had picked 1120 separately.
+- **The sheet scrolls independently** of the brand column. A phone on its side is ~410 dp tall,
+  which is expanded-width and landscape, and the form is taller than that.
+- **No `compact` variant.** 01b drops the hero subtitle and shrinks the title on short phones; the
+  shipped stacked layout scrolls instead, so nothing is unreachable. Still open.
+- The hero keeps its own line breaking — the string resource carries no `<br/>`.
+
+The rule that produced most of the above: **prefer an existing token over a number read off the
+canvas.** An artboard is one width; a token holds at all of them. Sizes that survived as literals
+are the ones with no token to snap to (sheet corner 28, elevation 12).
+
+The gradient direction is a `SurferAuthGradient` parameter on `SurferAuthBackground` (uikit), not
+a sign-in local: on a short, wide window a vertical ramp is compressed into no travel and reads as
+a flat fill. Onboarding, the other caller, keeps the vertical default.
+
+Reference frames: `feature/login/screenshots/sign_in_{compact,expanded,large}_{light,dark}.png`.
 
 ---
 

@@ -20,19 +20,12 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 import com.georgeci.moneysurfer.uikit.modifier.SurferContentMaxWidth
+import com.georgeci.moneysurfer.uikit.modifier.SurferWideContentMaxWidth
 import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
 import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
-
-/**
- * How wide the dashboard is allowed to grow before it stops and centres, once it lays out as a grid —
- * the content column of the 1360 dp desktop mock, minus its navigation drawer. Wider than the default
- * [SurferContentMaxWidth] reading measure, because a grid divides its width between cards instead of
- * stretching one line of text across it.
- */
-private val DASHBOARD_GRID_MAX_WIDTH = 1120.dp
 
 /**
  * Narrowest grid cell that still gets the Expanded widget treatments. A widget's Expanded density is
@@ -64,7 +57,7 @@ internal fun DashboardWidgets(
     val items = state.layout.enabledItems.filter { state.rendersWidget(it.type) }
     val modifier = Modifier
         .fillMaxSize()
-        .surferContentContainer(if (expanded) DASHBOARD_GRID_MAX_WIDTH else SurferContentMaxWidth)
+        .surferContentContainer(if (expanded) SurferWideContentMaxWidth else SurferContentMaxWidth)
         .padding(top = topInset)
     if (expanded) {
         DashboardGrid(state, items, bottomInset, onEvent, modifier)
