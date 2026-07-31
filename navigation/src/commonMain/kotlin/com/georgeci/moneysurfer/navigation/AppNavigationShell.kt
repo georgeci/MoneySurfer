@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerItem
 import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerSection
@@ -128,6 +129,11 @@ private fun AppNavigationDrawer(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
+                // `NavDisplay` slides a leaving screen out by its own full width, and drawing is
+                // not bounded by layout: without this the outgoing screen paints across the
+                // drawer for the length of the transition, so switching destinations appears to
+                // repaint the destination list itself. The drawer is chrome and stays put.
+                .clipToBounds()
                 .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),
         ) {
             content()
