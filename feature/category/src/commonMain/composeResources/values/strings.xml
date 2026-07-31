@@ -56,8 +56,10 @@
     <string name="category_details_hero_label_expense">Spent in %1$s</string>
     <string name="category_details_hero_label_income">Income · %1$s</string>
     <string name="category_details_hero_label_transfer">Transfer · %1$s</string>
-    <string name="category_details_stat_average">Avg / month</string>
-    <string name="category_details_stat_transactions">Transactions</string>
+    <!-- Three stat tiles share one row, leaving under 70dp of text per tile on a 411dp phone.
+         Keep these short — the tile clips to one line. -->
+    <string name="category_details_stat_average">Avg / mo</string>
+    <string name="category_details_stat_transactions">Txns</string>
     <string name="category_details_stat_per_transaction">Per txn</string>
     <string name="category_details_trend_title">Last 6 months</string>
     <string name="category_details_subcategories">Subcategories</string>
