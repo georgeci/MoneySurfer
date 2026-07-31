@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecalculateLocalProjectionsUseCase</title>
+  <title>MoneySurfer Coverage Report > UploadPendingChangesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: RecalculateLocalProjectionsUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: UploadPendingChangesUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecalculateLocalProjectionsUseCase</td>
+  <td class="name">UploadPendingChangesUseCase</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,21 +48,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
 &nbsp;
 &nbsp;/**
-&nbsp; * Recalculates derived stored values (account balances, aggregates) for the
-&nbsp; * given [ProjectionScope].
+&nbsp; * Pushes pending mutations from the outbox to the remote backend.
 &nbsp; *
-&nbsp; * Called both from the sync pipeline (after pull writes) and from local
-&nbsp; * mutation paths (after dual-write to outbox). The same use case is reused
-&nbsp; * to avoid drift between paths. See SyncCoordinatorFAQ.md №6, №7.
+&nbsp; * Implementations must classify SDK exceptions into [com.georgeci.moneysurfer.sync.api.SyncError]
+&nbsp; * and return them via `Either.Left` — never throw typed errors out of here.
+&nbsp; * See SyncCoordinatorFAQ.md №11, §4.2.
 &nbsp; */
-&nbsp;interface RecalculateLocalProjectionsUseCase {
+&nbsp;interface UploadPendingChangesUseCase {
 &nbsp;    suspend operator fun invoke(
-&nbsp;        scope: ProjectionScope,
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (UploadProgress) -&gt; Unit,
 &nbsp;        cancelToken: SyncCancelToken,
-&nbsp;    ): SyncResult&lt;ProjectionSummary&gt;
+&nbsp;    ): SyncResult&lt;UploadSummary&gt;
 &nbsp;}
+&nbsp;
+&nbsp;data class UploadProgress(
+&nbsp;    val entityType: String,
+&nbsp;    val current: Int,
+&nbsp;    val total: Int,
+&nbsp;)
+&nbsp;
+&nbsp;data class UploadSummary(val uploadedCount: Int)
 </code>
 </pre>
 </div>
@@ -86,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

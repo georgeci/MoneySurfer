@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferPaneTestTags</title>
+  <title>MoneySurfer Coverage Report > SurferToolbarTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferPaneTestTags (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferToolbarTestTags (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferPaneTestTags</td>
+  <td class="name">SurferToolbarTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,288 +47,327 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.RowScope
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.heightIn
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.FilledTonalButton
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.IconButton
-&nbsp;import androidx.compose.material3.LocalContentColor
-&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TopAppBar
 &nbsp;import androidx.compose.material3.TopAppBarColors
 &nbsp;import androidx.compose.material3.TopAppBarDefaults
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.runtime.Immutable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.uikit.window.LocalSurferPane
-&nbsp;import com.georgeci.moneysurfer.uikit.window.SurferPane
-&nbsp;import com.georgeci.moneysurfer.uikit.window.SurferPaneRole
 &nbsp;import moneysurfer.uikit.generated.resources.Res
 &nbsp;import moneysurfer.uikit.generated.resources.uikit_back
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/**
-&nbsp; * The screen&#39;s primary &quot;add a thing&quot; action.
-&nbsp; *
-&nbsp; * It is declared rather than passed as a composable because where it renders depends on the pane:
-&nbsp; * an extended FAB when the screen owns the section chrome, a header button when it is a detail
-&nbsp; * pane sitting next to its list and the list already owns the FAB. Dropping it outright in that
-&nbsp; * case would lose the affordance, which is why [SurferPaneScaffold] takes the action instead of a
-&nbsp; * `floatingActionButton` slot.
-&nbsp; */
-&nbsp;@Immutable
-&nbsp;data class SurferPaneAction(
-&nbsp;    val label: String,
-&nbsp;    val onClick: () -&gt; Unit,
-&nbsp;    val icon: ImageVector = SurferIcons.Add,
-&nbsp;    val testTag: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Tags on the two pieces of chrome a section may draw exactly once, however many panes it is split
-&nbsp; * across (issue #388).
-&nbsp; *
-&nbsp; * They exist so a test can *count* them: &quot;the section renders one top app bar&quot; is not expressible
-&nbsp; * through a title or a label, because the detail pane&#39;s [SurferPaneHeader] carries the same title
-&nbsp; * and its header action carries the same label as the list pane&#39;s FAB. Matching on the tags instead
-&nbsp; * distinguishes the bar from the header and the FAB from the button.
-&nbsp; */
-&nbsp;object SurferPaneTestTags {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * On the [SurferToolbar] branch of [SurferPaneTopBar] only — never on the pane header. A
-&nbsp;     * caller that tags the top bar through its own `modifier` overrides this one.
-&nbsp;     */
-&nbsp;    const val TopAppBar = &quot;pane:topAppBar&quot;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * On the [SurferPaneScaffold] FAB, unless the caller named its own tag through
-&nbsp;     * [SurferPaneAction.testTag] — a screen with a tagged FAB is reachable by that tag instead.
-&nbsp;     */
-&nbsp;    const val Fab = &quot;pane:fab&quot;
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * A [Scaffold] whose chrome adapts to the pane the host put the screen in — see [SurferPane].
-&nbsp; *
-&nbsp; * As a whole screen or as a list pane it is exactly the `Scaffold` + [SurferToolbar] + FAB every
-&nbsp; * screen used to build by hand. As the detail pane of a two-pane layout it drops the top app bar
-&nbsp; * and the FAB (its list pane is already drawing both, so drawing them again is what issue #388
-&nbsp; * showed twice at Expanded width) in favour of a [SurferPaneHeader]: a contextual header with no
-&nbsp; * navigation icon, carrying the same actions plus [primaryAction].
-&nbsp; *
-&nbsp; * @param onBack invoked by the back affordance. Kept in the signature even for a detail pane,
-&nbsp; *   which shows it only while [SurferPane.hasPaneBackStack] says popping still lands inside the
-&nbsp; *   pane.
-&nbsp; */
 &nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-&nbsp;fun SurferPaneScaffold(
+&nbsp;fun SurferToolbar(
 &nbsp;    title: String,
 &nbsp;    modifier: Modifier = Modifier,
 &nbsp;    onBack: (() -&gt; Unit)? = null,
-&nbsp;    containerColor: Color = AppTheme.materialColors.surface,
+&nbsp;    navigationIcon: (@Composable () -&gt; Unit)? = null,
+&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-&nbsp;    primaryAction: SurferPaneAction? = null,
-&nbsp;    content: @Composable (PaddingValues) -&gt; Unit,
 &nbsp;) {
-&nbsp;    val pane = LocalSurferPane.current
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier.surferSafeInsets().then(modifier),
-&nbsp;        containerColor = containerColor,
-&nbsp;        topBar = {
-&nbsp;            SurferPaneTopBar(
-&nbsp;                title = title,
-&nbsp;                onBack = onBack,
-&nbsp;                // The detail pane&#39;s header is content, not a bar, so it has to sit on the same
-&nbsp;                // colour the scaffold paints behind it.
-&nbsp;                colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
-&nbsp;                actions = {
-&nbsp;                    actions()
-&nbsp;                    // The FAB slot is the list pane&#39;s; a detail pane keeps the action as a button.
-&nbsp;                    if (!pane.ownsSectionChrome) primaryAction?.let { SurferPaneHeaderAction(it) }
-&nbsp;                },
-&nbsp;            )
-&nbsp;        },
-&nbsp;        floatingActionButton = {
-&nbsp;            if (pane.ownsSectionChrome &amp;&amp; primaryAction != null) {
-&nbsp;                SurferAddFab(
-&nbsp;                    label = primaryAction.label,
-&nbsp;                    onClick = primaryAction.onClick,
-&nbsp;                    icon = primaryAction.icon,
-&nbsp;                    modifier = Modifier.testTag(primaryAction.testTag ?: SurferPaneTestTags.Fab),
-&nbsp;                )
+&nbsp;    SurferToolbar(
+&nbsp;        modifier = modifier,
+&nbsp;        navigationIcon = {
+&nbsp;            when {
+&nbsp;                onBack != null -&gt; IconButton(
+&nbsp;                    onClick = onBack,
+&nbsp;                    modifier = Modifier.testTag(SurferToolbarTestTags.Back),
+&nbsp;                ) {
+&nbsp;                    Icon(
+&nbsp;                        imageVector = SurferIcons.Back,
+&nbsp;                        contentDescription = stringResource(Res.string.uikit_back),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                navigationIcon != null -&gt; navigationIcon()
 &nbsp;            }
 &nbsp;        },
-&nbsp;        content = content,
+&nbsp;        colors = colors,
+&nbsp;        actions = actions,
+&nbsp;        title = { Text(title) },
 &nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The top bar of a pane-aware screen: a [SurferToolbar] while the screen owns the section chrome,
-&nbsp; * a [SurferPaneHeader] once it is a detail pane displayed beside its list.
+&nbsp; * Stable selectors for [SurferToolbar] — see docs/testing/testing-strategy.md.
 &nbsp; *
-&nbsp; * Exposed on its own for screens that build their own [Scaffold] because they need slots
-&nbsp; * [SurferPaneScaffold] does not carry (a snackbar host, an overlay) but want the same chrome rule.
+&nbsp; * [Back] is on the navigation [IconButton] every screen with an `onBack` gets, so an E2E flow
+&nbsp; * can go back by id instead of matching the localized &quot;Back&quot; content description.
 &nbsp; */
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Composable
-&nbsp;fun SurferPaneTopBar(
-&nbsp;    title: String,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    onBack: (() -&gt; Unit)? = null,
-&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-&nbsp;) {
-&nbsp;    val pane = LocalSurferPane.current
-&nbsp;    if (pane.ownsSectionChrome) {
-&nbsp;        SurferToolbar(
-&nbsp;            title = title,
-&nbsp;            // Appended, not prepended: for one semantics key the *earlier* modifier in the chain
-&nbsp;            // wins, so a screen that tagged its own top bar keeps that tag and this is only the
-&nbsp;            // default — the same precedence [SurferPaneAction.testTag] gets over the FAB tag.
-&nbsp;            modifier = modifier.testTag(SurferPaneTestTags.TopAppBar),
-&nbsp;            onBack = onBack,
-&nbsp;            colors = colors,
-&nbsp;            actions = actions,
-&nbsp;        )
-&nbsp;    } else {
-&nbsp;        SurferPaneHeader(
-&nbsp;            title = title,
-&nbsp;            modifier = modifier,
-&nbsp;            onBack = onBack.takeIf { pane.showsBackNavigation },
-&nbsp;            colors = colors,
-&nbsp;            actions = actions,
-&nbsp;        )
-&nbsp;    }
+&nbsp;object SurferToolbarTestTags {
+&nbsp;    const val Back = &quot;toolbar:back&quot;
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SurferPaneHeaderAction(action: SurferPaneAction) {
-&nbsp;    SurferToolbarButtonAction(
-&nbsp;        icon = action.icon,
-&nbsp;        text = action.label,
-&nbsp;        onClick = action.onClick,
-&nbsp;        modifier = action.testTag?.let { Modifier.testTag(it) } ?: Modifier,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * The detail pane&#39;s contextual header: title and actions on one line, no navigation icon unless
-&nbsp; * [onBack] leads somewhere inside the pane.
-&nbsp; *
-&nbsp; * Deliberately not a `TopAppBar` — the whole point at Expanded width is that the section has one
-&nbsp; * top app bar, drawn by the list pane. This is part of the detail pane&#39;s content, so it also skips
-&nbsp; * the sync badge [SurferToolbar] adds.
-&nbsp; *
-&nbsp; * It still takes [TopAppBarColors] and honours the container, title, navigation-icon and
-&nbsp; * action-icon roles, so a screen that colours its chrome gets the same treatment whichever pane it
-&nbsp; * lands in — the scroll-dependent roles are the only ones with nothing to map onto. The defaults
-&nbsp; * resolve to the same `surface` / `onSurface` pair the toolbar uses, so the branches match out of
-&nbsp; * the box.
-&nbsp; */
 &nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-&nbsp;fun SurferPaneHeader(
-&nbsp;    title: String,
+&nbsp;fun SurferToolbar(
 &nbsp;    modifier: Modifier = Modifier,
-&nbsp;    onBack: (() -&gt; Unit)? = null,
+&nbsp;    navigationIcon: @Composable () -&gt; Unit = {},
 &nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
+&nbsp;    title: @Composable () -&gt; Unit,
 &nbsp;) {
-&nbsp;    Row(
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .background(colors.containerColor)
-&nbsp;            .heightIn(min = PaneHeaderMinHeight)
-&nbsp;            .padding(start = if (onBack == null) TitleInset else IconInset, end = IconInset),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;    ) {
-&nbsp;        if (onBack != null) {
-&nbsp;            IconButton(onClick = onBack, modifier = Modifier.testTag(SurferToolbarTestTags.Back)) {
-&nbsp;                Icon(
-&nbsp;                    imageVector = SurferIcons.Back,
-&nbsp;                    contentDescription = stringResource(Res.string.uikit_back),
-&nbsp;                    tint = colors.navigationIconContentColor,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;        Text(
-&nbsp;            text = title,
-&nbsp;            style = AppTheme.typography.titleLarge,
-&nbsp;            color = colors.titleContentColor,
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = TextOverflow.Ellipsis,
-&nbsp;            modifier = Modifier.weight(1f),
-&nbsp;        )
-&nbsp;        CompositionLocalProvider(LocalContentColor provides colors.actionIconContentColor) {
+&nbsp;    TopAppBar(
+&nbsp;        title = title,
+&nbsp;        modifier = modifier,
+&nbsp;        navigationIcon = navigationIcon,
+&nbsp;        actions = {
+&nbsp;            SurferSyncStatusBadge()
 &nbsp;            actions()
-&nbsp;        }
+&nbsp;        },
+&nbsp;        colors = colors,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Icon action for the trailing edge of [SurferToolbar] / [SurferDashboardToolbar]. Wraps
+&nbsp; * [IconButton] so every toolbar action gets the same 48dp tap target, tint, and content-
+&nbsp; * description handling without repeating boilerplate at every call site.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferToolbarAction(
+&nbsp;    icon: ImageVector,
+&nbsp;    contentDescription: String?,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    tint: Color = AppTheme.materialColors.onSurface,
+&nbsp;) {
+&nbsp;    IconButton(onClick = onClick, modifier = modifier) {
+&nbsp;        Icon(
+&nbsp;            imageVector = icon,
+&nbsp;            contentDescription = contentDescription,
+&nbsp;            tint = tint,
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Matches the `TopAppBar` height the list pane draws, so the two panes line up. */
-&nbsp;private val PaneHeaderMinHeight = 64.dp
-&nbsp;private val TitleInset = 16.dp
-&nbsp;private val IconInset = 4.dp
+&nbsp;/**
+&nbsp; * Pill-shaped tonal button with a leading icon and a label, sized for the trailing edge of
+&nbsp; * [SurferToolbar]. Use for primary commit-style toolbar actions (&quot;Save&quot;, &quot;Update&quot;) that need
+&nbsp; * more weight than a [SurferToolbarAction] icon.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferToolbarButtonAction(
+&nbsp;    icon: ImageVector,
+&nbsp;    text: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    enabled: Boolean = true,
+&nbsp;) {
+&nbsp;    FilledTonalButton(
+&nbsp;        onClick = onClick,
+&nbsp;        enabled = enabled,
+&nbsp;        shape = RoundedCornerShape(18.dp),
+&nbsp;        modifier = modifier.padding(end = 8.dp),
+&nbsp;    ) {
+&nbsp;        Icon(
+&nbsp;            imageVector = icon,
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            modifier = Modifier.size(16.dp),
+&nbsp;        )
+&nbsp;        Spacer(Modifier.width(6.dp))
+&nbsp;        Text(text = text, style = AppTheme.typography.labelLarge)
+&nbsp;    }
+&nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Dashboard-flavoured top app bar: a colored letter bubble on the left, a two-line title
+&nbsp; * (small label + larger headline), and trailing actions. Use for the home/dashboard screen
+&nbsp; * where the toolbar needs to identify the active workspace.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+&nbsp;fun SurferDashboardToolbar(
+&nbsp;    letter: String,
+&nbsp;    primaryText: String,
+&nbsp;    secondaryText: String,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    letterBackgroundColor: Color = AppTheme.materialColors.primaryContainer,
+&nbsp;    letterContentColor: Color = AppTheme.materialColors.onPrimaryContainer,
+&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
+&nbsp;) {
+&nbsp;    SurferToolbar(
+&nbsp;        modifier = modifier,
+&nbsp;        navigationIcon = {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .padding(start = 12.dp)
+&nbsp;                    .size(40.dp)
+&nbsp;                    .clip(CircleShape)
+&nbsp;                    .background(letterBackgroundColor),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                Text(
+&nbsp;                    text = letter,
+&nbsp;                    style = AppTheme.typography.titleSmall,
+&nbsp;                    color = letterContentColor,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;        colors = colors,
+&nbsp;        actions = actions,
+&nbsp;        title = {
+&nbsp;            Column {
+&nbsp;                Text(
+&nbsp;                    text = primaryText,
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;                Text(
+&nbsp;                    text = secondaryText,
+&nbsp;                    style = AppTheme.typography.titleSmall,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferPaneHeaderPreview() {
+&nbsp;private fun SurferToolbarPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        SurferPaneHeader(
-&nbsp;            title = &quot;Account&quot;,
+&nbsp;        SurferToolbar(title = &quot;Screen Title&quot;)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarWithBackPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Details with back&quot;,
+&nbsp;//            onBack = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarWithActionsPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Dashboard&quot;,
 &nbsp;            actions = {
 &nbsp;                SurferToolbarAction(
-&nbsp;                    icon = SurferIcons.Edit,
-&nbsp;                    contentDescription = &quot;Edit&quot;,
+&nbsp;                    icon = SurferIcons.Settings,
+&nbsp;                    contentDescription = &quot;Settings&quot;,
 &nbsp;                    onClick = {},
 &nbsp;                )
-&nbsp;                SurferToolbarButtonAction(icon = SurferIcons.Add, text = &quot;Add&quot;, onClick = {})
 &nbsp;            },
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferPaneHeaderWithBackPreview() {
+&nbsp;private fun SurferToolbarFullPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        SurferPaneHeader(title = &quot;Licenses&quot;, onBack = {})
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit Account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Delete,
+&nbsp;                    contentDescription = &quot;Delete&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferPaneScaffoldDetailPreview() {
+&nbsp;private fun SurferToolbarWithButtonActionPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        CompositionLocalProvider(
-&nbsp;            LocalSurferPane provides SurferPane(role = SurferPaneRole.Detail),
-&nbsp;        ) {
-&nbsp;            SurferPaneScaffold(
-&nbsp;                title = &quot;Budget&quot;,
-&nbsp;                onBack = {},
-&nbsp;                primaryAction = SurferPaneAction(label = &quot;Add&quot;, onClick = {}),
-&nbsp;            ) { padding -&gt;
-&nbsp;                Text(text = &quot;Detail pane content&quot;, modifier = Modifier.padding(padding))
-&nbsp;            }
-&nbsp;        }
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;New transaction&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Check,
+&nbsp;                    text = &quot;Save&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferToolbarWithButtonActionDisabledPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Check,
+&nbsp;                    text = &quot;Update&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                    enabled = false,
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferDashboardToolbarPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferDashboardToolbar(
+&nbsp;            letter = &quot;F&quot;,
+&nbsp;            primaryText = &quot;Family&quot;,
+&nbsp;            secondaryText = &quot;Good evening, Kasia&quot;,
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Notifications,
+&nbsp;                    contentDescription = &quot;Notifications&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Settings,
+&nbsp;                    contentDescription = &quot;Settings&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -354,7 +393,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

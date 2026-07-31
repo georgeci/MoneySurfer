@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (8/8)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (27/27)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (116/116)
+    (135/135)
   </span>
 </td>
 </tr>
@@ -389,10 +389,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    72.2%
+    75%
   </span>
   <span class="absValue">
-    (13/18)
+    (15/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -405,18 +405,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.7%
+    91.4%
   </span>
   <span class="absValue">
-    (49/54)
+    (53/58)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.4%
+    91.7%
   </span>
   <span class="absValue">
-    (555/607)
+    (574/626)
   </span>
 </td>
 </tr>
@@ -493,8 +493,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 <b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
 &nbsp;
+&nbsp;    /**
+&nbsp;     * The route the navigation host still has to put on the back stack, or `null` once it has.
+&nbsp;     *
+&nbsp;     * Consumed rather than left standing: a configuration change recreates the host&#39;s composition
+&nbsp;     * but not this view model, so a value kept here would be re-applied to the *restored* back
+&nbsp;     * stack on every rotation — which reset a signed-in user back to the launch decision (one
+&nbsp;     * rotation after signing in sent the user back to onboarding).
+&nbsp;     */
 <b class="fc">&nbsp;    val targetRoute: StateFlow&lt;Route?&gt;</b>
 <b class="fc">&nbsp;        field = MutableStateFlow&lt;Route?&gt;(null)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether the launch decision has already reached the back stack — the splash gate. Owned here
+&nbsp;     * rather than by the composition so it survives a configuration change; a fresh process starts
+&nbsp;     * over at `false` and holds the splash until the decision in `init` is made and applied.
+&nbsp;     */
+<b class="fc">&nbsp;    val launchRouteApplied: StateFlow&lt;Boolean&gt;</b>
+<b class="fc">&nbsp;        field = MutableStateFlow(false)</b>
 &nbsp;
 <b class="fc">&nbsp;    init {</b>
 <b class="fc">&nbsp;        viewModelScope.launch {</b>
@@ -540,6 +556,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        startPeriodicSyncTicker()</b>
 <b class="fc">&nbsp;        purgeExpiredTombstones()</b>
 <b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by the navigation host once [route] is on the back stack. Clears it so the same
+&nbsp;     * decision is not replayed onto a back stack that outlived the composition which applied it
+&nbsp;     * (rotation), while a later decision — the logout bounce below — still gets through:
+&nbsp;     * `compareAndSet` only clears the value the host actually applied.
+&nbsp;     */
+&nbsp;    fun onRouteApplied(route: Route) {
+<b class="fc">&nbsp;        targetRoute.compareAndSet(route, null)</b>
+<b class="fc">&nbsp;        launchRouteApplied.value = true</b>
+&nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Drops transaction tombstones past their retention window (issue #346) — the &quot;who runs it&quot;
@@ -671,7 +698,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">AppNavGraphKt</td>
 <td class="coverageStat">
   <span class="percent">
-    12%
+    16%
   </span>
   <span class="absValue">
-    (3/25)
+    (4/25)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    14.3%
   </span>
   <span class="absValue">
-    (0/24)
+    (4/28)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    40.9%
+    42.7%
   </span>
   <span class="absValue">
-    (52/127)
+    (56/131)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    21.6%
+    22.7%
   </span>
   <span class="absValue">
-    (290/1344)
+    (303/1337)
   </span>
 </td>
 </tr>
@@ -102,12 +102,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,15 +116,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/23)
+    (0/17)
   </span>
 </td>
   </tr>
@@ -282,34 +275,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    9.4%
+    12.5%
   </span>
   <span class="absValue">
-    (3/32)
+    (4/32)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    13.3%
   </span>
   <span class="absValue">
-    (0/30)
+    (4/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    38.2%
+    40.6%
   </span>
   <span class="absValue">
-    (52/136)
+    (56/138)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    19.9%
+    21%
   </span>
   <span class="absValue">
-    (290/1458)
+    (303/1445)
   </span>
 </td>
 </tr>
@@ -340,10 +333,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.runtime.LaunchedEffect
 &nbsp;import androidx.compose.runtime.derivedStateOf
 &nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
 &nbsp;import androidx.compose.runtime.remember
 &nbsp;import androidx.compose.runtime.rememberCoroutineScope
-&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.lifecycle.Lifecycle
 &nbsp;import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -443,12 +434,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()</b>
 &nbsp;    // The launch decision lands in a `LaunchedEffect`, i.e. one frame *after* the composition that
 &nbsp;    // first sees a non-null `targetRoute`. Without this flag that frame renders the back stack&#39;s
-&nbsp;    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding.
-<b class="nc">&nbsp;    var launchRouteApplied by remember { mutableStateOf(false) }</b>
+&nbsp;    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding. It is
+&nbsp;    // held by the view model, not this composition: a configuration change restores the back stack
+&nbsp;    // but rebuilds the composition, and a flag that reset there would replay the splash.
+<b class="nc">&nbsp;    val launchRouteApplied by appLaunchViewModel.launchRouteApplied.collectAsStateWithLifecycle()</b>
 <b class="nc">&nbsp;    LaunchedEffect(targetRoute) {</b>
-<b class="nc">&nbsp;        val route = targetRoute ?: return@LaunchedEffect</b>
-<b class="nc">&nbsp;        if (backStack.lastOrNull() != route) navigator.resetTo(route)</b>
-<b class="nc">&nbsp;        launchRouteApplied = true</b>
+<b class="nc">&nbsp;        navigator.applyLaunchRoute(targetRoute, backStack.lastOrNull(), appLaunchViewModel::onRouteApplied)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    // Server-owned flags, pulled here rather than from the view model&#39;s `init` because this is the
@@ -537,6 +528,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
 &nbsp;
+&nbsp;/**
+&nbsp; * Puts a launch decision on the back stack and reports it back through [onApplied], which is what
+&nbsp; * stops the same decision from being replayed — the composition that calls this is rebuilt on every
+&nbsp; * configuration change while the view model behind [onApplied] is not.
+&nbsp; *
+&nbsp; * A null [route] is the &quot;no decision yet&quot; state, and also the state right after one was consumed:
+&nbsp; * both mean leave the back stack exactly as it is. That second case is the whole point on a
+&nbsp; * rotation, where the stack has just been restored and the decision that built it is long spent.
+&nbsp; *
+&nbsp; * Skipping the reset when [currentTop] already is [route] keeps that destination&#39;s entry — and the
+&nbsp; * view models scoped to it — alive, instead of tearing it down and rebuilding it for a decision
+&nbsp; * that lands where the user already is.
+&nbsp; *
+&nbsp; * Whole policy outside the composable, taking the two values it needs rather than reading them: the
+&nbsp; * navigation host has no test harness in this module, so anything left inside it is untested.
+&nbsp; */
+&nbsp;internal fun AppNavigator.applyLaunchRoute(
+&nbsp;    route: Route?,
+&nbsp;    currentTop: NavKey?,
+&nbsp;    onApplied: (Route) -&gt; Unit,
+&nbsp;) {
+<b class="fc">&nbsp;    if (route == null) {</b>
+&nbsp;        return
+&nbsp;    }
+<b class="fc">&nbsp;    if (currentTop != route) {</b>
+<b class="fc">&nbsp;        resetTo(route)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    onApplied(route)</b>
+&nbsp;}
+&nbsp;
 &nbsp;/** App-level [SnackbarHost] state that renders one-shot messages posted to [controller]. */
 &nbsp;@Composable
 <b class="nc">&nbsp;private fun rememberSnackbarHostState(controller: SnackbarController): SnackbarHostState {</b>
@@ -591,7 +612,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

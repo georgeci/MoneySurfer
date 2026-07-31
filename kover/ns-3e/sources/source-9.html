@@ -109,6 +109,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.BurnRatePace
 &nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
+&nbsp;import com.georgeci.moneysurfer.domain.model.DayPart
 &nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 &nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
@@ -122,6 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
@@ -134,6 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrentWorkspaceUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
@@ -144,6 +147,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
 &nbsp;import kotlinx.coroutines.flow.MutableStateFlow
 &nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
 &nbsp;import kotlinx.coroutines.flow.map
 &nbsp;import kotlinx.coroutines.flow.onStart
 &nbsp;import kotlinx.datetime.TimeZone
@@ -174,6 +178,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
 &nbsp;    private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
 &nbsp;    private val getUpcomingRecurring: GetUpcomingRecurringUseCase,
+&nbsp;    private val clock: ClockUseCase,
+&nbsp;    getCurrentWorkspace: GetCurrentWorkspaceUseCase,
 &nbsp;    uiPreferences: UiPreferences,
 &nbsp;    hostCapabilities: HostCapabilities,
 &nbsp;) : MviViewModel&lt;DashboardState, DashboardEvent, DashboardEffect&gt;(
@@ -199,6 +205,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 &nbsp;    private val period = MutableStateFlow(DashboardPeriod.DEFAULT)
 &nbsp;
+&nbsp;    /**
+&nbsp;     * What the toolbar calls the active workspace, or null while nothing names one.
+&nbsp;     *
+&nbsp;     * Narrowed to the name here rather than carried as the whole [Workspace]: the row is rewritten
+&nbsp;     * with a fresh `updatedAt` on every sync pull, and a `distinctUntilChanged` over the whole
+&nbsp;     * object would let each of those — plus every description or base-currency edit — rebuild the
+&nbsp;     * entire dashboard state to produce a value equal to the one already on screen. Trimming before
+&nbsp;     * the guard folds `&quot; Home &quot;` into `&quot;Home&quot;` for the same reason.
+&nbsp;     *
+&nbsp;     * Null rather than blank: null is the screen&#39;s &quot;fall back to the app name&quot; signal, and a
+&nbsp;     * workspace named nothing but whitespace would otherwise draw an empty toolbar title instead of
+&nbsp;     * taking that fallback.
+&nbsp;     *
+&nbsp;     * `onStart` for the reason [layout] has one: the pointer is DataStore-backed and the row behind
+&nbsp;     * it a query, and the balance should not wait on either to draw.
+&nbsp;     */
+&nbsp;    private val workspaceName = getCurrentWorkspace()
+&nbsp;        .map { it?.name?.trim()?.ifBlank { null } }
+&nbsp;        .distinctUntilChanged()
+&nbsp;        .onStart { emit(null) }
+&nbsp;
 &nbsp;    init {
 &nbsp;        observeDashboard()
 &nbsp;    }
@@ -220,11 +247,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        // change — the new period beside the previous budget&#39;s figures — which resolves on the next
 &nbsp;        // frame and only differs at all when the workspace runs budgets on both cadences.
 &nbsp;        //
-&nbsp;        // The sixth source arrived with the budgets card, so the two the screen draws *around* the
-&nbsp;        // widgets — which layout, which span — ride together in [DashboardChrome] and free a slot.
-&nbsp;        // They are the pair to fold: both are local UI state that is always present, so neither can
-&nbsp;        // be the one a widget is waiting on.
-&nbsp;        val chrome = combine(layout, period, ::DashboardChrome)
+&nbsp;        // The sixth source arrived with the budgets card, so what the screen draws *around* the
+&nbsp;        // widgets — which layout, which span, whose workspace — rides together in [DashboardChrome]
+&nbsp;        // and frees a slot. They are the ones to fold: each carries an opening value of its own, so
+&nbsp;        // none of them can be what a widget is waiting on.
+&nbsp;        val chrome = combine(layout, period, workspaceName, ::DashboardChrome)
 &nbsp;        val widgetSources = combine(
 &nbsp;            chrome,
 &nbsp;            getSafeToSpend(period.map { it.budgetPeriod }).onStart { emit(null) },
@@ -268,9 +295,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    formattedTotalBalance = balance?.headline,
 &nbsp;                    otherCurrencyTotals = balance?.notConverted.orEmpty(),
 &nbsp;                    ratesAsOf = balance?.asOf,
-&nbsp;                    workspaceName = null,
-&nbsp;                    workspaceInitial = null,
-&nbsp;                    greeting = null,
+&nbsp;                    workspaceName = widgets.chrome.workspaceName,
+&nbsp;                    workspaceInitial = widgets.chrome.workspaceInitial,
+&nbsp;                    // Read per emission rather than once at subscription, so a dashboard left open
+&nbsp;                    // across a boundary is corrected by the next transaction change instead of
+&nbsp;                    // greeting the user with the wrong half of the day until they navigate away.
+&nbsp;                    greeting = DayPart.at(clock.now(), TimeZone.currentSystemDefault()),
 &nbsp;                    formattedTrendDelta = balance?.trend?.text,
 &nbsp;                    isTrendDeltaNegative = balance?.trend?.isNegative == true,
 &nbsp;                    balanceSeries = balance?.trend?.series.orEmpty(),
@@ -556,9 +586,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * Renders as the staleness signal so a total computed offline says how old it is.
 &nbsp;         */
 &nbsp;        val ratesAsOf: String? = null,
+&nbsp;        /**
+&nbsp;         * The active workspace&#39;s name, or null while nothing names one — nobody signed in, no
+&nbsp;         * workspace selected, or a row the device has not pulled yet. The screen draws the app&#39;s
+&nbsp;         * own name in that case; it never draws a guess at which workspace this is.
+&nbsp;         */
 &nbsp;        val workspaceName: String?,
+&nbsp;        /**
+&nbsp;         * The letter for the toolbar&#39;s avatar bubble, derived from [workspaceName]. Carried rather
+&nbsp;         * than re-derived on the screen so a leading space or a lowercase name cannot produce a
+&nbsp;         * different bubble than the title it is drawn beside.
+&nbsp;         */
 &nbsp;        val workspaceInitial: String?,
-&nbsp;        val greeting: String?,
+&nbsp;        /**
+&nbsp;         * Which greeting the toolbar opens with, off the device clock. The part of day, not the
+&nbsp;         * sentence — that needs a locale this class does not have. Null only in a state built by
+&nbsp;         * hand; the view model always resolves one.
+&nbsp;         */
+&nbsp;        val greeting: DayPart?,
 &nbsp;        /**
 &nbsp;         * What the balance moved by this month, signed and formatted, or null when no window of
 &nbsp;         * base-currency history backs a figure — see `toTrendUi`.
@@ -710,13 +755,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * What the screen draws around the widgets: which cards, in what order, and the span they are all
-&nbsp; * read at. Folded into one flow so the five `combine` takes can cover six sources.
+&nbsp; * What the screen draws around the widgets: which cards, in what order, the span they are all read
+&nbsp; * at, and what the toolbar calls the active workspace. Folded into one flow so the five `combine`
+&nbsp; * takes can cover seven sources.
 &nbsp; */
 &nbsp;private data class DashboardChrome(
 &nbsp;    val layout: DashboardLayoutConfig,
 &nbsp;    val period: DashboardPeriod,
-&nbsp;)
+&nbsp;    /** Trimmed, or null while nothing names one — see `DashboardViewModel.workspaceName`. */
+&nbsp;    val workspaceName: String?,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The letter in the toolbar bubble. Taken off the trimmed name, so a workspace called
+&nbsp;     * &quot; family &quot; gets an F — the screen&#39;s own fallback reads the raw first character and would
+&nbsp;     * draw a space.
+&nbsp;     */
+&nbsp;    val workspaceInitial: String? get() = workspaceName?.initial()
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The first *character* of a name as a display string — which is not always the first `Char`.
+&nbsp; *
+&nbsp; * A workspace called &quot;🏠 Home&quot; starts with a surrogate pair, and handing half of one to the avatar
+&nbsp; * bubble draws a replacement box where the letter should be. Uppercased through [String.uppercase],
+&nbsp; * which is locale-invariant: the toolbar bubble must not turn a Turkish user&#39;s &quot;istanbul&quot; into a
+&nbsp; * dotted İ the title beside it does not have.
+&nbsp; */
+&nbsp;private fun String.initial(): String =
+&nbsp;    take(if (first().isHighSurrogate() &amp;&amp; length &gt; 1) 2 else 1).uppercase()
 &nbsp;
 &nbsp;/** Everything the balance widget draws, already formatted. */
 &nbsp;private data class BalanceUi(
@@ -1076,7 +1143,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

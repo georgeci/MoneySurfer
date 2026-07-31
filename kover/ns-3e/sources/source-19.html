@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">DashboardScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    64.3%
+    65.5%
   </span>
   <span class="absValue">
-    (18/28)
+    (19/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    41.4%
+    40.3%
   </span>
   <span class="absValue">
-    (60/145)
+    (60/149)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.4%
+    78.6%
   </span>
   <span class="absValue">
-    (166/209)
+    (169/215)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.9%
+    79.5%
   </span>
   <span class="absValue">
-    (2196/2747)
+    (2185/2749)
   </span>
 </td>
 </tr>
@@ -88,34 +88,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    64.3%
+    65.5%
   </span>
   <span class="absValue">
-    (18/28)
+    (19/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    41.4%
+    40.3%
   </span>
   <span class="absValue">
-    (60/145)
+    (60/149)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.4%
+    78.6%
   </span>
   <span class="absValue">
-    (166/209)
+    (169/215)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.9%
+    79.5%
   </span>
   <span class="absValue">
-    (2196/2747)
+    (2185/2749)
   </span>
 </td>
 </tr>
@@ -150,6 +150,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;import com.georgeci.moneysurfer.domain.model.DayPart
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -184,6 +185,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_afternoon
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_evening
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_morning
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_night
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
@@ -193,6 +198,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_title
+&nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
@@ -334,7 +340,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                letter = state.workspaceInitial</b>
 <b class="pc">&nbsp;                    ?: workspaceName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),</b>
 <b class="fc">&nbsp;                primaryText = workspaceName,</b>
-<b class="fc">&nbsp;                secondaryText = state.greeting ?: stringResource(Res.string.dashboard_toolbar_greeting),</b>
+<b class="fc">&nbsp;                secondaryText = stringResource(state.greeting.labelRes()),</b>
 <b class="fc">&nbsp;                actions = {</b>
 <b class="fc">&nbsp;                    SurferToolbarAction(</b>
 <b class="fc">&nbsp;                        icon = SurferIcons.Edit,</b>
@@ -372,6 +378,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        )
 &nbsp;    }
 <b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The greeting&#39;s copy. Picked here rather than in the view model for the reason every other
+&nbsp; * sentence on this screen is: the string resources — and the locale behind them — live here, and
+&nbsp; * the view model carries only the decision.
+&nbsp; *
+&nbsp; * Null keeps the neutral screen name the toolbar showed before a greeting was ever resolved, which
+&nbsp; * is what a hand-built state (a preview, a screenshot frame) renders.
+&nbsp; */
+<b class="pc">&nbsp;private fun DayPart?.labelRes(): StringResource = when (this) {</b>
+<b class="nc">&nbsp;    DayPart.Morning -&gt; Res.string.dashboard_greeting_morning</b>
+<b class="nc">&nbsp;    DayPart.Afternoon -&gt; Res.string.dashboard_greeting_afternoon</b>
+<b class="fc">&nbsp;    DayPart.Evening -&gt; Res.string.dashboard_greeting_evening</b>
+<b class="nc">&nbsp;    DayPart.Night -&gt; Res.string.dashboard_greeting_night</b>
+<b class="fc">&nbsp;    null -&gt; Res.string.dashboard_toolbar_greeting</b>
+&nbsp;}
 &nbsp;
 &nbsp;/**
 &nbsp; * Whether [type] would draw anything at all for this state.
@@ -708,7 +730,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

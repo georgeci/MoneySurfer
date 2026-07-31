@@ -116,6 +116,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;import com.georgeci.moneysurfer.domain.model.DayPart
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -150,6 +151,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_afternoon
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_evening
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_morning
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_night
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
@@ -159,6 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_title
+&nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
@@ -300,7 +306,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                letter = state.workspaceInitial
 &nbsp;                    ?: workspaceName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),
 &nbsp;                primaryText = workspaceName,
-&nbsp;                secondaryText = state.greeting ?: stringResource(Res.string.dashboard_toolbar_greeting),
+&nbsp;                secondaryText = stringResource(state.greeting.labelRes()),
 &nbsp;                actions = {
 &nbsp;                    SurferToolbarAction(
 &nbsp;                        icon = SurferIcons.Edit,
@@ -337,6 +343,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            onEvent = onEvent,
 &nbsp;        )
 &nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The greeting&#39;s copy. Picked here rather than in the view model for the reason every other
+&nbsp; * sentence on this screen is: the string resources — and the locale behind them — live here, and
+&nbsp; * the view model carries only the decision.
+&nbsp; *
+&nbsp; * Null keeps the neutral screen name the toolbar showed before a greeting was ever resolved, which
+&nbsp; * is what a hand-built state (a preview, a screenshot frame) renders.
+&nbsp; */
+&nbsp;private fun DayPart?.labelRes(): StringResource = when (this) {
+&nbsp;    DayPart.Morning -&gt; Res.string.dashboard_greeting_morning
+&nbsp;    DayPart.Afternoon -&gt; Res.string.dashboard_greeting_afternoon
+&nbsp;    DayPart.Evening -&gt; Res.string.dashboard_greeting_evening
+&nbsp;    DayPart.Night -&gt; Res.string.dashboard_greeting_night
+&nbsp;    null -&gt; Res.string.dashboard_toolbar_greeting
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -674,7 +696,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

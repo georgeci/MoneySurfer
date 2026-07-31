@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    83.3%
   </span>
   <span class="absValue">
-    (3/6)
+    (5/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -136,10 +136,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -152,10 +152,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    100%
   </span>
   <span class="absValue">
-    (10/12)
+    (12/12)
   </span>
 </td>
   </tr>
@@ -199,10 +199,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    87.5%
   </span>
   <span class="absValue">
-    (4/8)
+    (7/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -215,10 +215,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.5%
+    100%
   </span>
   <span class="absValue">
-    (135/137)
+    (137/137)
   </span>
 </td>
 </tr>
@@ -293,7 +293,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                // they are quoted in its base currency. A workspace row that has not arrived yet
 &nbsp;                // leaves nothing to quote them in, and an invented currency would print the wrong
 &nbsp;                // symbol beside a real amount.
-<b class="pc">&nbsp;                currency ?: return@combine emptyList()</b>
+<b class="fc">&nbsp;                currency ?: return@combine emptyList()</b>
 <b class="fc">&nbsp;                rules.upcomingOccurrences(today = today, currency = currency, limit = limit)</b>
 <b class="fc">&nbsp;            }.distinctUntilChanged()</b>
 &nbsp;        }
@@ -306,7 +306,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 &nbsp;    private fun baseCurrency(workspaceId: WorkspaceId): Flow&lt;CurrencyCode?&gt; =
 <b class="fc">&nbsp;        workspaceRepository.getAll()</b>
-<b class="pc">&nbsp;            .map { workspaces -&gt; workspaces.firstOrNull { it.id == workspaceId }?.baseCurrency }</b>
+<b class="fc">&nbsp;            .map { workspaces -&gt; workspaces.firstOrNull { it.id == workspaceId }?.baseCurrency }</b>
 <b class="fc">&nbsp;            .distinctUntilChanged()</b>
 &nbsp;
 &nbsp;    /**
@@ -356,7 +356,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

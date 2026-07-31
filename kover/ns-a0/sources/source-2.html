@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseConfig</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateRemoteSource</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseConfig (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: ExchangeRateRemoteSource (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseConfig</td>
+  <td class="name">ExchangeRateRemoteSource</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,24 +46,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;
 &nbsp;/**
-&nbsp; * Toggle for the Firebase Emulator Suite. Bound by `:data` per platform; tests
-&nbsp; * override with a fixture that always returns `useEmulator = true`.
-&nbsp; *
-&nbsp; * - [useEmulator] — when `true`, the SDK is redirected to a local Firestore + Auth
-&nbsp; *   emulator BEFORE the first read/write. Production builds keep this `false`.
-&nbsp; * - [emulatorHost] — Android emulator reaches the host machine via `10.0.2.2`,
-&nbsp; *   iOS simulator and Desktop via `localhost`. Implementations resolve this
-&nbsp; *   per-platform.
-&nbsp; * - [authPort] / [firestorePort] — match `firebase.json` (defaults 9099 / 8080).
-&nbsp; *
-&nbsp; * See md/sync.md emulator section.
+&nbsp; * The FX provider behind [ExchangeRateRepository]. Implemented over HTTP in `data-remote`; the
+&nbsp; * offline build binds a no-op so the cache is simply never refilled there.
 &nbsp; */
-&nbsp;interface FirebaseConfig {
-&nbsp;    val useEmulator: Boolean
-&nbsp;    val emulatorHost: String
-&nbsp;    val authPort: Int
-&nbsp;    val firestorePort: Int
+&nbsp;fun interface ExchangeRateRemoteSource {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Latest published quotes against [base], or `null` when the provider could not be reached
+&nbsp;     * or answered with something unusable. Implementations do not throw — an unreachable
+&nbsp;     * provider is an expected state on a phone, not an error the caller can act on.
+&nbsp;     */
+&nbsp;    suspend fun fetchLatest(base: CurrencyCode): ExchangeRateTable?
 &nbsp;}
 </code>
 </pre>
@@ -88,7 +85,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>

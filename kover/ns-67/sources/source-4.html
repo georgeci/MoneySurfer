@@ -236,8 +236,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    private val log = Logger.withTag(TAG)
 &nbsp;
+&nbsp;    /**
+&nbsp;     * The route the navigation host still has to put on the back stack, or `null` once it has.
+&nbsp;     *
+&nbsp;     * Consumed rather than left standing: a configuration change recreates the host&#39;s composition
+&nbsp;     * but not this view model, so a value kept here would be re-applied to the *restored* back
+&nbsp;     * stack on every rotation — which reset a signed-in user back to the launch decision (one
+&nbsp;     * rotation after signing in sent the user back to onboarding).
+&nbsp;     */
 &nbsp;    val targetRoute: StateFlow&lt;Route?&gt;
 &nbsp;        field = MutableStateFlow&lt;Route?&gt;(null)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether the launch decision has already reached the back stack — the splash gate. Owned here
+&nbsp;     * rather than by the composition so it survives a configuration change; a fresh process starts
+&nbsp;     * over at `false` and holds the splash until the decision in `init` is made and applied.
+&nbsp;     */
+&nbsp;    val launchRouteApplied: StateFlow&lt;Boolean&gt;
+&nbsp;        field = MutableStateFlow(false)
 &nbsp;
 &nbsp;    init {
 &nbsp;        viewModelScope.launch {
@@ -282,6 +298,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;        startPeriodicSyncTicker()
 &nbsp;        purgeExpiredTombstones()
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by the navigation host once [route] is on the back stack. Clears it so the same
+&nbsp;     * decision is not replayed onto a back stack that outlived the composition which applied it
+&nbsp;     * (rotation), while a later decision — the logout bounce below — still gets through:
+&nbsp;     * `compareAndSet` only clears the value the host actually applied.
+&nbsp;     */
+&nbsp;    fun onRouteApplied(route: Route) {
+&nbsp;        targetRoute.compareAndSet(route, null)
+&nbsp;        launchRouteApplied.value = true
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -414,7 +441,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:23</div>
+    <div style="float:right;">generated on 2026-07-31 21:52</div>
 </div>
 </body>
 </html>
