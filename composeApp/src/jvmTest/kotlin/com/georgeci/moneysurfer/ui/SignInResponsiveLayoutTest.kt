@@ -8,6 +8,7 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runSkikoComposeUiTest
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.feature.login.SignInContent
@@ -22,7 +23,7 @@ import io.kotest.matchers.shouldBe
  *
  * Assertions are on geometry rather than on what is drawn, because the split is the whole of what
  * this adds: the same nodes, placed side by side instead of stacked. `SignInScreenStateTest` covers
- * the states themselves, at the default window size.
+ * the states themselves, pinned to a phone window.
  *
  * Bounds are read unclipped — in a short landscape window the sheet scrolls, and a node below the
  * fold still has the position that is under test.
@@ -68,13 +69,21 @@ class SignInResponsiveLayoutTest : StringSpec({
         }
     }
 
-    "the split layout keeps the sheet within a readable measure on a wide window" {
+    // Asserted as "the same at both widths" rather than against a copy of the production cap: the
+    // point is that the sheet stops growing, and a duplicated number would drift from the real one.
+    "the sheet stops growing once the cap engages, instead of tracking the window" {
+        var onTablet = 0.dp
+        var onDesktop = 0.dp
+        runSignInAt(TABLET_LANDSCAPE_WIDTH_PX, TABLET_LANDSCAPE_HEIGHT_PX) {
+            setContent { SignInContent(state = SignInState(), onEvent = {}) }
+            onTablet = sheet().width
+        }
         runSignInAt(DESKTOP_WIDTH_PX, DESKTOP_HEIGHT_PX) {
             setContent { SignInContent(state = SignInState(), onEvent = {}) }
-
-            val width = sheet().right - sheet().left
-            (width <= SHEET_MAX_WIDTH) shouldBe true
+            onDesktop = sheet().width
         }
+
+        onDesktop shouldBe onTablet
     }
 
     "every action stays reachable in a short landscape window" {
@@ -107,8 +116,7 @@ private const val TABLET_PORTRAIT_HEIGHT_PX = 1366f
 private const val DESKTOP_WIDTH_PX = 1360f
 private const val DESKTOP_HEIGHT_PX = 880f
 
-/** `SplitSheetMaxWidth` in `SignInScreen.kt`, which is private to the feature module. */
-private val SHEET_MAX_WIDTH = 432.dp
+private val DpRect.width: Dp get() = right - left
 
 @OptIn(ExperimentalTestApi::class)
 private fun SkikoComposeUiTest.sheet(): DpRect =

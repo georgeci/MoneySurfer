@@ -41,4 +41,21 @@ class SurferWindowSizeTest : StringSpec({
         (SurferWindowSize.ofWidth(1360.dp) >= SurferWindowSize.Medium) shouldBe true
         (SurferWindowSize.ofWidth(411.dp) >= SurferWindowSize.Medium) shouldBe false
     }
+
+    "geometry reports the width band, same as ofWidth" {
+        SurferWindowGeometry(width = 411.dp, height = 891.dp).sizeClass shouldBe SurferWindowSize.Compact
+        SurferWindowGeometry(width = 1024.dp, height = 700.dp).sizeClass shouldBe SurferWindowSize.Expanded
+        SurferWindowGeometry(width = 1360.dp, height = 880.dp).sizeClass shouldBe SurferWindowSize.Large
+    }
+
+    // The pair a width band cannot tell apart, and the reason the flag exists: the same 1024 dp
+    // tablet reports Expanded whether it is lying down or stood up.
+    "landscape is width against height, not a band" {
+        SurferWindowGeometry(width = 1024.dp, height = 700.dp).isLandscape shouldBe true
+        SurferWindowGeometry(width = 1024.dp, height = 1366.dp).isLandscape shouldBe false
+    }
+
+    "a square window is not landscape" {
+        SurferWindowGeometry(width = 800.dp, height = 800.dp).isLandscape shouldBe false
+    }
 })

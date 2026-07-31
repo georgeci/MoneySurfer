@@ -61,22 +61,32 @@ width alone does not earn the split.
 
 Shipped as the `SignInSplitLayout` branch in
 [SignInScreen.kt](../../feature/login/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/login/SignInScreen.kt),
-selected by `isSplitLayout(width, height)` — at least `SurferWindowSize.Expanded` **and** wider
-than tall. The height half has no counterpart in the mockups: the canvas only ever draws fixed
-artboards, so nothing there distinguishes a 1024 dp tablet lying down from the same tablet stood
-up, and splitting the upright one would leave two tall, half-empty columns.
+selected by `SurferWindowGeometry.supportsSplitLayout()` — at least `SurferWindowSize.Expanded`
+**and** wider than tall. The height half has no counterpart in the mockups: the canvas only ever
+draws fixed artboards, so nothing there distinguishes a 1024 dp tablet lying down from the same
+tablet stood up, and splitting the upright one would leave two tall, half-empty columns.
 
 Deliberate departures from the mockup:
 
-- **A max width of 1120 dp on the split row**, centred (`surferContentContainer`). The design's
-  percentage columns were drawn at 1024 dp; left unbounded they keep growing, and at 2560 dp the
-  brand text and the card end up a screen apart.
+- **Type comes from the scale, not the artboard.** The mockup measures the hero at 52 px in the
+  split and 40 px stacked; neither is on the app's type ramp. They ship as `displayMedium` (45/52)
+  and `displaySmall` (36/44), keeping only the brand's ExtraBold weight as an override. Visible
+  consequence: on a phone the hero now sets on one line rather than the mockup's hard-wrapped two.
+- **The sheet is capped, and the brand takes what is left** — the mockup's `46% / max 460` is only
+  correct at the 1024 dp it was drawn at. The cap is `ContentMaxWidth`, the same measure the
+  stacked column already used, so one number covers the form in both layouts.
+- **A max width of 1120 dp on the split row**, centred (`surferContentContainer`). Unbounded, the
+  columns keep growing and at 2560 dp the brand text and the card end up a screen apart. This is
+  `SurferWideContentMaxWidth`, shared with the dashboard grid, which had picked 1120 separately.
 - **The sheet scrolls independently** of the brand column. A phone on its side is ~410 dp tall,
   which is expanded-width and landscape, and the form is taller than that.
 - **No `compact` variant.** 01b drops the hero subtitle and shrinks the title on short phones; the
   shipped stacked layout scrolls instead, so nothing is unreachable. Still open.
-- The hero keeps its own line breaking. The mockup hard-wraps `Ride your<br/>money wave.`; the
-  string resource carries no break, so wide layouts wrap it as `Ride your money / wave.`
+- The hero keeps its own line breaking — the string resource carries no `<br/>`.
+
+The rule that produced most of the above: **prefer an existing token over a number read off the
+canvas.** An artboard is one width; a token holds at all of them. Sizes that survived as literals
+are the ones with no token to snap to (sheet corner 28, elevation 12).
 
 The gradient direction is a `SurferAuthGradient` parameter on `SurferAuthBackground` (uikit), not
 a sign-in local: on a short, wide window a vertical ramp is compressed into no travel and reads as

@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,7 +50,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,6 +60,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.components.SurferPasswordField
 import com.georgeci.moneysurfer.uikit.components.SurferTextField
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.SurferWideContentMaxWidth
 import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
@@ -67,7 +68,9 @@ import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
 import com.georgeci.moneysurfer.uikit.tokens.AuthColors
+import com.georgeci.moneysurfer.uikit.window.SurferWindowGeometry
 import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowGeometry
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.login.generated.resources.Res
 import moneysurfer.feature.login.generated.resources.sign_in_anonymous
@@ -126,27 +129,20 @@ object SignInTestTags {
 private val SheetCorner: Dp = 28.dp
 private val PrimaryButtonHeight: Dp = 52.dp
 private val BrandIconSize: Dp = 42.dp
-private val HeroTitleSize = 40.sp
-private val HeroTitleLineHeight = 44.sp
-private val HeroSubtitleMaxWidth: Dp = 320.dp
 private val SheetPadding: Dp = 20.dp
 private val SheetElevation: Dp = 12.dp
 private val SheetTitleSize = 18.sp
 private val PasskeyIconSize: Dp = 18.dp
 private val OrLabelSize = 11.sp
 private val PrimaryLabelSize = 15.sp
+
+/**
+ * How wide the form is allowed to grow, in both layouts — the stacked column and the split card are
+ * the same thing at different addresses, so they hold the same measure.
+ */
 private val ContentMaxWidth: Dp = 480.dp
 
-// ── Split (wide + landscape) layout ──────────────────────────────────────────────────────────────
-private val SplitMaxWidth: Dp = 1120.dp
-private val SplitColumnGap: Dp = 40.dp
-private val SplitSheetMaxWidth: Dp = 432.dp
-private val SplitBrandIconSize: Dp = 44.dp
-private val SplitHeroTitleSize = 52.sp
-private val SplitHeroTitleLineHeight = 54.sp
-private val SplitHeroSubtitleMaxWidth: Dp = 380.dp
-private const val SplitBrandWeight = 0.54f
-private const val SplitFormWeight = 0.46f
+private val HeroSubtitleMaxWidth: Dp = 320.dp
 
 @Composable
 private fun SignInError.localized(): String = stringResource(
@@ -198,16 +194,13 @@ fun SignInContent(
     // only the content is inset — that is what tints the system bars green. The gradient is light
     // at the top and the wave band is dark at the bottom, so the two bars get opposite icon tints.
     ConfigureSystemBars(darkStatusBarBackground = false, darkNavigationBarBackground = true)
-    // Measured on the window rather than inside the insets below, so opening the keyboard — which
-    // eats into the bottom inset — cannot flip the screen between layouts mid-typing.
-    BoxWithConstraints(
+    val split = currentSurferWindowGeometry().supportsSplitLayout()
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .surferTestTagAsId()
             .testTag(SignInTestTags.Root),
     ) {
-        val split = isSplitLayout(width = maxWidth, height = maxHeight)
-
         SurferAuthBackground(
             modifier = Modifier.fillMaxSize(),
             gradient = if (split) SurferAuthGradient.Diagonal else SurferAuthGradient.Vertical,
@@ -250,9 +243,12 @@ fun SignInContent(
  * keep a readable measure — below it (a tablet in portrait, the 834 dp artboard) the design still
  * stacks. And the window has to be wider than it is tall: a 1024 dp tablet held in *portrait* is
  * Expanded too, and splitting it would leave two tall, half-empty columns.
+ *
+ * The measurement is uikit's; which shape to draw from it is sign-in's, so this stays here until a
+ * second screen wants the same answer.
  */
-private fun isSplitLayout(width: Dp, height: Dp): Boolean =
-    SurferWindowSize.ofWidth(width) >= SurferWindowSize.Expanded && width > height
+private fun SurferWindowGeometry.supportsSplitLayout(): Boolean =
+    sizeClass >= SurferWindowSize.Expanded && isLandscape
 
 /**
  * Phone and tablet-portrait: brand on top, sheet pinned to the bottom.
@@ -311,37 +307,34 @@ private fun SignInSplitLayout(
     Row(
         modifier = Modifier
             .fillMaxHeight()
-            .surferContentContainer(maxWidth = SplitMaxWidth)
+            .surferContentContainer(maxWidth = SurferWideContentMaxWidth)
             .padding(
                 horizontal = AppTheme.spacing.xLarge,
                 vertical = AppTheme.spacing.large,
             ),
-        horizontalArrangement = Arrangement.spacedBy(SplitColumnGap),
+        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.xLarge),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.weight(SplitBrandWeight)) {
-            SignInBrandHeader(iconSize = SplitBrandIconSize)
+        // The sheet is capped and the brand takes what is left, rather than the two splitting the
+        // row by percentage: the mockup's 46 % is only correct at the width it was drawn at, while
+        // the cap is the same measure the stacked layout uses and holds at any width.
+        Column(modifier = Modifier.weight(1f)) {
+            SignInBrandHeader()
             Spacer(Modifier.height(AppTheme.spacing.xxLarge))
-            SignInHero(
-                titleSize = SplitHeroTitleSize,
-                titleLineHeight = SplitHeroTitleLineHeight,
-                subtitleMaxWidth = SplitHeroSubtitleMaxWidth,
-            )
+            SignInHero(titleStyle = AppTheme.typography.displayMedium)
         }
         // The sheet scrolls on its own: the brand block always fits, but the form is taller than a
         // short landscape window (a phone on its side is ~410 dp tall) and has to stay reachable.
         BoxWithConstraints(
             modifier = Modifier
-                .weight(SplitFormWeight)
+                .widthIn(max = ContentMaxWidth)
                 .fillMaxHeight(),
         ) {
             val viewportHeight = maxHeight
             Column(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
                     .verticalScroll(rememberScrollState())
-                    .heightIn(min = viewportHeight)
-                    .widthIn(max = SplitSheetMaxWidth),
+                    .heightIn(min = viewportHeight),
                 verticalArrangement = Arrangement.Center,
             ) {
                 SignInActionSheet(state = state, onEvent = onEvent)
@@ -373,16 +366,13 @@ private fun SignInErrorDialog(
 }
 
 @Composable
-private fun SignInBrandHeader(
-    modifier: Modifier = Modifier,
-    iconSize: Dp = BrandIconSize,
-) {
+private fun SignInBrandHeader(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.testTag(SignInTestTags.BrandHeader),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
     ) {
-        SurferAppIcon(size = iconSize)
+        SurferAppIcon(size = BrandIconSize)
         Text(
             text = stringResource(Res.string.sign_in_brand),
             style = AppTheme.typography.titleLarge,
@@ -395,16 +385,15 @@ private fun SignInBrandHeader(
 @Composable
 private fun SignInHero(
     modifier: Modifier = Modifier,
-    titleSize: TextUnit = HeroTitleSize,
-    titleLineHeight: TextUnit = HeroTitleLineHeight,
-    subtitleMaxWidth: Dp = HeroSubtitleMaxWidth,
+    titleStyle: TextStyle = AppTheme.typography.displaySmall,
 ) {
     Column(modifier = modifier) {
         Text(
             text = stringResource(Res.string.sign_in_hero_title),
             color = AuthColors.OnBrand,
-            fontSize = titleSize,
-            lineHeight = titleLineHeight,
+            // Size and leading come from the scale; only the brand's weight is set here, because
+            // the display styles are Normal and the hero is the one place that shouts.
+            style = titleStyle,
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier.testTag(SignInTestTags.HeroTitle),
         )
@@ -414,7 +403,7 @@ private fun SignInHero(
             color = AuthColors.OnBrandMuted,
             style = AppTheme.typography.bodyLarge,
             modifier = Modifier
-                .widthIn(max = subtitleMaxWidth)
+                .widthIn(max = HeroSubtitleMaxWidth)
                 .testTag(SignInTestTags.HeroSubtitle),
         )
     }

@@ -19,6 +19,15 @@ import androidx.compose.ui.unit.dp
 val SurferContentMaxWidth: Dp = 840.dp
 
 /**
+ * Cap for the layouts that genuinely use the extra room, where [SurferContentMaxWidth] would be a
+ * straitjacket rather than a readable measure — a widget grid, a two-column form.
+ *
+ * A single value rather than one per screen: it was picked twice independently, for the dashboard
+ * grid and for the sign-in split, and two hand-tuned copies of the same number drift.
+ */
+val SurferWideContentMaxWidth: Dp = 1120.dp
+
+/**
  * Caps content at [maxWidth] and centres it horizontally in whatever space the parent offers.
  *
  * Apply at a screen's content root, *before* the padding and scrolling modifiers, so the cap
