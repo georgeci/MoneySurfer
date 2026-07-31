@@ -1,241 +1,35 @@
 // QA pipeline: tests + Kover + Allure for common, Android host, Android device, Maestro.
 // Loaded from root build.gradle.kts via `apply(from = "gradle/qa.gradle.kts")`.
 
+import com.georgeci.moneysurfer.buildlogic.AllureTools
+import com.georgeci.moneysurfer.buildlogic.MaestroTools
 import org.gradle.api.tasks.Exec
 import java.io.FileOutputStream
-import javax.xml.parsers.DocumentBuilderFactory
-import org.w3c.dom.Element
 
-/**
- * Resolves the Android SDK's `adb` binary. The Gradle daemon's PATH does not
- * include shell-only entries (e.g. Homebrew under `/opt/homebrew/bin`), so
- * `commandLine("adb", ...)` fails on macOS unless adb is on the inherited PATH.
- *
- * Resolution order:
- *   1. `local.properties` → `sdk.dir`
- *   2. env `ANDROID_HOME`
- *   3. env `ANDROID_SDK_ROOT`
- */
-fun resolveAdbExecutable(rootDir: File): String {
-    val sdkDir: String = run {
-        val props = java.util.Properties()
-        rootDir.resolve("local.properties").takeIf { it.exists() }
-            ?.inputStream()?.use { props.load(it) }
-        props.getProperty("sdk.dir")
-            ?: System.getenv("ANDROID_HOME")
-            ?: System.getenv("ANDROID_SDK_ROOT")
-            ?: error("Android SDK not found: set `sdk.dir` in local.properties or ANDROID_HOME / ANDROID_SDK_ROOT.")
-    }
-    val adb = File(sdkDir, "platform-tools/adb")
-    require(adb.canExecute()) { "adb not executable at ${adb.absolutePath}. Install platform-tools." }
-    return adb.absolutePath
-}
+// The helper layer this script used to declare inline (adb/maestro/allure
+// discovery, JUnit summarising, log tails) now lives in the `build-logic`
+// included build as `MaestroTools` / `AllureTools`, put on this script's
+// classpath by the `ms.qa-tools` marker declared in `settings.gradle.kts`.
+//
+// The move is what makes these tasks configuration-cache clean: a `doFirst` /
+// `doLast` that calls a script-level function captures the compiled script
+// instance — and, via `rootProject` / `project.delete`, the `Project` — neither
+// of which can be serialized. Gradle reported those captures on every Maestro
+// run ("Configuration cache entry discarded with N problems") regardless of the
+// `notCompatibleWithConfigurationCache(...)` opt-outs, which is why the opt-outs
+// are gone from the tasks below.
+//
+// Rules of thumb when touching the task bodies:
+//   - a task action may only reference `MaestroTools` / `AllureTools`, `File`s
+//     and `Provider`s captured in the surrounding configuration block, and the
+//     task itself;
+//   - never `project`, `rootProject`, `rootDir` or a script-level `val`/`fun`
+//     from inside `doFirst` / `doLast` — copy the value into a local first.
+val repoRoot: File = rootProject.projectDir
 
-fun resolveAllureExecutable(): String {
-    System.getenv("ALLURE_BIN")?.takeIf { it.isNotBlank() && File(it).canExecute() }?.let { return it }
-    val candidates = listOf(
-        "/opt/homebrew/bin/allure",
-        "/usr/local/bin/allure",
-        "/usr/bin/allure",
-    )
-    return candidates.firstOrNull { File(it).canExecute() } ?: "allure"
-}
-
-/**
- * Resolves the `maestro` CLI. Same problem as adb — Gradle daemon's PATH
- * skips Homebrew. Returns absolute path; caller falls back to bare `"maestro"`
- * if nothing found, so CI images that put it on PATH still work.
- */
-fun resolveMaestroExecutable(): String {
-    System.getenv("MAESTRO_BIN")?.takeIf { it.isNotBlank() && File(it).canExecute() }?.let { return it }
-    val candidates = listOf(
-        "/opt/homebrew/bin/maestro",
-        "/usr/local/bin/maestro",
-        System.getenv("HOME")?.let { "$it/.maestro/bin/maestro" },
-    ).filterNotNull()
-    return candidates.firstOrNull { File(it).canExecute() } ?: "maestro"
-}
-
-fun loadKeyValueFile(file: File): Map<String, String> {
-    if (!file.exists()) return emptyMap()
-
-    return file.readLines()
-        .map { it.trim() }
-        .filter { it.isNotBlank() && !it.startsWith("#") && it.contains('=') }
-        .associate { line ->
-            val (key, value) = line.split('=', limit = 2)
-            key.trim() to value.trim()
-        }
-}
-
-fun resolveMaestroFlow(flowProperty: String?): String {
-    val flow = flowProperty?.trim().orEmpty()
-    require(flow.isNotBlank()) {
-        "Missing flow. Use -PmaestroFlow=05_sign_out.yaml (or full path)."
-    }
-    return when {
-        flow.startsWith("/") -> flow
-        flow.startsWith("scripts/maestro/") -> flow
-        else -> "scripts/maestro/$flow"
-    }
-}
-
-fun loadMaestroTestUser(rootDir: File): Map<String, String> =
-    loadKeyValueFile(rootDir.resolve("scripts/e2e-test-user.properties"))
-        .filterKeys { it in setOf("TEST_EMAIL", "TEST_PASSWORD") }
-
-val androidMaestroAppId = "com.georgeci.moneysurfer.dev"
-// iOS Debug mirrors the Android `.dev` flavor (project.pbxproj sets
-// PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.dev for the Debug config),
-// so the installed simulator app — the one qaMaestroIos builds — carries the
-// `.dev` suffix too. Launching the un-suffixed id fails every flow with
-// "Unable to launch app com.georgeci.moneysurfer".
-val iosMaestroAppId = "com.georgeci.moneysurfer.dev"
-
-// Offline build, debug variant: `KmpAppConventionPlugin` appends `.dev` to the
-// `com.georgeci.moneysurfer.offline` applicationId / bundle id. Android and iOS
-// debug builds land on the same id, so a single constant covers both.
-val offlineMaestroAppId = "com.georgeci.moneysurfer.offline.dev"
-
-fun buildMaestroCommand(
-    rootDir: File,
-    target: String,
-    junitOutput: File? = null,
-    excludeTags: List<String> = emptyList(),
-    includeTags: List<String> = emptyList(),
-    appId: String = androidMaestroAppId,
-    platform: String? = null,
-    deviceId: String? = null,
-): List<String> {
-    val command = mutableListOf(resolveMaestroExecutable(), "test")
-    if (!platform.isNullOrBlank()) {
-        command += listOf("--platform", platform)
-    }
-    if (!deviceId.isNullOrBlank()) {
-        command += listOf("--device", deviceId)
-    }
-    val env = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to appId)
-    env.forEach { (key, value) ->
-        command += listOf("--env", "$key=$value")
-    }
-    if (junitOutput != null) {
-        command += listOf("--format", "junit", "--output", junitOutput.absolutePath)
-    }
-    // Keep debug artifacts/screenshots under project build/ instead of ~/.maestro.
-    val debugOutputDir = rootDir.resolve("build/maestro-debug")
-    val testOutputDir = rootDir.resolve("build/maestro-artifacts")
-    command += listOf(
-        "--debug-output", debugOutputDir.absolutePath,
-        "--test-output-dir", testOutputDir.absolutePath,
-        "--flatten-debug-output",
-    )
-    includeTags.forEach { tag ->
-        command += listOf("--include-tags", tag)
-    }
-    excludeTags.forEach { tag ->
-        command += listOf("--exclude-tags", tag)
-    }
-    command += target
-    return command
-}
-
-/**
- * Returns the last [lines] lines of [file] for inclusion in failure messages,
- * or "" when the file is missing/empty/unreadable. Maestro/Firebase emulator
- * failures often happen long before JUnit is written, so the only signal is
- * the captured stdout/stderr.
- *
- * Uses `useLines` + a fixed-size ArrayDeque ring buffer so a multi-MB Maestro
- * log doesn't get fully materialised into memory at the moment we're already
- * crashing.
- */
-fun tailLogFile(file: File, lines: Int = 40): String {
-    if (!file.exists() || file.length() == 0L) return ""
-    return runCatching {
-        val buffer = ArrayDeque<String>(lines)
-        file.useLines { seq ->
-            seq.forEach { line ->
-                if (buffer.size == lines) buffer.removeFirst()
-                buffer.addLast(line)
-            }
-        }
-        if (buffer.isEmpty()) {
-            ""
-        } else {
-            val rel = file.relativeTo(rootProject.projectDir)
-            "Last ${buffer.size} lines of $rel:\n${buffer.joinToString("\n")}"
-        }
-    }.getOrElse { "(unable to read ${file.absolutePath}: ${it.message})" }
-}
-
-/**
- * Joins per-stream tails for a failure message. Includes whichever streams
- * actually produced output — stderr is shown first because it usually carries
- * the cause; stdout follows when present.
- */
-fun joinLogTails(vararg files: File): String =
-    files.map(::tailLogFile)
-        .filter { it.isNotBlank() }
-        .joinToString("\n\n")
-        .ifBlank { "(no log output captured)" }
-
-fun summarizeMaestroJunit(report: File): String {
-    if (!report.exists()) {
-        return "Maestro result unavailable: JUnit report was not written at ${report.absolutePath} " +
-            "(Maestro likely crashed before any flow finished — check the emulator/seed logs above)."
-    }
-
-    return runCatching {
-        val document = DocumentBuilderFactory.newInstance()
-            .newDocumentBuilder()
-            .parse(report)
-
-        val suites = document.getElementsByTagName("testsuite")
-        var tests = 0
-        var failures = 0
-        var errors = 0
-        var skipped = 0
-
-        for (index in 0 until suites.length) {
-            val suite = suites.item(index) as Element
-            tests += suite.getAttribute("tests").toIntOrNull() ?: 0
-            failures += suite.getAttribute("failures").toIntOrNull() ?: 0
-            errors += suite.getAttribute("errors").toIntOrNull() ?: 0
-            skipped += suite.getAttribute("skipped").toIntOrNull() ?: 0
-        }
-
-        val failedNames = mutableListOf<String>()
-        val cases = document.getElementsByTagName("testcase")
-        for (index in 0 until cases.length) {
-            val testcase = cases.item(index) as Element
-            val hasFailure = testcase.getElementsByTagName("failure").length > 0
-            val hasError = testcase.getElementsByTagName("error").length > 0
-            val status = testcase.getAttribute("status")
-            if (hasFailure || hasError || status.equals("ERROR", ignoreCase = true)) {
-                failedNames += testcase.getAttribute("name").ifBlank { testcase.getAttribute("id") }
-            }
-        }
-
-        if (tests == 0) {
-            tests = cases.length
-        }
-
-        val failed = maxOf(failures + errors, failedNames.size)
-        val passed = (tests - failed - skipped).coerceAtLeast(0)
-        val skippedText = if (skipped > 0) ", $skipped skipped" else ""
-        val failedText = if (failedNames.isNotEmpty()) {
-            val shown = failedNames.take(3).joinToString(", ")
-            val more = if (failedNames.size > 3) ", +${failedNames.size - 3} more" else ""
-            ". Failed: $shown$more"
-        } else {
-            "."
-        }
-
-        "Maestro result: $passed/$tests passed, $failed failed$skippedText$failedText"
-    }.getOrElse { error ->
-        "Maestro result unavailable: failed to parse JUnit report (${error.message})."
-    }
-}
+val androidMaestroAppId = MaestroTools.ANDROID_APP_ID
+val iosMaestroAppId = MaestroTools.IOS_APP_ID
+val offlineMaestroAppId = MaestroTools.OFFLINE_APP_ID
 
 val debugApkPath = rootProject.file("androidApp/build/outputs/apk/debug/androidApp-debug.apk")
 val maestroReportsDir = rootProject.file("build/test-results/maestro")
@@ -250,8 +44,8 @@ val maestroIosLogsDir = rootProject.file("build/logs/maestro-ios")
 val maestroIosDebugDir = rootProject.file("build/maestro-ios-debug")
 val maestroIosArtifactsDir = rootProject.file("build/maestro-ios-artifacts")
 val maestroIosAllureResultsDir = rootProject.file("build/allure-results/maestro-ios")
-val maestroEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to androidMaestroAppId)
-val maestroIosEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to iosMaestroAppId)
+val maestroEmulatorEnv = MaestroTools.loadMaestroTestUser(repoRoot) + mapOf("APP_ID" to androidMaestroAppId)
+val maestroIosEmulatorEnv = MaestroTools.loadMaestroTestUser(repoRoot) + mapOf("APP_ID" to iosMaestroAppId)
 val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
     ?: System.getenv("IOS_SIMULATOR_UDID")
 // Tags kept out of the default (online) Maestro suites:
@@ -335,54 +129,22 @@ val allScopeAllureSources: List<File> =
             androidDeviceScopeAllureSources
         ).distinct()
 
-/**
- * Walks each source directory and returns every subdir (and the source itself)
- * that holds at least one supported Allure input file directly inside it.
- * Inputs can be JUnit XML (`*.xml`) or native Allure files
- * (`*-result.json`, `executor.json`, `environment.properties`).
- *
- * Used to feed `allure generate` paths at multiple depths in one call:
- * JVM/host tests put XMLs at the root of the source dir, KMP device tests put
- * them at `connected/androidMain/`, AGP-app device tests at
- * `connected<Flavor>/`, and Maestro enriched results live under
- * `build/allure-results/maestro/` as native JSON + metadata.
- *
- * Cap at depth 4 so a stray walk doesn't descend into `build/intermediates/`.
- */
-fun resolveAllureInputDirs(sources: List<File>): List<File> {
-    val out = mutableListOf<File>()
-    val containsSupportedInputs: (File) -> Boolean = { dir ->
-        dir.isDirectory && dir.listFiles { _, name ->
-            name.endsWith(".xml") ||
-                name.endsWith("-result.json") ||
-                name == "executor.json" ||
-                name == "environment.properties"
-        }?.isNotEmpty() == true
-    }
-    sources.forEach { source ->
-        if (!source.exists()) return@forEach
-        if (containsSupportedInputs(source)) out += source
-        source.walkTopDown()
-            .maxDepth(4)
-            .filter { it != source && containsSupportedInputs(it) }
-            .forEach { out += it }
-    }
-    return out.distinct()
-}
-
 fun registerAllureGenerate(name: String, scopeLabel: String, sources: List<File>, output: File) {
     tasks.register<Exec>(name) {
         group = "verification"
-        description = "Generate Allure report for $scopeLabel scope into ${output.relativeTo(rootProject.projectDir)}."
+        description = "Generate Allure report for $scopeLabel scope into ${output.relativeTo(repoRoot)}."
         // Best-effort: a hard fail here would silently swallow the underlying
         // test-task failure (Gradle reports the *last* task's exit code). On
         // the green path `allure generate` returns 0 anyway; on the red path
         // we'd rather still upload whatever HTML did make it to disk.
         isIgnoreExitValue = true
-        val args = mutableListOf<String>(resolveAllureExecutable(), "generate")
-        resolveAllureInputDirs(sources).forEach { args += it.absolutePath }
-        args += listOf("-o", output.absolutePath, "--clean")
-        commandLine(args)
+        doFirst {
+            // Built at execution time on purpose: the input directories are
+            // produced by the very test tasks this report aggregates, so a
+            // command line resolved during configuration would be stale as soon
+            // as the configuration cache replays it.
+            commandLine(AllureTools.generateCommand(sources, output))
+        }
         doLast {
             val exit = executionResult.get().exitValue
             if (exit != 0) {
@@ -418,17 +180,19 @@ tasks.register<Exec>("maestroAssembleDebug") {
 tasks.register<Exec>("maestroInstallDebug") {
     group = "verification"
     description = "Build USE_EMULATOR=true debug APK and adb-install on connected device/AVD."
-    // Resolves the adb path and the install command in doFirst (script-level
-    // helpers), same as the maestroRun* tasks below — not config-cache safe.
-    notCompatibleWithConfigurationCache("Resolves adb + install args at execution time.")
     dependsOn("maestroAssembleDebug")
+    // adb lives outside the daemon's PATH and the APK is produced by the task
+    // we depend on, so both are resolved in doFirst — from captured `File`s and
+    // `MaestroTools`, never from the script or `project`.
+    val root = repoRoot
+    val apk = debugApkPath
     doFirst {
-        require(debugApkPath.exists()) {
-            "Debug APK not found at ${debugApkPath.absolutePath}. " +
+        require(apk.exists()) {
+            "Debug APK not found at ${apk.absolutePath}. " +
                 ":androidApp:assembleDebug -PuseEmulator=true did not produce its expected output — " +
                 "check the assembleDebug log above (DEV signing, processDebugGoogleServices, USE_EMULATOR=true)."
         }
-        commandLine(resolveAdbExecutable(rootDir), "install", "-r", debugApkPath.absolutePath)
+        commandLine(MaestroTools.resolveAdbExecutable(root), "install", "-r", apk.absolutePath)
     }
 }
 
@@ -436,7 +200,11 @@ tasks.register<Exec>("maestroRunAll") {
     group = "verification"
     description = "Install APK + run all Maestro flows (Firebase Emulator must be running)."
     dependsOn("maestroInstallDebug")
-    commandLine(buildMaestroCommand(rootDir, "scripts/maestro/", excludeTags = maestroSetupTags))
+    val root = repoRoot
+    val excludedTags = maestroSetupTags
+    doFirst {
+        commandLine(MaestroTools.buildMaestroCommand(root, "scripts/maestro/", excludeTags = excludedTags))
+    }
 }
 
 tasks.register("maestroRunAllAndroid") {
@@ -448,11 +216,15 @@ tasks.register("maestroRunAllAndroid") {
 tasks.register<Exec>("maestroRunOne") {
     group = "verification"
     description = "Install APK + run one Maestro flow (Firebase Emulator must be running). Pass -PmaestroFlow=05_sign_out.yaml."
-    notCompatibleWithConfigurationCache("Flow path is resolved dynamically at execution time.")
     dependsOn("maestroInstallDebug")
+    val root = repoRoot
+    // Captured as a Provider so `-PmaestroFlow=` stays an input of the
+    // configuration-cache entry instead of being read off `project` at
+    // execution time.
+    val flowProperty = providers.gradleProperty("maestroFlow")
     doFirst {
-        val flow = resolveMaestroFlow(providers.gradleProperty("maestroFlow").orNull)
-        commandLine(buildMaestroCommand(rootDir, flow))
+        val flow = MaestroTools.resolveMaestroFlow(flowProperty.orNull)
+        commandLine(MaestroTools.buildMaestroCommand(root, flow))
     }
 }
 
@@ -465,32 +237,39 @@ tasks.register("maestroRunOneAndroid") {
 tasks.register<Exec>("maestroRunAllJunit") {
     group = "verification"
     description = "Install APK, run all flows (Firebase Emulator must be running), write JUnit XML to build/test-results/maestro/maestro-report.xml."
-    notCompatibleWithConfigurationCache("Wires dynamic log streams in doFirst.")
     dependsOn("maestroInstallDebug")
     finalizedBy("allureGenerateMaestro")
     isIgnoreExitValue = true
+    val root = repoRoot
+    val reportsDir = maestroReportsDir
+    val logsDir = maestroLogsDir
+    val debugDir = maestroDebugDir
+    val artifactsDir = maestroArtifactsDir
+    val junit = maestroAllFlowsJunit
+    val allureDir = allureMaestroDir
+    val excludedTags = maestroSetupTags
     val stdoutLog = maestroLogsDir.resolve("maestroRunAllJunit.out.log")
     val stderrLog = maestroLogsDir.resolve("maestroRunAllJunit.err.log")
     doFirst {
-        maestroReportsDir.mkdirs()
-        maestroLogsDir.mkdirs()
-        maestroDebugDir.mkdirs()
-        maestroArtifactsDir.mkdirs()
+        reportsDir.mkdirs()
+        logsDir.mkdirs()
+        debugDir.mkdirs()
+        artifactsDir.mkdirs()
         standardOutput = FileOutputStream(stdoutLog)
         errorOutput = FileOutputStream(stderrLog)
-        logger.lifecycle("[maestro] junit: ${maestroAllFlowsJunit.relativeTo(rootProject.projectDir)}")
-        logger.lifecycle("[maestro] logs : ${stdoutLog.relativeTo(rootProject.projectDir)}, ${stderrLog.relativeTo(rootProject.projectDir)}")
+        logger.lifecycle("[maestro] junit: ${junit.relativeTo(root)}")
+        logger.lifecycle("[maestro] logs : ${stdoutLog.relativeTo(root)}, ${stderrLog.relativeTo(root)}")
+        commandLine(MaestroTools.buildMaestroCommand(root, "scripts/maestro/", junit, excludeTags = excludedTags))
     }
-    commandLine(buildMaestroCommand(rootDir, "scripts/maestro/", maestroAllFlowsJunit, excludeTags = maestroSetupTags))
     doLast {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
-            val summary = summarizeMaestroJunit(maestroAllFlowsJunit)
-            val tail = joinLogTails(stderrLog, stdoutLog)
+            val summary = MaestroTools.summarizeMaestroJunit(junit)
+            val tail = MaestroTools.joinLogTails(root, stderrLog, stdoutLog)
             throw GradleException(
                 buildString {
                     appendLine("maestroRunAllJunit failed (exit=$exit). $summary")
-                    appendLine("Allure HTML (always generated): ${allureMaestroDir.absolutePath}")
+                    appendLine("Allure HTML (always generated): ${allureDir.absolutePath}")
                     appendLine("Stdout log: ${stdoutLog.absolutePath}")
                     appendLine("Stderr log: ${stderrLog.absolutePath}")
                     appendLine(tail)
@@ -509,17 +288,21 @@ tasks.register("maestroRunAllAndroidJunit") {
 tasks.register<Exec>("maestroRunOneJunit") {
     group = "verification"
     description = "Install APK, run one flow (Firebase Emulator must be running), write JUnit XML. Pass -PmaestroFlow=05_sign_out.yaml."
-    notCompatibleWithConfigurationCache("Flow path is resolved dynamically at execution time.")
     dependsOn("maestroInstallDebug")
     finalizedBy("allureGenerateMaestro")
+    val root = repoRoot
+    val reportsDir = maestroReportsDir
+    val debugDir = maestroDebugDir
+    val artifactsDir = maestroArtifactsDir
+    val flowProperty = providers.gradleProperty("maestroFlow")
     doFirst {
-        maestroReportsDir.mkdirs()
-        maestroDebugDir.mkdirs()
-        maestroArtifactsDir.mkdirs()
-        val flow = resolveMaestroFlow(providers.gradleProperty("maestroFlow").orNull)
+        reportsDir.mkdirs()
+        debugDir.mkdirs()
+        artifactsDir.mkdirs()
+        val flow = MaestroTools.resolveMaestroFlow(flowProperty.orNull)
         val flowName = flow.substringAfterLast('/').substringBeforeLast('.')
-        val reportFile = maestroReportsDir.resolve("maestro-$flowName.xml")
-        commandLine(buildMaestroCommand(rootDir, flow, reportFile))
+        val reportFile = reportsDir.resolve("maestro-$flowName.xml")
+        commandLine(MaestroTools.buildMaestroCommand(root, flow, reportFile))
     }
 }
 
@@ -538,7 +321,6 @@ tasks.register("maestroRun") {
 tasks.register<Exec>("maestroBuildIosSimulator") {
     group = "verification"
     description = "Build iOS Debug simulator app with MS_USE_EMULATOR=YES for Maestro E2E tests."
-    notCompatibleWithConfigurationCache("Spawns xcodebuild.")
     workingDir = rootDir
     val simulatorName = providers.gradleProperty("iosSimulatorName").orNull
         ?: System.getenv("IOS_SIMULATOR_NAME")
@@ -560,13 +342,13 @@ tasks.register<Exec>("maestroBuildIosSimulator") {
 tasks.register<Exec>("maestroInstallIosSimulator") {
     group = "verification"
     description = "Build and install the iOS simulator app on the booted Simulator."
-    notCompatibleWithConfigurationCache("Uses xcrun simctl against the currently booted simulator.")
     dependsOn("maestroBuildIosSimulator")
+    val appPath = iosMaestroAppPath
     doFirst {
-        require(iosMaestroAppPath.exists()) {
-            "iOS app not found at ${iosMaestroAppPath.absolutePath}. Run maestroBuildIosSimulator first."
+        require(appPath.exists()) {
+            "iOS app not found at ${appPath.absolutePath}. Run maestroBuildIosSimulator first."
         }
-        commandLine("xcrun", "simctl", "install", "booted", iosMaestroAppPath.absolutePath)
+        commandLine("xcrun", "simctl", "install", "booted", appPath.absolutePath)
     }
 }
 
@@ -574,57 +356,72 @@ tasks.register<Exec>("maestroRunAllIos") {
     group = "verification"
     description = "Install iOS simulator app + run all Maestro flows (Firebase Emulator must be running)."
     dependsOn("maestroInstallIosSimulator")
-    commandLine(
-        buildMaestroCommand(
-            rootDir = rootDir,
-            target = "scripts/maestro/",
-            excludeTags = maestroSetupTags,
-            appId = iosMaestroAppId,
-            platform = "ios",
-            deviceId = iosMaestroDeviceId,
-        ),
-    )
+    val root = repoRoot
+    val excludedTags = maestroSetupTags
+    val appId = iosMaestroAppId
+    val deviceId = iosMaestroDeviceId
+    doFirst {
+        commandLine(
+            MaestroTools.buildMaestroCommand(
+                rootDir = root,
+                target = "scripts/maestro/",
+                excludeTags = excludedTags,
+                appId = appId,
+                platform = "ios",
+                deviceId = deviceId,
+            ),
+        )
+    }
 }
 
 tasks.register<Exec>("maestroRunAllIosJunit") {
     group = "verification"
     description = "Install iOS simulator app, run all flows, write JUnit XML to build/test-results/maestro-ios/maestro-ios-report.xml."
-    notCompatibleWithConfigurationCache("Wires dynamic log streams in doFirst.")
     dependsOn("maestroInstallIosSimulator")
     finalizedBy("allureGenerateMaestroIos")
     isIgnoreExitValue = true
+    val root = repoRoot
+    val reportsDir = maestroIosReportsDir
+    val logsDir = maestroIosLogsDir
+    val debugDir = maestroIosDebugDir
+    val artifactsDir = maestroIosArtifactsDir
+    val junit = maestroIosAllFlowsJunit
+    val allureDir = allureMaestroIosDir
+    val excludedTags = maestroSetupTags
+    val appId = iosMaestroAppId
+    val deviceId = iosMaestroDeviceId
     val stdoutLog = maestroIosLogsDir.resolve("maestroRunAllIosJunit.out.log")
     val stderrLog = maestroIosLogsDir.resolve("maestroRunAllIosJunit.err.log")
     doFirst {
-        maestroIosReportsDir.mkdirs()
-        maestroIosLogsDir.mkdirs()
-        maestroIosDebugDir.mkdirs()
-        maestroIosArtifactsDir.mkdirs()
+        reportsDir.mkdirs()
+        logsDir.mkdirs()
+        debugDir.mkdirs()
+        artifactsDir.mkdirs()
         standardOutput = FileOutputStream(stdoutLog)
         errorOutput = FileOutputStream(stderrLog)
-        logger.lifecycle("[maestro-ios] junit: ${maestroIosAllFlowsJunit.relativeTo(rootProject.projectDir)}")
-        logger.lifecycle("[maestro-ios] logs : ${stdoutLog.relativeTo(rootProject.projectDir)}, ${stderrLog.relativeTo(rootProject.projectDir)}")
+        logger.lifecycle("[maestro-ios] junit: ${junit.relativeTo(root)}")
+        logger.lifecycle("[maestro-ios] logs : ${stdoutLog.relativeTo(root)}, ${stderrLog.relativeTo(root)}")
+        commandLine(
+            MaestroTools.buildMaestroCommand(
+                rootDir = root,
+                target = "scripts/maestro/",
+                junitOutput = junit,
+                excludeTags = excludedTags,
+                appId = appId,
+                platform = "ios",
+                deviceId = deviceId,
+            ),
+        )
     }
-    commandLine(
-        buildMaestroCommand(
-            rootDir = rootDir,
-            target = "scripts/maestro/",
-            junitOutput = maestroIosAllFlowsJunit,
-            excludeTags = maestroSetupTags,
-            appId = iosMaestroAppId,
-            platform = "ios",
-            deviceId = iosMaestroDeviceId,
-        ),
-    )
     doLast {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
-            val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
-            val tail = joinLogTails(stderrLog, stdoutLog)
+            val summary = MaestroTools.summarizeMaestroJunit(junit)
+            val tail = MaestroTools.joinLogTails(root, stderrLog, stdoutLog)
             throw GradleException(
                 buildString {
                     appendLine("maestroRunAllIosJunit failed (exit=$exit). $summary")
-                    appendLine("Allure HTML (always generated): ${allureMaestroIosDir.absolutePath}")
+                    appendLine("Allure HTML (always generated): ${allureDir.absolutePath}")
                     appendLine("Stdout log: ${stdoutLog.absolutePath}")
                     appendLine("Stderr log: ${stderrLog.absolutePath}")
                     appendLine(tail)
@@ -672,9 +469,8 @@ fun firebaseEmulatorWrap(rootDir: File, gradleSubcommand: List<String>): List<St
 tasks.register<Exec>("qaIntegrationDeviceEmulator") {
     group = "verification"
     description = "Wrap firebase emulators:exec around :integration-test:connectedAndroidDeviceTest. Requires a running AVD."
-    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     workingDir = rootDir
-    commandLine(firebaseEmulatorWrap(rootDir, listOf(":integration-test:connectedAndroidDeviceTest")))
+    commandLine(firebaseEmulatorWrap(repoRoot, listOf(":integration-test:connectedAndroidDeviceTest")))
     // Allure runs even on failure — XMLs land at
     // `integration-test/build/outputs/androidTest-results/connected/androidMain/`
     // which `androidDeviceScopeAllureSources` already walks via `resolveXmlDirs`.
@@ -684,7 +480,6 @@ tasks.register<Exec>("qaIntegrationDeviceEmulator") {
 tasks.register<Exec>("qaIntegrationDeviceHermetic") {
     group = "verification"
     description = "Fully hermetic device-IT — boots Firebase emulator + Gradle-Managed AVD, runs :integration-test, tears down."
-    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     workingDir = rootDir
     // Wipe prior test-results so:
     //  1. Gradle's task cache for `integrationAvdAndroidDeviceTest` is invalidated and
@@ -693,17 +488,21 @@ tasks.register<Exec>("qaIntegrationDeviceHermetic") {
     //     manual `connectedAndroidDeviceTest` run on a plugged-in AVD) with the new
     //     `managedDevice/androidmain/integrationAvd/` XMLs — its dedup picks one and
     //     silently drops the other, so a 1-test stale file masks a 2-test fresh run.
-    val testResultsDir = rootProject.file("integration-test/build/outputs/androidTest-results")
-    val managedDeviceExtraDir = rootProject.file("integration-test/build/outputs/managed_device_android_test_additional_output")
+    val testResultsDir: File = rootProject.file("integration-test/build/outputs/androidTest-results")
+    val managedDeviceExtraDir: File =
+        rootProject.file("integration-test/build/outputs/managed_device_android_test_additional_output")
     doFirst {
-        project.delete(testResultsDir, managedDeviceExtraDir)
+        // `File.deleteRecursively()` rather than `project.delete(...)`: a task
+        // action must not hold on to the `Project`.
+        testResultsDir.deleteRecursively()
+        managedDeviceExtraDir.deleteRecursively()
     }
     // `integrationAvdAndroidDeviceTest` is the AGP-generated task for the
     // managed device named `integrationAvd` in integration-test/build.gradle.kts.
     // Naming for KMP `KotlinMultiplatformAndroidLibraryTarget`:
     // `<deviceName>AndroidDeviceTest` (note the extra `Device` vs the AGP-app
     // convention of `<deviceName>AndroidTest`).
-    commandLine(firebaseEmulatorWrap(rootDir, listOf(":integration-test:integrationAvdAndroidDeviceTest")))
+    commandLine(firebaseEmulatorWrap(repoRoot, listOf(":integration-test:integrationAvdAndroidDeviceTest")))
     // Managed-device XMLs land under `build/outputs/androidTest-results/<deviceName>/`
     // (vs. `connected/androidMain/` for plugged-in devices). Both sit under
     // `androidTest-results/` so the depth-4 walk in `resolveXmlDirs` picks them up.
@@ -776,45 +575,19 @@ registerAllureGenerate("allureGenerateMaestroIos", "Maestro iOS", maestroIosAllu
 registerAllureGenerate("allureGenerateFirestore", "Firestore rules (Mocha)", firestoreAllureSources, allureFirestoreDir)
 registerAllureGenerate("allureGenerateAll", "all", allScopeAllureSources, allureAllDir)
 
-/**
- * Writes a minimal `executor.json` + `environment.properties` so
- * `allure generate` always has metadata to render, even when the python
- * converter crashed (malformed JUnit, unreadable attachment, etc.). Called
- * unconditionally in `doLast` of the prep tasks below.
- */
-fun writeAllureFallbackMetadata(outDir: File, scope: String, pipeline: String) {
-    outDir.mkdirs()
-    val executor = outDir.resolve("executor.json")
-    if (!executor.exists()) {
-        executor.writeText(
-            """{"name":"Gradle $scope","type":"local","buildName":"$scope",""" +
-                """"buildUrl":"./gradlew $scope","reportName":"Maestro E2E ($scope)"}""",
-        )
-    }
-    val env = outDir.resolve("environment.properties")
-    if (!env.exists()) {
-        env.writeText(
-            """
-            firebase.project=demo-moneysurfer
-            firebase.mode=emulator
-            qa.scope=$scope
-            qa.pipeline=$pipeline
-            """.trimIndent() + "\n",
-        )
-    }
-}
-
 tasks.register<Exec>("maestroPrepareAllureResults") {
     group = "verification"
     description = "Convert Maestro JUnit + debug artifacts into native Allure results with test steps and screenshots."
-    notCompatibleWithConfigurationCache("Produces dynamic files from test artifacts.")
     // Prep is best-effort: a malformed JUnit or an unreadable attachment must
     // not break the Allure HTML pipeline, otherwise CI uploads an empty report
     // on red runs. We still log the converter's exit code in doLast.
     isIgnoreExitValue = true
+    val allureResultsDir = maestroAllureResultsDir
+    val reportsDir = maestroReportsDir
+    val junit = maestroAllFlowsJunit
     doFirst {
-        maestroAllureResultsDir.mkdirs()
-        maestroReportsDir.mkdirs()
+        allureResultsDir.mkdirs()
+        reportsDir.mkdirs()
     }
     commandLine(
         "python3",
@@ -831,11 +604,11 @@ tasks.register<Exec>("maestroPrepareAllureResults") {
         if (exit != 0) {
             logger.warn(
                 "[maestro] maestro_to_allure.py exited with $exit — Allure will render with " +
-                    "whatever results were already written. JUnit: ${maestroAllFlowsJunit.absolutePath}",
+                    "whatever results were already written. JUnit: ${junit.absolutePath}",
             )
         }
-        writeAllureFallbackMetadata(
-            outDir = maestroAllureResultsDir,
+        AllureTools.writeFallbackMetadata(
+            outDir = allureResultsDir,
             scope = "qaMaestroAndroid",
             pipeline = "maestroPrepareAllureResults -> allureGenerateMaestro",
         )
@@ -849,11 +622,13 @@ tasks.named<Exec>("allureGenerateMaestro") {
 tasks.register<Exec>("maestroPrepareAllureResultsIos") {
     group = "verification"
     description = "Convert iOS Maestro JUnit + debug artifacts into native Allure results with test steps and screenshots."
-    notCompatibleWithConfigurationCache("Produces dynamic files from test artifacts.")
     isIgnoreExitValue = true
+    val allureResultsDir = maestroIosAllureResultsDir
+    val reportsDir = maestroIosReportsDir
+    val junit = maestroIosAllFlowsJunit
     doFirst {
-        maestroIosAllureResultsDir.mkdirs()
-        maestroIosReportsDir.mkdirs()
+        allureResultsDir.mkdirs()
+        reportsDir.mkdirs()
     }
     commandLine(
         "python3",
@@ -870,11 +645,11 @@ tasks.register<Exec>("maestroPrepareAllureResultsIos") {
         if (exit != 0) {
             logger.warn(
                 "[maestro-ios] maestro_to_allure.py exited with $exit — Allure will render with " +
-                    "whatever results were already written. JUnit: ${maestroIosAllFlowsJunit.absolutePath}",
+                    "whatever results were already written. JUnit: ${junit.absolutePath}",
             )
         }
-        writeAllureFallbackMetadata(
-            outDir = maestroIosAllureResultsDir,
+        AllureTools.writeFallbackMetadata(
+            outDir = allureResultsDir,
             scope = "qaMaestroIos",
             pipeline = "maestroPrepareAllureResultsIos -> allureGenerateMaestroIos",
         )
@@ -919,19 +694,20 @@ tasks.register("qaAndroidDevice") {
 tasks.register<Exec>("qaFirestoreRules") {
     group = "verification"
     description = "Run Mocha Firestore-rules tests (boots firestore emulator); writes JUnit XML for Allure into build/test-results/firestore/."
-    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     finalizedBy("allureGenerateFirestore")
     isIgnoreExitValue = true
     workingDir = firestoreTestsDir
+    val reportsDir = firestoreReportsDir
+    val junit = firestoreJunit
     doFirst {
-        firestoreReportsDir.mkdirs()
+        reportsDir.mkdirs()
     }
     commandLine("npm", "run", "test:junit")
     doLast {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
             throw GradleException(
-                "qaFirestoreRules failed (exit=$exit). JUnit: ${firestoreJunit.absolutePath}",
+                "qaFirestoreRules failed (exit=$exit). JUnit: ${junit.absolutePath}",
             )
         }
     }
@@ -946,53 +722,61 @@ tasks.register<Exec>("qaFirestoreRules") {
 tasks.register<Exec>("qaMaestroAndroid") {
     group = "verification"
     description = "Boot Firebase Emulator, seed users, run all Android Maestro flows, generate Allure report."
-    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     dependsOn("maestroInstallDebug")
     finalizedBy("allureGenerateMaestro")
     isIgnoreExitValue = true
     workingDir = rootDir
-    val maestroBin = resolveMaestroExecutable()
-    val flowsDir = rootDir.resolve("scripts/maestro/").absolutePath
+    val flowsDir = repoRoot.resolve("scripts/maestro/").absolutePath
     val reportPath = maestroAllFlowsJunit.absolutePath
     val debugOutputPath = maestroDebugDir.absolutePath
     val testOutputPath = maestroArtifactsDir.absolutePath
     val envArgs = maestroEmulatorEnv.flatMap { (k, v) -> listOf("--env", "$k=$v") }
+    val excludedTags = maestroSetupTags
+    val reportsDir = maestroReportsDir
+    val debugDir = maestroDebugDir
+    val artifactsDir = maestroArtifactsDir
+    val junit = maestroAllFlowsJunit
+    val allureDir = allureMaestroDir
     doFirst {
-        maestroReportsDir.mkdirs()
-        maestroDebugDir.mkdirs()
-        maestroArtifactsDir.mkdirs()
+        reportsDir.mkdirs()
+        debugDir.mkdirs()
+        artifactsDir.mkdirs()
+        // Resolved here, not at configuration time: `File.canExecute()` is not
+        // a tracked configuration-cache input, so a path baked into the cache
+        // entry would survive installing/moving the Maestro CLI.
+        val maestroBin = MaestroTools.resolveMaestroExecutable()
+        commandLine(
+            listOf(
+                "firebase", "emulators:exec",
+                "--project", "demo-moneysurfer",
+                "--only", "auth,firestore",
+            ) + listOf(
+                (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
+                    listOf(
+                        "--format", "junit",
+                        "--output", reportPath,
+                        "--debug-output", debugOutputPath,
+                        "--test-output-dir", testOutputPath,
+                        "--flatten-debug-output",
+                    ) + excludedTags.flatMap { listOf("--exclude-tags", it) } +
+                    listOf(
+                        flowsDir,
+                    ))
+                    .joinToString(" "),
+            ),
+        )
     }
-    commandLine(
-        listOf(
-            "firebase", "emulators:exec",
-            "--project", "demo-moneysurfer",
-            "--only", "auth,firestore",
-        ) + listOf(
-            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
-                listOf(
-                    "--format", "junit",
-                    "--output", reportPath,
-                    "--debug-output", debugOutputPath,
-                    "--test-output-dir", testOutputPath,
-                    "--flatten-debug-output",
-                ) + maestroSetupTags.flatMap { listOf("--exclude-tags", it) } +
-                listOf(
-                    flowsDir,
-                ))
-                .joinToString(" "),
-        ),
-    )
     doLast {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
-            val summary = summarizeMaestroJunit(maestroAllFlowsJunit)
+            val summary = MaestroTools.summarizeMaestroJunit(junit)
             throw GradleException(
                 buildString {
                     appendLine("qaMaestroAndroid failed (exit=$exit). $summary")
-                    appendLine("JUnit         : ${maestroAllFlowsJunit.absolutePath}")
-                    appendLine("Maestro debug : ${maestroDebugDir.absolutePath}")
-                    appendLine("Maestro shots : ${maestroArtifactsDir.absolutePath}")
-                    appendLine("Allure HTML   : ${allureMaestroDir.absolutePath} (generated unconditionally)")
+                    appendLine("JUnit         : ${junit.absolutePath}")
+                    appendLine("Maestro debug : ${debugDir.absolutePath}")
+                    appendLine("Maestro shots : ${artifactsDir.absolutePath}")
+                    appendLine("Allure HTML   : ${allureDir.absolutePath} (generated unconditionally)")
                     append("If JUnit is missing, the failure happened before any flow finished — ")
                     append("inspect the firebase emulators:exec / seed.sh / maestro stdout above.")
                 },
@@ -1023,58 +807,65 @@ tasks.register("qaMaestro") {
 tasks.register<Exec>("qaMaestroIos") {
     group = "verification"
     description = "Boot Firebase Emulator, seed users, run the iOS launch smoke flow, generate Allure report."
-    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     dependsOn("maestroInstallIosSimulator")
     finalizedBy("allureGenerateMaestroIos")
     isIgnoreExitValue = true
     workingDir = rootDir
-    val maestroBin = resolveMaestroExecutable()
-    val flowTarget = rootDir.resolve(iosSmokeFlow).absolutePath
+    val flowTarget = repoRoot.resolve(iosSmokeFlow).absolutePath
     val reportPath = maestroIosAllFlowsJunit.absolutePath
     val debugOutputPath = maestroIosDebugDir.absolutePath
     val testOutputPath = maestroIosArtifactsDir.absolutePath
     val envArgs = maestroIosEmulatorEnv.flatMap { (k, v) -> listOf("--env", "$k=$v") }
+    val deviceId = iosMaestroDeviceId
+    val reportsDir = maestroIosReportsDir
+    val debugDir = maestroIosDebugDir
+    val artifactsDir = maestroIosArtifactsDir
+    val junit = maestroIosAllFlowsJunit
+    val allureDir = allureMaestroIosDir
     doFirst {
-        maestroIosReportsDir.mkdirs()
-        maestroIosDebugDir.mkdirs()
-        maestroIosArtifactsDir.mkdirs()
+        reportsDir.mkdirs()
+        debugDir.mkdirs()
+        artifactsDir.mkdirs()
+        // See qaMaestroAndroid: the CLI path must not be baked into the
+        // configuration-cache entry.
+        val maestroBin = MaestroTools.resolveMaestroExecutable()
+        commandLine(
+            listOf(
+                "firebase", "emulators:exec",
+                "--project", "demo-moneysurfer",
+                "--only", "auth,firestore",
+            ) + listOf(
+                (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
+                    listOf(
+                        "--platform", "ios",
+                    ) + deviceId?.let { listOf("--device", it) }.orEmpty() +
+                    listOf(
+                        "--format", "junit",
+                        "--output", reportPath,
+                        "--debug-output", debugOutputPath,
+                        "--test-output-dir", testOutputPath,
+                        "--flatten-debug-output",
+                    ) +
+                    // No `--exclude-tags`: the target is a single flow file rather
+                    // than the suite directory, so there is nothing to filter out.
+                    listOf(
+                        flowTarget,
+                    ))
+                    .joinToString(" "),
+            ),
+        )
     }
-    commandLine(
-        listOf(
-            "firebase", "emulators:exec",
-            "--project", "demo-moneysurfer",
-            "--only", "auth,firestore",
-        ) + listOf(
-            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
-                listOf(
-                    "--platform", "ios",
-                ) + iosMaestroDeviceId?.let { listOf("--device", it) }.orEmpty() +
-                listOf(
-                    "--format", "junit",
-                    "--output", reportPath,
-                    "--debug-output", debugOutputPath,
-                    "--test-output-dir", testOutputPath,
-                    "--flatten-debug-output",
-                ) +
-                // No `--exclude-tags`: the target is a single flow file rather
-                // than the suite directory, so there is nothing to filter out.
-                listOf(
-                    flowTarget,
-                ))
-                .joinToString(" "),
-        ),
-    )
     doLast {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
-            val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
+            val summary = MaestroTools.summarizeMaestroJunit(junit)
             throw GradleException(
                 buildString {
                     appendLine("qaMaestroIos failed (exit=$exit). $summary")
-                    appendLine("JUnit         : ${maestroIosAllFlowsJunit.absolutePath}")
-                    appendLine("Maestro debug : ${maestroIosDebugDir.absolutePath}")
-                    appendLine("Maestro shots : ${maestroIosArtifactsDir.absolutePath}")
-                    appendLine("Allure HTML   : ${allureMaestroIosDir.absolutePath} (generated unconditionally)")
+                    appendLine("JUnit         : ${junit.absolutePath}")
+                    appendLine("Maestro debug : ${debugDir.absolutePath}")
+                    appendLine("Maestro shots : ${artifactsDir.absolutePath}")
+                    appendLine("Allure HTML   : ${allureDir.absolutePath} (generated unconditionally)")
                     append("If JUnit is missing, the failure happened before any flow finished — ")
                     append("inspect xcodebuild / firebase emulators:exec / maestro stdout above.")
                 },
@@ -1118,37 +909,41 @@ tasks.register("maestroAssembleOfflineDebug") {
 tasks.register<Exec>("maestroInstallOfflineDebug") {
     group = "verification"
     description = "Build the offline debug APK and adb-install it on the connected device/AVD."
-    notCompatibleWithConfigurationCache("Resolves the adb executable and APK path at execution time.")
     dependsOn("maestroAssembleOfflineDebug")
+    val root = repoRoot
+    val apk = offlineDebugApkPath
     doFirst {
-        require(offlineDebugApkPath.exists()) {
-            "Offline debug APK not found at ${offlineDebugApkPath.absolutePath}. " +
+        require(apk.exists()) {
+            "Offline debug APK not found at ${apk.absolutePath}. " +
                 ":androidApp-offline:assembleDebug did not produce its expected output — " +
                 "check the assembleDebug log above."
         }
-        commandLine(resolveAdbExecutable(rootDir), "install", "-r", offlineDebugApkPath.absolutePath)
+        commandLine(MaestroTools.resolveAdbExecutable(root), "install", "-r", apk.absolutePath)
     }
 }
 
 tasks.register<Exec>("qaMaestroOfflineAndroid") {
     group = "verification"
     description = "Install the offline app + run the offline golden Maestro flow on Android (no Firebase emulator)."
-    notCompatibleWithConfigurationCache("Resolves the Maestro executable and flow path at execution time.")
     dependsOn("maestroInstallOfflineDebug")
     workingDir = rootDir
+    val root = repoRoot
+    val reportsDir = maestroReportsDir
+    val junit = maestroOfflineJunit
+    val appId = offlineMaestroAppId
     doFirst {
-        maestroReportsDir.mkdirs()
+        reportsDir.mkdirs()
         commandLine(
-            buildMaestroCommand(
-                rootDir = rootDir,
+            MaestroTools.buildMaestroCommand(
+                rootDir = root,
                 // Target the subdirectory itself: without a workspace config
                 // Maestro only scans top-level flows, so `scripts/maestro/`
                 // never discovers `offline/offline-golden.yaml` and
                 // `--include-tags offline` matches nothing.
                 target = "scripts/maestro/offline/",
-                junitOutput = maestroOfflineJunit,
+                junitOutput = junit,
                 includeTags = listOf("offline"),
-                appId = offlineMaestroAppId,
+                appId = appId,
             ),
         )
     }
@@ -1157,7 +952,6 @@ tasks.register<Exec>("qaMaestroOfflineAndroid") {
 tasks.register<Exec>("maestroBuildIosOfflineSimulator") {
     group = "verification"
     description = "Build the iOS offline Debug simulator app for Maestro E2E tests."
-    notCompatibleWithConfigurationCache("Spawns xcodebuild.")
     workingDir = rootDir
     val simulatorName = providers.gradleProperty("iosSimulatorName").orNull
         ?: System.getenv("IOS_SIMULATOR_NAME")
@@ -1177,38 +971,43 @@ tasks.register<Exec>("maestroBuildIosOfflineSimulator") {
 tasks.register<Exec>("maestroInstallIosOfflineSimulator") {
     group = "verification"
     description = "Build and install the iOS offline simulator app on the booted Simulator."
-    notCompatibleWithConfigurationCache("Uses xcrun simctl against the currently booted simulator.")
     dependsOn("maestroBuildIosOfflineSimulator")
+    val appPath = iosOfflineMaestroAppPath
     doFirst {
-        require(iosOfflineMaestroAppPath.exists()) {
-            "iOS offline app not found at ${iosOfflineMaestroAppPath.absolutePath}. " +
+        require(appPath.exists()) {
+            "iOS offline app not found at ${appPath.absolutePath}. " +
                 "Run maestroBuildIosOfflineSimulator first."
         }
-        commandLine("xcrun", "simctl", "install", "booted", iosOfflineMaestroAppPath.absolutePath)
+        commandLine("xcrun", "simctl", "install", "booted", appPath.absolutePath)
     }
 }
 
 tasks.register<Exec>("qaMaestroOfflineIos") {
     group = "verification"
     description = "Install the offline app + run the launch smoke Maestro flow on the booted iOS Simulator."
-    notCompatibleWithConfigurationCache("Resolves the Maestro executable and flow path at execution time.")
     dependsOn("maestroInstallIosOfflineSimulator")
     workingDir = rootDir
+    val root = repoRoot
+    val reportsDir = maestroIosReportsDir
+    val junit = maestroOfflineIosJunit
+    val appId = offlineMaestroAppId
+    val smokeFlow = iosSmokeFlow
+    val deviceId = iosMaestroDeviceId
     doFirst {
-        maestroIosReportsDir.mkdirs()
+        reportsDir.mkdirs()
         commandLine(
-            buildMaestroCommand(
-                rootDir = rootDir,
+            MaestroTools.buildMaestroCommand(
+                rootDir = root,
                 // Launch smoke instead of the offline golden path while the iOS
                 // lanes are cut back (#297) — the golden flow still runs on
                 // Android via `qaMaestroOfflineAndroid`. Single-file target, so
                 // no `--include-tags offline` filter is needed; the flow picks up
                 // the offline bundle id from `APP_ID` below.
-                target = iosSmokeFlow,
-                junitOutput = maestroOfflineIosJunit,
-                appId = offlineMaestroAppId,
+                target = smokeFlow,
+                junitOutput = junit,
+                appId = appId,
                 platform = "ios",
-                deviceId = iosMaestroDeviceId,
+                deviceId = deviceId,
             ),
         )
     }

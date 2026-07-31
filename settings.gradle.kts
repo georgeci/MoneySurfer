@@ -39,6 +39,13 @@ dependencyResolutionManagement {
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    // Never applied — declared here purely so `MaestroTools` / `AllureTools`
+    // from `build-logic/qa-tools` are on the settings classloader scope, which
+    // is an ancestor of every build script *and* of the script plugins applied
+    // with `apply(from = ...)`. `gradle/qa.gradle.kts` needs them; a plugin
+    // declared in the root build script's own `plugins { }` block would come
+    // too late for a script plugin that script applies.
+    id("ms.qa-tools") apply false
 }
 
 include(":androidApp")

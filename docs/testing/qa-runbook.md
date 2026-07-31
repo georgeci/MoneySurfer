@@ -9,6 +9,7 @@
 - [Firebase bootstrap (emulator)](#firebase-bootstrap-emulator)
 - [Filling a debug build with data](#filling-a-debug-build-with-data)
 - [QA tasks](#qa-tasks)
+  - [Configuration cache](#configuration-cache)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
   - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
 - [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
@@ -152,6 +153,25 @@ The common and Android-host aggregates discover test owners from
 `commonTest`, `jvmTest`, and `androidHostTest` source directories rather than a
 maintained module list. Adding one of those source sets is therefore enough to
 join the corresponding aggregate.
+
+### Configuration cache
+
+Every QA task is configuration-cache compatible — no
+`notCompatibleWithConfigurationCache(...)` opt-outs, no discarded entries. Two
+rules keep it that way when you add or edit a task in
+[`gradle/qa.gradle.kts`](../../gradle/qa.gradle.kts):
+
+- **Helpers go in `build-logic/qa-tools`** (`MaestroTools`, `AllureTools`), not
+  in the script. A `doFirst` / `doLast` that calls a script-level function
+  captures the compiled script instance, which cannot be serialized.
+- **Actions capture values, not the build model.** Copy script-level `val`s into
+  locals inside the task's configuration block and use those; never touch
+  `project`, `rootProject` or `rootDir` from inside an action (use the captured
+  `repoRoot`, and `File.deleteRecursively()` instead of `project.delete(...)`).
+
+Spawning subprocesses (`adb`, `maestro`, `xcodebuild`, `firebase emulators:exec`,
+a nested `./gradlew`) from a task action is fine — only *configuration-time*
+work has to be cacheable.
 
 ## Plain test/Maestro tasks (no Allure)
 
