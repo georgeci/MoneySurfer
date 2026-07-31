@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard.screenshot
 
+import com.georgeci.moneysurfer.domain.model.DayPart
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.feature.dashboard.AccountUi
@@ -87,7 +88,7 @@ class DashboardScreenshotTest {
         formattedTotalBalance = "€11,575.32",
         workspaceName = "Household budget",
         workspaceInitial = "H",
-        greeting = "Good evening",
+        greeting = DayPart.Evening,
         formattedTrendDelta = "+€412",
         balanceSeries = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f),
         transferEnabled = true,
