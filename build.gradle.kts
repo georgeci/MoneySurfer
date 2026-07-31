@@ -173,6 +173,21 @@ allprojects {
 //
 // This list is a TODO, not a target state: as a module gains tests, add it to
 // `kover(...)` and delete it from here.
+// Individual files that install process-global platform state, so no test can execute them —
+// the Sonar-side twin of the `kover { reports { filters { excludes { classes(...) } } } }` block
+// near the bottom of this file. Both are needed: Kover keeps them out of the merged report, and
+// without the Sonar exclusion too a file absent from that report simply scores 0% against
+// "Coverage on New Code" (the lesson of #424).
+//
+// This is for code that *cannot* be executed, never for code that is merely untested. Prefer
+// moving the untestable install into its own file, as `DesktopFirebaseInitializer.jvm.kt` does,
+// so excluding it does not also hide the tested logic it sits next to.
+val uncoverableSources = mapOf(
+    ":data-remote" to listOf(
+        "src/jvmMain/kotlin/com/georgeci/moneysurfer/data/remote/DesktopFirebaseInitializer.jvm.kt",
+    ),
+)
+
 val coverageExcludedProjects = setOf(
     ":shared",
     ":sync:no-op",
@@ -300,7 +315,8 @@ subprojects {
             // the day a module starts using one.
             val coverageExclusions = when {
                 path in coverageExcludedProjects -> listOf("**/*")
-                else -> mainDirs.filter { it.startsWith("src/ios") }.map { "$it/**/*" }
+                else -> mainDirs.filter { it.startsWith("src/ios") }.map { "$it/**/*" } +
+                    uncoverableSources.getOrDefault(path, emptyList())
             }
             if (coverageExclusions.isNotEmpty()) {
                 property("sonar.coverage.exclusions", coverageExclusions.joinToString(","))
@@ -388,6 +404,13 @@ kover {
                 // Desktop entry point: `fun main()` in composeApp/src/jvmMain — starts the
                 // real application window, so no test can call it.
                 classes("com.georgeci.moneysurfer.MainKt")
+                // Desktop Firebase install: sets the process-global `FirebasePlatform` and the
+                // default `FirebaseApp`, which a test can neither install nor undo. It lives in
+                // its own file precisely so this exclusion is honest — everything it decides
+                // (project selection, credentials, the store, App Check) sits in
+                // `FirebaseBootstrap.jvm.kt` / `DesktopAppCheck.jvm.kt` and stays measured.
+                // Keep the Sonar twin in `uncoverableSources` below in sync with this.
+                classes("com.georgeci.moneysurfer.data.remote.DesktopFirebaseInitializer_jvmKt")
             }
         }
     }

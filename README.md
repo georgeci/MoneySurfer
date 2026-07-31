@@ -110,9 +110,11 @@ To build for Android or iOS:
    `firebase deploy --only firestore`.
 5. Restrict your API keys in
    [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   by Android `applicationId` + SHA-1 / iOS Bundle ID, and enable
-   [App Check](https://firebase.google.com/docs/app-check) before shipping a
-   real release.
+   by Android `applicationId` + SHA-1 / iOS Bundle ID.
+6. Register App Check providers and debug tokens for your project — the clients
+   are already wired, only the console side is per-project. Enforcement must stay
+   off until your released clients are attesting; see
+   [docs/security/app-check.md](docs/security/app-check.md).
 
 For local development and tests you can skip the real project entirely and
 use the Firebase Emulator Suite — see

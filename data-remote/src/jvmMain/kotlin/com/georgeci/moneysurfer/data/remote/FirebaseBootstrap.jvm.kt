@@ -1,63 +1,12 @@
 package com.georgeci.moneysurfer.data.remote
 
-import android.app.Application
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.domain.storage.appDataDir
 import com.google.firebase.FirebasePlatform
-import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.initialize
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.Properties
-
-/**
- * Initializes the default `FirebaseApp` for the desktop (JVM) host.
- *
- * Android gets this for free from `google-services.json` + the Google Services
- * plugin, and iOS from `GoogleService-Info.plist` via `FirebaseApp.configure()`
- * ([iosApp/iosApp/iOSApp.swift](../../../../../../../../iosApp/iosApp/iOSApp.swift)).
- * The JVM has neither, so the default app has to be built by hand — without it
- * the first `Firebase.firestore` read inside Koin fails the whole graph with
- * "Default FirebaseApp is not initialized in this process".
- *
- * Must run **before** `initKoin`: `RemoteDataModule` resolves `Firebase.firestore`
- * / `Firebase.auth` lazily, but the first resolution happens while the app graph
- * is being built.
- *
- * Two option sources, mirroring the iOS host:
- * - Emulator runs (`MS_USE_EMULATOR=true`) use demo-project options — no
- *   credentials needed, the `demo-` project prefix puts the Firebase tooling in
- *   demo mode. The project id follows `FIREBASE_PROJECT_ID` when set, matching
- *   the `scripts/firebase` entry points. This is the documented desktop flow,
- *   see [docs/testing/firebase-emulator.md](../../../../../../../../docs/testing/firebase-emulator.md).
- * - Everything else reads `MS_FIREBASE_APP_ID` / `MS_FIREBASE_API_KEY` /
- *   `MS_FIREBASE_PROJECT_ID` from the environment. Desktop is a developer-only
- *   host with no shipped release, so real project credentials stay out of the
- *   repo (`google-services.json` is git-ignored) and are supplied per developer.
- *
- * Idempotent — a second call is a no-op.
- */
-fun initializeDesktopFirebase() {
-    if (initialized) return
-    // The platform hook has to be installed before any FirebaseApp work: the java-sdk routes all
-    // persistence (installation ids, auth tokens) and logging through it and has no default.
-    FirebasePlatform.initializeFirebasePlatform(
-        DesktopFirebasePlatform(File(appDataDir(), STORE_FILE_NAME)),
-    )
-    // `android.app.Application` here is the stub shipped *by* `firebase-java-sdk`, not the real
-    // Android class. gitlive's JVM artifacts are Android sources repackaged, so they cast this
-    // argument to Android types and the java-sdk supplies JVM-side stand-ins. It has to be
-    // `Application`, not its `Context` supertype: Firestore's ComponentProvider casts down to
-    // `Application` to register lifecycle callbacks, and a plain `Context` panics its async
-    // queue with a ClassCastException on the first read.
-    Firebase.initialize(Application(), desktopFirebaseOptions())
-    initialized = true
-}
-
-@Volatile
-private var initialized = false
 
 /**
  * Which Firebase project this host talks to. [useEmulator] and [env] are parameters
@@ -173,8 +122,6 @@ internal class DesktopFirebasePlatform(private val storeFile: File) : FirebasePl
         const val TAG = "DesktopFirebase"
     }
 }
-
-private const val STORE_FILE_NAME = "firebase.properties"
 
 /**
  * Shared emulator project id — keep in sync with

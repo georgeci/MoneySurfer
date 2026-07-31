@@ -106,6 +106,7 @@
 				F1A00000A333333333333333 /* FirebaseFirestore */,
 				F1A00000A444444444444444 /* FirebaseAuth */,
 				F1A00000A555555555555555 /* FirebaseCrashlytics */,
+				F1A00000A666666666666666 /* FirebaseAppCheck */,
 			);
 			productName = iosApp;
 			productReference = 66EE562EB3C06377DC657E21 /* MoneySurfer.app */;
@@ -482,6 +483,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F1A00000B111111111111111 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		F1A00000A666666666666666 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1A00000B111111111111111 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

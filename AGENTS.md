@@ -242,6 +242,10 @@ Rules for this table:
 - A host key is only the *build* term. `SyncSettings.isEnabled` also ands in a server kill
   switch and a user toggle, so flipping the build term on is what makes the other two
   reachable — not what forces sync on.
+- **App Check is deliberately not in this table.** Its clients ship enabled on every host,
+  and the switch that decides whether unverified callers are rejected lives in the Firebase
+  console per project, not in any Build-layer key — so there is nothing here to flip and
+  nothing to grep for. See [docs/security/app-check.md](docs/security/app-check.md).
 - The server term is **live** in the online build since issue #333: setting
   `sync.remote_enabled: false` in the `appConfig/flags` Firestore document turns sync off on
   every online install at its next launch or foreground return, with no release. Only keys
