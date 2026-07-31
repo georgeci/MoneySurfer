@@ -211,8 +211,11 @@ val entryPointSources = mapOf(
 // compiles it, rather than for the whole build.
 val screenshotHarnessProjects = setOf(
     ":uikit",
+    ":feature:account",
+    ":feature:category",
     ":feature:dashboard",
     ":feature:login",
+    ":feature:transaction",
 )
 
 subprojects {
