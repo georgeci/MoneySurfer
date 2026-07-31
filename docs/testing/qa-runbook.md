@@ -178,6 +178,31 @@ iOS defaults to simulator name `iPhone 17`. Override with
 `-PiosSimulatorName="<name>"`; pass `-PiosSimulatorUdid=<udid>` when multiple
 simulators are visible to Maestro.
 
+### Picking an Android device
+
+With exactly one AVD or phone attached, nothing needs saying — `adb` and
+`maestro test` each pick the only target. With **both** attached, the install
+step dies on `adb: more than one device/emulator` and Maestro may drive the
+wrong one. Pass the serial from `adb devices`:
+
+```bash
+./gradlew qaMaestroOfflineAndroid -PandroidDeviceSerial=emulator-5554
+```
+
+`ANDROID_SERIAL` is honoured as a fallback, but it is **not** sufficient on its
+own: it steers `adb`, and Maestro does not read it. The Gradle property (or env
+var) feeds both sides — `adb -s <serial> install` and `maestro test --device
+<serial>` — and applies to every Android Maestro task (`maestroInstallDebug`,
+`maestroInstallOfflineDebug`, `maestroRunAll*`, `maestroRunOne*`,
+`qaMaestroAndroid`, `qaMaestroOfflineAndroid`). It is the Android mirror of
+`-PiosSimulatorUdid`.
+
+Pick an **AVD** serial for the online lanes. `defaultEmulatorHost()` is hardcoded
+to `10.0.2.2` — the AVD-only alias for the host machine — so an app pointed at a
+physical phone cannot reach the host Firebase Emulator, and every flow fails at
+sign-in with opaque network errors. A phone serial is fine for
+`qaMaestroOfflineAndroid`, which makes no network calls at all.
+
 ### iOS scope: launch smoke only (issue #297)
 
 The iOS E2E suites were non-deterministically red, so the two iOS entry points

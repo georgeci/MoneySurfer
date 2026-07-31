@@ -254,6 +254,41 @@ val maestroEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to androi
 val maestroIosEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to iosMaestroAppId)
 val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
     ?: System.getenv("IOS_SIMULATOR_UDID")
+
+/**
+ * Serial of the Android device/AVD that the Android Maestro lane should drive —
+ * `-PandroidDeviceSerial=<serial>` or the `ANDROID_SERIAL` env var. The mirror
+ * of `-PiosSimulatorUdid` / `IOS_SIMULATOR_UDID` above.
+ *
+ * Absent is the normal single-target case: `adb` and `maestro test` each pick
+ * the only thing attached. With an AVD *and* a phone plugged in, `adb install`
+ * aborts with "more than one device/emulator" and `maestro test` may drive the
+ * wrong target — so the serial has to reach both sides. `ANDROID_SERIAL` on its
+ * own only covers adb; Maestro does not read it.
+ *
+ * Handed out as a `Provider` (rather than a resolved `String?` like the iOS one)
+ * so tasks that build their `commandLine` in `doFirst` capture the serial in the
+ * configuration block instead of reading it back out of the script at execution
+ * time. That is only a local tidiness win: the Android Maestro tasks are *not*
+ * configuration-cache clean — they still call `resolveAdbExecutable` /
+ * `buildMaestroCommand` from their actions, hence the
+ * `notCompatibleWithConfigurationCache` opt-out each of them carries.
+ *
+ * Blank is filtered out on each source *before* the fallback, so a script that
+ * expands an unset variable into `-PandroidDeviceSerial=` still falls through to
+ * `ANDROID_SERIAL` rather than silently selecting nothing.
+ */
+fun androidMaestroDeviceId(): Provider<String> {
+    val nonBlank: (Provider<String>) -> Provider<String> = { source ->
+        source.map { it.trim() }.filter { it.isNotEmpty() }
+    }
+    return nonBlank(providers.gradleProperty("androidDeviceSerial"))
+        .orElse(nonBlank(providers.environmentVariable("ANDROID_SERIAL")))
+}
+
+/** `-s <serial>` for `adb`, or nothing at all when no serial was given. */
+fun androidMaestroAdbTargetArgs(): Provider<List<String>> =
+    androidMaestroDeviceId().map { listOf("-s", it) }.orElse(emptyList())
 // Tags kept out of the default (online) Maestro suites:
 //  - `setup`   : reusable login fragment, not a standalone flow.
 //  - `offline` : offline-build golden path — different appId, no Firebase
@@ -422,13 +457,17 @@ tasks.register<Exec>("maestroInstallDebug") {
     // helpers), same as the maestroRun* tasks below — not config-cache safe.
     notCompatibleWithConfigurationCache("Resolves adb + install args at execution time.")
     dependsOn("maestroAssembleDebug")
+    val adbTargetArgs = androidMaestroAdbTargetArgs()
     doFirst {
         require(debugApkPath.exists()) {
             "Debug APK not found at ${debugApkPath.absolutePath}. " +
                 ":androidApp:assembleDebug -PuseEmulator=true did not produce its expected output — " +
                 "check the assembleDebug log above (DEV signing, processDebugGoogleServices, USE_EMULATOR=true)."
         }
-        commandLine(resolveAdbExecutable(rootDir), "install", "-r", debugApkPath.absolutePath)
+        commandLine(
+            listOf(resolveAdbExecutable(rootDir)) + adbTargetArgs.get() +
+                listOf("install", "-r", debugApkPath.absolutePath),
+        )
     }
 }
 
@@ -436,7 +475,14 @@ tasks.register<Exec>("maestroRunAll") {
     group = "verification"
     description = "Install APK + run all Maestro flows (Firebase Emulator must be running)."
     dependsOn("maestroInstallDebug")
-    commandLine(buildMaestroCommand(rootDir, "scripts/maestro/", excludeTags = maestroSetupTags))
+    commandLine(
+        buildMaestroCommand(
+            rootDir,
+            "scripts/maestro/",
+            excludeTags = maestroSetupTags,
+            deviceId = androidMaestroDeviceId().orNull,
+        ),
+    )
 }
 
 tasks.register("maestroRunAllAndroid") {
@@ -450,9 +496,10 @@ tasks.register<Exec>("maestroRunOne") {
     description = "Install APK + run one Maestro flow (Firebase Emulator must be running). Pass -PmaestroFlow=05_sign_out.yaml."
     notCompatibleWithConfigurationCache("Flow path is resolved dynamically at execution time.")
     dependsOn("maestroInstallDebug")
+    val deviceId = androidMaestroDeviceId()
     doFirst {
         val flow = resolveMaestroFlow(providers.gradleProperty("maestroFlow").orNull)
-        commandLine(buildMaestroCommand(rootDir, flow))
+        commandLine(buildMaestroCommand(rootDir, flow, deviceId = deviceId.orNull))
     }
 }
 
@@ -481,7 +528,15 @@ tasks.register<Exec>("maestroRunAllJunit") {
         logger.lifecycle("[maestro] junit: ${maestroAllFlowsJunit.relativeTo(rootProject.projectDir)}")
         logger.lifecycle("[maestro] logs : ${stdoutLog.relativeTo(rootProject.projectDir)}, ${stderrLog.relativeTo(rootProject.projectDir)}")
     }
-    commandLine(buildMaestroCommand(rootDir, "scripts/maestro/", maestroAllFlowsJunit, excludeTags = maestroSetupTags))
+    commandLine(
+        buildMaestroCommand(
+            rootDir,
+            "scripts/maestro/",
+            maestroAllFlowsJunit,
+            excludeTags = maestroSetupTags,
+            deviceId = androidMaestroDeviceId().orNull,
+        ),
+    )
     doLast {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
@@ -512,6 +567,7 @@ tasks.register<Exec>("maestroRunOneJunit") {
     notCompatibleWithConfigurationCache("Flow path is resolved dynamically at execution time.")
     dependsOn("maestroInstallDebug")
     finalizedBy("allureGenerateMaestro")
+    val deviceId = androidMaestroDeviceId()
     doFirst {
         maestroReportsDir.mkdirs()
         maestroDebugDir.mkdirs()
@@ -519,7 +575,7 @@ tasks.register<Exec>("maestroRunOneJunit") {
         val flow = resolveMaestroFlow(providers.gradleProperty("maestroFlow").orNull)
         val flowName = flow.substringAfterLast('/').substringBeforeLast('.')
         val reportFile = maestroReportsDir.resolve("maestro-$flowName.xml")
-        commandLine(buildMaestroCommand(rootDir, flow, reportFile))
+        commandLine(buildMaestroCommand(rootDir, flow, reportFile, deviceId = deviceId.orNull))
     }
 }
 
@@ -957,6 +1013,7 @@ tasks.register<Exec>("qaMaestroAndroid") {
     val debugOutputPath = maestroDebugDir.absolutePath
     val testOutputPath = maestroArtifactsDir.absolutePath
     val envArgs = maestroEmulatorEnv.flatMap { (k, v) -> listOf("--env", "$k=$v") }
+    val deviceArgs = androidMaestroDeviceId().orNull?.let { listOf("--device", it) }.orEmpty()
     doFirst {
         maestroReportsDir.mkdirs()
         maestroDebugDir.mkdirs()
@@ -968,7 +1025,7 @@ tasks.register<Exec>("qaMaestroAndroid") {
             "--project", "demo-moneysurfer",
             "--only", "auth,firestore",
         ) + listOf(
-            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
+            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs + deviceArgs +
                 listOf(
                     "--format", "junit",
                     "--output", reportPath,
@@ -1120,13 +1177,17 @@ tasks.register<Exec>("maestroInstallOfflineDebug") {
     description = "Build the offline debug APK and adb-install it on the connected device/AVD."
     notCompatibleWithConfigurationCache("Resolves the adb executable and APK path at execution time.")
     dependsOn("maestroAssembleOfflineDebug")
+    val adbTargetArgs = androidMaestroAdbTargetArgs()
     doFirst {
         require(offlineDebugApkPath.exists()) {
             "Offline debug APK not found at ${offlineDebugApkPath.absolutePath}. " +
                 ":androidApp-offline:assembleDebug did not produce its expected output — " +
                 "check the assembleDebug log above."
         }
-        commandLine(resolveAdbExecutable(rootDir), "install", "-r", offlineDebugApkPath.absolutePath)
+        commandLine(
+            listOf(resolveAdbExecutable(rootDir)) + adbTargetArgs.get() +
+                listOf("install", "-r", offlineDebugApkPath.absolutePath),
+        )
     }
 }
 
@@ -1136,6 +1197,7 @@ tasks.register<Exec>("qaMaestroOfflineAndroid") {
     notCompatibleWithConfigurationCache("Resolves the Maestro executable and flow path at execution time.")
     dependsOn("maestroInstallOfflineDebug")
     workingDir = rootDir
+    val deviceId = androidMaestroDeviceId()
     doFirst {
         maestroReportsDir.mkdirs()
         commandLine(
@@ -1149,6 +1211,7 @@ tasks.register<Exec>("qaMaestroOfflineAndroid") {
                 junitOutput = maestroOfflineJunit,
                 includeTags = listOf("offline"),
                 appId = offlineMaestroAppId,
+                deviceId = deviceId.orNull,
             ),
         )
     }
