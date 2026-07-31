@@ -72,6 +72,7 @@ kotlin {
                 implementation(projects.feature.category)
                 implementation(projects.feature.dashboard)
                 implementation(projects.feature.goal)
+                implementation(projects.feature.insights)
                 implementation(projects.feature.login)
                 implementation(projects.feature.settings)
                 implementation(projects.feature.transaction)

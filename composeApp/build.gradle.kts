@@ -87,6 +87,9 @@ kotlin {
             implementation(projects.feature.budget)
             // DebugConfigScreenStateTest mounts the QA configuration panel's stateless content.
             implementation(projects.feature.settings)
+            // InsightsScreenTest mounts the analytics screen's stateless content — the only cover
+            // the screen, its period pager and the shared bar-column charts get.
+            implementation(projects.feature.insights)
             // SyncScreenStateTest feeds the sync panel real outbox rows and cursors.
             implementation(projects.sync.api)
             // GlobalErrorBoundaryTest drives the real boundary component and the real

@@ -76,7 +76,7 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
 }
 
 /**
- * Canned spend rollups. The three seeded queries are shaped by what their callers need to assert:
+ * Canned spend rollups. The seeded queries are shaped by what their callers need to assert:
  *
  * - [byCategory] answers from [slicesByWindow], keyed by the scope's window, because the insight
  *   rules ask it twice with two different windows and the whole point of the assertion is that the
@@ -92,15 +92,23 @@ class FakeRecurringRuleRepository(seed: List<RecurringRule> = emptyList()) : Rec
  *   caller reading *part* of a month needs: the spent-this-month card compares 1..20 April against
  *   1..20 March, and a month-granular seed cannot tell those two from the whole months. A window
  *   the map does not carry falls through to [nets].
+ * - [topMerchants] and [excludedByCurrency] answer from one flat seed each and ignore the window:
+ *   their callers assert on the recorded scope instead, which keeps a spec from having to spell out
+ *   a window twice to say "these rows came back for it". [topMerchants] does honour the row limit,
+ *   because that is a number its caller chooses.
  *
- * All three record the scopes they were asked for; the remaining queries return nothing, since
- * nothing reads them yet.
+ * Every query records the scopes it was asked for, in call order.
  */
 class FakeSpendAnalyticsRepository(
     private val slicesByWindow: Map<TransactionPeriodWindow, List<CategorySpendSlice>> = emptyMap(),
     daily: List<DailySpendPoint> = emptyList(),
     private val nets: List<MonthlyNet> = emptyList(),
     private val monthlyNetsByWindow: Map<TransactionPeriodWindow, List<MonthlyNet>> = emptyMap(),
+    // Named apart from the queries they seed, as `nets` already is: a body reading
+    // `flowOf(topMerchants)` inside `override fun topMerchants(...)` resolves to the seed, but
+    // nobody should have to check.
+    private val merchants: List<MerchantSpend> = emptyList(),
+    private val excluded: List<CurrencyTotal> = emptyList(),
 ) : SpendAnalyticsRepository {
 
     private val dailyPoints = MutableStateFlow(daily)
@@ -113,6 +121,9 @@ class FakeSpendAnalyticsRepository(
 
     /** The same record for [netByMonth] — the windows it is asked for are worth asserting on. */
     val netByMonthScopes: MutableList<SpendScope> = mutableListOf()
+
+    /** The same record for [topMerchants], paired with the row limit each call asked for. */
+    val topMerchantsScopes: MutableList<Pair<SpendScope, Int>> = mutableListOf()
 
     fun setDaily(points: List<DailySpendPoint>) {
         dailyPoints.value = points
@@ -139,8 +150,10 @@ class FakeSpendAnalyticsRepository(
         }
     }
 
-    override fun topMerchants(scope: SpendScope, limit: Int): Flow<List<MerchantSpend>> =
-        flowOf(emptyList())
+    override fun topMerchants(scope: SpendScope, limit: Int): Flow<List<MerchantSpend>> {
+        topMerchantsScopes += scope to limit
+        return flowOf(merchants.take(limit))
+    }
 
-    override fun excludedByCurrency(scope: SpendScope): Flow<List<CurrencyTotal>> = flowOf(emptyList())
+    override fun excludedByCurrency(scope: SpendScope): Flow<List<CurrencyTotal>> = flowOf(excluded)
 }

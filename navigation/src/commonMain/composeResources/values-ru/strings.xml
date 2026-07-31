@@ -2,6 +2,7 @@
     <string name="nav_dashboard">Главная</string>
     <string name="nav_transactions">Операции</string>
     <string name="nav_accounts">Счета</string>
+    <string name="nav_insights">Аналитика</string>
     <string name="nav_budgets">Бюджеты</string>
     <string name="nav_goals">Цели</string>
     <string name="nav_categories">Категории</string>
