@@ -18,10 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -121,12 +119,14 @@ fun AppNavGraph(
     val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()
     // The launch decision lands in a `LaunchedEffect`, i.e. one frame *after* the composition that
     // first sees a non-null `targetRoute`. Without this flag that frame renders the back stack's
-    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding.
-    var launchRouteApplied by remember { mutableStateOf(false) }
+    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding. It is
+    // held by the view model, not this composition: a configuration change restores the back stack
+    // but rebuilds the composition, and a flag that reset there would replay the splash.
+    val launchRouteApplied by appLaunchViewModel.launchRouteApplied.collectAsStateWithLifecycle()
     LaunchedEffect(targetRoute) {
         val route = targetRoute ?: return@LaunchedEffect
         if (backStack.lastOrNull() != route) navigator.resetTo(route)
-        launchRouteApplied = true
+        appLaunchViewModel.onRouteApplied(route)
     }
 
     // Server-owned flags, pulled here rather than from the view model's `init` because this is the
