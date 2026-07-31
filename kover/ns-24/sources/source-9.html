@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PaletteSource</title>
+  <title>MoneySurfer Coverage Report > AppVersionStatus</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: PaletteSource (com.georgeci.moneysurfer.domain.preferences)</h1>
+<h1>Coverage Summary for Class: AppVersionStatus (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">PaletteSource$Brand</td>
+    <td class="name">AppVersionStatus$Supported</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -74,7 +74,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
   </tr>
   <tr>
-    <td class="name">PaletteSource$Companion</td>
+    <td class="name">AppVersionStatus$Unsupported</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -97,40 +97,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (7/7)
   </span>
 </td>
   </tr>
   <tr>
-    <td class="name">PaletteSource$Dynamic</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">PaletteSource$Preset</td>
+    <td class="name">AppVersionStatus$UpdateAvailable</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -164,7 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (3/3)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -173,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -181,7 +153,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (16/16)
   </span>
 </td>
 </tr>
@@ -192,24 +164,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
 &nbsp;/**
-&nbsp; * Source of the active accent colour for the Material 3 theme.
+&nbsp; * Result of comparing the local build against the remote app-version gate.
 &nbsp; *
-&nbsp; * - [Brand]: app&#39;s static brand palette (no seed, uses tokens from `uikit`).
-&nbsp; * - [Preset]: one of the predefined accent seeds shipped with the app.
-&nbsp; *             The full scheme is generated from the seed via HCT.
-&nbsp; * - [Dynamic]: derived from the OS wallpaper (Android 12+ Material You).
+&nbsp; * - [Supported] — version is current or newer than `latestAppVersionCode`.
+&nbsp; * - [UpdateAvailable] — soft prompt; sync still allowed.
+&nbsp; * - [Unsupported] — hard block; sync and write-usecases must refuse.
+&nbsp; *
+&nbsp; * See block.md.
 &nbsp; */
-&nbsp;sealed interface PaletteSource {
-<b class="fc">&nbsp;    data object Brand : PaletteSource</b>
-<b class="fc">&nbsp;    data class Preset(val seed: AccentSeed) : PaletteSource</b>
-<b class="fc">&nbsp;    data object Dynamic : PaletteSource</b>
+&nbsp;sealed interface AppVersionStatus {
 &nbsp;
-&nbsp;    companion object {
-<b class="fc">&nbsp;        val DEFAULT: PaletteSource = Brand</b>
-&nbsp;    }
+<b class="fc">&nbsp;    data object Supported : AppVersionStatus</b>
+&nbsp;
+<b class="fc">&nbsp;    data class UpdateAvailable(val message: String?) : AppVersionStatus</b>
+&nbsp;
+<b class="fc">&nbsp;    data class Unsupported(val message: String) : AppVersionStatus</b>
 &nbsp;}
 </code>
 </pre>
@@ -234,7 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

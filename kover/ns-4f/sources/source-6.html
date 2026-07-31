@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteUserAccountViewModel</title>
+  <title>MoneySurfer Coverage Report > LicensesEffect</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.about.licenses</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteUserAccountViewModel (com.georgeci.moneysurfer.feature.settings.account)</h1>
+<h1>Coverage Summary for Class: LicensesEffect (com.georgeci.moneysurfer.feature.settings.about.licenses)</h1>
 
 <table class="coverageStats">
 
@@ -45,73 +45,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">DeleteUserAccountViewModel</td>
-<td class="coverageStat">
-  <span class="percent">
-    71.4%
-  </span>
-  <span class="absValue">
-    (5/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    72.7%
-  </span>
-  <span class="absValue">
-    (16/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    85.7%
-  </span>
-  <span class="absValue">
-    (24/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    76.8%
-  </span>
-  <span class="absValue">
-    (152/198)
-  </span>
-</td>
-</tr>
   <tr>
-    <td class="name">DeleteUserAccountViewModel$deleteAccount$3</td>
+    <td class="name">LicensesEffect$NavigateBack</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (62/62)
+    (0/2)
   </span>
 </td>
   </tr>
@@ -119,34 +77,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    0%
   </span>
   <span class="absValue">
-    (6/8)
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    0%
   </span>
   <span class="absValue">
-    (18/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.2%
-  </span>
-  <span class="absValue">
-    (30/34)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    82.3%
-  </span>
-  <span class="absValue">
-    (214/260)
+    (0/2)
   </span>
 </td>
 </tr>
@@ -157,118 +108,198 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.about.licenses
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.DeleteUserAccountUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlinx.serialization.json.Json
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import org.jetbrains.compose.resources.ExperimentalResourceApi
 &nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * User-account deletion flow (issue #213), online builds only — the Settings entry point is
-&nbsp; * hidden offline. Email/password sessions must retype their password (doubles as the Firebase
-&nbsp; * re-auth credential); anonymous sessions go straight to the confirmation dialog.
-&nbsp; *
-&nbsp; * On success no navigation is posted: the use case clears the session user pointer and
-&nbsp; * AppLaunchViewModel bounces the whole app to SignIn.
+&nbsp; * Lists the third-party libraries bundled with the app together with their
+&nbsp; * licenses. The data comes from `files/aboutlibraries.json`, generated by the
+&nbsp; * AboutLibraries Gradle plugin (`./gradlew :shared:exportLibraryDefinitions`).
 &nbsp; */
-<b class="fc">&nbsp;@KoinViewModel</b>
-&nbsp;class DeleteUserAccountViewModel(
-<b class="fc">&nbsp;    private val deleteUserAccount: DeleteUserAccountUseCase,</b>
-&nbsp;    authRemoteRepository: AuthRemoteRepository,
-&nbsp;) : MviViewModel&lt;DeleteUserAccountState, DeleteUserAccountEvent, DeleteUserAccountEffect&gt;(
-<b class="fc">&nbsp;    initialState = DeleteUserAccountState(</b>
-<b class="fc">&nbsp;        isAnonymousUser = authRemoteRepository.isCurrentUserAnonymous(),</b>
-<b class="fc">&nbsp;        userEmail = authRemoteRepository.currentEmail(),</b>
-&nbsp;    ),
+&nbsp;@KoinViewModel
+&nbsp;class LicensesViewModel : MviViewModel&lt;LicensesState, LicensesEvent, LicensesEffect&gt;(
+&nbsp;    initialState = LicensesState(),
 &nbsp;) {
 &nbsp;
-&nbsp;    override fun onEvent(event: DeleteUserAccountEvent) {
-<b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            DeleteUserAccountEvent.OnBackClick -&gt; postSideEffect(DeleteUserAccountEffect.NavigateBack)</b>
-<b class="fc">&nbsp;            is DeleteUserAccountEvent.OnPasswordChange -&gt;</b>
-<b class="fc">&nbsp;                updateState { copy(password = event.value, passwordMissing = false) }</b>
-<b class="fc">&nbsp;            DeleteUserAccountEvent.OnDeleteClick -&gt; requestConfirmation()</b>
-<b class="pc">&nbsp;            DeleteUserAccountEvent.OnConfirmDismissed -&gt;</b>
-<b class="nc">&nbsp;                updateState { copy(showConfirmDialog = false) }</b>
-<b class="fc">&nbsp;            DeleteUserAccountEvent.OnConfirmAccepted -&gt; deleteAccount()</b>
+&nbsp;    init {
+&nbsp;        loadLicenses()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onEvent(event: LicensesEvent) {
+&nbsp;        when (event) {
+&nbsp;            LicensesEvent.OnBackClick -&gt; postSideEffect(LicensesEffect.NavigateBack)
+&nbsp;            is LicensesEvent.OnLibraryClick -&gt; updateState {
+&nbsp;                copy(expandedLibraryId = if (expandedLibraryId == event.libraryId) null else event.libraryId)
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun requestConfirmation() {
-<b class="fc">&nbsp;        val state = currentState</b>
-<b class="fc">&nbsp;        if (!state.isAnonymousUser &amp;&amp; state.password.isBlank()) {</b>
-<b class="fc">&nbsp;            updateState { copy(passwordMissing = true) }</b>
-&nbsp;            return
-&nbsp;        }
-<b class="fc">&nbsp;        updateState { copy(showConfirmDialog = true) }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun deleteAccount() {
-<b class="fc">&nbsp;        updateState { copy(showConfirmDialog = false, isDeleting = true) }</b>
-<b class="fc">&nbsp;        launch(</b>
-&nbsp;            onError = {
-<b class="nc">&nbsp;                updateState { copy(isDeleting = false) }</b>
-<b class="nc">&nbsp;                postSideEffect(DeleteUserAccountEffect.Notify(DeleteUserAccountNotice.Generic))</b>
-&nbsp;            },
-&nbsp;        ) {
-<b class="fc">&nbsp;            val password = currentState.password.takeIf { !currentState.isAnonymousUser }</b>
-<b class="fc">&nbsp;            deleteUserAccount(password = password).fold(</b>
-&nbsp;                ifLeft = { error -&gt;
-<b class="fc">&nbsp;                    updateState { copy(isDeleting = false) }</b>
-<b class="fc">&nbsp;                    postSideEffect(DeleteUserAccountEffect.Notify(error.toNotice()))</b>
-<b class="fc">&nbsp;                },</b>
-&nbsp;                ifRight = {
-&nbsp;                    // Session user pointer is already null — AppLaunchViewModel navigates
-&nbsp;                    // to SignIn; keep the overlay up so the screen can&#39;t be re-submitted.
-<b class="fc">&nbsp;                },</b>
-&nbsp;            )
+&nbsp;    @OptIn(ExperimentalResourceApi::class)
+&nbsp;    private fun loadLicenses() {
+&nbsp;        launch(onError = { updateState { copy(isLoading = false, isError = true) } }) {
+&nbsp;            val libraries = parseOssLibraries(Res.readBytes(LICENSES_RESOURCE).decodeToString())
+&nbsp;            updateState { copy(isLoading = false, libraries = libraries) }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-<b class="fc">&nbsp;    private fun AccountDeletionError.toNotice(): DeleteUserAccountNotice = when (this) {</b>
-<b class="pc">&nbsp;        AccountDeletionError.NotSignedIn -&gt; DeleteUserAccountNotice.Generic</b>
-<b class="fc">&nbsp;        AccountDeletionError.InvalidCredentials -&gt; DeleteUserAccountNotice.WrongPassword</b>
-<b class="pc">&nbsp;        is AccountDeletionError.ReauthenticationFailed -&gt; DeleteUserAccountNotice.Generic</b>
-<b class="pc">&nbsp;        AccountDeletionError.RequiresRecentLogin -&gt; DeleteUserAccountNotice.RequiresRecentLogin</b>
-<b class="pc">&nbsp;        is AccountDeletionError.RemoteDataCleanupFailed -&gt; DeleteUserAccountNotice.CleanupFailed</b>
-<b class="nc">&nbsp;        is AccountDeletionError.AuthDeletionFailed -&gt; DeleteUserAccountNotice.AuthDeletionFailed</b>
+&nbsp;    private companion object {
+&nbsp;        const val LICENSES_RESOURCE = &quot;files/aboutlibraries.json&quot;
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;data class DeleteUserAccountState(
-&nbsp;    val isAnonymousUser: Boolean = false,
-&nbsp;    val userEmail: String? = null,
-&nbsp;    val password: String = &quot;&quot;,
-&nbsp;    val passwordMissing: Boolean = false,
-&nbsp;    val showConfirmDialog: Boolean = false,
-&nbsp;    val isDeleting: Boolean = false,
-&nbsp;) {
-&nbsp;    val showPasswordField: Boolean get() = !isAnonymousUser
+&nbsp;data class LicensesState(
+&nbsp;    val isLoading: Boolean = true,
+&nbsp;    val isError: Boolean = false,
+&nbsp;    val libraries: List&lt;OssLibrary&gt; = emptyList(),
+&nbsp;    val expandedLibraryId: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One row of the screen: a library family (all artifacts published under the
+&nbsp; * same project), not a single Maven coordinate — the raw export lists ~180
+&nbsp; * artifacts, most of them per-platform slices of a handful of projects.
+&nbsp; */
+&nbsp;data class OssLibrary(
+&nbsp;    val id: String,
+&nbsp;    val name: String,
+&nbsp;    /** Shared version of every artifact in the family, or `null` when they differ. */
+&nbsp;    val version: String?,
+&nbsp;    val author: String?,
+&nbsp;    /** `group:artifact version` for each bundled artifact, shown when the row is expanded. */
+&nbsp;    val artifacts: List&lt;String&gt;,
+&nbsp;    val licenses: List&lt;OssLicense&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;data class OssLicense(
+&nbsp;    val name: String,
+&nbsp;    val content: String?,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface LicensesEvent {
+&nbsp;    data object OnBackClick : LicensesEvent
+&nbsp;    data class OnLibraryClick(val libraryId: String) : LicensesEvent
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface DeleteUserAccountEvent {
-&nbsp;    data object OnBackClick : DeleteUserAccountEvent
-&nbsp;    data class OnPasswordChange(val value: String) : DeleteUserAccountEvent
-&nbsp;    data object OnDeleteClick : DeleteUserAccountEvent
-&nbsp;    data object OnConfirmDismissed : DeleteUserAccountEvent
-&nbsp;    data object OnConfirmAccepted : DeleteUserAccountEvent
+&nbsp;sealed interface LicensesEffect {
+<b class="nc">&nbsp;    data object NavigateBack : LicensesEffect</b>
 &nbsp;}
 &nbsp;
-&nbsp;/** Localised in the screen layer — the ViewModel stays free of platform string APIs. */
-&nbsp;enum class DeleteUserAccountNotice {
-&nbsp;    WrongPassword,
-&nbsp;    RequiresRecentLogin,
-&nbsp;    CleanupFailed,
-&nbsp;    AuthDeletionFailed,
-&nbsp;    Generic,
+&nbsp;/**
+&nbsp; * Maps the AboutLibraries export JSON to the screen model, collapsing the flat
+&nbsp; * artifact list into library families: `androidx.compose.ui:ui-android`,
+&nbsp; * `androidx.compose.runtime:runtime-android` and their ~20 siblings are one
+&nbsp; * &quot;Jetpack Compose&quot; row rather than 20 near-identical ones. BOM artifacts are
+&nbsp; * dropped — they ship no code, only version constraints.
+&nbsp; */
+&nbsp;internal fun parseOssLibraries(jsonText: String): List&lt;OssLibrary&gt; {
+&nbsp;    val export = exportJson.decodeFromString&lt;AboutLibrariesExport&gt;(jsonText)
+&nbsp;    return export.libraries
+&nbsp;        .filterNot { it.artifactId.endsWith(BOM_ARTIFACT_SUFFIX) }
+&nbsp;        .groupBy { familyId(it.groupId) }
+&nbsp;        .map { (familyId, artifacts) -&gt; artifacts.toOssLibrary(familyId, export.licenses) }
+&nbsp;        .sortedBy { it.name.lowercase() }
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface DeleteUserAccountEffect {
-&nbsp;    data object NavigateBack : DeleteUserAccountEffect
-&nbsp;    data class Notify(val notice: DeleteUserAccountNotice) : DeleteUserAccountEffect
-&nbsp;}
+&nbsp;private fun List&lt;ExportedLibrary&gt;.toOssLibrary(
+&nbsp;    familyId: String,
+&nbsp;    licenses: Map&lt;String, ExportedLicense&gt;,
+&nbsp;): OssLibrary = OssLibrary(
+&nbsp;    id = familyId,
+&nbsp;    name = FAMILY_NAMES[familyId] ?: mapNotNull { it.name }.distinct().joinToString().ifEmpty { familyId },
+&nbsp;    version = mapNotNull { it.artifactVersion }.distinct().singleOrNull(),
+&nbsp;    author = flatMap { it.authors }.distinct().joinToString().ifEmpty { null },
+&nbsp;    artifacts = map { library -&gt;
+&nbsp;        listOfNotNull(library.uniqueId, library.artifactVersion).joinToString(&quot; &quot;)
+&nbsp;    }.sorted(),
+&nbsp;    licenses = flatMap { it.licenses }
+&nbsp;        .distinct()
+&nbsp;        .mapNotNull { licenseId -&gt;
+&nbsp;            licenses[licenseId]?.let { license -&gt;
+&nbsp;                OssLicense(name = license.name, content = license.content)
+&nbsp;            }
+&nbsp;        }
+&nbsp;        .sortedBy { it.name },
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Display names for the library families, keyed by the Maven group prefix they
+&nbsp; * cover. Longer prefixes win, so `androidx.compose.*` is Compose and every other
+&nbsp; * `androidx.*` artifact falls into the shared Jetpack row. Groups missing here
+&nbsp; * fall back to the names the export itself carries.
+&nbsp; */
+&nbsp;private val FAMILY_NAMES = mapOf(
+&nbsp;    &quot;androidx.compose&quot; to &quot;Jetpack Compose&quot;,
+&nbsp;    &quot;androidx&quot; to &quot;AndroidX (Android Jetpack)&quot;,
+&nbsp;    &quot;co.touchlab&quot; to &quot;Kermit &amp; Stately&quot;,
+&nbsp;    &quot;com.github.ajalt.colormath&quot; to &quot;Colormath&quot;,
+&nbsp;    &quot;com.google.guava&quot; to &quot;Guava ListenableFuture&quot;,
+&nbsp;    &quot;com.materialkolor&quot; to &quot;MaterialKolor&quot;,
+&nbsp;    &quot;com.squareup.okio&quot; to &quot;Okio&quot;,
+&nbsp;    &quot;dev.drewhamilton.poko&quot; to &quot;Poko&quot;,
+&nbsp;    &quot;io.arrow-kt&quot; to &quot;Arrow&quot;,
+&nbsp;    &quot;io.github.irgaly.navigation3.resultstate&quot; to &quot;Navigation3 ResultState&quot;,
+&nbsp;    &quot;io.github.koalaplot&quot; to &quot;KoalaPlot&quot;,
+&nbsp;    &quot;io.insert-koin&quot; to &quot;Koin&quot;,
+&nbsp;    &quot;org.jetbrains&quot; to &quot;JetBrains Java Annotations&quot;,
+&nbsp;    &quot;org.jetbrains.androidx&quot; to &quot;AndroidX for Compose Multiplatform&quot;,
+&nbsp;    &quot;org.jetbrains.compose&quot; to &quot;Compose Multiplatform&quot;,
+&nbsp;    &quot;org.jetbrains.kotlin&quot; to &quot;Kotlin&quot;,
+&nbsp;    &quot;org.jetbrains.kotlinx&quot; to &quot;kotlinx libraries&quot;,
+&nbsp;    &quot;org.jetbrains.runtime&quot; to &quot;JetBrains Runtime API&quot;,
+&nbsp;    &quot;org.jetbrains.skiko&quot; to &quot;Skiko&quot;,
+&nbsp;    &quot;org.jspecify&quot; to &quot;JSpecify&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;private val FAMILY_PREFIXES = FAMILY_NAMES.keys.sortedByDescending { it.length }
+&nbsp;
+&nbsp;private const val BOM_ARTIFACT_SUFFIX = &quot;-bom&quot;
+&nbsp;
+&nbsp;private fun familyId(groupId: String): String =
+&nbsp;    FAMILY_PREFIXES.firstOrNull { groupId == it || groupId.startsWith(&quot;$it.&quot;) } ?: groupId
+&nbsp;
+&nbsp;private val exportJson = Json { ignoreUnknownKeys = true }
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class AboutLibrariesExport(
+&nbsp;    val libraries: List&lt;ExportedLibrary&gt; = emptyList(),
+&nbsp;    val licenses: Map&lt;String, ExportedLicense&gt; = emptyMap(),
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedLibrary(
+&nbsp;    val uniqueId: String,
+&nbsp;    val artifactVersion: String? = null,
+&nbsp;    val name: String? = null,
+&nbsp;    val developers: List&lt;ExportedDeveloper&gt; = emptyList(),
+&nbsp;    val organization: ExportedOrganization? = null,
+&nbsp;    val licenses: List&lt;String&gt; = emptyList(),
+&nbsp;)
+&nbsp;
+&nbsp;private val ExportedLibrary.groupId: String get() = uniqueId.substringBefore(&#39;:&#39;)
+&nbsp;
+&nbsp;private val ExportedLibrary.artifactId: String get() = uniqueId.substringAfter(&#39;:&#39;, missingDelimiterValue = &quot;&quot;)
+&nbsp;
+&nbsp;/** Organization first — for AndroidX artifacts it is the only field that is filled in consistently. */
+&nbsp;private val ExportedLibrary.authors: List&lt;String&gt;
+&nbsp;    get() = listOfNotNull(organization?.name).ifEmpty { developers.mapNotNull { it.name } }
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedDeveloper(val name: String? = null)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedOrganization(val name: String? = null)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedLicense(
+&nbsp;    val name: String,
+&nbsp;    val content: String? = null,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -292,7 +323,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

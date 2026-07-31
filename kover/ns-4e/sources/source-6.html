@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > LicensesEffect</title>
+  <title>MoneySurfer Coverage Report > AboutTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,88 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.about.licenses</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.about</a>
 </div>
 
-<h1>Coverage Summary for Class: LicensesEffect (com.georgeci.moneysurfer.feature.settings.about.licenses)</h1>
+<h1>Coverage Summary for Class: AboutTestTags (com.georgeci.moneysurfer.feature.settings.about)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
-  <tr>
-    <td class="name">LicensesEffect$NavigateBack</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+  <td class="name">AboutTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
@@ -108,198 +44,271 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.about.licenses
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.about
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlinx.serialization.json.Json
+&nbsp;import androidx.compose.foundation.Image
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
+&nbsp;import androidx.compose.ui.platform.LocalUriHandler
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;import moneysurfer.feature.settings.generated.resources.Res
-&nbsp;import org.jetbrains.compose.resources.ExperimentalResourceApi
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_brand
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_chip_license
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_chip_made_by
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_contact_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_contact_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_copyright
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_github_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_github_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_licenses_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_licenses_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_privacy_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_privacy_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_section_help
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_section_legal
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_terms_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_version_format
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_app_icon
+&nbsp;import org.jetbrains.compose.resources.painterResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import moneysurfer.uikit.generated.resources.Res as UikitRes
 &nbsp;
-&nbsp;/**
-&nbsp; * Lists the third-party libraries bundled with the app together with their
-&nbsp; * licenses. The data comes from `files/aboutlibraries.json`, generated by the
-&nbsp; * AboutLibraries Gradle plugin (`./gradlew :shared:exportLibraryDefinitions`).
-&nbsp; */
-&nbsp;@KoinViewModel
-&nbsp;class LicensesViewModel : MviViewModel&lt;LicensesState, LicensesEvent, LicensesEffect&gt;(
-&nbsp;    initialState = LicensesState(),
+&nbsp;@Composable
+&nbsp;fun AboutScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToLicenses: () -&gt; Unit,
+&nbsp;    viewModel: AboutViewModel = koinViewModel(),
 &nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;    val uriHandler = LocalUriHandler.current
 &nbsp;
-&nbsp;    init {
-&nbsp;        loadLicenses()
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            AboutEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is AboutEffect.OpenUrl -&gt; uriHandler.openUri(effect.url)
+&nbsp;            is AboutEffect.OpenEmail -&gt; uriHandler.openUri(&quot;mailto:${effect.address}&quot;)
+&nbsp;            AboutEffect.NavigateToLicenses -&gt; onNavigateToLicenses()
+&nbsp;            AboutEffect.OpenStoreListing,
+&nbsp;            AboutEffect.OpenRegionPicker,
+&nbsp;            AboutEffect.NavigateToDiagnostic,
+&nbsp;            -&gt; Unit
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    override fun onEvent(event: LicensesEvent) {
-&nbsp;        when (event) {
-&nbsp;            LicensesEvent.OnBackClick -&gt; postSideEffect(LicensesEffect.NavigateBack)
-&nbsp;            is LicensesEvent.OnLibraryClick -&gt; updateState {
-&nbsp;                copy(expandedLibraryId = if (expandedLibraryId == event.libraryId) null else event.libraryId)
+&nbsp;    AboutContent(state = state, onEvent = viewModel::onEvent)
+&nbsp;}
+&nbsp;
+&nbsp;object AboutTestTags {
+&nbsp;    const val Root = &quot;about:root&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun AboutContent(
+&nbsp;    state: AboutState,
+&nbsp;    onEvent: (AboutEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(AboutTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferPaneTopBar(
+&nbsp;                title = stringResource(Res.string.settings_about_title),
+&nbsp;                onBack = { onEvent(AboutEvent.OnBackClick) },
+&nbsp;                colors = TopAppBarDefaults.topAppBarColors(
+&nbsp;                    containerColor = AppTheme.materialColors.surface,
+&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .verticalScroll(rememberScrollState()),
+&nbsp;        ) {
+&nbsp;            AppIdentityHero(version = state.appVersion)
+&nbsp;
+&nbsp;            GitHubLinkRow(onClick = { onEvent(AboutEvent.OnGitHubClick) })
+&nbsp;
+&nbsp;            Spacer(Modifier.height(20.dp))
+&nbsp;
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_about_section_legal)) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Receipt,
+&nbsp;                    title = stringResource(Res.string.settings_about_terms_title),
+&nbsp;                    onClick = { onEvent(AboutEvent.OnTermsClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Shield,
+&nbsp;                    title = stringResource(Res.string.settings_about_privacy_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_about_privacy_supporting),
+&nbsp;                    onClick = { onEvent(AboutEvent.OnPrivacyClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Code,
+&nbsp;                    title = stringResource(Res.string.settings_about_licenses_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_about_licenses_supporting),
+&nbsp;                    onClick = { onEvent(AboutEvent.OnLicensesClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                )
 &nbsp;            }
-&nbsp;        }
-&nbsp;    }
 &nbsp;
-&nbsp;    @OptIn(ExperimentalResourceApi::class)
-&nbsp;    private fun loadLicenses() {
-&nbsp;        launch(onError = { updateState { copy(isLoading = false, isError = true) } }) {
-&nbsp;            val libraries = parseOssLibraries(Res.readBytes(LICENSES_RESOURCE).decodeToString())
-&nbsp;            updateState { copy(isLoading = false, libraries = libraries) }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val LICENSES_RESOURCE = &quot;files/aboutlibraries.json&quot;
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;data class LicensesState(
-&nbsp;    val isLoading: Boolean = true,
-&nbsp;    val isError: Boolean = false,
-&nbsp;    val libraries: List&lt;OssLibrary&gt; = emptyList(),
-&nbsp;    val expandedLibraryId: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * One row of the screen: a library family (all artifacts published under the
-&nbsp; * same project), not a single Maven coordinate — the raw export lists ~180
-&nbsp; * artifacts, most of them per-platform slices of a handful of projects.
-&nbsp; */
-&nbsp;data class OssLibrary(
-&nbsp;    val id: String,
-&nbsp;    val name: String,
-&nbsp;    /** Shared version of every artifact in the family, or `null` when they differ. */
-&nbsp;    val version: String?,
-&nbsp;    val author: String?,
-&nbsp;    /** `group:artifact version` for each bundled artifact, shown when the row is expanded. */
-&nbsp;    val artifacts: List&lt;String&gt;,
-&nbsp;    val licenses: List&lt;OssLicense&gt;,
-&nbsp;)
-&nbsp;
-&nbsp;data class OssLicense(
-&nbsp;    val name: String,
-&nbsp;    val content: String?,
-&nbsp;)
-&nbsp;
-&nbsp;sealed interface LicensesEvent {
-&nbsp;    data object OnBackClick : LicensesEvent
-&nbsp;    data class OnLibraryClick(val libraryId: String) : LicensesEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface LicensesEffect {
-<b class="nc">&nbsp;    data object NavigateBack : LicensesEffect</b>
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Maps the AboutLibraries export JSON to the screen model, collapsing the flat
-&nbsp; * artifact list into library families: `androidx.compose.ui:ui-android`,
-&nbsp; * `androidx.compose.runtime:runtime-android` and their ~20 siblings are one
-&nbsp; * &quot;Jetpack Compose&quot; row rather than 20 near-identical ones. BOM artifacts are
-&nbsp; * dropped — they ship no code, only version constraints.
-&nbsp; */
-&nbsp;internal fun parseOssLibraries(jsonText: String): List&lt;OssLibrary&gt; {
-&nbsp;    val export = exportJson.decodeFromString&lt;AboutLibrariesExport&gt;(jsonText)
-&nbsp;    return export.libraries
-&nbsp;        .filterNot { it.artifactId.endsWith(BOM_ARTIFACT_SUFFIX) }
-&nbsp;        .groupBy { familyId(it.groupId) }
-&nbsp;        .map { (familyId, artifacts) -&gt; artifacts.toOssLibrary(familyId, export.licenses) }
-&nbsp;        .sortedBy { it.name.lowercase() }
-&nbsp;}
-&nbsp;
-&nbsp;private fun List&lt;ExportedLibrary&gt;.toOssLibrary(
-&nbsp;    familyId: String,
-&nbsp;    licenses: Map&lt;String, ExportedLicense&gt;,
-&nbsp;): OssLibrary = OssLibrary(
-&nbsp;    id = familyId,
-&nbsp;    name = FAMILY_NAMES[familyId] ?: mapNotNull { it.name }.distinct().joinToString().ifEmpty { familyId },
-&nbsp;    version = mapNotNull { it.artifactVersion }.distinct().singleOrNull(),
-&nbsp;    author = flatMap { it.authors }.distinct().joinToString().ifEmpty { null },
-&nbsp;    artifacts = map { library -&gt;
-&nbsp;        listOfNotNull(library.uniqueId, library.artifactVersion).joinToString(&quot; &quot;)
-&nbsp;    }.sorted(),
-&nbsp;    licenses = flatMap { it.licenses }
-&nbsp;        .distinct()
-&nbsp;        .mapNotNull { licenseId -&gt;
-&nbsp;            licenses[licenseId]?.let { license -&gt;
-&nbsp;                OssLicense(name = license.name, content = license.content)
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_about_section_help)) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Mail,
+&nbsp;                    title = stringResource(Res.string.settings_about_contact_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_about_contact_supporting),
+&nbsp;                    onClick = { onEvent(AboutEvent.OnContactClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                )
 &nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(8.dp))
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_about_copyright),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .padding(horizontal = 32.dp, vertical = 20.dp),
+&nbsp;            )
+&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + 28.dp))
 &nbsp;        }
-&nbsp;        .sortedBy { it.name },
-&nbsp;)
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * Display names for the library families, keyed by the Maven group prefix they
-&nbsp; * cover. Longer prefixes win, so `androidx.compose.*` is Compose and every other
-&nbsp; * `androidx.*` artifact falls into the shared Jetpack row. Groups missing here
-&nbsp; * fall back to the names the export itself carries.
-&nbsp; */
-&nbsp;private val FAMILY_NAMES = mapOf(
-&nbsp;    &quot;androidx.compose&quot; to &quot;Jetpack Compose&quot;,
-&nbsp;    &quot;androidx&quot; to &quot;AndroidX (Android Jetpack)&quot;,
-&nbsp;    &quot;co.touchlab&quot; to &quot;Kermit &amp; Stately&quot;,
-&nbsp;    &quot;com.github.ajalt.colormath&quot; to &quot;Colormath&quot;,
-&nbsp;    &quot;com.google.guava&quot; to &quot;Guava ListenableFuture&quot;,
-&nbsp;    &quot;com.materialkolor&quot; to &quot;MaterialKolor&quot;,
-&nbsp;    &quot;com.squareup.okio&quot; to &quot;Okio&quot;,
-&nbsp;    &quot;dev.drewhamilton.poko&quot; to &quot;Poko&quot;,
-&nbsp;    &quot;io.arrow-kt&quot; to &quot;Arrow&quot;,
-&nbsp;    &quot;io.github.irgaly.navigation3.resultstate&quot; to &quot;Navigation3 ResultState&quot;,
-&nbsp;    &quot;io.github.koalaplot&quot; to &quot;KoalaPlot&quot;,
-&nbsp;    &quot;io.insert-koin&quot; to &quot;Koin&quot;,
-&nbsp;    &quot;org.jetbrains&quot; to &quot;JetBrains Java Annotations&quot;,
-&nbsp;    &quot;org.jetbrains.androidx&quot; to &quot;AndroidX for Compose Multiplatform&quot;,
-&nbsp;    &quot;org.jetbrains.compose&quot; to &quot;Compose Multiplatform&quot;,
-&nbsp;    &quot;org.jetbrains.kotlin&quot; to &quot;Kotlin&quot;,
-&nbsp;    &quot;org.jetbrains.kotlinx&quot; to &quot;kotlinx libraries&quot;,
-&nbsp;    &quot;org.jetbrains.runtime&quot; to &quot;JetBrains Runtime API&quot;,
-&nbsp;    &quot;org.jetbrains.skiko&quot; to &quot;Skiko&quot;,
-&nbsp;    &quot;org.jspecify&quot; to &quot;JSpecify&quot;,
-&nbsp;)
+&nbsp;@Composable
+&nbsp;private fun AppIdentityHero(version: String) {
+&nbsp;    val colors = AppTheme.materialColors
+&nbsp;    Column(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 28.dp),
+&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
+&nbsp;        verticalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;    ) {
+&nbsp;        Image(
+&nbsp;            painter = painterResource(UikitRes.drawable.uikit_app_icon),
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            modifier = Modifier
+&nbsp;                .size(72.dp)
+&nbsp;                .shadow(elevation = 8.dp, shape = RoundedCornerShape(20.dp))
+&nbsp;                .clip(RoundedCornerShape(20.dp)),
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.settings_about_brand),
+&nbsp;            style = AppTheme.typography.titleLarge,
+&nbsp;            color = colors.onSurface,
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.settings_about_version_format, version),
+&nbsp;            style = AppTheme.typography.bodyMedium,
+&nbsp;            color = colors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+&nbsp;            HeroChip(text = stringResource(Res.string.settings_about_chip_made_by))
+&nbsp;            HeroChip(text = stringResource(Res.string.settings_about_chip_license))
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;private val FAMILY_PREFIXES = FAMILY_NAMES.keys.sortedByDescending { it.length }
+&nbsp;@Composable
+&nbsp;private fun GitHubLinkRow(onClick: () -&gt; Unit) {
+&nbsp;    val colors = AppTheme.materialColors
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = 16.dp)
+&nbsp;            .clip(RoundedCornerShape(16.dp))
+&nbsp;            .background(colors.surfaceContainerHighest)
+&nbsp;            .clickable(onClick = onClick)
+&nbsp;            .padding(horizontal = 16.dp, vertical = 14.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;    ) {
+&nbsp;        Icon(
+&nbsp;            imageVector = SurferIcons.Info,
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            tint = colors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        Column(modifier = Modifier.fillMaxWidth()) {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_about_github_title),
+&nbsp;                style = AppTheme.typography.titleSmall,
+&nbsp;                color = colors.onSurface,
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_about_github_supporting),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = colors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;private const val BOM_ARTIFACT_SUFFIX = &quot;-bom&quot;
-&nbsp;
-&nbsp;private fun familyId(groupId: String): String =
-&nbsp;    FAMILY_PREFIXES.firstOrNull { groupId == it || groupId.startsWith(&quot;$it.&quot;) } ?: groupId
-&nbsp;
-&nbsp;private val exportJson = Json { ignoreUnknownKeys = true }
-&nbsp;
-&nbsp;@Serializable
-&nbsp;private data class AboutLibrariesExport(
-&nbsp;    val libraries: List&lt;ExportedLibrary&gt; = emptyList(),
-&nbsp;    val licenses: Map&lt;String, ExportedLicense&gt; = emptyMap(),
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;private data class ExportedLibrary(
-&nbsp;    val uniqueId: String,
-&nbsp;    val artifactVersion: String? = null,
-&nbsp;    val name: String? = null,
-&nbsp;    val developers: List&lt;ExportedDeveloper&gt; = emptyList(),
-&nbsp;    val organization: ExportedOrganization? = null,
-&nbsp;    val licenses: List&lt;String&gt; = emptyList(),
-&nbsp;)
-&nbsp;
-&nbsp;private val ExportedLibrary.groupId: String get() = uniqueId.substringBefore(&#39;:&#39;)
-&nbsp;
-&nbsp;private val ExportedLibrary.artifactId: String get() = uniqueId.substringAfter(&#39;:&#39;, missingDelimiterValue = &quot;&quot;)
-&nbsp;
-&nbsp;/** Organization first — for AndroidX artifacts it is the only field that is filled in consistently. */
-&nbsp;private val ExportedLibrary.authors: List&lt;String&gt;
-&nbsp;    get() = listOfNotNull(organization?.name).ifEmpty { developers.mapNotNull { it.name } }
-&nbsp;
-&nbsp;@Serializable
-&nbsp;private data class ExportedDeveloper(val name: String? = null)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;private data class ExportedOrganization(val name: String? = null)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;private data class ExportedLicense(
-&nbsp;    val name: String,
-&nbsp;    val content: String? = null,
-&nbsp;)
+&nbsp;@Composable
+&nbsp;private fun HeroChip(text: String) {
+&nbsp;    val colors = AppTheme.materialColors
+&nbsp;    Box(
+&nbsp;        modifier = Modifier
+&nbsp;            .clip(RoundedCornerShape(999.dp))
+&nbsp;            .background(colors.surfaceContainerHighest)
+&nbsp;            .padding(horizontal = 10.dp, vertical = 4.dp),
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            style = AppTheme.typography.labelMedium,
+&nbsp;            color = colors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -323,7 +332,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

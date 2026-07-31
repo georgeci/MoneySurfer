@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > InsightsSelection</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+</div>
+
+<h1>Coverage Summary for Class: InsightsSelection (com.georgeci.moneysurfer.domain.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">InsightsSelection</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.util.periodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.util.shiftPeriod
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;
+&nbsp;/**
+&nbsp; * Which slice of the calendar the insights screen is read at: one of the cadences the dashboard
+&nbsp; * already offers, plus the period the user has paged to.
+&nbsp; *
+&nbsp; * **Not a second period type.** [mode] is the dashboard&#39;s own [DashboardPeriod] and [window]
+&nbsp; * delegates to `periodWindow`, so a screen scoped by this cuts the calendar at exactly the same
+&nbsp; * dates as the dashboard&#39;s widgets and the transactions list. What it adds is the [anchor], which
+&nbsp; * a dashboard widget has no use for: a widget only ever shows the period containing today, while a
+&nbsp; * screen with prev/next arrows has to remember *which* period it is showing.
+&nbsp; */
+<b class="fc">&nbsp;data class InsightsSelection(</b>
+<b class="fc">&nbsp;    val mode: DashboardPeriod,</b>
+<b class="fc">&nbsp;    val anchor: LocalDate,</b>
+&nbsp;) {
+&nbsp;
+&nbsp;    /** Always bounded — neither [DashboardPeriod] entry is all-time. */
+<b class="fc">&nbsp;    val window: TransactionPeriodWindow get() = periodWindow(mode.mode, anchor)</b>
+&nbsp;
+&nbsp;    /** This selection moved [by] whole periods; negative goes back. */
+<b class="fc">&nbsp;    fun shifted(by: Int): InsightsSelection = copy(anchor = shiftPeriod(mode.mode, anchor, by))</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Everything the insights screen draws for one [InsightsSelection]: where the period&#39;s money went,
+&nbsp; * how income and expense have moved month by month, and who took the most.
+&nbsp; *
+&nbsp; * [breakdown] and [merchants] are scoped to [InsightsSelection.window]; [months] deliberately is
+&nbsp; * not — see [SpendInsights.MONTH_COLUMNS].
+&nbsp; *
+&nbsp; * [currency] is the workspace base currency, and on this screen it is a *filter* rather than a
+&nbsp; * formatting hint: everything else in the workspace is missing from the figures above and listed in
+&nbsp; * [excludedByCurrency] instead. That is what makes [hiddenByBaseCurrency] answerable — a screen that
+&nbsp; * only knew &quot;no spend&quot; could not tell an empty period from a workspace whose spending is all in
+&nbsp; * another currency.
+&nbsp; */
+&nbsp;data class SpendInsights(
+&nbsp;    val selection: InsightsSelection,
+&nbsp;    val currency: CurrencyCode,
+&nbsp;    val breakdown: SpentByCategory,
+&nbsp;    /** One entry per column, oldest first, gaps filled — always [MONTH_COLUMNS] long. */
+&nbsp;    val months: List&lt;MonthlyNet&gt;,
+&nbsp;    /** Largest first, at most [TOP_MERCHANTS] entries. */
+&nbsp;    val merchants: List&lt;MerchantSpend&gt;,
+&nbsp;    /** Per-currency spend the [currency] filter left out, largest first. */
+&nbsp;    val excludedByCurrency: List&lt;CurrencyTotal&gt;,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether the base-currency filter is the reason the period looks empty.
+&nbsp;     *
+&nbsp;     * The screen has to say so rather than draw a blank donut: in a workspace whose cards are all
+&nbsp;     * in another currency, silence reads as a bug instead of as the policy it is (`md/insights.md`
+&nbsp;     * decision 4). Nothing else on the screen can distinguish the two cases — the aggregates
+&nbsp;     * already applied the filter, so what it removed is only visible here.
+&nbsp;     */
+&nbsp;    val hiddenByBaseCurrency: Boolean
+&nbsp;        get() = breakdown.entries.isEmpty() &amp;&amp; excludedByCurrency.isNotEmpty()
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /**
+&nbsp;         * Columns the income-vs-expense chart draws, ending at the month the selection is anchored
+&nbsp;         * in. Six for the same reason [CategorySpendHistory.TREND_MONTHS] is six, halved again by
+&nbsp;         * this chart drawing two bars per column.
+&nbsp;         *
+&nbsp;         * The chart spans months whichever cadence [InsightsSelection.mode] names, because
+&nbsp;         * `netByMonth` groups *inside* the window it is given and a week-wide window would come back
+&nbsp;         * as one part-month column under a full month&#39;s name. A week of spend is what the breakdown
+&nbsp;         * and the merchant list answer for.
+&nbsp;         */
+&nbsp;        const val MONTH_COLUMNS: Int = 6
+&nbsp;
+&nbsp;        /** Rows the merchant list draws. Enough to see a pattern, few enough to read at a glance. */
+&nbsp;        const val TOP_MERCHANTS: Int = 8
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Fills [rows] out to one entry per month in [months], oldest first.
+&nbsp; *
+&nbsp; * `netByMonth` only returns months the workspace booked something in, so a chart drawn straight off
+&nbsp; * it would silently shrink to however many months had activity — a quiet half-year would draw a
+&nbsp; * two-column chart labelled as six months. Same tolerance [buildCategorySpendHistory] applies to
+&nbsp; * the category trend.
+&nbsp; *
+&nbsp; * Rows outside [months] are dropped rather than trusted, so a caller passing a wider query result
+&nbsp; * cannot add a column the chart never asked for.
+&nbsp; */
+&nbsp;fun buildNetTrend(months: List&lt;YearMonth&gt;, rows: List&lt;MonthlyNet&gt;): List&lt;MonthlyNet&gt; {
+&nbsp;    val byMonth = rows.associateBy { it.month }
+&nbsp;    return months.map { month -&gt;
+&nbsp;        byMonth[month] ?: MonthlyNet(month = month, income = Money.zero(), expense = Money.zero())
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

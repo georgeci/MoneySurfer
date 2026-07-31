@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DashboardSafeToSpendWidgetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
+</div>
+
+<h1>Coverage Summary for Class: DashboardSafeToSpendWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">DashboardSafeToSpendWidgetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (9/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98%
+  </span>
+  <span class="absValue">
+    (339/346)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DashboardSafeToSpendWidgetKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (9/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98%
+  </span>
+  <span class="absValue">
+    (339/346)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendEmpty
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_bar_a11y
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_empty_subtitle
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_empty_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_over_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_set_budget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * What is still safe to spend this period, and the pace that makes it last.
+&nbsp; *
+&nbsp; * Unlike the quick-actions row this one keeps drawing with nothing behind it: &quot;no budget&quot; is a
+&nbsp; * state the widget is *for*, and the card that says so also carries the link that fixes it.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SafeToSpendWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferSafeToSpendWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_safe_to_spend_title),</b>
+<b class="fc">&nbsp;        data = state.safeToSpend?.toWidgetData(),</b>
+<b class="fc">&nbsp;        empty = SurferSafeToSpendEmpty(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_safe_to_spend_empty_title),</b>
+<b class="fc">&nbsp;            subtitle = stringResource(Res.string.dashboard_safe_to_spend_empty_subtitle),</b>
+<b class="fc">&nbsp;            actionLabel = stringResource(Res.string.dashboard_safe_to_spend_set_budget),</b>
+<b class="fc">&nbsp;            onActionClick = { onEvent(DashboardEvent.OnSetBudgetClick) },</b>
+<b class="fc">&nbsp;            actionTestTag = DashboardTestTags.SafeToSpendSetBudget,</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.SafeToSpend),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The sentences around the numbers. The bar restates figures the card already prints, so its
+&nbsp; * screen-reader line is the spend against the limit rather than a percentage read off the shape.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun SafeToSpendUi.toWidgetData(): SurferSafeToSpendData {</b>
+<b class="fc">&nbsp;    val daysLeftLabel = pluralStringResource(Res.plurals.dashboard_days_left, daysLeft, daysLeft)</b>
+<b class="fc">&nbsp;    val captionResource = if (isOver) {</b>
+<b class="fc">&nbsp;        Res.string.dashboard_safe_to_spend_over_caption</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;        Res.string.dashboard_safe_to_spend_caption</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return SurferSafeToSpendData(</b>
+<b class="fc">&nbsp;        amount = remainingFormatted,</b>
+<b class="fc">&nbsp;        caption = stringResource(captionResource, limitFormatted, budgetName),</b>
+<b class="fc">&nbsp;        perDay = stringResource(Res.string.dashboard_safe_to_spend_per_day, perDayFormatted),</b>
+<b class="fc">&nbsp;        daysLeft = daysLeftLabel,</b>
+<b class="fc">&nbsp;        progress = progress,</b>
+<b class="fc">&nbsp;        paceFraction = paceFraction,</b>
+<b class="fc">&nbsp;        status = status.toWidgetStatus(),</b>
+<b class="fc">&nbsp;        progressContentDescription = stringResource(</b>
+<b class="fc">&nbsp;            Res.string.dashboard_safe_to_spend_bar_a11y,</b>
+<b class="fc">&nbsp;            spentFormatted,</b>
+<b class="fc">&nbsp;            limitFormatted,</b>
+<b class="fc">&nbsp;            daysLeftLabel,</b>
+&nbsp;        ),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** `uikit` does not depend on `domain`, so the status word crosses over here. */
+<b class="fc">&nbsp;internal fun BudgetStatus.toWidgetStatus(): SurferBudgetStatus = when (this) {</b>
+<b class="fc">&nbsp;    BudgetStatus.OK -&gt; SurferBudgetStatus.Ok</b>
+<b class="fc">&nbsp;    BudgetStatus.WARN -&gt; SurferBudgetStatus.Warn</b>
+<b class="fc">&nbsp;    BudgetStatus.OVER -&gt; SurferBudgetStatus.Over</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

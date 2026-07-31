@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > GoalContribution</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+</div>
+
+<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">GoalContribution</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (84/84)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
+&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
+&nbsp; *
+&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
+&nbsp; * touched. It exists so the money-backed model can later store the id of a real
+&nbsp; * transfer here without a schema change on either side of the wire.
+&nbsp; */
+<b class="fc">&nbsp;data class GoalContribution(</b>
+<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val goalId: GoalId,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
+<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
+<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
+<b class="fc">&nbsp;    val createdAt: Instant,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

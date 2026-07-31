@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseRemoteDocument</title>
+  <title>MoneySurfer Coverage Report > AppVersionGateImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseRemoteDocument (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: AppVersionGateImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseRemoteDocument</td>
+  <td class="name">AppVersionGateImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    93.8%
   </span>
   <span class="absValue">
-    (0/4)
+    (15/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (22/22)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/49)
+    (104/104)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">AppVersionGateImpl$refresh$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (104/104)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,16 +126,54 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
-&nbsp;import dev.gitlive.firebase.firestore.DocumentSnapshot
-&nbsp;import kotlinx.serialization.DeserializationStrategy
+&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
+&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.RemoteAppConfig
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;class FirebaseRemoteDocument(val snap: DocumentSnapshot) : RemoteDocument {</b>
-<b class="nc">&nbsp;    override val id: String get() = snap.id</b>
-<b class="nc">&nbsp;    override fun &lt;T&gt; decode(deserializer: DeserializationStrategy&lt;T&gt;): T = snap.data(deserializer)</b>
-<b class="nc">&nbsp;    override fun getLong(field: String): Long? = runCatching { snap.get&lt;Long&gt;(field) }.getOrNull()</b>
+&nbsp;private const val DEFAULT_UNSUPPORTED_MESSAGE: String =
+&nbsp;    &quot;This app version is no longer supported. Please update.&quot;
+&nbsp;
+<b class="fc">&nbsp;@Single(binds = [AppVersionGate::class])</b>
+&nbsp;class AppVersionGateImpl(
+<b class="fc">&nbsp;    private val appConfigRepository: AppConfigRepository,</b>
+<b class="fc">&nbsp;    private val appInfo: AppInfo,</b>
+&nbsp;) : AppVersionGate {
+&nbsp;
+<b class="fc">&nbsp;    private val _status = MutableStateFlow&lt;AppVersionStatus?&gt;(null)</b>
+<b class="fc">&nbsp;    override val status: StateFlow&lt;AppVersionStatus?&gt; = _status.asStateFlow()</b>
+&nbsp;
+&nbsp;    override suspend fun refresh(): AppVersionStatus {
+<b class="fc">&nbsp;        val config = appConfigRepository.fetch()</b>
+<b class="fc">&nbsp;        val resolved = if (config == null) AppVersionStatus.Supported else evaluate(config)</b>
+<b class="fc">&nbsp;        _status.value = resolved</b>
+<b class="fc">&nbsp;        return resolved</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    override fun isSyncAllowed(): Boolean = when (status.value) {</b>
+<b class="fc">&nbsp;        null,</b>
+<b class="pc">&nbsp;        AppVersionStatus.Supported,</b>
+<b class="fc">&nbsp;        is AppVersionStatus.UpdateAvailable,</b>
+<b class="fc">&nbsp;        -&gt; true</b>
+<b class="fc">&nbsp;        is AppVersionStatus.Unsupported -&gt; false</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private fun evaluate(config: RemoteAppConfig): AppVersionStatus = when {</b>
+<b class="fc">&nbsp;        appInfo.versionCode &lt; config.minSupportedAppVersionCode || config.forceUpdate -&gt;</b>
+<b class="fc">&nbsp;            AppVersionStatus.Unsupported(</b>
+<b class="fc">&nbsp;                message = config.message ?: DEFAULT_UNSUPPORTED_MESSAGE,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        appInfo.versionCode &lt; config.latestAppVersionCode -&gt;</b>
+<b class="fc">&nbsp;            AppVersionStatus.UpdateAvailable(message = config.message)</b>
+<b class="fc">&nbsp;        else -&gt; AppVersionStatus.Supported</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -133,7 +198,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

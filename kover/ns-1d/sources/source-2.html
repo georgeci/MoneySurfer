@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardLayoutConfig</title>
+  <title>MoneySurfer Coverage Report > CsvImportReport</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardLayoutConfig (com.georgeci.moneysurfer.domain.dashboard)</h1>
+<h1>Coverage Summary for Class: CsvImportReport (com.georgeci.moneysurfer.domain.csv)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,42 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardLayoutConfig</td>
+  <td class="name">CsvImportReport</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    92.5%
-  </span>
-  <span class="absValue">
-    (37/40)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (50/50)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    99.4%
-  </span>
-  <span class="absValue">
-    (506/509)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">DashboardLayoutConfig$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -96,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,45 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    92.5%
-  </span>
-  <span class="absValue">
-    (37/40)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (51/51)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    99.4%
-  </span>
-  <span class="absValue">
-    (507/510)
+    (17/17)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,164 +92,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
 &nbsp;
 &nbsp;/**
-&nbsp; * The dashboard layout: an ordered list of widgets. Order in [items] *is* the render order.
-&nbsp; *
-&nbsp; * At compact width that order is the whole story — one widget per row, top to bottom. From expanded
-&nbsp; * width up the same order is packed into a [DashboardWidgetSpan.COLUMNS]-column grid, greedily: a
-&nbsp; * widget joins the current row if its [DashboardLayoutItem.span] still fits, and starts a new one if
-&nbsp; * it does not. There are still no rows to reconcile — a row is whatever the order and the spans add
-&nbsp; * up to, so reordering or resizing one widget can never orphan another.
-&nbsp; *
-&nbsp; * Stored per device (see `UiPreferences.dashboardLayout`), never synced — a layout is a property
-&nbsp; * of the screen the user is holding, not of the workspace.
+&nbsp; * Outcome of a CSV import. Rows that failed stay in [errors] with their
+&nbsp; * 1-based CSV row number (header is row 1, first data row is row 2) so the
+&nbsp; * user can locate them in a spreadsheet editor.
 &nbsp; */
-<b class="fc">&nbsp;data class DashboardLayoutConfig(</b>
-<b class="fc">&nbsp;    val items: List&lt;DashboardLayoutItem&gt;,</b>
-&nbsp;) {
+<b class="fc">&nbsp;data class CsvImportReport(</b>
+<b class="fc">&nbsp;    val imported: Int,</b>
+<b class="fc">&nbsp;    val skippedDuplicates: Int,</b>
+<b class="fc">&nbsp;    val errors: List&lt;CsvRowError&gt;,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    /** What the dashboard actually renders, in order. */
-&nbsp;    val enabledItems: List&lt;DashboardLayoutItem&gt;
-<b class="fc">&nbsp;        get() = items.filter { it.enabled }</b>
+&nbsp;data class CsvRowError(val rowNumber: Int, val issue: CsvRowIssue)
 &nbsp;
-&nbsp;    /** The widgets the user switched off — the &quot;Available&quot; half of the customize screen. */
-&nbsp;    val disabledItems: List&lt;DashboardLayoutItem&gt;
-<b class="fc">&nbsp;        get() = items.filterNot { it.enabled }</b>
+&nbsp;/** Why a single CSV row could not be imported. Localised in the UI layer. */
+&nbsp;sealed interface CsvRowIssue {
+&nbsp;    data class ColumnCountMismatch(val expected: Int, val actual: Int) : CsvRowIssue
+&nbsp;    data class InvalidValue(val column: String) : CsvRowIssue
+&nbsp;    data class UnknownWorkspace(val workspaceId: String) : CsvRowIssue
+&nbsp;    data class UnknownAccount(val accountId: String) : CsvRowIssue
+&nbsp;    data class UnknownCategory(val categoryId: String) : CsvRowIssue
+&nbsp;    data class AccountWorkspaceMismatch(val accountId: String, val workspaceId: String) : CsvRowIssue
+&nbsp;    data class CategoryWorkspaceMismatch(val categoryId: String, val workspaceId: String) : CsvRowIssue
+&nbsp;    data class CurrencyMismatch(val currency: String, val accountCurrency: String) : CsvRowIssue
+&nbsp;    data class UnpairedTransfer(val transferId: String) : CsvRowIssue
+&nbsp;}
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Whether anything on screen reads [DashboardPeriod]. The period switch is chrome for the
-&nbsp;     * widgets under it, so a layout that shows none of them shows no switch either — a Week/Month
-&nbsp;     * control that visibly changes nothing reads as a broken one.
-&nbsp;     */
-&nbsp;    val hasPeriodScopedWidget: Boolean
-<b class="fc">&nbsp;        get() = enabledItems.any { it.type.isPeriodScoped }</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * [type] switched on or off, keeping the item either way so its card style survives the round
-&nbsp;     * trip. Switching on appends the widget after the last enabled one — it joins the bottom of the
-&nbsp;     * dashboard, rather than reappearing in a middle slot the user cannot see from the toggle.
-&nbsp;     * Switching off sends it to the end of [items], so the enabled block stays contiguous.
-&nbsp;     *
-&nbsp;     * A [type] the layout does not carry is a no-op: only [normalized] adds items.
-&nbsp;     */
-&nbsp;    fun withWidgetEnabled(type: DashboardWidgetType, enabled: Boolean): DashboardLayoutConfig {
-<b class="pc">&nbsp;        val target = items.firstOrNull { it.type == type } ?: return this</b>
-<b class="fc">&nbsp;        if (target.enabled == enabled) return this</b>
-<b class="fc">&nbsp;        val others = items.filterNot { it.type == type }</b>
-<b class="fc">&nbsp;        val moved = target.copy(enabled = enabled)</b>
-<b class="fc">&nbsp;        val stillEnabled = others.filter { it.enabled }</b>
-<b class="fc">&nbsp;        val stillDisabled = others.filterNot { it.enabled }</b>
-<b class="fc">&nbsp;        return DashboardLayoutConfig(</b>
-<b class="fc">&nbsp;            items = if (enabled) {</b>
-<b class="fc">&nbsp;                stillEnabled + moved + stillDisabled</b>
-&nbsp;            } else {
-<b class="fc">&nbsp;                stillEnabled + stillDisabled + moved</b>
-&nbsp;            },
-&nbsp;        )
-&nbsp;    }
+&nbsp;/**
+&nbsp; * File-level errors from [ExportTransactionsUseCase] / [ImportTransactionsUseCase].
+&nbsp; * Raw throwables (I/O and anything else that escapes the use cases) are
+&nbsp; * wrapped at this boundary per AGENTS.md so callers never see platform
+&nbsp; * exception types.
+&nbsp; */
+&nbsp;sealed class TransactionCsvError(message: String, cause: Throwable? = null) :
+&nbsp;    RuntimeException(message, cause) {
+&nbsp;    data class Unexpected(val unexpectedCause: Throwable) : TransactionCsvError(
+&nbsp;        &quot;CSV processing failed: &quot; +
+&nbsp;            (unexpectedCause.message ?: unexpectedCause::class.simpleName ?: &quot;unknown cause&quot;),
+&nbsp;        unexpectedCause,
+&nbsp;    )
+&nbsp;    data object EmptyFile : TransactionCsvError(&quot;CSV file has no header row&quot;)
+&nbsp;    data object HeaderMismatch :
+&nbsp;        TransactionCsvError(&quot;CSV header does not match the MoneySurfer transactions format&quot;)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * [from] dragged onto the slot [to] currently occupies. Positions are expressed as widget types
-&nbsp;     * rather than indices because the customize screen drags rows out of a list that also holds
-&nbsp;     * headers and the switched-off section — indices there are not layout positions.
-&nbsp;     *
-&nbsp;     * The two sections are one draggable list: dropping a widget onto a slot in the *other* section
-&nbsp;     * moves it there, which is the same edit the +/− button makes. So a drop adopts the target&#39;s
-&nbsp;     * [DashboardLayoutItem.enabled], and the enabled block stays contiguous either way — the row
-&nbsp;     * lands where the finger left it, on the side of the boundary it was dropped.
+&nbsp;     * The picked file is larger than [ImportTransactionsUseCase] will read into
+&nbsp;     * memory. Guards against an accidental or hostile multi-GB &quot;backup&quot; that
+&nbsp;     * would otherwise OOM the app during import.
 &nbsp;     */
-&nbsp;    fun withWidgetMoved(from: DashboardWidgetType, to: DashboardWidgetType): DashboardLayoutConfig {
-<b class="fc">&nbsp;        if (from == to) return this</b>
-&nbsp;        // Rendered order, not storage order: enabled first, switched-off under them.
-<b class="fc">&nbsp;        val ordered = (enabledItems + disabledItems).toMutableList()</b>
-<b class="fc">&nbsp;        val fromIndex = ordered.indexOfFirst { it.type == from }</b>
-<b class="fc">&nbsp;        val toIndex = ordered.indexOfFirst { it.type == to }</b>
-<b class="pc">&nbsp;        if (fromIndex &lt; 0 || toIndex &lt; 0) return this</b>
-<b class="fc">&nbsp;        val landsEnabled = ordered[toIndex].enabled</b>
-<b class="fc">&nbsp;        ordered.add(toIndex, ordered.removeAt(fromIndex).copy(enabled = landsEnabled))</b>
-<b class="fc">&nbsp;        return DashboardLayoutConfig(items = ordered)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * [type] restyled. Order and enabled-ness are left alone — the style picker only changes how a
-&nbsp;     * widget looks, and it can be opened for a widget that sits anywhere in the list. Like
-&nbsp;     * [withWidgetEnabled], naming a [type] the layout does not carry is a no-op.
-&nbsp;     */
-&nbsp;    fun withCardStyle(type: DashboardWidgetType, cardStyle: DashboardCardStyle): DashboardLayoutConfig {
-<b class="fc">&nbsp;        val target = items.firstOrNull { it.type == type } ?: return this</b>
-<b class="fc">&nbsp;        if (target.cardStyle == cardStyle) return this</b>
-<b class="fc">&nbsp;        return DashboardLayoutConfig(</b>
-<b class="fc">&nbsp;            items = items.map { if (it.type == type) it.copy(cardStyle = cardStyle) else it },</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * [type] rewidened or narrowed for the grid. Like [withCardStyle] this touches nothing else:
-&nbsp;     * a span is read only from expanded width up, and changing one widget&#39;s width there must not
-&nbsp;     * shuffle the order the compact dashboard renders. Naming a [type] the layout does not carry is
-&nbsp;     * a no-op.
-&nbsp;     */
-&nbsp;    fun withSpan(type: DashboardWidgetType, span: DashboardWidgetSpan): DashboardLayoutConfig {
-<b class="fc">&nbsp;        val target = items.firstOrNull { it.type == type } ?: return this</b>
-<b class="fc">&nbsp;        if (target.span == span) return this</b>
-<b class="fc">&nbsp;        return DashboardLayoutConfig(</b>
-<b class="fc">&nbsp;            items = items.map { if (it.type == type) it.copy(span = span) else it },</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * A layout safe to render: at most one entry per widget type, with any type missing from
-&nbsp;     * [items] appended in its [DEFAULT] position and style. Persisted layouts written by an older
-&nbsp;     * app version know nothing about widgets added since, and dropping those silently would make
-&nbsp;     * a new widget invisible until the user resets the dashboard.
-&nbsp;     */
-&nbsp;    fun normalized(): DashboardLayoutConfig {
-<b class="fc">&nbsp;        val unique = items.distinctBy { it.type }</b>
-<b class="fc">&nbsp;        val present = unique.mapTo(mutableSetOf()) { it.type }</b>
-<b class="fc">&nbsp;        val missing = DEFAULT.items.filterNot { it.type in present }</b>
-<b class="fc">&nbsp;        return if (unique.size == items.size &amp;&amp; missing.isEmpty()) this else DashboardLayoutConfig(unique + missing)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /**
-&nbsp;         * Variant A from the design: the balance headline first, the quick actions under it, the
-&nbsp;         * month&#39;s spend against its budget, then safe-to-spend, the burn rate that explains it, the
-&nbsp;         * budgets both are read off, where the period&#39;s money went, the accounts strip, the same
-&nbsp;         * spend as a donut, the payments still to come, the generated insights, goals, and the
-&nbsp;         * recent-transactions list. Every widget starts enabled and Hero-sized.
-&nbsp;         *
-&nbsp;         * The spans are that same order read as the desktop mock&#39;s bands: a hero balance beside the
-&nbsp;         * shortcuts, the spent-this-month band full width under them, a row of three stat cards, the
-&nbsp;         * spend chart with the accounts rail next to it, the donut and the upcoming payments on
-&nbsp;         * bands of their own, insights and goals paired, and the activity list full width at the bottom. Each row sums to
-&nbsp;         * [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
-&nbsp;         *
-&nbsp;         * Both new bands take [DashboardWidgetSpan.Full] for the same reason: it is the only span
-&nbsp;         * that seats a widget without renarrowing the cards around it, which would have changed the
-&nbsp;         * default dashboard of every user who never opened the customize screen. The donut is also a
-&nbsp;         * wide row by nature (chart beside legend), and the spent-this-month card is the headline
-&nbsp;         * figure the rest of the spend band is read against.
-&nbsp;         */
-<b class="fc">&nbsp;        val DEFAULT = DashboardLayoutConfig(</b>
-<b class="fc">&nbsp;            items = listOf(</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Balance, span = DashboardWidgetSpan.TwoThirds),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.QuickActions, span = DashboardWidgetSpan.Third),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SpentMonth),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SafeToSpend, span = DashboardWidgetSpan.Third),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.BurnRate, span = DashboardWidgetSpan.Third),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.CategoriesDonut, span = DashboardWidgetSpan.Full),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Recurring, span = DashboardWidgetSpan.Full),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),</b>
-&nbsp;            ),
-&nbsp;        )
-&nbsp;    }
+&nbsp;    data class FileTooLarge(val limitBytes: Long) :
+&nbsp;        TransactionCsvError(&quot;CSV file exceeds the $limitBytes-byte import limit&quot;)
 &nbsp;}
 </code>
 </pre>
@@ -332,7 +168,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

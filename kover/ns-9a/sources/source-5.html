@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.feature.transaction.generated.resources</a>
+    <a href="../index.html">moneysurfer.feature.settings.generated.resources</a>
 </div>
 
-<h1>Coverage Summary for Class: String1_commonMainKt (moneysurfer.feature.transaction.generated.resources)</h1>
+<h1>Coverage Summary for Class: String1_commonMainKt (moneysurfer.feature.settings.generated.resources)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -60,27 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.6%
+    61.2%
   </span>
   <span class="absValue">
-    (92/105)
+    (123/201)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    66.2%
+    33.8%
   </span>
   <span class="absValue">
-    (172/260)
+    (169/500)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71.2%
+    33%
   </span>
   <span class="absValue">
-    (1776/2496)
+    (1582/4800)
   </span>
 </td>
 </tr>
@@ -94,7 +94,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
 &nbsp;
-&nbsp;package moneysurfer.feature.transaction.generated.resources
+&nbsp;package moneysurfer.feature.settings.generated.resources
 &nbsp;
 &nbsp;import kotlin.OptIn
 &nbsp;import kotlin.String
@@ -105,479 +105,910 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import org.jetbrains.compose.resources.ResourceItem
 &nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;
-&nbsp;private const val MD: String =
-&nbsp;    &quot;composeResources/moneysurfer.feature.transaction.generated.resources/&quot;
+&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.settings.generated.resources/&quot;
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(439_539_190)
-<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_all: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transaction_filters_type_all&quot;, &quot;transaction_filters_type_all&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8081, 44),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6329, 40),</b>
+&nbsp;@delegate:ResourceContentHash(711_725_802)
+<b class="fc">&nbsp;internal val Res.string.settings_backup_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_backup_title&quot;, &quot;settings_backup_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10752, 69),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7648, 37),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_340_699_527)
-<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_expenses: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transaction_filters_type_expenses&quot;, &quot;transaction_filters_type_expenses&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8126, 61),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6370, 53),</b>
+&nbsp;@delegate:ResourceContentHash(2_113_639_036)
+<b class="fc">&nbsp;internal val Res.string.settings_budgets_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_budgets_supporting&quot;, &quot;settings_budgets_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10886, 107),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7718, 99),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_714_291_899)
-<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_income: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transaction_filters_type_income&quot;, &quot;transaction_filters_type_income&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8188, 55),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6424, 47),</b>
+&nbsp;@delegate:ResourceContentHash(-1_391_467_181)
+<b class="fc">&nbsp;internal val Res.string.settings_budgets_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_budgets_title&quot;, &quot;settings_budgets_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10994, 50),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7818, 42),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-224_525_539)
-<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_transfer: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transaction_filters_type_transfer&quot;, &quot;transaction_filters_type_transfer&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8244, 65),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6472, 53),</b>
+&nbsp;@delegate:ResourceContentHash(1_460_892_380)
+<b class="fc">&nbsp;internal val Res.string.settings_categories_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_categories_supporting&quot;, &quot;settings_categories_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11045, 142),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7861, 94),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_947_237_329)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_account: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_account&quot;, &quot;transactions_list_chip_account&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8310, 50),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6526, 50),</b>
+&nbsp;@delegate:ResourceContentHash(-1_275_896_251)
+<b class="fc">&nbsp;internal val Res.string.settings_categories_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_categories_title&quot;, &quot;settings_categories_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11188, 57),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7956, 49),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(391_069_452)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_category: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_category&quot;, &quot;transactions_list_chip_category&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8361, 63),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6577, 51),</b>
+&nbsp;@delegate:ResourceContentHash(1_178_147_741)
+<b class="fc">&nbsp;internal val Res.string.settings_change_workspace: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_change_workspace&quot;, &quot;settings_change_workspace&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11319, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8075, 57),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-423_648_048)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_date: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_date&quot;, &quot;transactions_list_chip_date&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8496, 47),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6680, 43),</b>
+&nbsp;@delegate:ResourceContentHash(1_638_905_726)
+<b class="fc">&nbsp;internal val Res.string.settings_change_workspace_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_change_workspace_supporting&quot;, &quot;settings_change_workspace_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11246, 72),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8006, 68),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_449_802_569)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_date_custom: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_date_custom&quot;, &quot;transactions_list_chip_date_custom&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8425, 70),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6629, 50),</b>
+&nbsp;@delegate:ResourceContentHash(-345_673_383)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore&quot;, &quot;settings_clear_firestore&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 12140, 68),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8664, 52),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(881_925_259)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_selected_count: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_selected_count&quot;, &quot;transactions_list_chip_selected_count&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8544, 73),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6724, 65),</b>
+&nbsp;@delegate:ResourceContentHash(-347_039_336)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore_dialog_cancel: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore_dialog_cancel&quot;, &quot;settings_clear_firestore_dialog_cancel&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11385, 62),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8133, 54),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_172_182_651)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_sort: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_sort&quot;, &quot;transactions_list_chip_sort&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8618, 63),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6790, 43),</b>
+&nbsp;@delegate:ResourceContentHash(2_122_233_061)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore_dialog_confirm: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore_dialog_confirm&quot;, &quot;settings_clear_firestore_dialog_confirm&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11448, 67),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8188, 55),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(106_723_727)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_type: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_type&quot;, &quot;transactions_list_chip_type&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8682, 43),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6834, 43),</b>
+&nbsp;@delegate:ResourceContentHash(-339_320_926)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore_dialog_message: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore_dialog_message&quot;, &quot;settings_clear_firestore_dialog_message&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11516, 235),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8244, 171),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_731_324_128)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_value: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_chip_value&quot;, &quot;transactions_list_chip_value&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8726, 52),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6878, 52),</b>
+&nbsp;@delegate:ResourceContentHash(779_552_046)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore_dialog_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore_dialog_title&quot;, &quot;settings_clear_firestore_dialog_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11752, 81),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8416, 69),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-516_179_456)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_date_full: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_date_full&quot;, &quot;transactions_list_date_full&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8779, 55),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6931, 55),</b>
+&nbsp;@delegate:ResourceContentHash(-886_380_814)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore_done: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore_done&quot;, &quot;settings_clear_firestore_done&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11834, 117),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8486, 69),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_773_032_597)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_date_today: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_date_today&quot;, &quot;transactions_list_date_today&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8835, 56),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6987, 44),</b>
+&nbsp;@delegate:ResourceContentHash(-1_287_319_810)
+<b class="fc">&nbsp;internal val Res.string.settings_clear_firestore_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_clear_firestore_supporting&quot;, &quot;settings_clear_firestore_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11952, 187),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8556, 107),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(26_816_387)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_date_yesterday: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_date_yesterday&quot;, &quot;transactions_list_date_yesterday&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8892, 56),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7032, 52),</b>
+&nbsp;@delegate:ResourceContentHash(1_037_527_089)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_export_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_export_supporting&quot;, &quot;settings_csv_export_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 12209, 122),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8717, 82),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-294_691_173)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_delete_undo: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_delete_undo&quot;, &quot;transactions_list_delete_undo&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8949, 61),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7085, 45),</b>
+&nbsp;@delegate:ResourceContentHash(1_833_657_144)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_hero_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_hero_supporting&quot;, &quot;settings_csv_hero_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 12332, 340),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8800, 196),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(723_482_477)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_deleted_snackbar: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_deleted_snackbar&quot;, &quot;transactions_list_deleted_snackbar&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9011, 90),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7131, 70),</b>
+&nbsp;@delegate:ResourceContentHash(-738_946_584)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_hero_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_hero_title&quot;, &quot;settings_csv_hero_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 12673, 75),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8997, 55),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-312_594_612)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty&quot;, &quot;transactions_list_empty&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9835, 123),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7699, 91),</b>
+&nbsp;@delegate:ResourceContentHash(-1_329_189_906)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_import_result: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_import_result&quot;, &quot;settings_csv_import_result&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 12749, 142),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9053, 94),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-569_514_008)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_cta: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_cta&quot;, &quot;transactions_list_empty_cta&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9102, 87),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7202, 55),</b>
+&nbsp;@delegate:ResourceContentHash(885_382_760)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_import_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_import_supporting&quot;, &quot;settings_csv_import_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 12892, 158),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9148, 94),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-447_874_996)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_filtered: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_filtered&quot;, &quot;transactions_list_empty_filtered&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9370, 172),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7390, 104),</b>
+&nbsp;@delegate:ResourceContentHash(61_548_272)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_import_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_import_title&quot;, &quot;settings_csv_import_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13051, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9243, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_947_797_912)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_filtered_cta: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_filtered_cta&quot;, &quot;transactions_list_empty_filtered_cta&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9190, 88),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7258, 64),</b>
+&nbsp;@delegate:ResourceContentHash(1_301_276_147)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_account_workspace_mismatch: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_account_workspace_mismatch&quot;, &quot;settings_csv_issue_account_workspace_mismatch&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13113, 173),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9297, 117),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(2_043_282_418)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_filtered_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_filtered_title&quot;, &quot;transactions_list_empty_filtered_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9279, 90),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7323, 66),</b>
+&nbsp;@delegate:ResourceContentHash(-1_502_332_726)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_category_workspace_mismatch: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_category_workspace_mismatch&quot;, &quot;settings_csv_issue_category_workspace_mismatch&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13287, 186),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9415, 118),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(743_344_798)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_search: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_search&quot;, &quot;transactions_list_empty_search&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9622, 126),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7554, 78),</b>
+&nbsp;@delegate:ResourceContentHash(-1_785_193_676)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_columns: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_columns&quot;, &quot;settings_csv_issue_columns&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13474, 122),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9534, 78),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_948_966_498)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_search_cta: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_search_cta&quot;, &quot;transactions_list_empty_search_cta&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9543, 78),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7495, 58),</b>
+&nbsp;@delegate:ResourceContentHash(-833_421_046)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_currency_mismatch: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_currency_mismatch&quot;, &quot;settings_csv_issue_currency_mismatch&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13597, 144),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9613, 112),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_416_249_796)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_empty_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_empty_title&quot;, &quot;transactions_list_empty_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9749, 85),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7633, 65),</b>
+&nbsp;@delegate:ResourceContentHash(-303_169_637)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_invalid_value: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_invalid_value&quot;, &quot;settings_csv_issue_invalid_value&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13742, 120),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9726, 88),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(439_539_190)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_filter_all: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_all&quot;, &quot;transactions_list_filter_all&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9959, 44),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7791, 40),</b>
+&nbsp;@delegate:ResourceContentHash(1_969_734_200)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_unknown_account: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_unknown_account&quot;, &quot;settings_csv_issue_unknown_account&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13863, 90),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9815, 70),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_340_699_527)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_filter_expenses: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_filter_expenses&quot;, &quot;transactions_list_filter_expenses&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10004, 61),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7832, 53),</b>
+&nbsp;@delegate:ResourceContentHash(1_558_429_532)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_unknown_category: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_unknown_category&quot;, &quot;settings_csv_issue_unknown_category&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 13954, 107),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9886, 71),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_714_291_899)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_filter_income: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_income&quot;, &quot;transactions_list_filter_income&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10066, 55),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7886, 47),</b>
+&nbsp;@delegate:ResourceContentHash(-1_799_060_316)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_unknown_workspace: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_unknown_workspace&quot;, &quot;settings_csv_issue_unknown_workspace&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14062, 136),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9958, 76),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-224_525_539)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_filter_transfer: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_transfer&quot;, &quot;transactions_list_filter_transfer&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10122, 65),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7934, 53),</b>
+&nbsp;@delegate:ResourceContentHash(966_750_358)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_issue_unpaired_transfer: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_issue_unpaired_transfer&quot;, &quot;settings_csv_issue_unpaired_transfer&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14199, 120),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10035, 104),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-841_968_928)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_filters_badge: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_filters_badge&quot;, &quot;transactions_list_filters_badge&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10188, 47),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7988, 47),</b>
+&nbsp;@delegate:ResourceContentHash(-1_908_833_764)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_last_import_summary: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_last_import_summary&quot;, &quot;settings_csv_last_import_summary&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14320, 168),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10140, 108),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_521_816_508)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_filters_content_description: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_filters_content_description&quot;, &quot;transactions_list_filters_content_description&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10236, 73),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8036, 65),</b>
+&nbsp;@delegate:ResourceContentHash(87_341_439)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_notice_file_too_large: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_notice_file_too_large&quot;, &quot;settings_csv_notice_file_too_large&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14489, 150),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10249, 90),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-799_818_477)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_new: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_new&quot;, &quot;transactions_list_new&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10310, 45),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8102, 33),</b>
+&nbsp;@delegate:ResourceContentHash(1_018_515_662)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_notice_generic: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_notice_generic&quot;, &quot;settings_csv_notice_generic&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14640, 95),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10340, 63),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_053_985_393)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_all_time: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_all_time&quot;, &quot;transactions_list_period_all_time&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10450, 65),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8202, 53),</b>
+&nbsp;@delegate:ResourceContentHash(1_277_002_804)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_notice_invalid_file: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_notice_invalid_file&quot;, &quot;settings_csv_notice_invalid_file&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14736, 156),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10404, 108),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_759_035_762)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_all_time_sub: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_all_time_sub&quot;, &quot;transactions_list_period_all_time_sub&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10356, 93),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8136, 65),</b>
+&nbsp;@delegate:ResourceContentHash(594_982_621)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_row_error_format: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_row_error_format&quot;, &quot;settings_csv_row_error_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14893, 69),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10513, 57),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_053_985_393)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_mode_all_time: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_mode_all_time&quot;, &quot;transactions_list_period_mode_all_time&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10516, 70),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8256, 58),</b>
+&nbsp;@delegate:ResourceContentHash(-165_994_426)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_section_export: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_section_export&quot;, &quot;settings_csv_section_export&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 14963, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10571, 43),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_558_260_591)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_mode_month: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_mode_month&quot;, &quot;transactions_list_period_mode_month&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10587, 59),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8315, 51),</b>
+&nbsp;@delegate:ResourceContentHash(-1_352_654_590)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_section_import: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_section_import&quot;, &quot;settings_csv_section_import&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15019, 51),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10615, 43),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_017_234_191)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_mode_week: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_mode_week&quot;, &quot;transactions_list_period_mode_week&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10647, 58),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8367, 50),</b>
+&nbsp;@delegate:ResourceContentHash(1_972_062_716)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_section_last_import: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_section_last_import&quot;, &quot;settings_csv_section_last_import&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15071, 84),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10659, 56),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(98_570_088)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_next: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_period_next&quot;, &quot;transactions_list_period_next&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10706, 81),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8418, 53),</b>
+&nbsp;@delegate:ResourceContentHash(1_129_689_150)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_supporting&quot;, &quot;settings_csv_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15156, 151),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10716, 87),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_254_737_271)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_previous: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_period_previous&quot;, &quot;transactions_list_period_previous&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10788, 85),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8472, 61),</b>
+&nbsp;@delegate:ResourceContentHash(-1_535_667_077)
+<b class="fc">&nbsp;internal val Res.string.settings_csv_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_csv_title&quot;, &quot;settings_csv_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15308, 74),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10804, 54),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_736_794_687)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_week_range: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_period_week_range&quot;, &quot;transactions_list_period_week_range&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10962, 67),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8622, 67),</b>
+&nbsp;@delegate:ResourceContentHash(-1_924_551_206)
+<b class="fc">&nbsp;internal val Res.string.settings_dark_theme: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_dark_theme&quot;, &quot;settings_dark_theme&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15466, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10930, 43),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(909_440_815)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_week_range_cross_month: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_week_range_cross_month&quot;, &quot;transactions_list_period_week_range_cross_month&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10874, 87),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8534, 87),</b>
+&nbsp;@delegate:ResourceContentHash(-1_914_589_912)
+<b class="fc">&nbsp;internal val Res.string.settings_dark_theme_off: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_dark_theme_off&quot;, &quot;settings_dark_theme_off&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15383, 43),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10859, 35),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_791_894_659)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_period_week_sub: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_period_week_sub&quot;, &quot;transactions_list_period_week_sub&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11030, 61),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8690, 61),</b>
+&nbsp;@delegate:ResourceContentHash(424_367_829)
+<b class="fc">&nbsp;internal val Res.string.settings_dark_theme_on: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_dark_theme_on&quot;, &quot;settings_dark_theme_on&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15427, 38),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10895, 34),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-587_822_539)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_search_content_description: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_search_content_description&quot;, &quot;transactions_list_search_content_description&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11092, 96),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8752, 80),</b>
+&nbsp;@delegate:ResourceContentHash(-2_008_753_103)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_debug_config&quot;, &quot;settings_debug_config&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17377, 73),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12217, 57),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_131_759_747)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_search_placeholder: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_search_placeholder&quot;, &quot;transactions_list_search_placeholder&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11189, 124),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8833, 84),</b>
+&nbsp;@delegate:ResourceContentHash(-2_017_382_770)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_clear: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_debug_config_clear&quot;, &quot;settings_debug_config_clear&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15522, 95),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10974, 55),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(769_790_844)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_sort_newest: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_sort_newest&quot;, &quot;transactions_list_sort_newest&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11314, 73),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8918, 45),</b>
+&nbsp;@delegate:ResourceContentHash(-1_087_805_703)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_degraded_format: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_degraded_format&quot;, &quot;settings_debug_config_degraded_format&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15618, 205),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11030, 141),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_190_574_627)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_sort_oldest: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_sort_oldest&quot;, &quot;transactions_list_sort_oldest&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11388, 73),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8964, 45),</b>
+&nbsp;@delegate:ResourceContentHash(-1_693_554_367)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_footnote: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_footnote&quot;, &quot;settings_debug_config_footnote&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 15824, 290),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11172, 158),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_254_784_972)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_split_categories: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_split_categories&quot;, &quot;transactions_list_split_categories&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11462, 74),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9010, 62),</b>
+&nbsp;@delegate:ResourceContentHash(438_583_699)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_host_owned: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_host_owned&quot;, &quot;settings_debug_config_host_owned&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16115, 248),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11331, 152),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_468_612_166)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_summary_expenses: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_summary_expenses&quot;, &quot;transactions_list_summary_expenses&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11537, 58),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9073, 54),</b>
+&nbsp;@delegate:ResourceContentHash(1_852_641_415)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_invalid_format: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_debug_config_invalid_format&quot;, &quot;settings_debug_config_invalid_format&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16364, 128),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11484, 92),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(1_713_894_541)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_summary_income: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_summary_income&quot;, &quot;transactions_list_summary_income&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11596, 56),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9128, 48),</b>
+&nbsp;@delegate:ResourceContentHash(818_966_899)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_layer_absent: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_layer_absent&quot;, &quot;settings_debug_config_layer_absent&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16493, 74),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11577, 50),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_814_834_370)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_summary_net: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_summary_net&quot;, &quot;transactions_list_summary_net&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11653, 53),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9177, 41),</b>
+&nbsp;@delegate:ResourceContentHash(133_538_071)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_layer_undecodable_format: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_layer_undecodable_format&quot;, &quot;settings_debug_config_layer_undecodable_format&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16568, 98),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11628, 78),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_081_215_191)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_title&quot;, &quot;transactions_list_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11707, 59),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9219, 47),</b>
+&nbsp;@delegate:ResourceContentHash(-415_724_575)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_reset_all: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_reset_all&quot;, &quot;settings_debug_config_reset_all&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16667, 111),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11707, 67),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_080_873_167)
-<b class="fc">&nbsp;internal val Res.string.transactions_list_untitled: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_untitled&quot;, &quot;transactions_list_untitled&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11767, 62),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9267, 50),</b>
+&nbsp;@delegate:ResourceContentHash(1_558_279_597)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_section_keys: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_section_keys&quot;, &quot;settings_debug_config_section_keys&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16779, 58),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11775, 50),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_776_679_033)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_debug_config_supporting&quot;, &quot;settings_debug_config_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 16838, 172),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11826, 100),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(845_730_547)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_title&quot;, &quot;settings_debug_config_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17011, 67),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11927, 55),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_029_073_924)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_unavailable: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_unavailable&quot;, &quot;settings_debug_config_unavailable&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17079, 241),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 11983, 177),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_781_169_993)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_config_winner_format: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_config_winner_format&quot;, &quot;settings_debug_config_winner_format&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17321, 55),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12161, 55),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(803_185_303)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_log_clear: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_log_clear&quot;, &quot;settings_debug_log_clear&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17451, 64),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12275, 44),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(323_899_496)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_log_empty: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_log_empty&quot;, &quot;settings_debug_log_empty&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17516, 196),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12320, 116),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(221_957_405)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_log_footnote: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_log_footnote&quot;, &quot;settings_debug_log_footnote&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 17713, 323),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12437, 187),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_297_191_078)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_log_supporting: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_log_supporting&quot;, &quot;settings_debug_log_supporting&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 18037, 149),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12625, 97),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(480_064_832)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_log_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_log_title&quot;, &quot;settings_debug_log_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 18187, 44),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12723, 40),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_720_293_318)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_done_format: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_done_format&quot;, &quot;settings_debug_prefill_done_format&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 18232, 202),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12764, 130),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-184_277_941)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_failed: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_failed&quot;, &quot;settings_debug_prefill_failed&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 18435, 133),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12895, 93),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-664_122_900)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_footnote: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_footnote&quot;, &quot;settings_debug_prefill_footnote&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 18569, 507),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 12989, 271),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(731_751_804)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_no_workspace: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_no_workspace&quot;, &quot;settings_debug_prefill_no_workspace&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19077, 183),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13261, 111),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-2_092_699_650)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_running: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_running&quot;, &quot;settings_debug_prefill_running&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19261, 70),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13373, 54),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-930_860_179)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_section: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_section&quot;, &quot;settings_debug_prefill_section&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19332, 66),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13428, 50),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_877_425_307)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_supporting: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_supporting&quot;, &quot;settings_debug_prefill_supporting&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19399, 133),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13479, 109),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-796_588_458)
+<b class="fc">&nbsp;internal val Res.string.settings_debug_prefill_title: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:settings_debug_prefill_title&quot;, &quot;settings_debug_prefill_title&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19533, 104),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13589, 68),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-557_704_228)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account&quot;, &quot;settings_delete_account&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22976, 71),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15880, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-848_052_022)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_button: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_button&quot;, &quot;settings_delete_account_button&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19638, 86),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13658, 62),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-347_039_336)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_confirm_cancel: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_confirm_cancel&quot;, &quot;settings_delete_account_confirm_cancel&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19725, 62),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13721, 54),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-601_623_902)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_confirm_confirm: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_confirm_confirm&quot;, &quot;settings_delete_account_confirm_confirm&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19788, 91),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13776, 67),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(2_084_337_159)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_confirm_message: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_confirm_message&quot;, &quot;settings_delete_account_confirm_message&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 19880, 243),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 13844, 155),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-557_704_676)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_confirm_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_confirm_title&quot;, &quot;settings_delete_account_confirm_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 20124, 85),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14000, 65),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(609_599_787)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_deleted_memberships: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_deleted_memberships&quot;, &quot;settings_delete_account_deleted_memberships&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 20210, 151),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14066, 103),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_719_307_252)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_deleted_section: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_deleted_section&quot;, &quot;settings_delete_account_deleted_section&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 20362, 91),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14170, 75),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_287_919_333)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_deleted_sync: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_deleted_sync&quot;, &quot;settings_delete_account_deleted_sync&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 20454, 164),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14246, 104),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-2_016_685_819)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_deleted_workspaces: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_deleted_workspaces&quot;, &quot;settings_delete_account_deleted_workspaces&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 20619, 234),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14351, 150),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_783_084_665)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_intro: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_intro&quot;, &quot;settings_delete_account_intro&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 20854, 249),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14502, 149),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_881_257_784)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_kept_local: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_kept_local&quot;, &quot;settings_delete_account_kept_local&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 21104, 238),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14652, 146),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_180_953_322)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_kept_section: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_kept_section&quot;, &quot;settings_delete_account_kept_section&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 21343, 80),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14799, 60),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(865_916_350)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_kept_shared: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_kept_shared&quot;, &quot;settings_delete_account_kept_shared&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 21424, 271),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 14860, 175),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(244_580_555)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_notice_auth_failed: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_notice_auth_failed&quot;, &quot;settings_delete_account_notice_auth_failed&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 21696, 226),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15036, 162),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(295_219_420)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_notice_cleanup_failed: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_notice_cleanup_failed&quot;, &quot;settings_delete_account_notice_cleanup_failed&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 21923, 249),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15199, 145),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_017_470_833)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_notice_generic: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_notice_generic&quot;, &quot;settings_delete_account_notice_generic&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22173, 162),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15345, 102),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(628_411_559)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_notice_recent_login: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_notice_recent_login&quot;, &quot;settings_delete_account_notice_recent_login&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22336, 239),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15448, 127),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_982_787_862)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_notice_wrong_password: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_notice_wrong_password&quot;, &quot;settings_delete_account_notice_wrong_password&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22576, 93),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15576, 77),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-368_077_484)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_password_label: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_password_label&quot;, &quot;settings_delete_account_password_label&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22670, 94),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15654, 74),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_324_139_049)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_password_missing: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_password_missing&quot;, &quot;settings_delete_account_password_missing&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22765, 128),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15729, 92),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(447_349_122)
+<b class="fc">&nbsp;internal val Res.string.settings_delete_account_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_delete_account_title&quot;, &quot;settings_delete_account_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 22894, 81),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15822, 57),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-762_783_158)
+<b class="fc">&nbsp;internal val Res.string.settings_dynamic_colors: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_dynamic_colors&quot;, &quot;settings_dynamic_colors&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23159, 79),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16003, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-637_907_906)
+<b class="fc">&nbsp;internal val Res.string.settings_dynamic_colors_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_dynamic_colors_supporting&quot;, &quot;settings_dynamic_colors_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23048, 110),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 15932, 70),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(279_579_247)
+<b class="fc">&nbsp;internal val Res.string.settings_export_csv: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_export_csv&quot;, &quot;settings_export_csv&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23239, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16055, 47),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_631_315_247)
+<b class="fc">&nbsp;internal val Res.string.settings_feedback: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_feedback&quot;, &quot;settings_feedback&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23295, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16103, 45),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(902_051_967)
+<b class="fc">&nbsp;internal val Res.string.settings_goals_supporting: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_goals_supporting&quot;, &quot;settings_goals_supporting&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23361, 109),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16149, 89),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_116_053_509)
+<b class="fc">&nbsp;internal val Res.string.settings_goals_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_goals_title&quot;, &quot;settings_goals_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23471, 40),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16239, 36),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-933_205_173)
+<b class="fc">&nbsp;internal val Res.string.settings_language_pill: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_language_pill&quot;, &quot;settings_language_pill&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23512, 50),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16276, 42),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(604_897_916)
+<b class="fc">&nbsp;internal val Res.string.settings_language_title: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_language_title&quot;, &quot;settings_language_title&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23563, 43),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16319, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(369_719_339)
+<b class="fc">&nbsp;internal val Res.string.settings_licenses_error: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:settings_licenses_error&quot;, &quot;settings_licenses_error&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 23607, 123),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 16363, 71),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@InternalResourceApi
 &nbsp;internal fun _collectCommonMainString1Resources(map: MutableMap&lt;String, StringResource&gt;) {
-<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_all&quot;, Res.string.transaction_filters_type_all)</b>
-<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_expenses&quot;, Res.string.transaction_filters_type_expenses)</b>
-<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_income&quot;, Res.string.transaction_filters_type_income)</b>
-<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_transfer&quot;, Res.string.transaction_filters_type_transfer)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_account&quot;, Res.string.transactions_list_chip_account)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_category&quot;, Res.string.transactions_list_chip_category)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_date&quot;, Res.string.transactions_list_chip_date)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_date_custom&quot;, Res.string.transactions_list_chip_date_custom)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_selected_count&quot;, Res.string.transactions_list_chip_selected_count)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_sort&quot;, Res.string.transactions_list_chip_sort)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_type&quot;, Res.string.transactions_list_chip_type)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_value&quot;, Res.string.transactions_list_chip_value)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_date_full&quot;, Res.string.transactions_list_date_full)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_date_today&quot;, Res.string.transactions_list_date_today)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_date_yesterday&quot;, Res.string.transactions_list_date_yesterday)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_delete_undo&quot;, Res.string.transactions_list_delete_undo)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_deleted_snackbar&quot;, Res.string.transactions_list_deleted_snackbar)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty&quot;, Res.string.transactions_list_empty)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_cta&quot;, Res.string.transactions_list_empty_cta)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_filtered&quot;, Res.string.transactions_list_empty_filtered)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_filtered_cta&quot;, Res.string.transactions_list_empty_filtered_cta)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_filtered_title&quot;, Res.string.transactions_list_empty_filtered_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_search&quot;, Res.string.transactions_list_empty_search)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_search_cta&quot;, Res.string.transactions_list_empty_search_cta)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_empty_title&quot;, Res.string.transactions_list_empty_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_filter_all&quot;, Res.string.transactions_list_filter_all)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_filter_expenses&quot;, Res.string.transactions_list_filter_expenses)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_filter_income&quot;, Res.string.transactions_list_filter_income)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_filter_transfer&quot;, Res.string.transactions_list_filter_transfer)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_filters_badge&quot;, Res.string.transactions_list_filters_badge)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_filters_content_description&quot;, Res.string.transactions_list_filters_content_description)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_new&quot;, Res.string.transactions_list_new)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_all_time&quot;, Res.string.transactions_list_period_all_time)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_all_time_sub&quot;, Res.string.transactions_list_period_all_time_sub)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_mode_all_time&quot;, Res.string.transactions_list_period_mode_all_time)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_mode_month&quot;, Res.string.transactions_list_period_mode_month)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_mode_week&quot;, Res.string.transactions_list_period_mode_week)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_next&quot;, Res.string.transactions_list_period_next)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_previous&quot;, Res.string.transactions_list_period_previous)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_week_range&quot;, Res.string.transactions_list_period_week_range)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_week_range_cross_month&quot;, Res.string.transactions_list_period_week_range_cross_month)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_period_week_sub&quot;, Res.string.transactions_list_period_week_sub)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_search_content_description&quot;, Res.string.transactions_list_search_content_description)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_search_placeholder&quot;, Res.string.transactions_list_search_placeholder)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_sort_newest&quot;, Res.string.transactions_list_sort_newest)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_sort_oldest&quot;, Res.string.transactions_list_sort_oldest)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_split_categories&quot;, Res.string.transactions_list_split_categories)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_summary_expenses&quot;, Res.string.transactions_list_summary_expenses)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_summary_income&quot;, Res.string.transactions_list_summary_income)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_summary_net&quot;, Res.string.transactions_list_summary_net)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_title&quot;, Res.string.transactions_list_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;transactions_list_untitled&quot;, Res.string.transactions_list_untitled)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_backup_title&quot;, Res.string.settings_backup_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_budgets_supporting&quot;, Res.string.settings_budgets_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_budgets_title&quot;, Res.string.settings_budgets_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_categories_supporting&quot;, Res.string.settings_categories_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_categories_title&quot;, Res.string.settings_categories_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_change_workspace&quot;, Res.string.settings_change_workspace)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_change_workspace_supporting&quot;, Res.string.settings_change_workspace_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore&quot;, Res.string.settings_clear_firestore)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore_dialog_cancel&quot;, Res.string.settings_clear_firestore_dialog_cancel)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore_dialog_confirm&quot;, Res.string.settings_clear_firestore_dialog_confirm)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore_dialog_message&quot;, Res.string.settings_clear_firestore_dialog_message)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore_dialog_title&quot;, Res.string.settings_clear_firestore_dialog_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore_done&quot;, Res.string.settings_clear_firestore_done)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_clear_firestore_supporting&quot;, Res.string.settings_clear_firestore_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_export_supporting&quot;, Res.string.settings_csv_export_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_hero_supporting&quot;, Res.string.settings_csv_hero_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_hero_title&quot;, Res.string.settings_csv_hero_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_import_result&quot;, Res.string.settings_csv_import_result)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_import_supporting&quot;, Res.string.settings_csv_import_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_import_title&quot;, Res.string.settings_csv_import_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_account_workspace_mismatch&quot;, Res.string.settings_csv_issue_account_workspace_mismatch)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_category_workspace_mismatch&quot;, Res.string.settings_csv_issue_category_workspace_mismatch)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_columns&quot;, Res.string.settings_csv_issue_columns)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_currency_mismatch&quot;, Res.string.settings_csv_issue_currency_mismatch)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_invalid_value&quot;, Res.string.settings_csv_issue_invalid_value)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_unknown_account&quot;, Res.string.settings_csv_issue_unknown_account)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_unknown_category&quot;, Res.string.settings_csv_issue_unknown_category)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_unknown_workspace&quot;, Res.string.settings_csv_issue_unknown_workspace)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_issue_unpaired_transfer&quot;, Res.string.settings_csv_issue_unpaired_transfer)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_last_import_summary&quot;, Res.string.settings_csv_last_import_summary)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_notice_file_too_large&quot;, Res.string.settings_csv_notice_file_too_large)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_notice_generic&quot;, Res.string.settings_csv_notice_generic)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_notice_invalid_file&quot;, Res.string.settings_csv_notice_invalid_file)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_row_error_format&quot;, Res.string.settings_csv_row_error_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_section_export&quot;, Res.string.settings_csv_section_export)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_section_import&quot;, Res.string.settings_csv_section_import)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_section_last_import&quot;, Res.string.settings_csv_section_last_import)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_supporting&quot;, Res.string.settings_csv_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_csv_title&quot;, Res.string.settings_csv_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_dark_theme&quot;, Res.string.settings_dark_theme)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_dark_theme_off&quot;, Res.string.settings_dark_theme_off)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_dark_theme_on&quot;, Res.string.settings_dark_theme_on)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config&quot;, Res.string.settings_debug_config)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_clear&quot;, Res.string.settings_debug_config_clear)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_degraded_format&quot;, Res.string.settings_debug_config_degraded_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_footnote&quot;, Res.string.settings_debug_config_footnote)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_host_owned&quot;, Res.string.settings_debug_config_host_owned)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_invalid_format&quot;, Res.string.settings_debug_config_invalid_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_layer_absent&quot;, Res.string.settings_debug_config_layer_absent)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_layer_undecodable_format&quot;, Res.string.settings_debug_config_layer_undecodable_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_reset_all&quot;, Res.string.settings_debug_config_reset_all)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_section_keys&quot;, Res.string.settings_debug_config_section_keys)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_supporting&quot;, Res.string.settings_debug_config_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_title&quot;, Res.string.settings_debug_config_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_unavailable&quot;, Res.string.settings_debug_config_unavailable)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_config_winner_format&quot;, Res.string.settings_debug_config_winner_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_log_clear&quot;, Res.string.settings_debug_log_clear)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_log_empty&quot;, Res.string.settings_debug_log_empty)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_log_footnote&quot;, Res.string.settings_debug_log_footnote)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_log_supporting&quot;, Res.string.settings_debug_log_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_log_title&quot;, Res.string.settings_debug_log_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_done_format&quot;, Res.string.settings_debug_prefill_done_format)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_failed&quot;, Res.string.settings_debug_prefill_failed)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_footnote&quot;, Res.string.settings_debug_prefill_footnote)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_no_workspace&quot;, Res.string.settings_debug_prefill_no_workspace)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_running&quot;, Res.string.settings_debug_prefill_running)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_section&quot;, Res.string.settings_debug_prefill_section)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_supporting&quot;, Res.string.settings_debug_prefill_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_debug_prefill_title&quot;, Res.string.settings_debug_prefill_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account&quot;, Res.string.settings_delete_account)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_button&quot;, Res.string.settings_delete_account_button)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_confirm_cancel&quot;, Res.string.settings_delete_account_confirm_cancel)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_confirm_confirm&quot;, Res.string.settings_delete_account_confirm_confirm)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_confirm_message&quot;, Res.string.settings_delete_account_confirm_message)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_confirm_title&quot;, Res.string.settings_delete_account_confirm_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_deleted_memberships&quot;, Res.string.settings_delete_account_deleted_memberships)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_deleted_section&quot;, Res.string.settings_delete_account_deleted_section)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_deleted_sync&quot;, Res.string.settings_delete_account_deleted_sync)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_deleted_workspaces&quot;, Res.string.settings_delete_account_deleted_workspaces)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_intro&quot;, Res.string.settings_delete_account_intro)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_kept_local&quot;, Res.string.settings_delete_account_kept_local)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_kept_section&quot;, Res.string.settings_delete_account_kept_section)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_kept_shared&quot;, Res.string.settings_delete_account_kept_shared)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_notice_auth_failed&quot;, Res.string.settings_delete_account_notice_auth_failed)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_notice_cleanup_failed&quot;, Res.string.settings_delete_account_notice_cleanup_failed)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_notice_generic&quot;, Res.string.settings_delete_account_notice_generic)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_notice_recent_login&quot;, Res.string.settings_delete_account_notice_recent_login)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_notice_wrong_password&quot;, Res.string.settings_delete_account_notice_wrong_password)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_password_label&quot;, Res.string.settings_delete_account_password_label)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_password_missing&quot;, Res.string.settings_delete_account_password_missing)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_delete_account_title&quot;, Res.string.settings_delete_account_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_dynamic_colors&quot;, Res.string.settings_dynamic_colors)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_dynamic_colors_supporting&quot;, Res.string.settings_dynamic_colors_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_export_csv&quot;, Res.string.settings_export_csv)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_feedback&quot;, Res.string.settings_feedback)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_goals_supporting&quot;, Res.string.settings_goals_supporting)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_goals_title&quot;, Res.string.settings_goals_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_language_pill&quot;, Res.string.settings_language_pill)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_language_title&quot;, Res.string.settings_language_title)</b>
+<b class="nc">&nbsp;  map.put(&quot;settings_licenses_error&quot;, Res.string.settings_licenses_error)</b>
 &nbsp;}
 </code>
 </pre>
@@ -602,7 +1033,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

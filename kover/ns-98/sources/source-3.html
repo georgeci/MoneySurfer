@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > String0_commonMainKt</title>
+  <title>MoneySurfer Coverage Report > Plurals0_commonMainKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.feature.login.generated.resources</a>
+    <a href="../index.html">moneysurfer.feature.insights.generated.resources</a>
 </div>
 
-<h1>Coverage Summary for Class: String0_commonMainKt (moneysurfer.feature.login.generated.resources)</h1>
+<h1>Coverage Summary for Class: Plurals0_commonMainKt (moneysurfer.feature.insights.generated.resources)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">String0_commonMainKt</td>
+  <td class="name">Plurals0_commonMainKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,27 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86%
+    66.7%
   </span>
   <span class="absValue">
-    (104/121)
+    (2/3)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    64%
+    80%
   </span>
   <span class="absValue">
-    (192/300)
+    (4/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    68.6%
+    87.5%
   </span>
   <span class="absValue">
-    (1976/2880)
+    (42/48)
   </span>
 </td>
 </tr>
@@ -94,561 +94,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
 &nbsp;
-&nbsp;package moneysurfer.feature.login.generated.resources
+&nbsp;package moneysurfer.feature.insights.generated.resources
 &nbsp;
 &nbsp;import kotlin.OptIn
 &nbsp;import kotlin.String
 &nbsp;import kotlin.collections.MutableMap
 &nbsp;import org.jetbrains.compose.resources.InternalResourceApi
 &nbsp;import org.jetbrains.compose.resources.LanguageQualifier
+&nbsp;import org.jetbrains.compose.resources.PluralStringResource
 &nbsp;import org.jetbrains.compose.resources.ResourceContentHash
 &nbsp;import org.jetbrains.compose.resources.ResourceItem
-&nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;
-&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.login.generated.resources/&quot;
+&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.feature.insights.generated.resources/&quot;
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-48_247_375)
-<b class="fc">&nbsp;internal val Res.string.legal_privacy_body: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:legal_privacy_body&quot;, &quot;legal_privacy_body&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10, 2126),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10, 1082),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_616_166_434)
-<b class="fc">&nbsp;internal val Res.string.legal_privacy_heading: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:legal_privacy_heading&quot;, &quot;legal_privacy_heading&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2137, 101),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1093, 49),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_847_662_259)
-<b class="fc">&nbsp;internal val Res.string.legal_terms_body: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:legal_terms_body&quot;, &quot;legal_terms_body&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 2239, 2216),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 1143, 1128),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_085_298_954)
-<b class="fc">&nbsp;internal val Res.string.legal_terms_heading: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:legal_terms_heading&quot;, &quot;legal_terms_heading&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4456, 83),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2272, 43),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_560_404_060)
-<b class="fc">&nbsp;internal val Res.string.legal_title: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:legal_title&quot;, &quot;legal_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4540, 67),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2316, 39),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_517_429_748)
-<b class="fc">&nbsp;internal val Res.string.legal_updated: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:legal_updated&quot;, &quot;legal_updated&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4608, 65),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2356, 53),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(825_393_453)
-<b class="fc">&nbsp;internal val Res.string.onboarding_skip: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_skip&quot;, &quot;onboarding_skip&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4674, 51),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2410, 31),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_629_463_618)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_card_body: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_card_body&quot;, &quot;onboarding_start_card_body&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4726, 134),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2442, 82),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(2_123_697_841)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_card_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_card_title&quot;, &quot;onboarding_start_card_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4861, 51),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2525, 43),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(2_067_121_464)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_cash_body: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_cash_body&quot;, &quot;onboarding_start_cash_body&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 4913, 146),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2569, 82),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_883_080_418)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_cash_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_cash_title&quot;, &quot;onboarding_start_cash_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5060, 59),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2652, 43),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_893_749_215)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_cta: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_cta&quot;, &quot;onboarding_start_cta&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5120, 60),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2696, 48),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_982_532_195)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_recommended: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_recommended&quot;, &quot;onboarding_start_recommended&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5181, 68),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2745, 52),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_755_847_815)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_savings_body: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_savings_body&quot;, &quot;onboarding_start_savings_body&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5250, 101),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2798, 73),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-53_473_801)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_savings_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_savings_title&quot;, &quot;onboarding_start_savings_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5352, 66),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2872, 50),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(225_880_828)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_subtitle: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_subtitle&quot;, &quot;onboarding_start_subtitle&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5419, 249),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 2923, 117),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(522_469_018)
-<b class="fc">&nbsp;internal val Res.string.onboarding_start_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_start_title&quot;, &quot;onboarding_start_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5669, 66),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3041, 54),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-741_858_769)
-<b class="fc">&nbsp;internal val Res.string.onboarding_step_format: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_step_format&quot;, &quot;onboarding_step_format&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5736, 58),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3096, 54),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-218_782_152)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_cta: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_cta&quot;, &quot;onboarding_value_cta&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5795, 44),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3151, 44),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_070_447_548)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_feature_offline_body: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_feature_offline_body&quot;, &quot;onboarding_value_feature_offline_body&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5840, 125),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3196, 93),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_215_635_337)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_feature_offline_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_feature_offline_title&quot;, &quot;onboarding_value_feature_offline_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 5966, 90),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3290, 74),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_519_203_902)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_feature_together_body: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_feature_together_body&quot;, &quot;onboarding_value_feature_together_body&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6057, 130),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3365, 98),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-527_785_556)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_feature_together_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_feature_together_title&quot;, &quot;onboarding_value_feature_together_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6188, 83),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3464, 67),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(780_060_533)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_feature_track_body: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_feature_track_body&quot;, &quot;onboarding_value_feature_track_body&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6272, 111),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3532, 91),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(2_141_859_021)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_feature_track_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_feature_track_title&quot;, &quot;onboarding_value_feature_track_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6384, 84),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3624, 76),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(816_717_793)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_note_offline: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_note_offline&quot;, &quot;onboarding_value_note_offline&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6469, 157),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3701, 109),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-228_056_301)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_note_online: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_note_online&quot;, &quot;onboarding_value_note_online&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6627, 188),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3811, 100),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-576_430_138)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_subtitle: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_subtitle&quot;, &quot;onboarding_value_subtitle&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 6816, 289),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 3912, 173),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-760_217_286)
-<b class="fc">&nbsp;internal val Res.string.onboarding_value_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:onboarding_value_title&quot;, &quot;onboarding_value_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7106, 114),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4086, 86),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_861_774_370)
-<b class="fc">&nbsp;internal val Res.string.sign_in_anonymous: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_anonymous&quot;, &quot;sign_in_anonymous&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7221, 77),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4173, 49),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(935_886_272)
-<b class="fc">&nbsp;internal val Res.string.sign_in_brand: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_brand&quot;, &quot;sign_in_brand&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7299, 37),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4223, 37),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_651_909_975)
-<b class="fc">&nbsp;internal val Res.string.sign_in_demo_mode: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_demo_mode&quot;, &quot;sign_in_demo_mode&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7337, 85),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4261, 61),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_535_573_411)
-<b class="fc">&nbsp;internal val Res.string.sign_in_email: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_email&quot;, &quot;sign_in_email&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7459, 53),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4359, 45),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_327_306_705)
-<b class="fc">&nbsp;internal val Res.string.sign_in_email_label: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_email_label&quot;, &quot;sign_in_email_label&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7423, 35),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4323, 35),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_777_745_602)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_dialog_ok: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_error_dialog_ok&quot;, &quot;sign_in_error_dialog_ok&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7513, 51),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4405, 35),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_219_954_087)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_dialog_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_error_dialog_title&quot;, &quot;sign_in_error_dialog_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7565, 90),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4441, 58),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_468_777_555)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_email_in_use: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_error_email_in_use&quot;, &quot;sign_in_error_email_in_use&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7656, 154),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4500, 106),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_246_205_475)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_email_invalid: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_error_email_invalid&quot;, &quot;sign_in_error_email_invalid&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7811, 155),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4607, 99),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_473_753_783)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_email_required: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_error_email_required&quot;, &quot;sign_in_error_email_required&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7967, 64),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4707, 60),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(500_733_275)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_invalid_credentials: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_error_invalid_credentials&quot;, &quot;sign_in_error_invalid_credentials&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8032, 101),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4768, 73),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-845_322_268)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_password_required: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_error_password_required&quot;, &quot;sign_in_error_password_required&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8134, 75),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4842, 67),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_904_290_243)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_password_too_short: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_error_password_too_short&quot;, &quot;sign_in_error_password_too_short&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8210, 84),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4910, 76),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(130_431_927)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_permission_denied: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_error_permission_denied&quot;, &quot;sign_in_error_permission_denied&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8295, 183),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 4987, 115),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-55_322_428)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_unknown: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_error_unknown&quot;, &quot;sign_in_error_unknown&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8479, 125),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5103, 81),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(611_977_876)
-<b class="fc">&nbsp;internal val Res.string.sign_in_error_weak_password: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_error_weak_password&quot;, &quot;sign_in_error_weak_password&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8605, 119),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5185, 103),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_146_478_121)
-<b class="fc">&nbsp;internal val Res.string.sign_in_hero_subtitle: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_hero_subtitle&quot;, &quot;sign_in_hero_subtitle&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8725, 213),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5289, 141),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(799_764_639)
-<b class="fc">&nbsp;internal val Res.string.sign_in_hero_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_hero_title&quot;, &quot;sign_in_hero_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8939, 94),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5431, 54),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(664_552_672)
-<b class="fc">&nbsp;internal val Res.string.sign_in_login: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_login&quot;, &quot;sign_in_login&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9034, 29),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5486, 29),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(468_988_781)
-<b class="fc">&nbsp;internal val Res.string.sign_in_or: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_or&quot;, &quot;sign_in_or&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9064, 26),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5516, 22),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-894_543_614)
-<b class="fc">&nbsp;internal val Res.string.sign_in_passkey: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_passkey&quot;, &quot;sign_in_passkey&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9091, 55),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5539, 51),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_624_333_965)
-<b class="fc">&nbsp;internal val Res.string.sign_in_password_label: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_password_label&quot;, &quot;sign_in_password_label&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9147, 46),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5591, 42),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_055_462_006)
-<b class="fc">&nbsp;internal val Res.string.sign_in_sheet_subtitle: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_sheet_subtitle&quot;, &quot;sign_in_sheet_subtitle&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9194, 178),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5634, 78),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_876_737_388)
-<b class="fc">&nbsp;internal val Res.string.sign_in_sheet_title: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_sheet_title&quot;, &quot;sign_in_sheet_title&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9373, 43),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5713, 43),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-198_578_608)
-<b class="fc">&nbsp;internal val Res.string.sign_in_submit_signin: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_submit_signin&quot;, &quot;sign_in_submit_signin&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9417, 45),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5757, 41),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_668_475_459)
-<b class="fc">&nbsp;internal val Res.string.sign_in_submit_signup: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_submit_signup&quot;, &quot;sign_in_submit_signup&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9463, 69),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5799, 49),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_530_291_355)
-<b class="fc">&nbsp;internal val Res.string.sign_in_subtitle: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_subtitle&quot;, &quot;sign_in_subtitle&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9533, 112),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5849, 80),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_680_486_770)
-<b class="fc">&nbsp;internal val Res.string.sign_in_terms: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_terms&quot;, &quot;sign_in_terms&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9646, 129),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 5930, 85),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-1_408_272_729)
-<b class="fc">&nbsp;internal val Res.string.sign_in_title: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:sign_in_title&quot;, &quot;sign_in_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9776, 33),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6016, 33),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-2_128_836_914)
-<b class="fc">&nbsp;internal val Res.string.sign_in_toggle_to_signin: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_toggle_to_signin&quot;, &quot;sign_in_toggle_to_signin&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9810, 96),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6050, 76),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_936_453_042)
-<b class="fc">&nbsp;internal val Res.string.sign_in_toggle_to_signup: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:sign_in_toggle_to_signup&quot;, &quot;sign_in_toggle_to_signup&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9907, 112),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6127, 68),</b>
+&nbsp;@delegate:ResourceContentHash(-528_081_996)
+<b class="fc">&nbsp;internal val Res.plurals.insights_merchant_transactions: PluralStringResource by lazy {</b>
+<b class="fc">&nbsp;      PluralStringResource(&quot;plurals:insights_merchant_transactions&quot;, &quot;insights_merchant_transactions&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/plurals.commonMain.cvr&quot;, 10, 173),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/plurals.commonMain.cvr&quot;, 10, 98),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@InternalResourceApi
-&nbsp;internal fun _collectCommonMainString0Resources(map: MutableMap&lt;String, StringResource&gt;) {
-<b class="nc">&nbsp;  map.put(&quot;legal_privacy_body&quot;, Res.string.legal_privacy_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;legal_privacy_heading&quot;, Res.string.legal_privacy_heading)</b>
-<b class="nc">&nbsp;  map.put(&quot;legal_terms_body&quot;, Res.string.legal_terms_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;legal_terms_heading&quot;, Res.string.legal_terms_heading)</b>
-<b class="nc">&nbsp;  map.put(&quot;legal_title&quot;, Res.string.legal_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;legal_updated&quot;, Res.string.legal_updated)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_skip&quot;, Res.string.onboarding_skip)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_card_body&quot;, Res.string.onboarding_start_card_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_card_title&quot;, Res.string.onboarding_start_card_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_cash_body&quot;, Res.string.onboarding_start_cash_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_cash_title&quot;, Res.string.onboarding_start_cash_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_cta&quot;, Res.string.onboarding_start_cta)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_recommended&quot;, Res.string.onboarding_start_recommended)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_savings_body&quot;, Res.string.onboarding_start_savings_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_savings_title&quot;, Res.string.onboarding_start_savings_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_subtitle&quot;, Res.string.onboarding_start_subtitle)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_start_title&quot;, Res.string.onboarding_start_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_step_format&quot;, Res.string.onboarding_step_format)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_cta&quot;, Res.string.onboarding_value_cta)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_feature_offline_body&quot;, Res.string.onboarding_value_feature_offline_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_feature_offline_title&quot;, Res.string.onboarding_value_feature_offline_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_feature_together_body&quot;, Res.string.onboarding_value_feature_together_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_feature_together_title&quot;, Res.string.onboarding_value_feature_together_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_feature_track_body&quot;, Res.string.onboarding_value_feature_track_body)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_feature_track_title&quot;, Res.string.onboarding_value_feature_track_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_note_offline&quot;, Res.string.onboarding_value_note_offline)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_note_online&quot;, Res.string.onboarding_value_note_online)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_subtitle&quot;, Res.string.onboarding_value_subtitle)</b>
-<b class="nc">&nbsp;  map.put(&quot;onboarding_value_title&quot;, Res.string.onboarding_value_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_anonymous&quot;, Res.string.sign_in_anonymous)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_brand&quot;, Res.string.sign_in_brand)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_demo_mode&quot;, Res.string.sign_in_demo_mode)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_email&quot;, Res.string.sign_in_email)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_email_label&quot;, Res.string.sign_in_email_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_dialog_ok&quot;, Res.string.sign_in_error_dialog_ok)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_dialog_title&quot;, Res.string.sign_in_error_dialog_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_email_in_use&quot;, Res.string.sign_in_error_email_in_use)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_email_invalid&quot;, Res.string.sign_in_error_email_invalid)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_email_required&quot;, Res.string.sign_in_error_email_required)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_invalid_credentials&quot;, Res.string.sign_in_error_invalid_credentials)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_password_required&quot;, Res.string.sign_in_error_password_required)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_password_too_short&quot;, Res.string.sign_in_error_password_too_short)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_permission_denied&quot;, Res.string.sign_in_error_permission_denied)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_unknown&quot;, Res.string.sign_in_error_unknown)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_error_weak_password&quot;, Res.string.sign_in_error_weak_password)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_hero_subtitle&quot;, Res.string.sign_in_hero_subtitle)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_hero_title&quot;, Res.string.sign_in_hero_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_login&quot;, Res.string.sign_in_login)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_or&quot;, Res.string.sign_in_or)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_passkey&quot;, Res.string.sign_in_passkey)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_password_label&quot;, Res.string.sign_in_password_label)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_sheet_subtitle&quot;, Res.string.sign_in_sheet_subtitle)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_sheet_title&quot;, Res.string.sign_in_sheet_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_submit_signin&quot;, Res.string.sign_in_submit_signin)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_submit_signup&quot;, Res.string.sign_in_submit_signup)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_subtitle&quot;, Res.string.sign_in_subtitle)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_terms&quot;, Res.string.sign_in_terms)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_title&quot;, Res.string.sign_in_title)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_toggle_to_signin&quot;, Res.string.sign_in_toggle_to_signin)</b>
-<b class="nc">&nbsp;  map.put(&quot;sign_in_toggle_to_signup&quot;, Res.string.sign_in_toggle_to_signup)</b>
+&nbsp;internal fun _collectCommonMainPlurals0Resources(map: MutableMap&lt;String, PluralStringResource&gt;) {
+<b class="nc">&nbsp;  map.put(&quot;insights_merchant_transactions&quot;, Res.plurals.insights_merchant_transactions)</b>
 &nbsp;}
 </code>
 </pre>
@@ -673,7 +142,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

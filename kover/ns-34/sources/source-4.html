@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetEditState</title>
+  <title>MoneySurfer Coverage Report > BudgetDetailsState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.edit</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetEditState (com.georgeci.moneysurfer.feature.budget.edit)</h1>
+<h1>Coverage Summary for Class: BudgetDetailsState (com.georgeci.moneysurfer.feature.budget.details)</h1>
 
 <table class="coverageStats">
 
@@ -45,49 +45,111 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">BudgetEditState</td>
-<td class="coverageStat">
-  <span class="percent">
-    60%
-  </span>
-  <span class="absValue">
-    (3/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    66.7%
-  </span>
-  <span class="absValue">
-    (12/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.2%
-  </span>
-  <span class="absValue">
-    (15/17)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.7%
-  </span>
-  <span class="absValue">
-    (134/151)
-  </span>
-</td>
-</tr>
   <tr>
-    <td class="name">BudgetEditState$Companion</td>
+    <td class="name">BudgetDetailsState$Companion</td>
     <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Content</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Content$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Loading</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Missing</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
     60%
   </span>
   <span class="absValue">
@@ -96,26 +158,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    75%
   </span>
   <span class="absValue">
-    (12/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.2%
-  </span>
-  <span class="absValue">
-    (15/17)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.7%
-  </span>
-  <span class="absValue">
-    (134/151)
+    (12/16)
   </span>
 </td>
 </tr>
@@ -126,252 +172,137 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.edit
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.CreateBudgetUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.EditBudgetUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.ArchiveBudgetUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
-&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetCategoryUi
-&nbsp;import com.georgeci.moneysurfer.navigation.SnackbarController
+&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetUi
+&nbsp;import com.georgeci.moneysurfer.feature.budget.formatShortDate
+&nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.TimeZone
-&nbsp;import kotlinx.datetime.toLocalDateTime
-&nbsp;import moneysurfer.feature.budget.generated.resources.Res
-&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_created_snackbar
-&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_updated_snackbar
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
 &nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;@KoinViewModel
-&nbsp;class BudgetEditViewModel(
-&nbsp;    private val budgetId: BudgetId?,
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class BudgetDetailsViewModel(
+&nbsp;    private val budgetId: BudgetId,
 &nbsp;    private val budgetRepository: BudgetRepository,
-&nbsp;    private val createBudget: CreateBudgetUseCase,
-&nbsp;    private val editBudget: EditBudgetUseCase,
+&nbsp;    private val getBudgetProgress: GetBudgetProgressUseCase,
+&nbsp;    private val getBudgetTransactions: GetBudgetTransactionsUseCase,
 &nbsp;    private val getCategories: GetCategoriesUseCase,
-&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,
-&nbsp;    private val session: SessionPointers,
-&nbsp;    private val clock: ClockUseCase,
-&nbsp;    private val snackbar: SnackbarController,
-&nbsp;) : MviViewModel&lt;BudgetEditState, BudgetEditEvent, BudgetEditEffect&gt;(
-&nbsp;    initialState = BudgetEditState(),
+&nbsp;    private val archiveBudget: ArchiveBudgetUseCase,
+&nbsp;) : MviViewModel&lt;BudgetDetailsState, BudgetDetailsEvent, BudgetDetailsEffect&gt;(
+&nbsp;    initialState = BudgetDetailsState.Loading,
 &nbsp;) {
 &nbsp;
 &nbsp;    init {
-&nbsp;        updateState { copy(startDate = today()) }
-&nbsp;        if (budgetId != null) loadBudget(budgetId)
-&nbsp;        observeCategories()
+&nbsp;        observeBudget()
 &nbsp;    }
 &nbsp;
-&nbsp;    override fun onEvent(event: BudgetEditEvent) {
+&nbsp;    override fun onEvent(event: BudgetDetailsEvent) {
 &nbsp;        when (event) {
-&nbsp;            is BudgetEditEvent.OnNameChanged -&gt; updateState {
-&nbsp;                copy(name = event.name.take(BudgetEditState.NAME_MAX_LENGTH), nameTouched = true)
-&nbsp;            }
-&nbsp;            is BudgetEditEvent.OnAmountChanged -&gt; updateState { copy(amount = event.amount, amountTouched = true) }
-&nbsp;            is BudgetEditEvent.OnPeriodChanged -&gt; updateState { copy(period = event.period) }
-&nbsp;            is BudgetEditEvent.OnStartDateChanged -&gt; updateState { copy(startDate = event.date) }
-&nbsp;            is BudgetEditEvent.OnCategoryToggled -&gt; toggleCategory(event.categoryId)
-&nbsp;            BudgetEditEvent.OnAllCategoriesSelected -&gt; updateState { copy(selectedCategoryIds = emptySet()) }
-&nbsp;            is BudgetEditEvent.OnAlertPercentChanged -&gt; updateState { copy(alertPercent = event.percent) }
-&nbsp;            is BudgetEditEvent.OnRolloverChanged -&gt; updateState { copy(rollover = event.enabled) }
-&nbsp;            BudgetEditEvent.OnBackClick -&gt; postSideEffect(BudgetEditEffect.NavigateBack)
-&nbsp;            BudgetEditEvent.OnSaveClick -&gt; save()
+&nbsp;            BudgetDetailsEvent.OnBackClick -&gt; postSideEffect(BudgetDetailsEffect.NavigateBack)
+&nbsp;            BudgetDetailsEvent.OnEditClick -&gt; postSideEffect(BudgetDetailsEffect.NavigateToBudgetEdit(budgetId))
+&nbsp;            BudgetDetailsEvent.OnArchiveClick -&gt; toggleArchive()
+&nbsp;            is BudgetDetailsEvent.OnTransactionClick -&gt;
+&nbsp;                postSideEffect(BudgetDetailsEffect.NavigateToTransactionDetails(event.transactionId))
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun toggleCategory(categoryId: String) = updateState {
-&nbsp;        copy(
-&nbsp;            selectedCategoryIds = if (categoryId in selectedCategoryIds) {
-&nbsp;                selectedCategoryIds - categoryId
-&nbsp;            } else {
-&nbsp;                selectedCategoryIds + categoryId
-&nbsp;            },
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun loadBudget(id: BudgetId) {
-&nbsp;        launch {
-&nbsp;            updateState { copy(isLoading = true) }
-&nbsp;            val budget = budgetRepository.getById(id)
-&nbsp;            if (budget == null) {
-&nbsp;                updateState { copy(isLoading = false) }
-&nbsp;                return@launch
-&nbsp;            }
-&nbsp;            updateState {
-&nbsp;                copy(
-&nbsp;                    name = budget.name,
-&nbsp;                    amount = budget.amount.toInput(),
-&nbsp;                    period = budget.period,
-&nbsp;                    startDate = budget.startDate,
-&nbsp;                    selectedCategoryIds = budget.categoryIds.map { it.value }.toSet(),
-&nbsp;                    alertPercent = budget.alertPercent,
-&nbsp;                    rollover = budget.rollover,
-&nbsp;                    isLoading = false,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
+&nbsp;    private fun toggleArchive() {
+&nbsp;        val content = currentState as? BudgetDetailsState.Content ?: return
+&nbsp;        launch { archiveBudget(budgetId, isActive = !content.budget.isActive) }
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Expense categories only: a budget caps spending, so offering income categories would let
-&nbsp;     * the user build one that can never move.
+&nbsp;     * The budget itself is read once and then re-read through the progress stream: progress
+&nbsp;     * recomputes on every transaction change, and an edit to the budget lands as a new emission
+&nbsp;     * of the repository flow feeding it.
 &nbsp;     */
-&nbsp;    private fun observeCategories() {
+&nbsp;    private fun observeBudget() {
 &nbsp;        launch {
-&nbsp;            getCategories().collect { categories -&gt;
-&nbsp;                val options = categories
-&nbsp;                    .filter { it.type == CategoryType.EXPENSE }
-&nbsp;                    .map {
-&nbsp;                        BudgetCategoryUi(
-&nbsp;                            id = it.id.value,
-&nbsp;                            name = it.name,
-&nbsp;                            iconKey = it.iconKey,
-&nbsp;                            hue = it.hue,
-&nbsp;                            systemKind = it.systemKind?.name,
+&nbsp;            budgetRepository.getAll()
+&nbsp;                .flatMapLatest { budgets -&gt;
+&nbsp;                    val budget = budgets.firstOrNull { it.id == budgetId }
+&nbsp;                        ?: return@flatMapLatest flowOf(null)
+&nbsp;                    combine(
+&nbsp;                        getBudgetProgress(budget),
+&nbsp;                        getBudgetTransactions(budget),
+&nbsp;                        getCategories(),
+&nbsp;                    ) { progress, transactions, categories -&gt;
+&nbsp;                        val categoriesById = categories.associateBy { it.id.value }
+&nbsp;                        BudgetDetailsState.Content(
+&nbsp;                            budget = progress.toUi(categoriesById),
+&nbsp;                            transactions = transactions.map { it.toUi() },
 &nbsp;                        )
 &nbsp;                    }
-&nbsp;                updateState {
-&nbsp;                    copy(
-&nbsp;                        categoryOptions = options,
-&nbsp;                        // Drop a selection whose category was deleted rather than saving a dangling id.
-&nbsp;                        selectedCategoryIds = selectedCategoryIds.filter { selected -&gt;
-&nbsp;                            options.any { it.id == selected }
-&nbsp;                        }.toSet(),
-&nbsp;                    )
 &nbsp;                }
-&nbsp;            }
+&nbsp;                .collect { content -&gt;
+&nbsp;                    updateState { content ?: BudgetDetailsState.Missing }
+&nbsp;                }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun save() {
-&nbsp;        val state = currentState
-&nbsp;        if (!state.canSave) return
-&nbsp;        val amount = state.amountAsMoney ?: return
-&nbsp;        launch {
-&nbsp;            updateState { copy(isLoading = true) }
-&nbsp;            val trimmedName = state.name.trim()
-&nbsp;            val categoryIds = state.selectedCategoryIds.map(::CategoryId)
+&nbsp;    private fun CategorizedTransaction.toUi() = BudgetTransactionUi(
+&nbsp;        id = transaction.id,
+&nbsp;        title = transaction.merchant.takeIf { it.isNotBlank() }
+&nbsp;            ?: transaction.note.takeIf { it.isNotBlank() }
+&nbsp;            ?: categoryName.orEmpty(),
+&nbsp;        categoryName = categoryName,
+&nbsp;        amountFormatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
+&nbsp;        dateLabel = formatShortDate(transaction.operationDate),
+&nbsp;    )
+&nbsp;}
 &nbsp;
-&nbsp;            if (budgetId != null) {
-&nbsp;                val existing = budgetRepository.getById(budgetId)
-&nbsp;                if (existing != null) {
-&nbsp;                    editBudget(
-&nbsp;                        existing.copy(
-&nbsp;                            name = trimmedName,
-&nbsp;                            amount = amount,
-&nbsp;                            period = state.period,
-&nbsp;                            startDate = state.startDate,
-&nbsp;                            categoryIds = categoryIds,
-&nbsp;                            alertPercent = state.alertPercent,
-&nbsp;                            rollover = state.rollover,
-&nbsp;                        ),
-&nbsp;                    )
-&nbsp;                    snackbar.show(Res.string.budget_edit_updated_snackbar, listOf(trimmedName))
-&nbsp;                }
-&nbsp;                postSideEffect(BudgetEditEffect.NavigateBack)
-&nbsp;                return@launch
-&nbsp;            }
+&nbsp;@optics
+&nbsp;sealed interface BudgetDetailsState {
+<b class="nc">&nbsp;    data object Loading : BudgetDetailsState</b>
 &nbsp;
-&nbsp;            val workspaceId = session.currentWorkspaceId.first()
-&nbsp;            if (workspaceId == null) {
-&nbsp;                updateState { copy(isLoading = false) }
-&nbsp;                return@launch
-&nbsp;            }
-&nbsp;            createBudget(
-&nbsp;                Budget(
-&nbsp;                    id = BudgetId.uuid(),
-&nbsp;                    workspaceId = workspaceId,
-&nbsp;                    name = trimmedName,
-&nbsp;                    categoryIds = categoryIds,
-&nbsp;                    amount = amount,
-&nbsp;                    period = state.period,
-&nbsp;                    startDate = state.startDate,
-&nbsp;                    alertPercent = state.alertPercent,
-&nbsp;                    rollover = state.rollover,
-&nbsp;                    createdAt = getCurrentTime(),
-&nbsp;                ),
-&nbsp;            )
-&nbsp;            snackbar.show(Res.string.budget_edit_created_snackbar, listOf(trimmedName))
-&nbsp;            postSideEffect(BudgetEditEffect.NavigateBack)
-&nbsp;        }
+&nbsp;    /** The budget was deleted — on another device, or from the list behind this screen. */
+<b class="nc">&nbsp;    data object Missing : BudgetDetailsState</b>
+&nbsp;
+<b class="fc">&nbsp;    @optics</b>
+&nbsp;    data class Content(
+<b class="fc">&nbsp;        val budget: BudgetUi,</b>
+<b class="fc">&nbsp;        val transactions: List&lt;BudgetTransactionUi&gt;,</b>
+&nbsp;    ) : BudgetDetailsState {
+&nbsp;        companion object
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun today(): LocalDate =
-&nbsp;        clock.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+&nbsp;    companion object
 &nbsp;}
 &nbsp;
-&nbsp;private const val MINOR_PER_MAJOR = 100
-&nbsp;private const val DECIMALS = 2
+&nbsp;data class BudgetTransactionUi(
+&nbsp;    val id: TransactionId,
+&nbsp;    val title: String,
+&nbsp;    val categoryName: String?,
+&nbsp;    val amountFormatted: String,
+&nbsp;    val dateLabel: String,
+&nbsp;)
 &nbsp;
-&nbsp;/** Money → the text the amount field shows, in major units with two decimals. */
-&nbsp;private fun Money.toInput(): String {
-&nbsp;    val major = minor / MINOR_PER_MAJOR
-&nbsp;    val cents = (minor % MINOR_PER_MAJOR).toInt()
-&nbsp;    return if (cents == 0) major.toString() else &quot;$major.${cents.toString().padStart(DECIMALS, &#39;0&#39;)}&quot;
+&nbsp;sealed interface BudgetDetailsEvent {
+&nbsp;    data object OnBackClick : BudgetDetailsEvent
+&nbsp;    data object OnEditClick : BudgetDetailsEvent
+&nbsp;    data object OnArchiveClick : BudgetDetailsEvent
+&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : BudgetDetailsEvent
 &nbsp;}
 &nbsp;
-&nbsp;data class BudgetEditState(
-<b class="fc">&nbsp;    val name: String = &quot;&quot;,</b>
-&nbsp;    /** Raw field text, already normalized by `AmountInputTransformation`. */
-<b class="fc">&nbsp;    val amount: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,</b>
-<b class="fc">&nbsp;    val startDate: LocalDate = LocalDate(EPOCH_YEAR, 1, 1),</b>
-&nbsp;    /** Empty means &quot;all categories&quot; — a general budget, exactly as the domain reads it. */
-<b class="fc">&nbsp;    val selectedCategoryIds: Set&lt;String&gt; = emptySet(),</b>
-<b class="fc">&nbsp;    val categoryOptions: List&lt;BudgetCategoryUi&gt; = emptyList(),</b>
-<b class="fc">&nbsp;    val alertPercent: Int = DEFAULT_ALERT_PERCENT,</b>
-<b class="fc">&nbsp;    val rollover: Boolean = false,</b>
-<b class="fc">&nbsp;    val isLoading: Boolean = false,</b>
-<b class="fc">&nbsp;    val nameTouched: Boolean = false,</b>
-<b class="fc">&nbsp;    val amountTouched: Boolean = false,</b>
-&nbsp;) {
-&nbsp;    val amountAsMoney: Money?
-<b class="fc">&nbsp;        get() = amount.toDoubleOrNull()</b>
-<b class="fc">&nbsp;            ?.takeIf { it &gt; 0.0 }</b>
-<b class="fc">&nbsp;            ?.let(Money::fromDouble)</b>
-&nbsp;
-<b class="fc">&nbsp;    val canSave: Boolean get() = name.isNotBlank() &amp;&amp; amountAsMoney != null &amp;&amp; !isLoading</b>
-&nbsp;
-<b class="nc">&nbsp;    val nameMissing: Boolean get() = nameTouched &amp;&amp; name.isBlank()</b>
-&nbsp;
-<b class="nc">&nbsp;    val amountMissing: Boolean get() = amountTouched &amp;&amp; amountAsMoney == null</b>
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        const val NAME_MAX_LENGTH = 50
-&nbsp;        const val DEFAULT_ALERT_PERCENT = 80
-&nbsp;
-&nbsp;        /** Placeholder only — the view model overwrites it with today on init. */
-&nbsp;        const val EPOCH_YEAR = 1970
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface BudgetEditEvent {
-&nbsp;    data class OnNameChanged(val name: String) : BudgetEditEvent
-&nbsp;    data class OnAmountChanged(val amount: String) : BudgetEditEvent
-&nbsp;    data class OnPeriodChanged(val period: BudgetPeriod) : BudgetEditEvent
-&nbsp;    data class OnStartDateChanged(val date: LocalDate) : BudgetEditEvent
-&nbsp;    data class OnCategoryToggled(val categoryId: String) : BudgetEditEvent
-&nbsp;    data object OnAllCategoriesSelected : BudgetEditEvent
-&nbsp;    data class OnAlertPercentChanged(val percent: Int) : BudgetEditEvent
-&nbsp;    data class OnRolloverChanged(val enabled: Boolean) : BudgetEditEvent
-&nbsp;    data object OnBackClick : BudgetEditEvent
-&nbsp;    data object OnSaveClick : BudgetEditEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface BudgetEditEffect {
-&nbsp;    data object NavigateBack : BudgetEditEffect
+&nbsp;sealed interface BudgetDetailsEffect {
+&nbsp;    data object NavigateBack : BudgetDetailsEffect
+&nbsp;    data class NavigateToBudgetEdit(val budgetId: BudgetId) : BudgetDetailsEffect
+&nbsp;    data class NavigateToTransactionDetails(val transactionId: TransactionId) : BudgetDetailsEffect
 &nbsp;}
 </code>
 </pre>
@@ -396,7 +327,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

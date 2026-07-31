@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferErrorBoundaryTestTags</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferErrorBoundaryTestTags (com.georgeci.moneysurfer.uikit.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferErrorBoundaryTestTags</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.material3.Surface
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.uikit.generated.resources.Res
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_subtitle
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_title
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_retry
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * App-level fallback for failures no screen handled itself: while [hasError] is true a
+&nbsp; * full-bleed [SurferErrorState] with a retry action covers [content] (issue #78).
+&nbsp; *
+&nbsp; * The content stays composed underneath rather than being torn down and rebuilt, so a
+&nbsp; * transient failure does not cost the user their navigation back stack — dismissing via
+&nbsp; * [onRetry] returns them exactly where they were, and the screen&#39;s own reload runs on the
+&nbsp; * data it already observes.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferErrorBoundary(
+&nbsp;    hasError: Boolean,
+&nbsp;    onRetry: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    Box(modifier = modifier.fillMaxSize()) {
+&nbsp;        content()
+&nbsp;
+&nbsp;        if (hasError) {
+&nbsp;            Surface(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .testTag(SurferErrorBoundaryTestTags.Fallback),
+&nbsp;                color = AppTheme.materialColors.surface,
+&nbsp;            ) {
+&nbsp;                Box(contentAlignment = Alignment.Center) {
+&nbsp;                    SurferErrorState(
+&nbsp;                        title = stringResource(Res.string.uikit_error_boundary_title),
+&nbsp;                        subtitle = stringResource(Res.string.uikit_error_boundary_subtitle),
+&nbsp;                        retryLabel = stringResource(Res.string.uikit_retry),
+&nbsp;                        onRetry = onRetry,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;object SurferErrorBoundaryTestTags {
+&nbsp;    const val Fallback = &quot;errorBoundary:fallback&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferErrorBoundaryPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferErrorBoundary(hasError = true, onRetry = {}) {}
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

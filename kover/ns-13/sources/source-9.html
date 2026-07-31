@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorySpendRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateLatestDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorySpendRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: ExchangeRateLatestDto (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,21 +46,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorySpendRepositoryImpl</td>
+  <td class="name">ExchangeRateLatestDto</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    30.8%
   </span>
   <span class="absValue">
-    (5/8)
+    (8/26)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,66 +68,62 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (17/17)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    93.7%
+    65.4%
   </span>
   <span class="absValue">
-    (89/95)
+    (125/191)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1</td>
+    <td class="name">ExchangeRateLatestDto$Companion</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1$2</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1$2$1</td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (3/6)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    30.8%
   </span>
   <span class="absValue">
-    (5/8)
+    (8/26)
   </span>
 </td>
 <td class="coverageStat">
@@ -135,15 +131,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (17/17)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    93.7%
+    66.2%
   </span>
   <span class="absValue">
-    (89/95)
+    (129/195)
   </span>
 </td>
 </tr>
@@ -154,68 +150,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
-&nbsp;import com.georgeci.moneysurfer.domain.model.next
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategorySpendRepository
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.flowOf
-&nbsp;import kotlinx.coroutines.flow.map
-&nbsp;import kotlinx.datetime.YearMonth
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlinx.serialization.SerialName
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlin.time.Instant
 &nbsp;
-<b class="fc">&nbsp;@Single(binds = [CategorySpendRepository::class])</b>
-&nbsp;class CategorySpendRepositoryImpl(
-<b class="fc">&nbsp;    private val dao: TransactionDao,</b>
-&nbsp;) : CategorySpendRepository {
+&nbsp;/**
+&nbsp; * Where the FX quotes come from.
+&nbsp; *
+&nbsp; * Default is ExchangeRate-API&#39;s *open* endpoint (`open.er-api.com`): free, no API key, no
+&nbsp; * registration, ~160 currencies, refreshed daily. Its free tier asks for attribution wherever the
+&nbsp; * rates are shown, which the dashboard&#39;s &quot;as of&quot; footnote carries.
+&nbsp; *
+&nbsp; * Bound in `RemoteDataModule` so the URL is one override away — swapping providers means replacing
+&nbsp; * this binding and [ExchangeRateLatestDto], nothing above the data layer.
+&nbsp; */
+&nbsp;data class ExchangeRateApiConfig(
+&nbsp;    val baseUrl: String = DEFAULT_BASE_URL,
+&nbsp;) {
+&nbsp;    /** `…/v6/latest/USD` — the base currency is a path segment, so nothing needs URL-encoding. */
+&nbsp;    fun latestUrl(base: CurrencyCode): String = &quot;$baseUrl/${base.value}&quot;
 &nbsp;
-&nbsp;    override fun monthlyTotals(
-&nbsp;        workspaceId: WorkspaceId,
-&nbsp;        categoryIds: List&lt;CategoryId&gt;,
-&nbsp;        type: TransactionType,
-&nbsp;        baseCurrency: CurrencyCode?,
-&nbsp;        fromMonth: YearMonth,
-&nbsp;        toMonth: YearMonth,
-&nbsp;    ): Flow&lt;List&lt;CategoryMonthlyTotal&gt;&gt; {
-&nbsp;        // `IN ()` is a syntax error in SQLite, and an empty subtree is a normal state — a
-&nbsp;        // category can be deleted out from under an open detail screen.
-<b class="pc">&nbsp;        if (categoryIds.isEmpty()) return flowOf(emptyList())</b>
-&nbsp;
-<b class="fc">&nbsp;        return dao.getMonthlyTotalsByCategory(</b>
-<b class="fc">&nbsp;            workspaceId = workspaceId.value,</b>
-<b class="fc">&nbsp;            categoryIds = categoryIds.map { it.value },</b>
-<b class="fc">&nbsp;            type = type.name,</b>
-<b class="fc">&nbsp;            baseCurrency = baseCurrency?.value,</b>
-<b class="fc">&nbsp;            fromDate = fromMonth.firstDay.toString(),</b>
-<b class="fc">&nbsp;            toDateExclusive = toMonth.next().firstDay.toString(),</b>
-<b class="fc">&nbsp;        ).map { rows -&gt; rows.mapNotNull { it.toDomain() } }</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Null for a row whose `month` will not parse. `substr` cannot produce one from a valid
-&nbsp;     * `operationDate`, and since the query joined the shared spend predicate it cannot see an
-&nbsp;     * invalid one either — `operationDate = date(operationDate)` admits only canonical dates. Kept
-&nbsp;     * as a second line because the column is a plain string one predicate change away from letting
-&nbsp;     * something else through, and dropping one unreadable month beats failing the whole screen.
-&nbsp;     */
-&nbsp;    private fun CategoryMonthlyTotalEntity.toDomain(): CategoryMonthlyTotal? {
-<b class="pc">&nbsp;        val parsed = runCatching { YearMonth.parse(month) }.getOrNull() ?: return null</b>
-<b class="fc">&nbsp;        return CategoryMonthlyTotal(</b>
-<b class="fc">&nbsp;            categoryId = CategoryId(categoryId),</b>
-<b class="fc">&nbsp;            month = parsed,</b>
-<b class="fc">&nbsp;            total = Money.fromMinor(totalMinor),</b>
-<b class="fc">&nbsp;            transactionCount = transactionCount,</b>
-&nbsp;        )
+&nbsp;    companion object {
+&nbsp;        const val DEFAULT_BASE_URL: String = &quot;https://open.er-api.com/v6/latest&quot;
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The subset of the provider&#39;s payload that matters. Unknown fields (`provider`, `terms_of_use`,
+&nbsp; * `time_next_update_*`, …) are ignored by the decoder rather than modelled.
+&nbsp; */
+<b class="pc">&nbsp;@Serializable</b>
+&nbsp;internal data class ExchangeRateLatestDto(
+<b class="fc">&nbsp;    val result: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    @SerialName(&quot;base_code&quot;) val baseCode: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    @SerialName(&quot;time_last_update_unix&quot;) val timeLastUpdateUnix: Long = 0L,</b>
+<b class="fc">&nbsp;    val rates: Map&lt;String, Double&gt; = emptyMap(),</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Maps the payload to the domain table, or `null` when it is not usable: a non-success `result`,
+&nbsp; * an empty quote set, a base that is not the one asked for (a redirect or a provider fallback), or
+&nbsp; * a missing publication timestamp — all of which would otherwise cache a table the UI would
+&nbsp; * mislabel.
+&nbsp; */
+&nbsp;internal fun ExchangeRateLatestDto.toDomain(requested: CurrencyCode): ExchangeRateTable? {
+&nbsp;    if (result != RESULT_SUCCESS || rates.isEmpty() || timeLastUpdateUnix &lt;= 0L) return null
+&nbsp;    if (!baseCode.equals(requested.value, ignoreCase = true)) return null
+&nbsp;    return ExchangeRateTable(
+&nbsp;        baseCurrency = requested,
+&nbsp;        rates = rates
+&nbsp;            .filterValues { it.isFinite() &amp;&amp; it &gt; 0.0 }
+&nbsp;            .mapKeys { (code, _) -&gt; CurrencyCode(code.uppercase()) },
+&nbsp;        asOf = Instant.fromEpochSeconds(timeLastUpdateUnix),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private const val RESULT_SUCCESS = &quot;success&quot;
 </code>
 </pre>
 </div>
@@ -239,7 +233,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

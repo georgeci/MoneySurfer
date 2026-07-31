@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryCreationTestTags</title>
+  <title>MoneySurfer Coverage Report > BudgetsTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.category.creation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.list</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryCreationTestTags (com.georgeci.moneysurfer.feature.category.creation)</h1>
+<h1>Coverage Summary for Class: BudgetsTestTags (com.georgeci.moneysurfer.feature.budget.list)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryCreationTestTags</td>
+  <td class="name">BudgetsTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,394 +44,305 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.creation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.list
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
 &nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.Card
-&nbsp;import androidx.compose.material3.CardDefaults
-&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.material3.AlertDialog
 &nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetUi
+&nbsp;import com.georgeci.moneysurfer.feature.budget.budgetPeriodLabel
+&nbsp;import com.georgeci.moneysurfer.feature.budget.budgetStatusLabel
+&nbsp;import com.georgeci.moneysurfer.feature.budget.previewBudget
+&nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferDropdown
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.category.SurferColorSwatchRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.category.SurferIconPickerGrid
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCardMetrics
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCategoryVisual
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.AmountInputTransformation
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.category.generated.resources.Res
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_cap_hint
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_cap_label
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_cap_managed
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_cap_managed_hint
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_color_label
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_field_parent
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_icon_label
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_name_counter
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_name_error_required
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_name_label
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_parent_none
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_save
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_title_create
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_title_edit
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_expense
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_income
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_label
-&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_untitled
+&nbsp;import moneysurfer.feature.budget.generated.resources.Res
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_days_left
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_footer_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_over_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_remaining_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_spent_of_format
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_active_header
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_add
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_archive
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_archived_header
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_delete
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_delete_cancel
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_delete_message
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_delete_title
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_empty
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_restore
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_title
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
-&nbsp;private val SectionSpacing = 24.dp
-&nbsp;
-&nbsp;/** Stable selectors for the category create/edit screen — see docs/testing/testing-strategy.md. */
-&nbsp;object CategoryCreationTestTags {
-&nbsp;    const val Root = &quot;categoryCreation:root&quot;
-&nbsp;    const val NameField = &quot;categoryCreation:name&quot;
-&nbsp;    const val SaveButton = &quot;categoryCreation:save&quot;
+&nbsp;/** Stable selectors for the Budgets screen — see docs/testing/testing-strategy.md. */
+&nbsp;object BudgetsTestTags {
+&nbsp;    const val Root = &quot;budgets:root&quot;
+&nbsp;    const val AddButton = &quot;budgets:add&quot;
+&nbsp;    const val List = &quot;budgets:list&quot;
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;fun CategoryCreationScreen(
-&nbsp;    categoryId: CategoryId? = null,
+&nbsp;fun BudgetsScreen(
 &nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    viewModel: CategoryCreationViewModel = koinViewModel(
-&nbsp;        key = categoryId?.value ?: &quot;new&quot;,
-&nbsp;    ) { parametersOf(categoryId) },
+&nbsp;    onNavigateToBudgetCreation: () -&gt; Unit,
+&nbsp;    onNavigateToBudgetDetails: (BudgetId) -&gt; Unit,
+&nbsp;    viewModel: BudgetsViewModel = koinViewModel(),
 &nbsp;) {
 &nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
 &nbsp;    viewModel.HandleSideEffect { effect -&gt;
 &nbsp;        when (effect) {
-&nbsp;            CategoryCreationEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            BudgetsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            BudgetsEffect.NavigateToBudgetCreation -&gt; onNavigateToBudgetCreation()
+&nbsp;            is BudgetsEffect.NavigateToBudgetDetails -&gt; onNavigateToBudgetDetails(effect.budgetId)
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    CategoryCreationContent(
+&nbsp;    BudgetsContent(
 &nbsp;        state = state,
-&nbsp;        isEditing = categoryId != null,
 &nbsp;        onEvent = viewModel::onEvent,
 &nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;private fun CategoryCreationContent(
-&nbsp;    state: CategoryCreationState,
-&nbsp;    isEditing: Boolean,
-&nbsp;    onEvent: (CategoryCreationEvent) -&gt; Unit,
+&nbsp;private fun BudgetsContent(
+&nbsp;    state: BudgetsState,
+&nbsp;    onEvent: (BudgetsEvent) -&gt; Unit,
 &nbsp;) {
-&nbsp;    // Same resolver every other category bubble in the app goes through, so the preview card
-&nbsp;    // shows exactly what the manage list and transaction screens will show once saved.
-&nbsp;    val visual = SurferCategoryPalette.visualFor(
-&nbsp;        id = &quot;&quot;,
-&nbsp;        iconKey = state.iconKey,
-&nbsp;        hue = state.hue,
-&nbsp;    )
-&nbsp;
 &nbsp;    Scaffold(
 &nbsp;        modifier = Modifier
 &nbsp;            .surferSafeInsets()
-&nbsp;            .testTag(CategoryCreationTestTags.Root)
+&nbsp;            .testTag(BudgetsTestTags.Root)
 &nbsp;            .surferTestTagAsId(),
 &nbsp;        containerColor = AppTheme.materialColors.surface,
 &nbsp;        topBar = {
 &nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(
-&nbsp;                    if (isEditing) {
-&nbsp;                        Res.string.category_creation_title_edit
-&nbsp;                    } else {
-&nbsp;                        Res.string.category_creation_title_create
-&nbsp;                    },
-&nbsp;                ),
-&nbsp;                onBack = { onEvent(CategoryCreationEvent.OnBackClick) },
-&nbsp;                actions = {
-&nbsp;                    SurferToolbarButtonAction(
-&nbsp;                        icon = SurferIcons.Check,
-&nbsp;                        text = stringResource(Res.string.category_creation_save),
-&nbsp;                        onClick = { onEvent(CategoryCreationEvent.OnSaveClick) },
-&nbsp;                        enabled = state.canSave,
-&nbsp;                        modifier = Modifier.testTag(CategoryCreationTestTags.SaveButton),
-&nbsp;                    )
-&nbsp;                },
+&nbsp;                title = stringResource(Res.string.budgets_title),
+&nbsp;                onBack = { onEvent(BudgetsEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        floatingActionButton = {
+&nbsp;            val addLabel = stringResource(Res.string.budgets_add)
+&nbsp;            SurferAddFab(
+&nbsp;                label = addLabel,
+&nbsp;                onClick = { onEvent(BudgetsEvent.OnAddBudgetClick) },
+&nbsp;                modifier = Modifier.testTag(BudgetsTestTags.AddButton),
 &nbsp;            )
 &nbsp;        },
 &nbsp;    ) { padding -&gt;
-&nbsp;        Column(
+&nbsp;        val content = state as? BudgetsState.Content
+&nbsp;        if (content == null) {
+&nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;            return@Scaffold
+&nbsp;        }
+&nbsp;        if (content.active.isEmpty() &amp;&amp; content.archived.isEmpty()) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .surferContentContainer()
+&nbsp;                    .padding(padding)
+&nbsp;                    .padding(horizontal = AppTheme.spacing.large),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budgets_empty),
+&nbsp;                    style = AppTheme.typography.bodyLarge,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    textAlign = TextAlign.Center,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            return@Scaffold
+&nbsp;        }
+&nbsp;
+&nbsp;        LazyColumn(
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
 &nbsp;                .surferContentContainer()
 &nbsp;                .padding(top = padding.calculateTopPadding())
-&nbsp;                .verticalScroll(rememberScrollState())
-&nbsp;                .padding(horizontal = SectionSpacing)
-&nbsp;                .padding(top = AppTheme.spacing.small),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(SectionSpacing),
+&nbsp;                .testTag(BudgetsTestTags.List),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                top = AppTheme.spacing.small,
+&nbsp;                bottom = padding.calculateBottomPadding() +
+&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
+&nbsp;            ),
 &nbsp;        ) {
-&nbsp;            PreviewCard(
-&nbsp;                name = state.name.ifBlank { stringResource(Res.string.category_creation_untitled) },
-&nbsp;                typeLabel = stringResource(
-&nbsp;                    if (state.type == CategoryTypeUi.Income) {
-&nbsp;                        Res.string.category_creation_type_income
-&nbsp;                    } else {
-&nbsp;                        Res.string.category_creation_type_expense
-&nbsp;                    },
-&nbsp;                ),
-&nbsp;                icon = visual.icon,
-&nbsp;                tint = visual.tint,
-&nbsp;            )
-&nbsp;
-&nbsp;            TypeSelector(
-&nbsp;                selected = state.type,
-&nbsp;                onChange = { onEvent(CategoryCreationEvent.OnTypeChanged(it)) },
-&nbsp;            )
-&nbsp;
-&nbsp;            OutlinedTextField(
-&nbsp;                value = state.name,
-&nbsp;                onValueChange = { onEvent(CategoryCreationEvent.OnNameChanged(it)) },
-&nbsp;                label = { Text(stringResource(Res.string.category_creation_name_label)) },
-&nbsp;                singleLine = true,
-&nbsp;                isError = state.nameMissing,
-&nbsp;                supportingText = when {
-&nbsp;                    state.nameMissing -&gt; {
-&nbsp;                        { Text(stringResource(Res.string.category_creation_name_error_required)) }
-&nbsp;                    }
-&nbsp;                    state.showNameCounter -&gt; {
-&nbsp;                        {
-&nbsp;                            Text(
-&nbsp;                                stringResource(
-&nbsp;                                    Res.string.category_creation_name_counter,
-&nbsp;                                    state.name.length,
-&nbsp;                                    CategoryCreationState.NAME_MAX_LENGTH,
-&nbsp;                                ),
-&nbsp;                            )
-&nbsp;                        }
-&nbsp;                    }
-&nbsp;                    else -&gt; null
-&nbsp;                },
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .testTag(CategoryCreationTestTags.NameField),
-&nbsp;            )
-&nbsp;
-&nbsp;            Column {
-&nbsp;                SurferSectionLabel(stringResource(Res.string.category_creation_icon_label))
-&nbsp;                Spacer(Modifier.height(10.dp))
-&nbsp;                SurferIconPickerGrid(
-&nbsp;                    selectedKey = state.iconKey,
-&nbsp;                    tint = visual.tint,
-&nbsp;                    onSelect = { onEvent(CategoryCreationEvent.OnIconSelected(it)) },
+&nbsp;            if (content.active.isNotEmpty() &amp;&amp; content.archived.isNotEmpty()) {
+&nbsp;                item(key = &quot;header:active&quot;) {
+&nbsp;                    SurferSectionHeader(
+&nbsp;                        title = stringResource(Res.string.budgets_active_header),
+&nbsp;                        modifier = Modifier.padding(
+&nbsp;                            start = AppTheme.spacing.default,
+&nbsp;                            end = AppTheme.spacing.default,
+&nbsp;                            top = AppTheme.spacing.medium,
+&nbsp;                            bottom = AppTheme.spacing.xSmall,
+&nbsp;                        ),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;            items(content.active, key = { it.id.value }) { budget -&gt;
+&nbsp;                BudgetRow(
+&nbsp;                    budget = budget,
+&nbsp;                    archiveLabel = stringResource(Res.string.budgets_archive),
+&nbsp;                    deleteLabel = stringResource(Res.string.budgets_delete),
+&nbsp;                    onClick = { onEvent(BudgetsEvent.OnBudgetClick(budget.id)) },
+&nbsp;                    onArchiveClick = { onEvent(BudgetsEvent.OnArchiveClick(budget.id)) },
+&nbsp;                    onDeleteClick = { onEvent(BudgetsEvent.OnDeleteClick(budget.id)) },
 &nbsp;                )
 &nbsp;            }
-&nbsp;
-&nbsp;            Column {
-&nbsp;                SurferSectionLabel(stringResource(Res.string.category_creation_color_label))
-&nbsp;                Spacer(Modifier.height(10.dp))
-&nbsp;                SurferColorSwatchRow(
-&nbsp;                    selectedHue = state.hue,
-&nbsp;                    onSelect = { onEvent(CategoryCreationEvent.OnColorSelected(it)) },
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            ParentPicker(
-&nbsp;                selectedId = state.parentId,
-&nbsp;                options = state.parentOptions,
-&nbsp;                onSelect = { onEvent(CategoryCreationEvent.OnParentSelected(it)) },
-&nbsp;            )
-&nbsp;
-&nbsp;            if (state.showCap) {
-&nbsp;                CapField(
-&nbsp;                    cap = state.cap,
-&nbsp;                    managedByBudgetName = state.capManagedByBudgetName,
-&nbsp;                    onChange = { onEvent(CategoryCreationEvent.OnCapChanged(it)) },
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + SectionSpacing))
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun PreviewCard(
-&nbsp;    name: String,
-&nbsp;    typeLabel: String,
-&nbsp;    icon: ImageVector,
-&nbsp;    tint: Color,
-&nbsp;) {
-&nbsp;    Card(
-&nbsp;        modifier = Modifier.fillMaxWidth(),
-&nbsp;        colors = CardDefaults.cardColors(
-&nbsp;            containerColor = AppTheme.materialColors.surfaceContainerHigh,
-&nbsp;        ),
-&nbsp;        shape = RoundedCornerShape(20.dp),
-&nbsp;    ) {
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.padding(AppTheme.spacing.default),
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(14.dp),
-&nbsp;        ) {
-&nbsp;            SurferCategoryBubble(icon = icon, tint = tint, size = 48.dp)
-&nbsp;            Column(modifier = Modifier.weight(1f)) {
-&nbsp;                Text(
-&nbsp;                    text = name,
-&nbsp;                    style = AppTheme.typography.titleMedium,
-&nbsp;                    color = AppTheme.materialColors.onSurface,
-&nbsp;                    maxLines = 1,
-&nbsp;                    overflow = TextOverflow.Ellipsis,
-&nbsp;                )
-&nbsp;                Text(
-&nbsp;                    text = typeLabel,
-&nbsp;                    style = AppTheme.typography.bodySmall,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                )
+&nbsp;            if (content.archived.isNotEmpty()) {
+&nbsp;                item(key = &quot;header:archived&quot;) {
+&nbsp;                    SurferSectionHeader(
+&nbsp;                        title = stringResource(Res.string.budgets_archived_header),
+&nbsp;                        modifier = Modifier.padding(
+&nbsp;                            start = AppTheme.spacing.default,
+&nbsp;                            end = AppTheme.spacing.default,
+&nbsp;                            top = AppTheme.spacing.medium,
+&nbsp;                            bottom = AppTheme.spacing.xSmall,
+&nbsp;                        ),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                items(content.archived, key = { it.id.value }) { budget -&gt;
+&nbsp;                    BudgetRow(
+&nbsp;                        budget = budget,
+&nbsp;                        archiveLabel = stringResource(Res.string.budgets_restore),
+&nbsp;                        deleteLabel = stringResource(Res.string.budgets_delete),
+&nbsp;                        onClick = { onEvent(BudgetsEvent.OnBudgetClick(budget.id)) },
+&nbsp;                        onArchiveClick = { onEvent(BudgetsEvent.OnRestoreClick(budget.id)) },
+&nbsp;                        onDeleteClick = { onEvent(BudgetsEvent.OnDeleteClick(budget.id)) },
+&nbsp;                    )
+&nbsp;                }
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun TypeSelector(
-&nbsp;    selected: CategoryTypeUi,
-&nbsp;    onChange: (CategoryTypeUi) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Column {
-&nbsp;        SurferSectionLabel(stringResource(Res.string.category_creation_type_label))
-&nbsp;        Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;        SurferSegmentedControl(
-&nbsp;            options = listOf(CategoryTypeUi.Expense, CategoryTypeUi.Income),
-&nbsp;            selected = selected,
-&nbsp;            label = { type -&gt;
-&nbsp;                stringResource(
-&nbsp;                    when (type) {
-&nbsp;                        CategoryTypeUi.Expense -&gt; Res.string.category_creation_type_expense
-&nbsp;                        CategoryTypeUi.Income -&gt; Res.string.category_creation_type_income
-&nbsp;                    },
-&nbsp;                )
+&nbsp;    (state as? BudgetsState.Content)?.pendingDelete?.let { pending -&gt;
+&nbsp;        AlertDialog(
+&nbsp;            onDismissRequest = { onEvent(BudgetsEvent.OnDeleteCancel) },
+&nbsp;            title = { Text(stringResource(Res.string.budgets_delete_title)) },
+&nbsp;            text = { Text(stringResource(Res.string.budgets_delete_message, pending.name)) },
+&nbsp;            confirmButton = {
+&nbsp;                TextButton(onClick = { onEvent(BudgetsEvent.OnDeleteConfirm) }) {
+&nbsp;                    Text(stringResource(Res.string.budgets_delete))
+&nbsp;                }
 &nbsp;            },
-&nbsp;            onSelect = onChange,
+&nbsp;            dismissButton = {
+&nbsp;                TextButton(onClick = { onEvent(BudgetsEvent.OnDeleteCancel) }) {
+&nbsp;                    Text(stringResource(Res.string.budgets_delete_cancel))
+&nbsp;                }
+&nbsp;            },
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * Parent selection over the eligible options the ViewModel computed — the category itself, its
-&nbsp; * descendants, system rows and the wrong type are already gone from [options], so anything
-&nbsp; * offered here is safe to save.
-&nbsp; *
-&nbsp; * &quot;None&quot; is an entry in the list rather than a separate control: having no parent is an ordinary
-&nbsp; * choice for a top-level category, not the absence of one.
-&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun ParentPicker(
-&nbsp;    selectedId: CategoryId?,
-&nbsp;    options: List&lt;CategoryParentOption&gt;,
-&nbsp;    onSelect: (CategoryId?) -&gt; Unit,
+&nbsp;private fun BudgetRow(
+&nbsp;    budget: BudgetUi,
+&nbsp;    archiveLabel: String,
+&nbsp;    deleteLabel: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    onArchiveClick: () -&gt; Unit,
+&nbsp;    onDeleteClick: () -&gt; Unit,
 &nbsp;) {
-&nbsp;    val noneLabel = stringResource(Res.string.category_creation_parent_none)
-&nbsp;    val entries = listOf&lt;CategoryParentOption?&gt;(null) + options
-&nbsp;    SurferDropdown(
-&nbsp;        items = entries,
-&nbsp;        selected = entries.firstOrNull { it?.id == selectedId },
-&nbsp;        label = stringResource(Res.string.category_creation_field_parent),
-&nbsp;        itemName = { it?.name ?: noneLabel },
-&nbsp;        onItemSelected = { onSelect(it?.id) },
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * The monthly-cap shortcut. `Category` has no `cap` field — this is a two-tap front end for a
-&nbsp; * budget whose only category is this one (md/categories.md, decision 2). Clearing it deletes that
-&nbsp; * budget; leaving it empty never creates one.
-&nbsp; *
-&nbsp; * When a budget the user built on the Budgets screen already limits this category *alongside
-&nbsp; * others*, the field is replaced by a read-only notice naming that budget. Offering an editable
-&nbsp; * cap there would put two limits on one category with no defined winner, which is exactly what
-&nbsp; * keeping limits in Budgets was meant to avoid. The all-categories budget is not treated as such
-&nbsp; * coverage: it is the global envelope that per-category budgets already live inside.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;private fun CapField(
-&nbsp;    cap: String,
-&nbsp;    managedByBudgetName: String?,
-&nbsp;    onChange: (String) -&gt; Unit,
-&nbsp;) {
-&nbsp;    if (managedByBudgetName != null) {
-&nbsp;        Column {
-&nbsp;            SurferSectionLabel(stringResource(Res.string.category_creation_cap_label))
-&nbsp;            Spacer(Modifier.height(10.dp))
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.category_creation_cap_managed, managedByBudgetName),
-&nbsp;                style = AppTheme.typography.bodyLarge,
-&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;    SurferSwipeRevealRow(
+&nbsp;        revealWidth = 176.dp,
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = AppTheme.spacing.default)
+&nbsp;            .padding(vertical = AppTheme.spacing.xSmall),
+&nbsp;        actions = {
+&nbsp;            SurferSwipeAction(
+&nbsp;                icon = if (budget.isActive) SurferIcons.Archive else SurferIcons.Restore,
+&nbsp;                label = archiveLabel,
+&nbsp;                onClick = onArchiveClick,
 &nbsp;            )
-&nbsp;            Spacer(Modifier.height(4.dp))
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.category_creation_cap_managed_hint),
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            SurferSwipeAction(
+&nbsp;                icon = SurferIcons.Delete,
+&nbsp;                label = deleteLabel,
+&nbsp;                onClick = onDeleteClick,
+&nbsp;                destructive = true,
 &nbsp;            )
-&nbsp;        }
-&nbsp;    } else {
-&nbsp;        OutlinedTextField(
-&nbsp;            value = cap,
-&nbsp;            onValueChange = { input -&gt; AmountInputTransformation.validateAndNormalize(input)?.let(onChange) },
-&nbsp;            label = { Text(stringResource(Res.string.category_creation_cap_label)) },
-&nbsp;            supportingText = { Text(stringResource(Res.string.category_creation_cap_hint)) },
-&nbsp;            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-&nbsp;            singleLine = true,
-&nbsp;            modifier = Modifier.fillMaxWidth(),
+&nbsp;        },
+&nbsp;    ) {
+&nbsp;        SurferBudgetCard(
+&nbsp;            name = budget.name,
+&nbsp;            statusLabel = budgetStatusLabel(budget.status),
+&nbsp;            status = budget.status.toUi(),
+&nbsp;            metrics = SurferBudgetCardMetrics(
+&nbsp;                spentOfLimit = stringResource(
+&nbsp;                    Res.string.budget_spent_of_format,
+&nbsp;                    budget.spentFormatted,
+&nbsp;                    budget.limitFormatted,
+&nbsp;                ),
+&nbsp;                remaining = if (budget.isOver) {
+&nbsp;                    stringResource(Res.string.budget_over_format, budget.remainderFormatted)
+&nbsp;                } else {
+&nbsp;                    stringResource(Res.string.budget_remaining_format, budget.remainderFormatted)
+&nbsp;                },
+&nbsp;                progress = budget.progress,
+&nbsp;                footer = stringResource(
+&nbsp;                    Res.string.budget_footer_format,
+&nbsp;                    budgetPeriodLabel(budget.period),
+&nbsp;                    pluralStringResource(Res.plurals.budget_days_left, budget.daysLeft, budget.daysLeft),
+&nbsp;                ),
+&nbsp;                alertFraction = budget.alertFraction,
+&nbsp;            ),
+&nbsp;            categories = budget.categories.map { category -&gt;
+&nbsp;                val visual = SurferCategoryPalette.visualFor(
+&nbsp;                    id = category.id,
+&nbsp;                    iconKey = category.iconKey,
+&nbsp;                    hue = category.hue,
+&nbsp;                    systemKind = category.systemKind,
+&nbsp;                )
+&nbsp;                SurferBudgetCategoryVisual(icon = visual.icon, tint = visual.tint)
+&nbsp;            },
+&nbsp;            onClick = onClick,
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun CategoryCreationPreview() {
+&nbsp;private fun BudgetsContentPreview() {
 &nbsp;    AppTheme {
-&nbsp;        CategoryCreationContent(
-&nbsp;            state = CategoryCreationState(
-&nbsp;                name = &quot;Coffee&quot;,
-&nbsp;                iconKey = SurferCategoryPalette.iconKeys[1],
-&nbsp;                hue = SurferCategoryPalette.hues[1],
-&nbsp;                parentOptions = listOf(CategoryParentOption(CategoryId(&quot;c-1&quot;), &quot;Dining&quot;)),
-&nbsp;                parentId = CategoryId(&quot;c-1&quot;),
-&nbsp;                cap = &quot;250&quot;,
+&nbsp;        BudgetsContent(
+&nbsp;            state = BudgetsState.Content(
+&nbsp;                active = listOf(previewBudget()),
+&nbsp;                archived = emptyList(),
 &nbsp;            ),
-&nbsp;            isEditing = false,
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
@@ -459,7 +370,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

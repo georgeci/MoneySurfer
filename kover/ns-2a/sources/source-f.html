@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > ConvertAccountsTotalUseCase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: ConvertAccountsTotalUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConvertAccountsTotalUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (19/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.5%
+  </span>
+  <span class="absValue">
+    (129/131)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
+&nbsp;import com.georgeci.moneysurfer.domain.model.CurrencyTotal
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.model.totalsByCurrency
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Folds every account balance into one figure in the workspace base currency, using [rates].
+&nbsp; *
+&nbsp; * Conversion happens per *currency total*, not per account: one rounding per currency instead of
+&nbsp; * one per row, so the headline does not drift by a cent for every extra account.
+&nbsp; *
+&nbsp; * Accounts in a currency [rates] cannot price are not dropped — they come back in
+&nbsp; * [ConvertedTotal.unconverted] for the caller to show beside the headline. With no rates cached
+&nbsp; * at all (offline first run, or the offline build, which has no provider) that degrades to
+&nbsp; * &quot;base-currency accounts sum, the rest listed&quot; rather than to a wrong number.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class ConvertAccountsTotalUseCase {
+&nbsp;
+&nbsp;    operator fun invoke(
+&nbsp;        accounts: List&lt;Account&gt;,
+&nbsp;        baseCurrency: CurrencyCode,
+&nbsp;        rates: ExchangeRateTable?,
+&nbsp;    ): ConvertedTotal {
+&nbsp;        // A table quoted against some other base cannot price this workspace: only the window
+&nbsp;        // between a base-currency change and the next refresh can produce one, and re-basing
+&nbsp;        // second-hand quotes is a worse answer than saying &quot;not converted&quot;.
+<b class="fc">&nbsp;        val usable = rates?.takeIf { it.baseCurrency == baseCurrency }</b>
+<b class="fc">&nbsp;        val byCurrency = accounts.totalsByCurrency()</b>
+&nbsp;
+<b class="fc">&nbsp;        var converted: Money? = null</b>
+<b class="fc">&nbsp;        var usedRates = false</b>
+<b class="fc">&nbsp;        val unconverted = mutableListOf&lt;CurrencyTotal&gt;()</b>
+&nbsp;
+<b class="fc">&nbsp;        byCurrency.forEach { bucket -&gt;</b>
+<b class="fc">&nbsp;            val inBase: Money? = bucket.inBaseCurrency(baseCurrency, usable)</b>
+<b class="fc">&nbsp;            if (inBase == null) {</b>
+<b class="fc">&nbsp;                unconverted += bucket</b>
+&nbsp;            } else {
+&nbsp;                // A bucket already in the base needed no quote; anything else got here through
+&nbsp;                // one, and that is what earns the &quot;as of&quot; label below.
+<b class="fc">&nbsp;                if (bucket.currencyCode != baseCurrency) usedRates = true</b>
+<b class="fc">&nbsp;                converted = (converted ?: Money.zero()) + inBase</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return ConvertedTotal(</b>
+<b class="fc">&nbsp;            baseCurrency = baseCurrency,</b>
+<b class="fc">&nbsp;            total = converted,</b>
+<b class="fc">&nbsp;            unconverted = unconverted,</b>
+&nbsp;            // Only claim an &quot;as of&quot; when a quote actually moved money — a single-currency
+&nbsp;            // workspace needs no rates and must not be labelled with yesterday&#39;s date.
+<b class="pc">&nbsp;            asOf = usable?.asOf?.takeIf { usedRates },</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /** This bucket expressed in [base], or `null` when [rates] cannot price its currency. */
+&nbsp;    private fun CurrencyTotal.inBaseCurrency(base: CurrencyCode, rates: ExchangeRateTable?): Money? =
+<b class="fc">&nbsp;        if (currencyCode == base) amount else rates?.convertToBase(amount, currencyCode)</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

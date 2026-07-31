@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OnlineFirstRunModule</title>
+  <title>MoneySurfer Coverage Report > AccountSyncPlugin</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: OnlineFirstRunModule (com.georgeci.moneysurfer.di)</h1>
+<h1>Coverage Summary for Class: AccountSyncPlugin (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
 
@@ -46,58 +46,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OnlineFirstRunModule</td>
+  <td class="name">AccountSyncPlugin</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (2/4)
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (284/284)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">OnlineFirstRunModule$firstRunSeeder$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+    <td class="name">AccountSyncPlugin$applyDoc$1</td>
     <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AccountSyncPlugin$push$2</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/1)
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (42/42)
   </span>
 </td>
   </tr>
@@ -105,27 +123,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    100%
   </span>
   <span class="absValue">
-    (1/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    33.3%
-  </span>
-  <span class="absValue">
-    (1/3)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    40%
+    90%
   </span>
   <span class="absValue">
-    (2/5)
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (32/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (326/326)
   </span>
 </td>
 </tr>
@@ -136,23 +161,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.di
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
-&nbsp;import org.koin.core.annotation.Module
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountDoc
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
+&nbsp;import com.georgeci.moneysurfer.data.sync.toDoc
+&nbsp;import com.georgeci.moneysurfer.data.sync.toEntity
+&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
+&nbsp;import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
+&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictMetadata
+&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictResolver
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
 &nbsp;
-&nbsp;/**
-&nbsp; * Online build has nothing to seed at first run — Firestore-backed onboarding (sign-in,
-&nbsp; * workspace selector / creation) handles the empty-state path. Bind a no-op so
-&nbsp; * `AppLaunchViewModel` can depend on `FirstRunSeeder` unconditionally; mirrors the offline
-&nbsp; * override in `OfflineWiring.offlineFirstRunModule`.
-&nbsp; */
-<b class="fc">&nbsp;@Module</b>
-&nbsp;class OnlineFirstRunModule {
+<b class="fc">&nbsp;@Single(binds = [SyncEntityPlugin::class])</b>
+&nbsp;class AccountSyncPlugin(
+<b class="fc">&nbsp;    private val writer: WorkspaceDocumentWriter,</b>
+<b class="fc">&nbsp;    private val appInfo: AppInfo,</b>
+<b class="fc">&nbsp;    private val conflictResolver: ConflictResolver,</b>
+<b class="fc">&nbsp;    private val accountDao: AccountDao,</b>
+<b class="fc">&nbsp;    private val transactionDao: TransactionDao,</b>
+&nbsp;) : SyncEntityPlugin {
 &nbsp;
-&nbsp;    @Single
-<b class="nc">&nbsp;    fun firstRunSeeder(): FirstRunSeeder = FirstRunSeeder { /* no-op */ }</b>
+<b class="fc">&nbsp;    override val entityType: String = SyncEntityTypes.ACCOUNT</b>
+<b class="fc">&nbsp;    override val firestoreCollectionName: String = SyncCollection.ACCOUNTS</b>
+<b class="fc">&nbsp;    override val pullPriority: Int = SyncPullPriorities.ACCOUNTS</b>
+&nbsp;
+<b class="fc">&nbsp;    override suspend fun push(mutation: PendingMutation) = writer.pushToCollection(</b>
+<b class="fc">&nbsp;        mutation = mutation,</b>
+<b class="fc">&nbsp;        collectionName = SyncCollection.ACCOUNTS,</b>
+<b class="fc">&nbsp;        clientVersionCode = appInfo.versionCode,</b>
+<b class="fc">&nbsp;        strategy = AccountDoc.serializer(),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        accountDao.getById(mutation.entityId)</b>
+<b class="fc">&nbsp;            ?.toDoc()</b>
+<b class="pc">&nbsp;            ?.copy(clientVersionCode = appInfo.versionCode)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
+<b class="fc">&nbsp;        val dto = doc.decodeOrNull(AccountDoc.serializer()) ?: return SKIPPED_APPLY_RESULT</b>
+<b class="fc">&nbsp;        if (dto.deletedAt != null) {</b>
+<b class="fc">&nbsp;            transactionDao.deleteByAccountId(doc.id)</b>
+<b class="fc">&nbsp;            accountDao.delete(doc.id)</b>
+<b class="fc">&nbsp;            return EntityApplyResult(applied = true, wasConflict = false)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        val local = accountDao.getById(doc.id)</b>
+<b class="fc">&nbsp;        val resolution = conflictResolver.resolve(</b>
+<b class="fc">&nbsp;            local = local,</b>
+<b class="fc">&nbsp;            remote = dto.toEntity(id = doc.id, workspaceId = scopeKey),</b>
+<b class="fc">&nbsp;            metadata = ConflictMetadata(</b>
+<b class="fc">&nbsp;                entityType = SyncEntityTypes.ACCOUNT,</b>
+<b class="fc">&nbsp;                entityId = doc.id,</b>
+<b class="fc">&nbsp;                localUpdatedAt = local?.updatedAt?.let(Instant::fromEpochMilliseconds),</b>
+<b class="fc">&nbsp;                remoteUpdatedAt = Instant.fromEpochMilliseconds(dto.updatedAt),</b>
+&nbsp;            ),
+&nbsp;        )
+<b class="fc">&nbsp;        return applyResolution(resolution) { accountDao.upsertAll(listOf(it)) }</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -177,7 +248,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

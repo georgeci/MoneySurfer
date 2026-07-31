@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AbandonAuthSessionUseCase</title>
+  <title>MoneySurfer Coverage Report > CrashReportingKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.telemetry</a>
 </div>
 
-<h1>Coverage Summary for Class: AbandonAuthSessionUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: CrashReportingKt (com.georgeci.moneysurfer.domain.telemetry)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AbandonAuthSessionUseCase</td>
+  <td class="name">CrashReportingKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,43 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (62/62)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CrashReportingKt$bindCrashReportingUser$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,22 +107,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (10/10)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (87/87)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">AbandonAuthSessionUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">AbandonAuthSessionUseCase$invoke$1</td>
-    <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -95,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -103,7 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -119,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (87/87)
+    (72/72)
   </span>
 </td>
 </tr>
@@ -130,63 +150,77 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.telemetry
 &nbsp;
-&nbsp;import arrow.core.Either
 &nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlinx.coroutines.CoroutineScope
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.Job
+&nbsp;import kotlinx.coroutines.SupervisorJob
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.launchIn
+&nbsp;import kotlinx.coroutines.flow.onEach
 &nbsp;
 &nbsp;/**
-&nbsp; * Undoes a half-finished sign-in: the auth provider accepted the credentials and the session
-&nbsp; * pointers were already pinned, but [PostAuthBootstrapUseCase] failed afterwards.
+&nbsp; * Wires [crashReporter] into the app: collection is enabled for release builds only, and
+&nbsp; * Kermit gains a [CrashReportingLogWriter] so Warn+ logs become breadcrumbs and logged
+&nbsp; * throwables become non-fatals — no call site has to know Crashlytics exists.
 &nbsp; *
-&nbsp; * Without this the app is left &quot;signed in&quot; with no workspace, and `resolveStartRoute` sends the
-&nbsp; * next cold start straight to the workspace selector — the sign-in screen is skipped, and the
-&nbsp; * bootstrap has no retry path of its own (issue #342). Clearing the pointers puts the user back
-&nbsp; * on the sign-in form, where retrying re-runs the whole flow.
+&nbsp; * When [userIds] is given (the session&#39;s Firebase uid, null when signed out) the
+&nbsp; * Crashlytics user id is kept in step with it for the lifetime of the process, so a
+&nbsp; * crash report can be tied back to the account that produced it. The uid is an opaque
+&nbsp; * Firebase identifier, not PII in the sense of issue #154 — unlike emails it never
+&nbsp; * reaches logcat, only the crash backend the account already lives in.
 &nbsp; *
-&nbsp; * Deliberately *not* [LogoutUseCase]: nothing was hydrated yet, so there is no local data to
-&nbsp; * wipe and no shutdown gate to trip. The `users` row written by
-&nbsp; * [com.georgeci.moneysurfer.domain.auth.AuthLocalRepository] is left in place — it is an idempotent
-&nbsp; * upsert that the retry rewrites anyway, and deleting it would cascade into rows a later attempt
-&nbsp; * still wants.
+&nbsp; * Called once per process from `initKoin`, after Koin has started. Debug builds keep
+&nbsp; * collection off so local crashes never pollute the production Crashlytics dashboard.
+&nbsp; *
+&nbsp; * Idempotent: a second call is a no-op. Repeated `initKoin` calls — instrumented tests,
+&nbsp; * previews — therefore stack neither duplicate log writers nor duplicate uid collectors,
+&nbsp; * and the collector&#39;s scope is created at most once per process.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class AbandonAuthSessionUseCase(
-<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
-<b class="fc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
+&nbsp;fun installCrashReporting(
+&nbsp;    crashReporter: CrashReporter,
+&nbsp;    isDebug: Boolean,
+<b class="fc">&nbsp;    userIds: Flow&lt;String?&gt;? = null,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+<b class="fc">&nbsp;    if (isInstalled) return</b>
+<b class="fc">&nbsp;    isInstalled = true</b>
 &nbsp;
-&nbsp;    /**
-&nbsp;     * [isAnon] must be `true` for an anonymous sign-in. An anonymous account has no credential to
-&nbsp;     * sign back in with: `signInAnonymously()` reuses `auth.currentUser` when there is one and
-&nbsp;     * mints a brand-new uid otherwise. Signing out would therefore make the *previous* anonymous
-&nbsp;     * account — and whatever it already owns on Firestore — permanently unreachable, over what may
-&nbsp;     * be a transient bootstrap failure. Clearing the local pointers is enough to put the user back
-&nbsp;     * on the sign-in screen; the provider session is left alone so a retry lands on the same uid.
-&nbsp;     */
-&nbsp;    suspend operator fun invoke(isAnon: Boolean) {
-<b class="fc">&nbsp;        log.w { &quot;[rollback] clearing session pointers after a failed post-auth bootstrap&quot; }</b>
-&nbsp;        // One store edit, so a crash mid-rollback cannot leave a half-cleared session behind —
-&nbsp;        // which is the state this use case exists to get out of.
-<b class="fc">&nbsp;        sessionMutator.clearSession()</b>
+<b class="fc">&nbsp;    crashReporter.setCollectionEnabled(!isDebug)</b>
+<b class="fc">&nbsp;    Logger.addLogWriter(CrashReportingLogWriter(crashReporter))</b>
 &nbsp;
-<b class="fc">&nbsp;        if (isAnon) {</b>
-<b class="fc">&nbsp;            log.i { &quot;[rollback] keeping the anonymous provider session — signing out would orphan it&quot; }</b>
-&nbsp;            return
-&nbsp;        }
-&nbsp;        // Best-effort: a provider session that outlives the pointers is harmless — the next
-&nbsp;        // sign-in overwrites it — but a throw here would mask the original bootstrap failure.
-<b class="fc">&nbsp;        Either.catch { authRemoteRepository.signOut() }</b>
-<b class="fc">&nbsp;            .onLeft { log.w(it) { &quot;[rollback] signOut failed — pointers are cleared regardless&quot; } }</b>
+<b class="fc">&nbsp;    if (userIds != null) {</b>
+<b class="fc">&nbsp;        userBinding = bindCrashReportingUser(crashReporter, userIds, processScope)</b>
 &nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;AbandonAuthSession&quot;
-&nbsp;    }
+&nbsp;/**
+&nbsp; * Mirrors [userIds] onto the Crashlytics user id on [scope]. Exposed separately from
+&nbsp; * [installCrashReporting] so the binding can be driven by a caller-owned scope in tests;
+&nbsp; * production goes through [installCrashReporting], which owns a single process scope.
+&nbsp; */
+&nbsp;fun bindCrashReportingUser(
+&nbsp;    crashReporter: CrashReporter,
+&nbsp;    userIds: Flow&lt;String?&gt;,
+&nbsp;    scope: CoroutineScope,
+<b class="fc">&nbsp;): Job = userIds</b>
+<b class="fc">&nbsp;    .onEach { uid -&gt; crashReporter.setUserId(uid) }</b>
+<b class="fc">&nbsp;    .launchIn(scope)</b>
+&nbsp;
+&nbsp;private var isInstalled = false
+&nbsp;private var userBinding: Job? = null
+&nbsp;
+&nbsp;// Process-scoped on purpose: the uid collector lives as long as the app does, and there
+&nbsp;// is nothing above `initKoin` to own it. `installCrashReporting` is latched, so this is
+&nbsp;// created at most once.
+<b class="fc">&nbsp;private val processScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)</b>
+&nbsp;
+&nbsp;/** Test-only reset of the [installCrashReporting] latch and its uid collector. */
+&nbsp;internal fun resetCrashReportingForTest() {
+<b class="fc">&nbsp;    userBinding?.cancel()</b>
+<b class="fc">&nbsp;    userBinding = null</b>
+<b class="fc">&nbsp;    isInstalled = false</b>
 &nbsp;}
 </code>
 </pre>
@@ -211,7 +245,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

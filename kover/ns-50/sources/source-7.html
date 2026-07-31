@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CsvBackupViewModel</title>
+  <title>MoneySurfer Coverage Report > DeleteUserAccountTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,158 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.csv</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
 </div>
 
-<h1>Coverage Summary for Class: CsvBackupViewModel (com.georgeci.moneysurfer.feature.settings.csv)</h1>
+<h1>Coverage Summary for Class: DeleteUserAccountTestTags (com.georgeci.moneysurfer.feature.settings.account)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">CsvBackupViewModel</td>
-<td class="coverageStat">
-  <span class="percent">
-    77.8%
-  </span>
-  <span class="absValue">
-    (7/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    68.8%
-  </span>
-  <span class="absValue">
-    (11/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    85.7%
-  </span>
-  <span class="absValue">
-    (24/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    74.1%
-  </span>
-  <span class="absValue">
-    (149/201)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">CsvBackupViewModel$handleOpenSource$3</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">DeleteUserAccountTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (59/59)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">CsvBackupViewModel$handleSaveSink$3</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (58/58)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    81.8%
-  </span>
-  <span class="absValue">
-    (9/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    68.8%
-  </span>
-  <span class="absValue">
-    (11/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    89.7%
-  </span>
-  <span class="absValue">
-    (35/39)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    83.6%
-  </span>
-  <span class="absValue">
-    (266/318)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
@@ -178,131 +44,283 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.csv
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.csv.CsvImportReport
-&nbsp;import com.georgeci.moneysurfer.domain.csv.ExportTransactionsUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.csv.ImportTransactionsUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.csv.TransactionCsvError
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.CancellationException
-&nbsp;import okio.BufferedSink
-&nbsp;import okio.BufferedSource
-&nbsp;import okio.use
-&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.material3.ButtonDefaults
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.SnackbarDuration
+&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_button
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_cancel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_message
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_memberships
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_sync
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_workspaces
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_intro
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_local
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_shared
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_auth_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_cleanup_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_generic
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_recent_login
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_wrong_password
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_label
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_missing
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-<b class="fc">&nbsp;@KoinViewModel</b>
-&nbsp;class CsvBackupViewModel(
-<b class="fc">&nbsp;    private val exportTransactions: ExportTransactionsUseCase,</b>
-<b class="fc">&nbsp;    private val importTransactions: ImportTransactionsUseCase,</b>
-<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
-<b class="fc">&nbsp;) : MviViewModel&lt;CsvBackupState, CsvBackupEvent, CsvBackupEffect&gt;(initialState = CsvBackupState()) {</b>
+&nbsp;/** Stable selectors — see docs/testing/testing-strategy.md. */
+&nbsp;object DeleteUserAccountTestTags {
+&nbsp;    const val PasswordField = &quot;deleteAccount:passwordField&quot;
+&nbsp;    const val DeleteButton = &quot;deleteAccount:deleteButton&quot;
+&nbsp;}
 &nbsp;
-&nbsp;    override fun onEvent(event: CsvBackupEvent) {
-<b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            CsvBackupEvent.OnBackClick -&gt; postSideEffect(CsvBackupEffect.NavigateBack)</b>
-<b class="fc">&nbsp;            CsvBackupEvent.OnExportClick -&gt;</b>
-<b class="fc">&nbsp;                postSideEffect(CsvBackupEffect.RequestSaveFile(suggestedFilename()))</b>
-<b class="fc">&nbsp;            is CsvBackupEvent.OnSaveSinkChosen -&gt; handleSaveSink(event.sink)</b>
-<b class="pc">&nbsp;            CsvBackupEvent.OnImportClick -&gt; postSideEffect(CsvBackupEffect.RequestOpenFile)</b>
-<b class="fc">&nbsp;            is CsvBackupEvent.OnOpenSourceChosen -&gt; handleOpenSource(event.source)</b>
+&nbsp;@Composable
+&nbsp;fun DeleteUserAccountScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    viewModel: DeleteUserAccountViewModel = koinViewModel(),
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;    val snackbarHostState = remember { SnackbarHostState() }
+&nbsp;    var pendingNotice by remember { mutableStateOf&lt;DeleteUserAccountNotice?&gt;(null) }
+&nbsp;
+&nbsp;    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }
+&nbsp;    LaunchedEffect(pendingNoticeText) {
+&nbsp;        val text = pendingNoticeText ?: return@LaunchedEffect
+&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
+&nbsp;        pendingNotice = null
+&nbsp;    }
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            DeleteUserAccountEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is DeleteUserAccountEffect.Notify -&gt; pendingNotice = effect.notice
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun handleSaveSink(sink: BufferedSink?) {
-<b class="fc">&nbsp;        if (sink == null) return</b>
-<b class="fc">&nbsp;        updateState { copy(phase = CsvBackupPhase.Exporting) }</b>
-<b class="fc">&nbsp;        launch(</b>
-&nbsp;            onError = { error -&gt;
-&nbsp;                // MviViewModel.launch catches Exception (including cancellation);
-&nbsp;                // rethrow so a cleared ViewModel doesn&#39;t surface as a fake error.
-<b class="nc">&nbsp;                if (error is CancellationException) throw error</b>
-<b class="nc">&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }</b>
-<b class="nc">&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))</b>
-<b class="nc">&nbsp;                runCatching { sink.close() }</b>
-&nbsp;            },
-&nbsp;        ) {
-<b class="fc">&nbsp;            val count = sink.use { exportTransactions(it).getOrThrow() }</b>
-<b class="fc">&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle) }</b>
-<b class="fc">&nbsp;            postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.ExportSuccess(count)))</b>
-&nbsp;        }
+&nbsp;    DeleteUserAccountContent(
+&nbsp;        state = state,
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun noticeText(notice: DeleteUserAccountNotice): String = when (notice) {
+&nbsp;    DeleteUserAccountNotice.WrongPassword -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_wrong_password)
+&nbsp;    DeleteUserAccountNotice.RequiresRecentLogin -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_recent_login)
+&nbsp;    DeleteUserAccountNotice.CleanupFailed -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_cleanup_failed)
+&nbsp;    DeleteUserAccountNotice.AuthDeletionFailed -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_auth_failed)
+&nbsp;    DeleteUserAccountNotice.Generic -&gt;
+&nbsp;        stringResource(Res.string.settings_delete_account_notice_generic)
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DeleteUserAccountContent(
+&nbsp;    state: DeleteUserAccountState,
+&nbsp;    snackbarHostState: SnackbarHostState,
+&nbsp;    onEvent: (DeleteUserAccountEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    if (state.showConfirmDialog) {
+&nbsp;        ConfirmDeleteUserAccountDialog(
+&nbsp;            onConfirm = { onEvent(DeleteUserAccountEvent.OnConfirmAccepted) },
+&nbsp;            onDismiss = { onEvent(DeleteUserAccountEvent.OnConfirmDismissed) },
+&nbsp;        )
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun handleOpenSource(source: BufferedSource?) {
-<b class="fc">&nbsp;        if (source == null) return</b>
-<b class="fc">&nbsp;        updateState { copy(phase = CsvBackupPhase.Importing) }</b>
-<b class="fc">&nbsp;        launch(</b>
-&nbsp;            onError = { error -&gt;
-<b class="pc">&nbsp;                if (error is CancellationException) throw error</b>
-<b class="fc">&nbsp;                updateState { copy(phase = CsvBackupPhase.Idle) }</b>
-<b class="fc">&nbsp;                postSideEffect(CsvBackupEffect.Notify(CsvBackupNotice.fromError(error)))</b>
-<b class="fc">&nbsp;                runCatching { source.close() }</b>
-&nbsp;            },
+&nbsp;    SettingsSubScreenScaffold(
+&nbsp;        title = stringResource(Res.string.settings_delete_account_title),
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onBack = { onEvent(DeleteUserAccountEvent.OnBackClick) },
+&nbsp;        showProgressOverlay = state.isDeleting,
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(horizontal = 16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
 &nbsp;        ) {
-<b class="fc">&nbsp;            val report = source.use { importTransactions(it).getOrThrow() }</b>
-<b class="fc">&nbsp;            updateState { copy(phase = CsvBackupPhase.Idle, lastImportReport = report) }</b>
-<b class="fc">&nbsp;            postSideEffect(</b>
-<b class="fc">&nbsp;                CsvBackupEffect.Notify(</b>
-<b class="fc">&nbsp;                    CsvBackupNotice.ImportFinished(</b>
-<b class="fc">&nbsp;                        imported = report.imported,</b>
-<b class="fc">&nbsp;                        skipped = report.skippedDuplicates,</b>
-<b class="fc">&nbsp;                        failed = report.errors.size,</b>
-&nbsp;                    ),
-&nbsp;                ),
+&nbsp;            Spacer(Modifier.height(4.dp))
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_intro),
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
 &nbsp;            )
+&nbsp;
+&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_deleted_section))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_workspaces))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_memberships))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_sync))
+&nbsp;
+&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_kept_section))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_shared))
+&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_local))
+&nbsp;
+&nbsp;            if (state.showPasswordField) {
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                OutlinedTextField(
+&nbsp;                    value = state.password,
+&nbsp;                    onValueChange = { onEvent(DeleteUserAccountEvent.OnPasswordChange(it)) },
+&nbsp;                    label = { Text(stringResource(Res.string.settings_delete_account_password_label)) },
+&nbsp;                    singleLine = true,
+&nbsp;                    visualTransformation = PasswordVisualTransformation(),
+&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+&nbsp;                    isError = state.passwordMissing,
+&nbsp;                    supportingText = {
+&nbsp;                        if (state.passwordMissing) {
+&nbsp;                            Text(stringResource(Res.string.settings_delete_account_password_missing))
+&nbsp;                        }
+&nbsp;                    },
+&nbsp;                    enabled = !state.isDeleting,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .testTag(DeleteUserAccountTestTags.PasswordField),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;            Button(
+&nbsp;                onClick = { onEvent(DeleteUserAccountEvent.OnDeleteClick) },
+&nbsp;                enabled = !state.isDeleting,
+&nbsp;                colors = ButtonDefaults.buttonColors(
+&nbsp;                    containerColor = AppTheme.materialColors.error,
+&nbsp;                    contentColor = AppTheme.materialColors.onError,
+&nbsp;                ),
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .testTag(DeleteUserAccountTestTags.DeleteButton),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_button))
+&nbsp;            }
+&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
 &nbsp;        }
 &nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    private fun suggestedFilename(): String {
-<b class="fc">&nbsp;        val now = clock.now().toEpochMilliseconds()</b>
-<b class="fc">&nbsp;        return &quot;moneysurfer-transactions-$now.csv&quot;</b>
+&nbsp;@Composable
+&nbsp;private fun SectionTitle(text: String) {
+&nbsp;    Text(
+&nbsp;        text = text,
+&nbsp;        style = AppTheme.typography.titleSmall,
+&nbsp;        color = AppTheme.materialColors.onSurface,
+&nbsp;        modifier = Modifier.padding(top = AppTheme.spacing.small),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BulletLine(text: String) {
+&nbsp;    Row {
+&nbsp;        Text(
+&nbsp;            text = &quot;•&quot;,
+&nbsp;            style = AppTheme.typography.bodyMedium,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        Spacer(Modifier.width(8.dp))
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            style = AppTheme.typography.bodyMedium,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;data class CsvBackupState(
-&nbsp;    val phase: CsvBackupPhase = CsvBackupPhase.Idle,
-&nbsp;    val lastImportReport: CsvImportReport? = null,
-&nbsp;)
+&nbsp;/** Final confirmation — mirrors the M3 dialog shape used by the financial-account delete. */
+&nbsp;@Composable
+&nbsp;private fun ConfirmDeleteUserAccountDialog(
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    AlertDialog(
+&nbsp;        onDismissRequest = onDismiss,
+&nbsp;        icon = {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Delete,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                tint = AppTheme.materialColors.error,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        title = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_title),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        text = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_message),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        confirmButton = {
+&nbsp;            Button(
+&nbsp;                onClick = onConfirm,
+&nbsp;                colors = ButtonDefaults.buttonColors(
+&nbsp;                    containerColor = AppTheme.materialColors.error,
+&nbsp;                    contentColor = AppTheme.materialColors.onError,
+&nbsp;                ),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_confirm))
+&nbsp;            }
+&nbsp;        },
+&nbsp;        dismissButton = {
+&nbsp;            TextButton(onClick = onDismiss) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+&nbsp;}
 &nbsp;
-&nbsp;enum class CsvBackupPhase { Idle, Exporting, Importing }
-&nbsp;
-&nbsp;/**
-&nbsp; * User-facing notice raised by the CSV flow. Resolution to localised strings
-&nbsp; * happens in the screen layer via Compose resources — keeping the ViewModel
-&nbsp; * free of platform string APIs.
-&nbsp; */
-&nbsp;sealed interface CsvBackupNotice {
-&nbsp;    data class ExportSuccess(val count: Int) : CsvBackupNotice
-&nbsp;    data class ImportFinished(val imported: Int, val skipped: Int, val failed: Int) : CsvBackupNotice
-&nbsp;    data object InvalidFile : CsvBackupNotice
-&nbsp;    data object FileTooLarge : CsvBackupNotice
-&nbsp;    data object Generic : CsvBackupNotice
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        fun fromError(error: Throwable): CsvBackupNotice = when (error) {
-&nbsp;            is TransactionCsvError.EmptyFile,
-&nbsp;            is TransactionCsvError.HeaderMismatch,
-&nbsp;            -&gt; InvalidFile
-&nbsp;            is TransactionCsvError.FileTooLarge -&gt; FileTooLarge
-&nbsp;            else -&gt; Generic
-&nbsp;        }
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun DeleteUserAccountScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        DeleteUserAccountContent(
+&nbsp;            state = DeleteUserAccountState(userEmail = &quot;kasia@georgeci.com&quot;),
+&nbsp;            snackbarHostState = SnackbarHostState(),
+&nbsp;            onEvent = {},
+&nbsp;        )
 &nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface CsvBackupEvent {
-&nbsp;    data object OnBackClick : CsvBackupEvent
-&nbsp;    data object OnExportClick : CsvBackupEvent
-&nbsp;    data class OnSaveSinkChosen(val sink: BufferedSink?) : CsvBackupEvent
-&nbsp;    data object OnImportClick : CsvBackupEvent
-&nbsp;    data class OnOpenSourceChosen(val source: BufferedSource?) : CsvBackupEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface CsvBackupEffect {
-&nbsp;    data object NavigateBack : CsvBackupEffect
-&nbsp;    data class RequestSaveFile(val suggestedName: String) : CsvBackupEffect
-&nbsp;    data object RequestOpenFile : CsvBackupEffect
-&nbsp;    data class Notify(val notice: CsvBackupNotice) : CsvBackupEffect
 &nbsp;}
 </code>
 </pre>
@@ -327,7 +345,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 22:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

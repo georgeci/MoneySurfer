@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferRoundIconButtonKt</title>
+  <title>MoneySurfer Coverage Report > SurferDetailPlaceholderKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferRoundIconButtonKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferDetailPlaceholderKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferRoundIconButtonKt</td>
+  <td class="name">SurferDetailPlaceholderKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    50%
   </span>
   <span class="absValue">
-    (3/4)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    40%
   </span>
   <span class="absValue">
-    (15/18)
+    (4/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89.3%
+    96.2%
   </span>
   <span class="absValue">
-    (25/28)
+    (25/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.4%
+    89.4%
   </span>
   <span class="absValue">
-    (317/371)
+    (252/282)
   </span>
 </td>
 </tr>
@@ -99,96 +99,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
-&nbsp;import androidx.compose.material3.IconButtonDefaults
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;/**
-&nbsp; * Round icon button on a tinted disc — the add/remove control for rows that join or leave a list.
-&nbsp; *
-&nbsp; * A switch would be the other option and is the wrong one here: a toggle says &quot;this row has a
-&nbsp; * state&quot;, while these rows *move* between two sections when tapped. The disc keeps the tap target
-&nbsp; * at [IconButton]&#39;s 48dp while drawing at [DiscSize].
-&nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;fun SurferRoundIconButton(</b>
-&nbsp;    icon: ImageVector,
-&nbsp;    contentDescription: String?,
-&nbsp;    onClick: () -&gt; Unit,
+<b class="nc">&nbsp;fun SurferDetailPlaceholder(</b>
+&nbsp;    text: String,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    containerColor: Color = AppTheme.materialColors.surfaceContainerHighest,</b>
-<b class="fc">&nbsp;    contentColor: Color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;    icon: ImageVector = SurferIcons.Info,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    IconButton(</b>
-<b class="fc">&nbsp;        onClick = onClick,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        colors = IconButtonDefaults.iconButtonColors(contentColor = contentColor),</b>
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(DiscSize)</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(containerColor),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxSize()</b>
+<b class="fc">&nbsp;            .background(AppTheme.materialColors.surface),</b>
+<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+<b class="fc">&nbsp;            modifier = Modifier.padding(AppTheme.spacing.large),</b>
 &nbsp;        ) {
 <b class="fc">&nbsp;            Icon(</b>
 <b class="fc">&nbsp;                imageVector = icon,</b>
-<b class="fc">&nbsp;                contentDescription = contentDescription,</b>
-<b class="fc">&nbsp;                tint = contentColor,</b>
-<b class="fc">&nbsp;                modifier = Modifier.size(IconSize),</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(48.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = text,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodyLarge,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                textAlign = TextAlign.Center,</b>
 &nbsp;            )
 <b class="fc">&nbsp;        }</b>
-&nbsp;    }
+<b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
-&nbsp;
-<b class="fc">&nbsp;private val DiscSize: Dp = 32.dp</b>
-<b class="fc">&nbsp;private val IconSize: Dp = 20.dp</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferRoundIconButtonPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
-&nbsp;        ) {
-&nbsp;            SurferRoundIconButton(
-&nbsp;                icon = SurferIcons.Add,
-&nbsp;                contentDescription = &quot;Add&quot;,
-&nbsp;                onClick = {},
-&nbsp;                containerColor = AppTheme.materialColors.primaryContainer,
-&nbsp;                contentColor = AppTheme.materialColors.onPrimaryContainer,
-&nbsp;            )
-&nbsp;            SurferRoundIconButton(
-&nbsp;                icon = SurferIcons.Remove,
-&nbsp;                contentDescription = &quot;Remove&quot;,
-&nbsp;                onClick = {},
-&nbsp;            )
-&nbsp;        }
+&nbsp;private fun SurferDetailPlaceholderPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferDetailPlaceholder(text = &quot;Select an item to see details&quot;)
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -212,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDiOnlineHostConfigModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > SavingsGoalSyncPlugin</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,30 +19,236 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDiOnlineHostConfigModuleModuleKt (com.georgeci.moneysurfer.di)</h1>
+<h1>Coverage Summary for Class: SavingsGoalSyncPlugin (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDiOnlineHostConfigModuleModuleKt</td>
-    <td class="coverageStat"/>
+  <td class="name">SavingsGoalSyncPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.3%
+  </span>
+  <span class="absValue">
+    (326/335)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">SavingsGoalSyncPlugin$applyDoc$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SavingsGoalSyncPlugin$push$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (44/44)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SavingsGoalSyncPlugin$withResolvableAccount$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (9/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.6%
+  </span>
+  <span class="absValue">
+    (370/379)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalDao
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
+&nbsp;import com.georgeci.moneysurfer.data.remote.GoalDoc
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
+&nbsp;import com.georgeci.moneysurfer.data.sync.toDoc
+&nbsp;import com.georgeci.moneysurfer.data.sync.toEntity
+&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
+&nbsp;import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
+&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictMetadata
+&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictResolver
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
+&nbsp;
+<b class="fc">&nbsp;@Single(binds = [SyncEntityPlugin::class])</b>
+&nbsp;class SavingsGoalSyncPlugin(
+<b class="fc">&nbsp;    private val writer: WorkspaceDocumentWriter,</b>
+<b class="fc">&nbsp;    private val appInfo: AppInfo,</b>
+<b class="fc">&nbsp;    private val conflictResolver: ConflictResolver,</b>
+<b class="fc">&nbsp;    private val goalDao: GoalDao,</b>
+<b class="fc">&nbsp;    private val accountDao: AccountDao,</b>
+&nbsp;) : SyncEntityPlugin {
+&nbsp;
+<b class="fc">&nbsp;    override val entityType: String = SyncEntityTypes.GOAL</b>
+<b class="fc">&nbsp;    override val firestoreCollectionName: String = SyncCollection.GOALS</b>
+<b class="fc">&nbsp;    override val pullPriority: Int = SyncPullPriorities.GOALS</b>
+&nbsp;
+<b class="fc">&nbsp;    override suspend fun push(mutation: PendingMutation) = writer.pushToCollection(</b>
+<b class="fc">&nbsp;        mutation = mutation,</b>
+<b class="fc">&nbsp;        collectionName = SyncCollection.GOALS,</b>
+<b class="fc">&nbsp;        clientVersionCode = appInfo.versionCode,</b>
+<b class="fc">&nbsp;        strategy = GoalDoc.serializer(),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        goalDao.getById(mutation.entityId)</b>
+<b class="pc">&nbsp;            ?.toDoc()</b>
+<b class="pc">&nbsp;            ?.copy(clientVersionCode = appInfo.versionCode)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
+<b class="pc">&nbsp;        val dto = doc.decodeOrNull(GoalDoc.serializer()) ?: return SKIPPED_APPLY_RESULT</b>
+<b class="fc">&nbsp;        if (dto.deletedAt != null) {</b>
+&nbsp;            // Room cascades the contribution rows away with the goal. The peer that
+&nbsp;            // deleted the goal enqueued their tombstones too, so nothing is lost here.
+<b class="fc">&nbsp;            goalDao.delete(doc.id)</b>
+<b class="fc">&nbsp;            return EntityApplyResult(applied = true, wasConflict = false)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        val local = goalDao.getById(doc.id)</b>
+<b class="fc">&nbsp;        val resolution = conflictResolver.resolve(</b>
+<b class="fc">&nbsp;            local = local,</b>
+<b class="fc">&nbsp;            remote = dto.toEntity(id = doc.id, workspaceId = scopeKey).withResolvableAccount(),</b>
+<b class="fc">&nbsp;            metadata = ConflictMetadata(</b>
+<b class="fc">&nbsp;                entityType = SyncEntityTypes.GOAL,</b>
+<b class="fc">&nbsp;                entityId = doc.id,</b>
+<b class="pc">&nbsp;                localUpdatedAt = local?.updatedAt?.let(Instant::fromEpochMilliseconds),</b>
+<b class="fc">&nbsp;                remoteUpdatedAt = Instant.fromEpochMilliseconds(dto.updatedAt),</b>
+&nbsp;            ),
+&nbsp;        )
+<b class="fc">&nbsp;        return applyResolution(resolution) { goalDao.upsertAll(listOf(it)) }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Drops an `accountId` that points at an account this device does not have.
+&nbsp;     *
+&nbsp;     * The FK is soft in spirit — the pointer is decorative — but hard in SQLite, so
+&nbsp;     * a goal referencing an account that was never pulled here (or was deleted
+&nbsp;     * before this doc arrived) would fail the insert and abort the batch BEFORE the
+&nbsp;     * cursor advanced, wedging every later pull. Accounts pull first (priority 20 &lt;
+&nbsp;     * 60), so this only fires for a genuinely absent account. The goal keeps every
+&nbsp;     * field that carries meaning; only the decoration is lost, and a later edit that
+&nbsp;     * re-points it syncs the pointer back.
+&nbsp;     */
+&nbsp;    private suspend fun GoalEntity.withResolvableAccount(): GoalEntity {
+<b class="fc">&nbsp;        val id = accountId ?: return this</b>
+<b class="pc">&nbsp;        return if (accountDao.getById(id) == null) copy(accountId = null) else this</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +270,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

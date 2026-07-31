@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorySystemKind</title>
+  <title>MoneySurfer Coverage Report > DefaultTransactionType</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorySystemKind (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: DefaultTransactionType (com.georgeci.moneysurfer.domain.preferences)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorySystemKind</td>
+  <td class="name">DefaultTransactionType</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -58,6 +55,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultTransactionType$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,11 +97,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,10 +136,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
 &nbsp;
-&nbsp;enum class CategorySystemKind {
-<b class="fc">&nbsp;    TRANSFER,</b>
+&nbsp;/**
+&nbsp; * Which kind of transaction the creation screen should open on.
+&nbsp; *
+&nbsp; * Deliberately narrower than
+&nbsp; * [TransactionType][com.georgeci.moneysurfer.domain.primitives.TransactionType]: `OPENING_BALANCE`
+&nbsp; * is written by account creation and is never something the user starts, and a transfer is gated
+&nbsp; * by the `host.transfer_enabled` capability — offering it here would let the picker store a
+&nbsp; * default the host cannot open.
+&nbsp; */
+&nbsp;enum class DefaultTransactionType {
+<b class="fc">&nbsp;    Expense,</b>
+<b class="fc">&nbsp;    Income,</b>
+&nbsp;
+&nbsp;    ;
+&nbsp;
+&nbsp;    companion object {
+<b class="fc">&nbsp;        val DEFAULT: DefaultTransactionType = Expense</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -120,7 +180,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

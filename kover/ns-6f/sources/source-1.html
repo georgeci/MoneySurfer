@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PendingMutationEntity</title>
+  <title>MoneySurfer Coverage Report > SyncDatabase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
 </div>
 
-<h1>Coverage Summary for Class: PendingMutationEntity (com.georgeci.moneysurfer.sync.db.entity)</h1>
+<h1>Coverage Summary for Class: SyncDatabase (com.georgeci.moneysurfer.sync.db)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PendingMutationEntity</td>
+  <td class="name">SyncDatabase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -61,50 +72,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (47/47)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">PendingMutationEntity$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
     (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (47/47)
+    (2/2)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -112,47 +92,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
 &nbsp;
-&nbsp;import androidx.room.Entity
-&nbsp;import androidx.room.Index
-&nbsp;import androidx.room.PrimaryKey
+&nbsp;import androidx.room.ConstructedBy
+&nbsp;import androidx.room.Database
+&nbsp;import androidx.room.RoomDatabase
+&nbsp;import androidx.room.RoomDatabaseConstructor
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
 &nbsp;
-&nbsp;/**
-&nbsp; * Outbox row — one queued local mutation awaiting push.
-&nbsp; *
-&nbsp; * No FK constraints intentionally: the outbox is an independent ledger that
-&nbsp; * must outlive the row it references (e.g. for DELETE operations the entity
-&nbsp; * is already gone from its primary table).
-&nbsp; *
-&nbsp; * Schema mirrors `sync.md §4.3`.
-&nbsp; */
-<b class="fc">&nbsp;@Entity(</b>
-&nbsp;    tableName = &quot;pending_mutations&quot;,
-&nbsp;    // (status, createdAt) as one composite: the drain query is
-&nbsp;    // `WHERE status = &#39;PENDING&#39; ... ORDER BY createdAt ASC LIMIT n`, so the index
-&nbsp;    // serves both the filter and the ordering, replacing the two single-column ones.
-&nbsp;    indices = [
-&nbsp;        Index(value = [&quot;status&quot;, &quot;createdAt&quot;]),
-&nbsp;        Index(&quot;workspaceId&quot;),
+<b class="fc">&nbsp;@Database(</b>
+&nbsp;    entities = [
+&nbsp;        SyncMetaEntity::class,
+&nbsp;        PendingMutationEntity::class,
 &nbsp;    ],
+&nbsp;    // v2: pending_mutations dropped the separate status / createdAt indices for one
+&nbsp;    // composite. Destructive fallback is fine here — the outbox is transient.
+&nbsp;    version = 2,
 &nbsp;)
-&nbsp;data class PendingMutationEntity(
-<b class="fc">&nbsp;    @PrimaryKey val id: String,</b>
-<b class="fc">&nbsp;    val entityType: String,</b>
-<b class="fc">&nbsp;    val entityId: String,</b>
-<b class="fc">&nbsp;    val operation: String,</b>
-<b class="fc">&nbsp;    val workspaceId: String?,</b>
-<b class="fc">&nbsp;    val createdAt: Long,</b>
-<b class="fc">&nbsp;    val attempts: Int,</b>
-<b class="fc">&nbsp;    val status: String,</b>
-<b class="fc">&nbsp;    val lastError: String?,</b>
-&nbsp;) {
-&nbsp;    companion object {
-&nbsp;        const val STATUS_PENDING: String = &quot;PENDING&quot;
-&nbsp;        const val STATUS_IN_FLIGHT: String = &quot;IN_FLIGHT&quot;
-&nbsp;        const val STATUS_FAILED: String = &quot;FAILED&quot;
-&nbsp;    }
+&nbsp;@ConstructedBy(SyncDatabaseConstructor::class)
+&nbsp;abstract class SyncDatabase : RoomDatabase() {
+&nbsp;    abstract fun syncMetaDao(): SyncMetaDao
+&nbsp;    abstract fun pendingMutationDao(): PendingMutationDao
+&nbsp;}
+&nbsp;
+&nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
+&nbsp;expect object SyncDatabaseConstructor : RoomDatabaseConstructor&lt;SyncDatabase&gt; {
+&nbsp;    override fun initialize(): SyncDatabase
 &nbsp;}
 </code>
 </pre>
@@ -177,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

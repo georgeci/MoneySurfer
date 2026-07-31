@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseUserCollectionReader</title>
+  <title>MoneySurfer Coverage Report > AuthRemoteRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseUserCollectionReader (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: AuthRemoteRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
 
@@ -46,16 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseUserCollectionReader</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
+  <td class="name">AuthRemoteRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -69,12 +60,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/52)
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/278)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">FirebaseUserCollectionReader$fetchAll$1</td>
+    <td class="name">AuthRemoteRepositoryImpl$createUserWithEmail$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$deleteCurrentUser$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$reauthenticateWithEmail$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$signInAnonymously$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$signInWithEmail$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$signOut$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -84,15 +111,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
     (0/10)
   </span>
 </td>
@@ -101,7 +119,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/52)
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/278)
   </span>
 </td>
 </tr>
@@ -112,36 +146,116 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
+&nbsp;import arrow.core.Either
+&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import dev.gitlive.firebase.auth.EmailAuthProvider
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuth
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthRecentLoginRequiredException
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;@Single(binds = [UserCollectionReader::class])</b>
-&nbsp;class FirebaseUserCollectionReader(
-<b class="nc">&nbsp;    private val firestore: FirebaseFirestore,</b>
-&nbsp;) : UserCollectionReader {
+<b class="nc">&nbsp;@Single(binds = [AuthRemoteRepository::class])</b>
+&nbsp;class AuthRemoteRepositoryImpl(
+<b class="nc">&nbsp;    private val auth: FirebaseAuth,</b>
+&nbsp;) : AuthRemoteRepository {
 &nbsp;
-&nbsp;    /**
-&nbsp;     * No `where` and no `orderBy` — only the cap, so the Firestore rule still has to permit nothing
-&nbsp;     * more than a bare `list`. The cap bounds the read; it does not paginate, because a truncated
-&nbsp;     * settings collection is a bug to report, not a page to fetch.
-&nbsp;     */
-&nbsp;    override suspend fun fetchAll(
-&nbsp;        uid: String,
-&nbsp;        collectionName: String,
-&nbsp;        limit: Int,
-&nbsp;    ): List&lt;RemoteDocument&gt; =
-<b class="nc">&nbsp;        firestore</b>
-<b class="nc">&nbsp;            .collection(SyncCollection.USERS)</b>
-<b class="nc">&nbsp;            .document(uid)</b>
-<b class="nc">&nbsp;            .collection(collectionName)</b>
-<b class="nc">&nbsp;            .limit(limit.toLong())</b>
-<b class="nc">&nbsp;            .get()</b>
-<b class="nc">&nbsp;            .documents</b>
-<b class="nc">&nbsp;            .map { FirebaseRemoteDocument(it) }</b>
+<b class="nc">&nbsp;    override fun currentUid(): String? = auth.currentUser?.uid</b>
+&nbsp;
+<b class="nc">&nbsp;    override fun currentEmail(): String? = auth.currentUser?.email</b>
+&nbsp;
+<b class="nc">&nbsp;    override fun isCurrentUserAnonymous(): Boolean = auth.currentUser?.isAnonymous == true</b>
+&nbsp;
+&nbsp;    override suspend fun signInWithEmail(email: String, password: String): Either&lt;AuthError, String&gt; =
+<b class="nc">&nbsp;        Either.catch { auth.signInWithEmailAndPassword(email.trim(), password).user!!.uid }</b>
+<b class="nc">&nbsp;            .mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun createUserWithEmail(email: String, password: String): Either&lt;AuthError, String&gt; =
+<b class="nc">&nbsp;        Either.catch { auth.createUserWithEmailAndPassword(email.trim(), password).user!!.uid }</b>
+<b class="nc">&nbsp;            .mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun signInAnonymously(): Either&lt;AuthError, String&gt; =
+<b class="nc">&nbsp;        Either.catch { auth.currentUser?.uid ?: auth.signInAnonymously().user!!.uid }</b>
+<b class="nc">&nbsp;            .mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun signOut(): Either&lt;AuthError, Unit&gt; =
+<b class="nc">&nbsp;        Either.catch { auth.signOut() }.mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun reauthenticateWithEmail(email: String, password: String): Either&lt;AuthError, Unit&gt; =
+<b class="nc">&nbsp;        Either.catch {</b>
+<b class="nc">&nbsp;            val user = auth.currentUser ?: error(&quot;No active session to re-authenticate&quot;)</b>
+<b class="nc">&nbsp;            user.reauthenticate(EmailAuthProvider.credential(email.trim(), password))</b>
+<b class="nc">&nbsp;        }.mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun deleteCurrentUser(): Either&lt;AuthError, Unit&gt; =
+<b class="nc">&nbsp;        Either.catch {</b>
+<b class="nc">&nbsp;            val user = auth.currentUser ?: error(&quot;No active session to delete&quot;)</b>
+<b class="nc">&nbsp;            user.delete()</b>
+<b class="nc">&nbsp;        }.mapLeft { it.toAuthError() }</b>
+&nbsp;}
+&nbsp;
+&nbsp;/** Classify Firebase auth exceptions into the typed [AuthError.Type] domain enum. */
+&nbsp;private fun Throwable.toAuthError(): AuthError {
+&nbsp;    val byMessage = classifyAuthErrorByMessage(message)
+&nbsp;    val type = when {
+&nbsp;        // Checked before the typed branches on purpose: Android throws a plain
+&nbsp;        // FirebaseAuthInvalidCredentialsException for a malformed address, which would otherwise
+&nbsp;        // surface as &quot;wrong email or password&quot; — nonsense while creating an account.
+&nbsp;        byMessage == AuthError.Type.InvalidEmail -&gt; AuthError.Type.InvalidEmail
+&nbsp;        this is FirebaseAuthRecentLoginRequiredException -&gt; AuthError.Type.RequiresRecentLogin
+&nbsp;        this is FirebaseAuthWeakPasswordException -&gt; AuthError.Type.WeakPassword
+&nbsp;        this is FirebaseAuthUserCollisionException -&gt; AuthError.Type.EmailAlreadyInUse
+&nbsp;        this is FirebaseAuthInvalidCredentialsException -&gt; AuthError.Type.InvalidCredentials
+&nbsp;        this is FirebaseAuthInvalidUserException -&gt; AuthError.Type.InvalidCredentials
+&nbsp;        // gitlive&#39;s iOS SDK surfaces every FIRAuthErrorDomain failure as the base
+&nbsp;        // FirebaseAuthException rather than the typed subclasses matched above, so
+&nbsp;        // wrong-password / no-such-user sign-ins fall through here and would show a
+&nbsp;        // generic &quot;Sign-in failed&quot; instead of &quot;Wrong email or password&quot; (issue
+&nbsp;        // #219). Recover the classification from the server error-code name carried
+&nbsp;        // in the message. Android throws the typed subclasses and is matched above,
+&nbsp;        // so this fallback only ever runs on iOS.
+&nbsp;        else -&gt; byMessage ?: AuthError.Type.Unknown
+&nbsp;    }
+&nbsp;    return AuthError(type = type, message = message, cause = this)
+&nbsp;}
+&nbsp;
+&nbsp;// FIRAuth error-code names that all mean &quot;the supplied credentials don&#39;t match a
+&nbsp;// user&quot; — spelled identically to Android&#39;s FirebaseAuthException.getErrorCode().
+&nbsp;private val INVALID_CREDENTIAL_ERROR_CODES = listOf(
+&nbsp;    &quot;ERROR_USER_NOT_FOUND&quot;,
+&nbsp;    &quot;ERROR_WRONG_PASSWORD&quot;,
+&nbsp;    &quot;ERROR_INVALID_CREDENTIAL&quot;,
+&nbsp;    &quot;ERROR_INVALID_LOGIN_CREDENTIALS&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Fallback classifier keyed off the Firebase error-code name embedded in a
+&nbsp; * [dev.gitlive.firebase.auth.FirebaseAuthException] message. Needed only for
+&nbsp; * gitlive&#39;s iOS SDK, which does not throw the typed exception subclasses (see
+&nbsp; * [toAuthError]). Returns null when no known code is present so the caller falls
+&nbsp; * back to [AuthError.Type.Unknown].
+&nbsp; */
+&nbsp;internal fun classifyAuthErrorByMessage(message: String?): AuthError.Type? {
+&nbsp;    if (message == null) return null
+&nbsp;    return when {
+&nbsp;        // Must precede the invalid-credential codes: ERROR_INVALID_EMAIL is the more specific
+&nbsp;        // diagnosis and Android reports it only through the human-readable phrase.
+&nbsp;        message.contains(&quot;ERROR_INVALID_EMAIL&quot;, ignoreCase = true) ||
+&nbsp;            message.contains(&quot;badly formatted&quot;, ignoreCase = true) -&gt;
+&nbsp;            AuthError.Type.InvalidEmail
+&nbsp;        INVALID_CREDENTIAL_ERROR_CODES.any { message.contains(it, ignoreCase = true) } -&gt;
+&nbsp;            AuthError.Type.InvalidCredentials
+&nbsp;        message.contains(&quot;ERROR_EMAIL_ALREADY_IN_USE&quot;, ignoreCase = true) -&gt;
+&nbsp;            AuthError.Type.EmailAlreadyInUse
+&nbsp;        message.contains(&quot;ERROR_WEAK_PASSWORD&quot;, ignoreCase = true) -&gt;
+&nbsp;            AuthError.Type.WeakPassword
+&nbsp;        else -&gt; null
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -166,7 +280,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardWidgetSpan</title>
+  <title>MoneySurfer Coverage Report > ExportTransactionsUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardWidgetSpan (com.georgeci.moneysurfer.domain.dashboard)</h1>
+<h1>Coverage Summary for Class: ExportTransactionsUseCase (com.georgeci.moneysurfer.domain.csv)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardWidgetSpan</td>
+  <td class="name">ExportTransactionsUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,13 +63,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (95/95)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExportTransactionsUseCase$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">ExportTransactionsUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">ExportTransactionsUseCase$invoke$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,12 +112,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (48/48)
+    (22/22)
   </span>
 </td>
-</tr>
+  </tr>
   <tr>
-    <td class="name">DashboardWidgetSpan$Companion</td>
+    <td class="name">ExportTransactionsUseCase$writeCsv$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -84,16 +127,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
     (2/2)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
@@ -101,7 +151,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (48/48)
+    (117/117)
   </span>
 </td>
 </tr>
@@ -112,33 +162,52 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
 &nbsp;
-&nbsp;/** Columns in the dashboard grid — the lowest common multiple of the halves and thirds below. */
-&nbsp;private const val GRID_COLUMNS = 6
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import kotlinx.coroutines.CancellationException
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.IO
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import okio.BufferedSink
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * How much of a dashboard *row* a widget claims once there is a grid to place it in. Only read at
-&nbsp; * expanded width and above; below that the dashboard is one widget per row and every span renders
-&nbsp; * the same.
-&nbsp; *
-&nbsp; * Widths are expressed as columns of a [COLUMNS]-column grid rather than as free fractions, so the
-&nbsp; * useful ones all tile a row exactly — `2+2+2`, `3+3`, `4+2`, `6`. A layout therefore cannot leave a
-&nbsp; * half-column sliver, and rows can be packed greedily without a solver.
-&nbsp; *
-&nbsp; * Declared widest-first: that is the order the picker offers, and [Full] is the default — the width
-&nbsp; * every widget already has in the single-column dashboard.
+&nbsp; * Streams every local transaction into [sink] as CSV (header + one record per
+&nbsp; * transaction, see [TransactionCsvCodec]). Returns the number of exported
+&nbsp; * transactions. Caller owns [sink] and must close it; the use case flushes
+&nbsp; * but does not close.
 &nbsp; */
-<b class="fc">&nbsp;enum class DashboardWidgetSpan(val columns: Int) {</b>
-<b class="fc">&nbsp;    Full(GRID_COLUMNS),</b>
-<b class="fc">&nbsp;    TwoThirds(4),</b>
-<b class="fc">&nbsp;    Half(3),</b>
-<b class="fc">&nbsp;    Third(2),</b>
-&nbsp;    ;
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class ExportTransactionsUseCase(
+<b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
+&nbsp;) {
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Columns a dashboard grid row is divided into. */
-&nbsp;        const val COLUMNS = GRID_COLUMNS
+&nbsp;    suspend operator fun invoke(sink: BufferedSink): Result&lt;Int&gt; = try {
+<b class="fc">&nbsp;        Result.success(withContext(Dispatchers.IO) { writeCsv(sink) })</b>
+&nbsp;    } catch (cancelled: CancellationException) {
+&nbsp;        throw cancelled
+&nbsp;    } catch (
+&nbsp;        @Suppress(&quot;TooGenericExceptionCaught&quot;) t: Throwable,
+&nbsp;    ) {
+<b class="fc">&nbsp;        Result.failure(TransactionCsvError.Unexpected(t))</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun writeCsv(sink: BufferedSink): Int {
+<b class="fc">&nbsp;        val transactions = transactionRepository.getAll().first()</b>
+<b class="fc">&nbsp;        sink.writeUtf8(Csv.encodeRecord(TransactionCsvCodec.header))</b>
+<b class="fc">&nbsp;        sink.writeUtf8(NEWLINE)</b>
+<b class="fc">&nbsp;        for (transaction in transactions) {</b>
+<b class="fc">&nbsp;            sink.writeUtf8(Csv.encodeRecord(TransactionCsvCodec.encode(transaction)))</b>
+<b class="fc">&nbsp;            sink.writeUtf8(NEWLINE)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        sink.flush()</b>
+<b class="fc">&nbsp;        return transactions.size</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val NEWLINE = &quot;\n&quot;
 &nbsp;    }
 &nbsp;}
 </code>
@@ -164,7 +233,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpWorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > CategoryDeletion</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpWorkspaceSyncer (com.georgeci.moneysurfer.offline.noop)</h1>
+<h1>Coverage Summary for Class: CategoryDeletion (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpWorkspaceSyncer</td>
+  <td class="name">CategoryDeletion</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/5)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -92,19 +92,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Offline build has no remote sync. Every push/pull request is a silent
-&nbsp; * success — the on-disk Room database is the source of truth.
+&nbsp; * What a delete removed, in enough detail to undo it: the category itself plus its children
+&nbsp; * **as they were before**, still pointing at the deleted parent.
 &nbsp; */
-<b class="nc">&nbsp;class NoOpWorkspaceSyncer : WorkspaceSyncer {</b>
-<b class="nc">&nbsp;    override suspend fun pushAll() = Unit</b>
-<b class="nc">&nbsp;    override suspend fun syncAll() = Unit</b>
-<b class="nc">&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit</b>
+<b class="fc">&nbsp;data class CategoryDeletion(</b>
+<b class="fc">&nbsp;    val category: Category,</b>
+<b class="fc">&nbsp;    val reparentedChildren: List&lt;Category&gt;,</b>
+&nbsp;)
+&nbsp;
+&nbsp;@Single
+&nbsp;class DeleteCategoryUseCase(
+&nbsp;    private val categoryRepository: CategoryRepository,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the category and returns what was removed so callers can offer an Undo.
+&nbsp;     *
+&nbsp;     * Deleting a parent moves its children up to the root rather than removing them with it —
+&nbsp;     * the alternative, refusing the delete while children exist, makes the user dismantle a
+&nbsp;     * tree from the bottom for no gain. The reparenting also has to happen *first*: the
+&nbsp;     * `parentId` foreign key declares no cascade, so deleting a row that still has children
+&nbsp;     * would be rejected by SQLite.
+&nbsp;     */
+&nbsp;    suspend operator fun invoke(id: CategoryId): CategoryDeletion? {
+&nbsp;        val existing = categoryRepository.getById(id) ?: return null
+&nbsp;        val children = CategoryTree.childrenOf(categoryRepository.getAll().first(), id)
+&nbsp;        children.forEach { child -&gt;
+&nbsp;            categoryRepository.update(child.copy(parentId = null))
+&nbsp;        }
+&nbsp;        categoryRepository.delete(id)
+&nbsp;        return CategoryDeletion(category = existing, reparentedChildren = children)
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -129,7 +157,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

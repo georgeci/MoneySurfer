@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEntityPlugin</title>
+  <title>MoneySurfer Coverage Report > NetworkMonitor</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,116 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.plugin</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.network</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEntityPlugin (com.georgeci.moneysurfer.sync.plugin)</h1>
+<h1>Coverage Summary for Class: NetworkMonitor (com.georgeci.moneysurfer.sync.network)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">SyncEntityPlugin</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
+  <td class="name">NetworkMonitor</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
 </tr>
-  <tr>
-    <td class="name">SyncEntityPlugin$DefaultImpls</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    25%
-  </span>
-  <span class="absValue">
-    (1/4)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    25%
-  </span>
-  <span class="absValue">
-    (1/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    16.7%
-  </span>
-  <span class="absValue">
-    (1/6)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,63 +44,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.plugin
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.network
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;
-&nbsp;/**
-&nbsp; * Self-contained per-entity sync adapter.
-&nbsp; *
-&nbsp; * [UploadPendingChangesUseCaseImpl] calls [push] for mutations whose
-&nbsp; * [entityType] matches. [PullRemoteChangesUseCaseImpl] calls [applyDoc]
-&nbsp; * for each document in the plugin&#39;s [firestoreCollectionName].
-&nbsp; *
-&nbsp; * [firestoreCollectionName] is null for entities that are not pulled via the
-&nbsp; * subcollection cursor path (e.g. workspace root docs, users).
-&nbsp; *
-&nbsp; * [pullPriority] controls the pull order within a workspace. Lower values run
-&nbsp; * first. Plugins that have Room FK dependencies on other plugins must declare a
-&nbsp; * higher (later) priority than the plugins they depend on. Defaults to 0
-&nbsp; * (no ordering preference). Concrete values are defined in each plugin
-&nbsp; * implementation inside `:sync-surfer`.
-&nbsp; */
-&nbsp;interface SyncEntityPlugin {
-&nbsp;    val entityType: String
-&nbsp;    val firestoreCollectionName: String?
-&nbsp;
-&nbsp;    /** Pull order within a workspace. Lower = pulled first. Default: 100. */
-<b class="nc">&nbsp;    val pullPriority: Int get() = 100</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Which document tree this plugin&#39;s collection hangs off. Defaults to
-&nbsp;     * [PullScope.Workspace] — everything but per-user configuration.
-&nbsp;     */
-<b class="pc">&nbsp;    val pullScope: PullScope get() = PullScope.Workspace</b>
-&nbsp;
-&nbsp;    suspend fun push(mutation: PendingMutation)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Applies one remote document. [scopeKey] is the workspace id for a
-&nbsp;     * [PullScope.Workspace] plugin and the Firebase uid for a [PullScope.User] one — the
-&nbsp;     * same value the plugin&#39;s own outbox rows carry in `scopeKey`.
-&nbsp;     */
-&nbsp;    suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult
-&nbsp;}
+&nbsp;import kotlinx.coroutines.flow.StateFlow
 &nbsp;
 &nbsp;/**
-&nbsp; * Whether a plugin&#39;s documents live under `workspaces/{wid}` or under `users/{uid}`.
+&nbsp; * Reports whether the device currently has network connectivity.
 &nbsp; *
-&nbsp; * The discriminator exists because [PullRemoteChangesUseCaseImpl] runs *every* registered plugin
-&nbsp; * for *every* workspace. A user-scoped plugin dragged into that loop breaks either way: with
-&nbsp; * `firestoreCollectionName = null` it is handed the workspace root document and a lenient DTO
-&nbsp; * writes a garbage row, and with a name it queries a path that does not exist, once per workspace.
+&nbsp; * Platform implementations live in `:data` (Android `ConnectivityManager`,
+&nbsp; * iOS `NWPathMonitor`, desktop stub). Phase 0 ships only the interface;
+&nbsp; * tests use an in-memory fake.
+&nbsp; *
+&nbsp; * See SyncCoordinatorFAQ.md №9.
 &nbsp; */
-&nbsp;enum class PullScope {
-&nbsp;    Workspace,
-&nbsp;    User,
+&nbsp;interface NetworkMonitor {
+&nbsp;    val online: StateFlow&lt;Boolean&gt;
 &nbsp;}
-&nbsp;
-&nbsp;data class EntityApplyResult(val applied: Boolean, val wasConflict: Boolean)
 </code>
 </pre>
 </div>
@@ -216,7 +83,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseCurrentAuthInfo</title>
+  <title>MoneySurfer Coverage Report > AppConfigRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseCurrentAuthInfo (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: AppConfigRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseCurrentAuthInfo</td>
+  <td class="name">AppConfigRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/22)
+    (116/116)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">AppConfigRepositoryImpl$fetch$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (116/116)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,23 +126,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.logging.redactEmail
-&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
-&nbsp;import dev.gitlive.firebase.auth.FirebaseAuth
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.data.remote.AppConfigRemoteSource
+&nbsp;import com.georgeci.moneysurfer.domain.model.RemoteAppConfig
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;@Single(binds = [CurrentAuthInfo::class])</b>
-<b class="nc">&nbsp;class FirebaseCurrentAuthInfo(private val auth: FirebaseAuth) : CurrentAuthInfo {</b>
-&nbsp;    override fun diagnostics(): String {
-<b class="nc">&nbsp;        val user = auth.currentUser</b>
-<b class="nc">&nbsp;        return if (user == null) {</b>
-<b class="nc">&nbsp;            &quot;uid=&lt;null&gt; NOT_SIGNED_IN&quot;</b>
-&nbsp;        } else {
-<b class="nc">&nbsp;            &quot;uid=${user.uid.redactUid()} email=${user.email.redactEmail()} anon=${user.isAnonymous}&quot;</b>
-&nbsp;        }
-&nbsp;    }
+<b class="fc">&nbsp;@Single(binds = [AppConfigRepository::class])</b>
+&nbsp;class AppConfigRepositoryImpl(
+<b class="fc">&nbsp;    private val remoteSource: AppConfigRemoteSource,</b>
+&nbsp;) : AppConfigRepository {
+&nbsp;
+<b class="fc">&nbsp;    private val log = Logger.withTag(&quot;AppConfigRepository&quot;)</b>
+&nbsp;
+<b class="fc">&nbsp;    override suspend fun fetch(): RemoteAppConfig? = runCatching {</b>
+<b class="fc">&nbsp;        remoteSource.fetchMobile()?.let { dto -&gt;</b>
+<b class="fc">&nbsp;            RemoteAppConfig(</b>
+<b class="fc">&nbsp;                minSupportedAppVersionCode = dto.minSupportedAppVersionCode,</b>
+<b class="fc">&nbsp;                latestAppVersionCode = dto.latestAppVersionCode,</b>
+<b class="fc">&nbsp;                forceUpdate = dto.forceUpdate,</b>
+<b class="fc">&nbsp;                message = dto.message,</b>
+<b class="fc">&nbsp;            )</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }.onFailure { error -&gt;</b>
+<b class="fc">&nbsp;        log.w(error) { &quot;fetch failed — gate falls back to Supported&quot; }</b>
+<b class="fc">&nbsp;    }.getOrNull()</b>
 &nbsp;}
 </code>
 </pre>
@@ -140,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

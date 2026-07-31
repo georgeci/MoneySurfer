@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SwatchSpec</title>
+  <title>MoneySurfer Coverage Report > DeleteUserAccountViewModel</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.appearance</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
 </div>
 
-<h1>Coverage Summary for Class: SwatchSpec (com.georgeci.moneysurfer.feature.settings.appearance)</h1>
+<h1>Coverage Summary for Class: DeleteUserAccountViewModel (com.georgeci.moneysurfer.feature.settings.account)</h1>
 
 <table class="coverageStats">
 
@@ -45,59 +45,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
+<tr>
+  <td class="name">DeleteUserAccountViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (16/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (24/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.8%
+  </span>
+  <span class="absValue">
+    (152/198)
+  </span>
+</td>
+</tr>
   <tr>
-    <td class="name">SwatchSpec$Brand</td>
+    <td class="name">DeleteUserAccountViewModel$deleteAccount$3</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/13)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">SwatchSpec$Preset</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/17)
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (62/62)
   </span>
 </td>
   </tr>
@@ -105,27 +119,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
+    (6/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/30)
+    (18/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (30/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.3%
+  </span>
+  <span class="absValue">
+    (214/260)
   </span>
 </td>
 </tr>
@@ -136,431 +157,117 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.appearance
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.aspectRatio
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TopAppBarDefaults
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.AccentSeed
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.PaletteSource
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.ThemeMode
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRadio
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AccentSeeds
-&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AppColors
-&nbsp;import moneysurfer.feature.settings.generated.resources.Res
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_accent_footnote
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_color_source
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_dynamic_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_dynamic_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_live_preview_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_live_preview_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_swatch_brand
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_swatch_mint
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_swatch_plum
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_swatch_rose
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_swatch_sky
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_dark
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_dark_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_light
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_light_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_section
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_system
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_theme_system_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_title
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;
-&nbsp;private sealed interface SwatchSpec {
-&nbsp;    val labelRes: StringResource
-&nbsp;    val color: Color
-&nbsp;
-<b class="nc">&nbsp;    data class Brand(override val color: Color) : SwatchSpec {</b>
-<b class="nc">&nbsp;        override val labelRes: StringResource = Res.string.settings_appearance_swatch_brand</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    data class Preset(</b>
-<b class="nc">&nbsp;        val seed: AccentSeed,</b>
-<b class="nc">&nbsp;        override val labelRes: StringResource,</b>
-<b class="nc">&nbsp;        override val color: Color,</b>
-&nbsp;    ) : SwatchSpec
-&nbsp;}
-&nbsp;
-&nbsp;private val FixedSwatches: List&lt;SwatchSpec&gt; = listOf(
-&nbsp;    SwatchSpec.Brand(AppColors.Primary),
-&nbsp;    SwatchSpec.Preset(AccentSeed.Plum, Res.string.settings_appearance_swatch_plum, AccentSeeds.Plum),
-&nbsp;    SwatchSpec.Preset(AccentSeed.Sky, Res.string.settings_appearance_swatch_sky, AccentSeeds.Sky),
-&nbsp;    SwatchSpec.Preset(AccentSeed.Mint, Res.string.settings_appearance_swatch_mint, AccentSeeds.Mint),
-&nbsp;    SwatchSpec.Preset(AccentSeed.Rose, Res.string.settings_appearance_swatch_rose, AccentSeeds.Rose),
-&nbsp;)
+&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.DeleteUserAccountUseCase
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * Stable selectors for the Appearance screen — see docs/testing/testing-strategy.md.
+&nbsp; * User-account deletion flow (issue #213), online builds only — the Settings entry point is
+&nbsp; * hidden offline. Email/password sessions must retype their password (doubles as the Firebase
+&nbsp; * re-auth credential); anonymous sessions go straight to the confirmation dialog.
 &nbsp; *
-&nbsp; * The option rows are named after the enum entry they set, not the localized label, so a
-&nbsp; * renamed row title never breaks a flow: `appearance:theme:system|light|dark` and
-&nbsp; * `appearance:cardStyle:filled|outlined|card`.
+&nbsp; * On success no navigation is posted: the use case clears the session user pointer and
+&nbsp; * AppLaunchViewModel bounces the whole app to SignIn.
 &nbsp; */
-&nbsp;object AppearanceTestTags {
-&nbsp;    const val Root = &quot;appearance:root&quot;
-&nbsp;
-&nbsp;    /** Row that selects a [ThemeMode]. */
-&nbsp;    fun theme(mode: ThemeMode): String = &quot;appearance:theme:${mode.name.lowercase()}&quot;
-&nbsp;
-&nbsp;    /** Row that selects a [ContainerStyle] — the &quot;Card style&quot; section. */
-&nbsp;    fun cardStyle(style: ContainerStyle): String = &quot;appearance:cardStyle:${style.name.lowercase()}&quot;
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun AppearanceScreen(
-&nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    viewModel: AppearanceViewModel = koinViewModel(),
+<b class="fc">&nbsp;@KoinViewModel</b>
+&nbsp;class DeleteUserAccountViewModel(
+<b class="fc">&nbsp;    private val deleteUserAccount: DeleteUserAccountUseCase,</b>
+&nbsp;    authRemoteRepository: AuthRemoteRepository,
+&nbsp;) : MviViewModel&lt;DeleteUserAccountState, DeleteUserAccountEvent, DeleteUserAccountEffect&gt;(
+<b class="fc">&nbsp;    initialState = DeleteUserAccountState(</b>
+<b class="fc">&nbsp;        isAnonymousUser = authRemoteRepository.isCurrentUserAnonymous(),</b>
+<b class="fc">&nbsp;        userEmail = authRemoteRepository.currentEmail(),</b>
+&nbsp;    ),
 &nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
-&nbsp;    AppearanceContent(
-&nbsp;        state = state,
-&nbsp;        onNavigateBack = onNavigateBack,
-&nbsp;        onDynamicSelect = { viewModel.onEvent(AppearanceEvent.OnDynamicSelect) },
-&nbsp;        onBrandSelect = { viewModel.onEvent(AppearanceEvent.OnBrandSelect) },
-&nbsp;        onPresetSelect = { seed -&gt; viewModel.onEvent(AppearanceEvent.OnPresetSelect(seed)) },
-&nbsp;        onThemeModeSelect = { mode -&gt; viewModel.onEvent(AppearanceEvent.OnThemeModeSelect(mode)) },
-&nbsp;        onContainerStyleSelect = { style -&gt;
-&nbsp;            viewModel.onEvent(AppearanceEvent.OnContainerStyleSelect(style))
-&nbsp;        },
-&nbsp;    )
-&nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun AppearanceContent(
-&nbsp;    state: AppearanceState,
-&nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    onDynamicSelect: () -&gt; Unit,
-&nbsp;    onBrandSelect: () -&gt; Unit,
-&nbsp;    onPresetSelect: (AccentSeed) -&gt; Unit,
-&nbsp;    onThemeModeSelect: (ThemeMode) -&gt; Unit,
-&nbsp;    onContainerStyleSelect: (ContainerStyle) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
-&nbsp;            .testTag(AppearanceTestTags.Root)
-&nbsp;            .surferTestTagAsId(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferPaneTopBar(
-&nbsp;                title = stringResource(Res.string.settings_appearance_title),
-&nbsp;                onBack = onNavigateBack,
-&nbsp;                colors = TopAppBarDefaults.topAppBarColors(
-&nbsp;                    containerColor = AppTheme.materialColors.surface,
-&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,
-&nbsp;                ),
+&nbsp;    override fun onEvent(event: DeleteUserAccountEvent) {
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="pc">&nbsp;            DeleteUserAccountEvent.OnBackClick -&gt; postSideEffect(DeleteUserAccountEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            is DeleteUserAccountEvent.OnPasswordChange -&gt;</b>
+<b class="fc">&nbsp;                updateState { copy(password = event.value, passwordMissing = false) }</b>
+<b class="fc">&nbsp;            DeleteUserAccountEvent.OnDeleteClick -&gt; requestConfirmation()</b>
+<b class="pc">&nbsp;            DeleteUserAccountEvent.OnConfirmDismissed -&gt;</b>
+<b class="nc">&nbsp;                updateState { copy(showConfirmDialog = false) }</b>
+<b class="fc">&nbsp;            DeleteUserAccountEvent.OnConfirmAccepted -&gt; deleteAccount()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun requestConfirmation() {
+<b class="fc">&nbsp;        val state = currentState</b>
+<b class="fc">&nbsp;        if (!state.isAnonymousUser &amp;&amp; state.password.isBlank()) {</b>
+<b class="fc">&nbsp;            updateState { copy(passwordMissing = true) }</b>
+&nbsp;            return
+&nbsp;        }
+<b class="fc">&nbsp;        updateState { copy(showConfirmDialog = true) }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun deleteAccount() {
+<b class="fc">&nbsp;        updateState { copy(showConfirmDialog = false, isDeleting = true) }</b>
+<b class="fc">&nbsp;        launch(</b>
+&nbsp;            onError = {
+<b class="nc">&nbsp;                updateState { copy(isDeleting = false) }</b>
+<b class="nc">&nbsp;                postSideEffect(DeleteUserAccountEffect.Notify(DeleteUserAccountNotice.Generic))</b>
+&nbsp;            },
+&nbsp;        ) {
+<b class="fc">&nbsp;            val password = currentState.password.takeIf { !currentState.isAnonymousUser }</b>
+<b class="fc">&nbsp;            deleteUserAccount(password = password).fold(</b>
+&nbsp;                ifLeft = { error -&gt;
+<b class="fc">&nbsp;                    updateState { copy(isDeleting = false) }</b>
+<b class="fc">&nbsp;                    postSideEffect(DeleteUserAccountEffect.Notify(error.toNotice()))</b>
+<b class="fc">&nbsp;                },</b>
+&nbsp;                ifRight = {
+&nbsp;                    // Session user pointer is already null — AppLaunchViewModel navigates
+&nbsp;                    // to SignIn; keep the overlay up so the screen can&#39;t be re-submitted.
+<b class="fc">&nbsp;                },</b>
 &nbsp;            )
-&nbsp;        },
-&nbsp;    ) { padding -&gt;
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(top = padding.calculateTopPadding())
-&nbsp;                .verticalScroll(rememberScrollState()),
-&nbsp;        ) {
-&nbsp;            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-&nbsp;                LiveSchemePreview()
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_appearance_theme_section)) {
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Sparkle,
-&nbsp;                    title = stringResource(Res.string.settings_appearance_theme_system),
-&nbsp;                    supportingText = stringResource(Res.string.settings_appearance_theme_system_supporting),
-&nbsp;                    onClick = { onThemeModeSelect(ThemeMode.System) },
-&nbsp;                    trailing = { SurferSettingsRadio(selected = state.themeMode == ThemeMode.System) },
-&nbsp;                    modifier = Modifier.testTag(AppearanceTestTags.theme(ThemeMode.System)),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.LightMode,
-&nbsp;                    title = stringResource(Res.string.settings_appearance_theme_light),
-&nbsp;                    supportingText = stringResource(Res.string.settings_appearance_theme_light_supporting),
-&nbsp;                    onClick = { onThemeModeSelect(ThemeMode.Light) },
-&nbsp;                    trailing = { SurferSettingsRadio(selected = state.themeMode == ThemeMode.Light) },
-&nbsp;                    modifier = Modifier.testTag(AppearanceTestTags.theme(ThemeMode.Light)),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.DarkMode,
-&nbsp;                    title = stringResource(Res.string.settings_appearance_theme_dark),
-&nbsp;                    supportingText = stringResource(Res.string.settings_appearance_theme_dark_supporting),
-&nbsp;                    onClick = { onThemeModeSelect(ThemeMode.Dark) },
-&nbsp;                    trailing = { SurferSettingsRadio(selected = state.themeMode == ThemeMode.Dark) },
-&nbsp;                    modifier = Modifier.testTag(AppearanceTestTags.theme(ThemeMode.Dark)),
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(
-&nbsp;                title = stringResource(Res.string.settings_appearance_color_source),
-&nbsp;                footnote = stringResource(Res.string.settings_appearance_accent_footnote),
-&nbsp;            ) {
-&nbsp;                if (state.isDynamicColorAvailable) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Sparkle,
-&nbsp;                        title = stringResource(Res.string.settings_appearance_dynamic_title),
-&nbsp;                        supportingText = stringResource(Res.string.settings_appearance_dynamic_supporting),
-&nbsp;                        onClick = onDynamicSelect,
-&nbsp;                        trailing = { SurferSettingsRadio(selected = state.isDynamicColorEnabled) },
-&nbsp;                    )
-&nbsp;                }
-&nbsp;                SeedPickerCard(
-&nbsp;                    swatches = FixedSwatches,
-&nbsp;                    isBrandSelected = state.isBrandSelected,
-&nbsp;                    selectedSeed = state.selectedSeed,
-&nbsp;                    onPickBrand = onBrandSelect,
-&nbsp;                    onPickPreset = onPresetSelect,
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(title = &quot;Card style&quot;) {
-&nbsp;                ContainerStyle.entries.forEach { style -&gt;
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = containerStyleIcon(style),
-&nbsp;                        title = style.displayLabel(),
-&nbsp;                        supportingText = style.displaySupporting(),
-&nbsp;                        onClick = { onContainerStyleSelect(style) },
-&nbsp;                        trailing = { SurferSettingsRadio(selected = state.containerStyle == style) },
-&nbsp;                        modifier = Modifier.testTag(AppearanceTestTags.cardStyle(style)),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private fun AccountDeletionError.toNotice(): DeleteUserAccountNotice = when (this) {</b>
+<b class="pc">&nbsp;        AccountDeletionError.NotSignedIn -&gt; DeleteUserAccountNotice.Generic</b>
+<b class="fc">&nbsp;        AccountDeletionError.InvalidCredentials -&gt; DeleteUserAccountNotice.WrongPassword</b>
+<b class="pc">&nbsp;        is AccountDeletionError.ReauthenticationFailed -&gt; DeleteUserAccountNotice.Generic</b>
+<b class="pc">&nbsp;        AccountDeletionError.RequiresRecentLogin -&gt; DeleteUserAccountNotice.RequiresRecentLogin</b>
+<b class="pc">&nbsp;        is AccountDeletionError.RemoteDataCleanupFailed -&gt; DeleteUserAccountNotice.CleanupFailed</b>
+<b class="nc">&nbsp;        is AccountDeletionError.AuthDeletionFailed -&gt; DeleteUserAccountNotice.AuthDeletionFailed</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;private fun ContainerStyle.displayLabel(): String = when (this) {
-&nbsp;    ContainerStyle.Filled -&gt; &quot;Filled&quot;
-&nbsp;    ContainerStyle.Outlined -&gt; &quot;Outlined&quot;
-&nbsp;    ContainerStyle.Card -&gt; &quot;Card&quot;
-&nbsp;}
-&nbsp;
-&nbsp;private fun ContainerStyle.displaySupporting(): String = when (this) {
-&nbsp;    ContainerStyle.Filled -&gt; &quot;Solid surfaces, no border&quot;
-&nbsp;    ContainerStyle.Outlined -&gt; &quot;Bordered surfaces, no fill&quot;
-&nbsp;    ContainerStyle.Card -&gt; &quot;Elevated surfaces with shadow&quot;
-&nbsp;}
-&nbsp;
-&nbsp;private fun containerStyleIcon(style: ContainerStyle) = when (style) {
-&nbsp;    ContainerStyle.Filled -&gt; SurferIcons.Palette
-&nbsp;    ContainerStyle.Outlined -&gt; SurferIcons.Code
-&nbsp;    ContainerStyle.Card -&gt; SurferIcons.Receipt
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun LiveSchemePreview() {
-&nbsp;    val colors = AppTheme.materialColors
-&nbsp;    SurferCard(modifier = Modifier.fillMaxWidth()) {
-&nbsp;        Row(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxWidth()
-&nbsp;                .padding(18.dp),
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(14.dp),
-&nbsp;        ) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .size(48.dp)
-&nbsp;                    .clip(CircleShape)
-&nbsp;                    .background(colors.primary),
-&nbsp;                contentAlignment = Alignment.Center,
-&nbsp;            ) {
-&nbsp;                Icon(
-&nbsp;                    imageVector = SurferIcons.Palette,
-&nbsp;                    contentDescription = SurferSemantics.Decorative,
-&nbsp;                    tint = colors.onPrimary,
-&nbsp;                    modifier = Modifier.size(22.dp),
-&nbsp;                )
-&nbsp;            }
-&nbsp;            Column(modifier = Modifier.weight(1f)) {
-&nbsp;                Text(
-&nbsp;                    text = stringResource(Res.string.settings_appearance_live_preview_title),
-&nbsp;                    style = AppTheme.typography.titleSmall,
-&nbsp;                    color = colors.onSurface,
-&nbsp;                )
-&nbsp;                Text(
-&nbsp;                    text = stringResource(Res.string.settings_appearance_live_preview_supporting),
-&nbsp;                    style = AppTheme.typography.bodySmall,
-&nbsp;                    color = colors.onSurfaceVariant,
-&nbsp;                    modifier = Modifier.padding(top = 2.dp),
-&nbsp;                )
-&nbsp;            }
-&nbsp;            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-&nbsp;                listOf(colors.primary, colors.secondary, colors.tertiary).forEach { c -&gt;
-&nbsp;                    Box(
-&nbsp;                        modifier = Modifier
-&nbsp;                            .size(18.dp)
-&nbsp;                            .clip(CircleShape)
-&nbsp;                            .background(c),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SeedPickerCard(
-&nbsp;    swatches: List&lt;SwatchSpec&gt;,
-&nbsp;    isBrandSelected: Boolean,
-&nbsp;    selectedSeed: AccentSeed?,
-&nbsp;    onPickBrand: () -&gt; Unit,
-&nbsp;    onPickPreset: (AccentSeed) -&gt; Unit,
+&nbsp;data class DeleteUserAccountState(
+&nbsp;    val isAnonymousUser: Boolean = false,
+&nbsp;    val userEmail: String? = null,
+&nbsp;    val password: String = &quot;&quot;,
+&nbsp;    val passwordMissing: Boolean = false,
+&nbsp;    val showConfirmDialog: Boolean = false,
+&nbsp;    val isDeleting: Boolean = false,
 &nbsp;) {
-&nbsp;    val colors = AppTheme.materialColors
-&nbsp;    SurferCard(modifier = Modifier.fillMaxWidth()) {
-&nbsp;        Row(
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(10.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;        ) {
-&nbsp;            swatches.forEach { swatch -&gt;
-&nbsp;                val selected = when (swatch) {
-&nbsp;                    is SwatchSpec.Brand -&gt; isBrandSelected
-&nbsp;                    is SwatchSpec.Preset -&gt; swatch.seed == selectedSeed
-&nbsp;                }
-&nbsp;                SwatchCell(
-&nbsp;                    label = stringResource(swatch.labelRes),
-&nbsp;                    color = swatch.color,
-&nbsp;                    selected = selected,
-&nbsp;                    labelColor = if (selected) colors.onSurface else colors.onSurfaceVariant,
-&nbsp;                    onClick = {
-&nbsp;                        when (swatch) {
-&nbsp;                            is SwatchSpec.Brand -&gt; onPickBrand()
-&nbsp;                            is SwatchSpec.Preset -&gt; onPickPreset(swatch.seed)
-&nbsp;                        }
-&nbsp;                    },
-&nbsp;                    modifier = Modifier.weight(1f),
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
+&nbsp;    val showPasswordField: Boolean get() = !isAnonymousUser
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SwatchCell(
-&nbsp;    label: String,
-&nbsp;    color: Color,
-&nbsp;    selected: Boolean,
-&nbsp;    labelColor: Color,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    Column(
-&nbsp;        modifier = modifier,
-&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
-&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxWidth()
-&nbsp;                .aspectRatio(1f)
-&nbsp;                .clip(RoundedCornerShape(16.dp))
-&nbsp;                .background(color)
-&nbsp;                .clickable { onClick() },
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            if (selected) {
-&nbsp;                Box(
-&nbsp;                    modifier = Modifier
-&nbsp;                        .size(28.dp)
-&nbsp;                        .clip(CircleShape)
-&nbsp;                        .background(Color.White.copy(alpha = 0.25f)),
-&nbsp;                    contentAlignment = Alignment.Center,
-&nbsp;                ) {
-&nbsp;                    Icon(
-&nbsp;                        imageVector = SurferIcons.Check,
-&nbsp;                        contentDescription = SurferSemantics.Decorative,
-&nbsp;                        tint = Color.White,
-&nbsp;                        modifier = Modifier.size(18.dp),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;        Text(
-&nbsp;            text = label,
-&nbsp;            style = AppTheme.typography.labelMedium,
-&nbsp;            color = labelColor,
-&nbsp;        )
-&nbsp;    }
+&nbsp;sealed interface DeleteUserAccountEvent {
+&nbsp;    data object OnBackClick : DeleteUserAccountEvent
+&nbsp;    data class OnPasswordChange(val value: String) : DeleteUserAccountEvent
+&nbsp;    data object OnDeleteClick : DeleteUserAccountEvent
+&nbsp;    data object OnConfirmDismissed : DeleteUserAccountEvent
+&nbsp;    data object OnConfirmAccepted : DeleteUserAccountEvent
 &nbsp;}
 &nbsp;
-&nbsp;@Preview()
-&nbsp;@Composable
-&nbsp;private fun AppearanceScreenPreview() {
-&nbsp;    AppTheme {
-&nbsp;        AppearanceContent(
-&nbsp;            state = AppearanceState(isDynamicColorAvailable = true),
-&nbsp;            onNavigateBack = {},
-&nbsp;            onDynamicSelect = {},
-&nbsp;            onBrandSelect = {},
-&nbsp;            onPresetSelect = {},
-&nbsp;            onThemeModeSelect = {},
-&nbsp;            onContainerStyleSelect = {},
-&nbsp;        )
-&nbsp;    }
+&nbsp;/** Localised in the screen layer — the ViewModel stays free of platform string APIs. */
+&nbsp;enum class DeleteUserAccountNotice {
+&nbsp;    WrongPassword,
+&nbsp;    RequiresRecentLogin,
+&nbsp;    CleanupFailed,
+&nbsp;    AuthDeletionFailed,
+&nbsp;    Generic,
 &nbsp;}
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun AppearanceScreenDynamicOnPreview() {
-&nbsp;    AppTheme {
-&nbsp;        AppearanceContent(
-&nbsp;            state = AppearanceState(
-&nbsp;                isDynamicColorAvailable = true,
-&nbsp;                paletteSource = PaletteSource.Dynamic,
-&nbsp;            ),
-&nbsp;            onNavigateBack = {},
-&nbsp;            onDynamicSelect = {},
-&nbsp;            onBrandSelect = {},
-&nbsp;            onPresetSelect = {},
-&nbsp;            onThemeModeSelect = {},
-&nbsp;            onContainerStyleSelect = {},
-&nbsp;        )
-&nbsp;    }
+&nbsp;sealed interface DeleteUserAccountEffect {
+&nbsp;    data object NavigateBack : DeleteUserAccountEffect
+&nbsp;    data class Notify(val notice: DeleteUserAccountNotice) : DeleteUserAccountEffect
 &nbsp;}
 </code>
 </pre>
@@ -585,7 +292,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

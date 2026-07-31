@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > WorkspaceMemberRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: WorkspaceMemberRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt</td>
+  <td class="name">WorkspaceMemberRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMember
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;/**
+&nbsp; * Membership roster repository.
+&nbsp; *
+&nbsp; * Soft-delete only — `markRemoved` and `markLeft` flip `status` and stamp the matching
+&nbsp; * timestamp, never erase the row. Firestore rules forbid hard deletes; mirrored locally
+&nbsp; * to keep history readable for the rest of the workspace.
+&nbsp; */
+&nbsp;interface WorkspaceMemberRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceMember&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;WorkspaceMember&gt;&gt;
+&nbsp;    fun getByUserId(userId: UserId): Flow&lt;List&lt;WorkspaceMember&gt;&gt;
+&nbsp;    suspend fun getById(userId: UserId, workspaceId: WorkspaceId): WorkspaceMember?
+&nbsp;    suspend fun insert(member: WorkspaceMember)
+&nbsp;    suspend fun update(member: WorkspaceMember)
+&nbsp;
+&nbsp;    /** Owner removes a member: status → REMOVED, removedAt = now, addedByUserId untouched. */
+&nbsp;    suspend fun markRemoved(userId: UserId, workspaceId: WorkspaceId, removedByUserId: UserId?)
+&nbsp;
+&nbsp;    /** Member voluntarily leaves: status → LEFT, leftAt = now. */
+&nbsp;    suspend fun markLeft(userId: UserId, workspaceId: WorkspaceId)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > UpcomingRecurringKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+</div>
+
+<h1>Coverage Summary for Class: UpcomingRecurringKt (com.georgeci.moneysurfer.domain.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpcomingRecurringKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (34/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.9%
+  </span>
+  <span class="absValue">
+    (63/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (458/460)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UpcomingRecurringKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (34/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.9%
+  </span>
+  <span class="absValue">
+    (63/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (458/460)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.isoDayNumber
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.number
+&nbsp;import kotlinx.datetime.plus
+&nbsp;
+&nbsp;/**
+&nbsp; * One scheduled payment the dashboard is about to be hit by: which rule, what it costs, and the
+&nbsp; * day it next falls due.
+&nbsp; *
+&nbsp; * [daysUntil] travels beside [dueDate] rather than being re-derived on the screen — &quot;today&quot; is a
+&nbsp; * time zone away from the UI layer, and a card that computed it itself would drift from the list
+&nbsp; * it was sorted into the moment the two disagreed about which day it is.
+&nbsp; */
+&nbsp;data class UpcomingRecurring(
+&nbsp;    val ruleId: RecurringRuleId,
+&nbsp;    val title: String,
+&nbsp;    val amount: Money,
+&nbsp;    val currency: CurrencyCode,
+&nbsp;    val dueDate: LocalDate,
+&nbsp;    /** Whole days from the day the list was built. `0` is today, never negative. */
+&nbsp;    val daysUntil: Int,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether this one is close enough to be worth the tint. Today and tomorrow only: the tint is
+&nbsp;     * &quot;you cannot plan around this any more&quot;, and everything further out is exactly what the rest
+&nbsp;     * of the list is for.
+&nbsp;     */
+&nbsp;    val isImminent: Boolean get() = daysUntil &lt;= IMMINENT_DAYS
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The next occurrence of each active rule, soonest first, capped at [limit].
+&nbsp; *
+&nbsp; * Rules the calendar can no longer place — see [nextOccurrenceOnOrAfter] — drop out rather than
+&nbsp; * being listed without a date. Ties break on the rule id so two payments due the same day keep a
+&nbsp; * stable order across emissions instead of swapping rows whenever the query re-runs.
+&nbsp; */
+&nbsp;fun List&lt;RecurringRule&gt;.upcomingOccurrences(
+&nbsp;    today: LocalDate,
+&nbsp;    currency: CurrencyCode,
+&nbsp;    limit: Int,
+<b class="fc">&nbsp;): List&lt;UpcomingRecurring&gt; = asSequence()</b>
+<b class="fc">&nbsp;    .filter { it.isActive }</b>
+<b class="fc">&nbsp;    .mapNotNull { rule -&gt;</b>
+<b class="fc">&nbsp;        rule.nextOccurrenceOnOrAfter(today)?.let { due -&gt;</b>
+<b class="fc">&nbsp;            UpcomingRecurring(</b>
+<b class="fc">&nbsp;                ruleId = rule.id,</b>
+<b class="fc">&nbsp;                title = rule.title,</b>
+<b class="fc">&nbsp;                amount = rule.amount,</b>
+<b class="fc">&nbsp;                currency = currency,</b>
+<b class="fc">&nbsp;                dueDate = due,</b>
+<b class="fc">&nbsp;                daysUntil = (due.toEpochDays() - today.toEpochDays()).toInt(),</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        }
+&nbsp;    }
+<b class="fc">&nbsp;    .sortedWith(compareBy({ it.dueDate }, { it.ruleId.value }))</b>
+<b class="fc">&nbsp;    .take(limit)</b>
+<b class="fc">&nbsp;    .toList()</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The first day on or after [date] that this rule fires, or null when there is none within the
+&nbsp; * probing horizon below.
+&nbsp; *
+&nbsp; * Derived from the schedule rather than read from [RecurringRule.nextRunAt]: that field is the
+&nbsp; * generator&#39;s own bookkeeping — null on every rule that has not run yet, and stale on any device
+&nbsp; * that pulled the rule before the run happened — so a widget reading it would show a date the
+&nbsp; * calendar disagrees with. The schedule is the thing the user actually configured.
+&nbsp; *
+&nbsp; * A rule due *today* counts as due today even if it has already been generated. Whether a given
+&nbsp; * occurrence has been booked is the generator&#39;s question, and this file has no transactions to ask
+&nbsp; * it with; showing today&#39;s rent one hour after it posted is a far smaller error than hiding
+&nbsp; * tomorrow&#39;s.
+&nbsp; */
+&nbsp;fun RecurringRule.nextOccurrenceOnOrAfter(date: LocalDate): LocalDate? {
+&nbsp;    // Never before the rule itself begins, and never below a one-step interval: a zero or negative
+&nbsp;    // interval reaches the domain from remote sync, and stepping by it would not terminate.
+<b class="fc">&nbsp;    val from = maxOf(date, startDate)</b>
+<b class="fc">&nbsp;    val step = schedule.interval.coerceAtLeast(1)</b>
+<b class="fc">&nbsp;    return when (schedule.frequency) {</b>
+<b class="fc">&nbsp;        RecurringFrequency.DAILY -&gt; nextDaily(from, step)</b>
+<b class="fc">&nbsp;        RecurringFrequency.WEEKLY -&gt; nextWeekly(from, step)</b>
+<b class="fc">&nbsp;        RecurringFrequency.MONTHLY -&gt; nextMonthly(from, step)</b>
+<b class="fc">&nbsp;        RecurringFrequency.YEARLY -&gt; nextYearly(from, step)</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Every [step] days from the start date — the one frequency with nothing to clamp. */
+&nbsp;private fun RecurringRule.nextDaily(from: LocalDate, step: Int): LocalDate {
+<b class="fc">&nbsp;    val elapsed = from.toEpochDays() - startDate.toEpochDays()</b>
+<b class="fc">&nbsp;    val stepsTaken = ceilDiv(elapsed, step.toLong())</b>
+<b class="fc">&nbsp;    return startDate.plus(stepsTaken * step, DateTimeUnit.DAY)</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The selected weekdays of every [step]-th week, counted from the week the rule starts in. A rule
+&nbsp; * that names no weekday keeps the one its start date falls on.
+&nbsp; *
+&nbsp; * Two weeks are probed, not one: the first aligned week can be the week [from] sits in, whose
+&nbsp; * matching days may all be behind it already.
+&nbsp; */
+&nbsp;private fun RecurringRule.nextWeekly(from: LocalDate, step: Int): LocalDate? {
+<b class="fc">&nbsp;    val weekdays = schedule.daysOfWeek.ifEmpty { setOf(startDate.dayOfWeek) }</b>
+<b class="fc">&nbsp;    val base = startDate.startOfWeek()</b>
+<b class="fc">&nbsp;    val elapsedWeeks = (from.startOfWeek().toEpochDays() - base.toEpochDays()) / DAYS_PER_WEEK</b>
+<b class="fc">&nbsp;    val alignedWeeks = ceilDiv(elapsedWeeks, step.toLong()) * step</b>
+<b class="pc">&nbsp;    for (probe in 0 until WEEK_PROBES) {</b>
+<b class="fc">&nbsp;        val weekStart = base.plus((alignedWeeks + probe.toLong() * step) * DAYS_PER_WEEK, DateTimeUnit.DAY)</b>
+<b class="fc">&nbsp;        weekdays</b>
+<b class="fc">&nbsp;            .map { weekStart.plus((it.isoDayNumber - 1).toLong(), DateTimeUnit.DAY) }</b>
+<b class="fc">&nbsp;            .filter { it &gt;= from }</b>
+<b class="fc">&nbsp;            .minOrNull()</b>
+<b class="fc">&nbsp;            ?.let { return it }</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return null</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The selected days of every [step]-th month, counted from the month the rule starts in. A rule
+&nbsp; * that names no day of the month keeps the one its start date falls on.
+&nbsp; *
+&nbsp; * Several months are probed because a month can legitimately yield nothing: under
+&nbsp; * [MissingDayPolicy.SKIP] a &quot;the 31st&quot; rule simply does not fire in February.
+&nbsp; */
+&nbsp;private fun RecurringRule.nextMonthly(from: LocalDate, step: Int): LocalDate? {
+<b class="fc">&nbsp;    val days = schedule.daysOfMonth.ifEmpty { setOf(startDate.day) }</b>
+<b class="fc">&nbsp;    val elapsedMonths = monthIndex(from) - monthIndex(startDate)</b>
+<b class="fc">&nbsp;    val alignedMonths = ceilDiv(elapsedMonths, step.toLong()) * step</b>
+<b class="fc">&nbsp;    val base = LocalDate(startDate.year, startDate.month, 1)</b>
+<b class="fc">&nbsp;    for (probe in 0 until MONTH_PROBES) {</b>
+<b class="fc">&nbsp;        val monthStart = base.plus(alignedMonths + probe.toLong() * step, DateTimeUnit.MONTH)</b>
+<b class="fc">&nbsp;        days</b>
+<b class="fc">&nbsp;            .mapNotNull { resolveDayOfMonth(monthStart, it) }</b>
+<b class="fc">&nbsp;            .filter { it &gt;= from }</b>
+<b class="fc">&nbsp;            .minOrNull()</b>
+<b class="fc">&nbsp;            ?.let { return it }</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return null</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The start date&#39;s own day and month, every [step]-th year. Probed for the same reason the monthly
+&nbsp; * branch is: a February 29th rule under [MissingDayPolicy.SKIP] only fires in leap years.
+&nbsp; */
+&nbsp;private fun RecurringRule.nextYearly(from: LocalDate, step: Int): LocalDate? {
+<b class="fc">&nbsp;    val elapsedYears = (from.year - startDate.year).toLong()</b>
+<b class="fc">&nbsp;    val alignedYears = ceilDiv(elapsedYears, step.toLong()) * step</b>
+<b class="pc">&nbsp;    for (probe in 0 until YEAR_PROBES) {</b>
+<b class="fc">&nbsp;        val year = startDate.year + (alignedYears + probe.toLong() * step).toInt()</b>
+<b class="fc">&nbsp;        val candidate = resolveDayOfMonth(LocalDate(year, startDate.month, 1), startDate.day)</b>
+<b class="fc">&nbsp;        if (candidate != null &amp;&amp; candidate &gt;= from) return candidate</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return null</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * [day] placed inside the month [monthStart] opens, or null when that month is too short and the
+&nbsp; * rule&#39;s [MissingDayPolicy] says to skip it rather than pull the payment onto the last day.
+&nbsp; */
+&nbsp;private fun RecurringRule.resolveDayOfMonth(monthStart: LocalDate, day: Int): LocalDate? {
+<b class="fc">&nbsp;    val lastDay = monthStart.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)</b>
+<b class="fc">&nbsp;    return when {</b>
+<b class="fc">&nbsp;        day &lt; 1 -&gt; null</b>
+<b class="fc">&nbsp;        day &lt;= lastDay.day -&gt; LocalDate(monthStart.year, monthStart.month, day)</b>
+<b class="fc">&nbsp;        schedule.missingDayPolicy == MissingDayPolicy.LAST_DAY_OF_MONTH -&gt; lastDay</b>
+<b class="fc">&nbsp;        else -&gt; null</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Monday of the week [this] falls in — the anchor weekly alignment is counted from. */
+&nbsp;private fun LocalDate.startOfWeek(): LocalDate =
+<b class="fc">&nbsp;    minus((dayOfWeek.isoDayNumber - 1).toLong(), DateTimeUnit.DAY)</b>
+&nbsp;
+&nbsp;/** Months since year zero, so two dates can be subtracted into a plain month count. */
+<b class="fc">&nbsp;private fun monthIndex(date: LocalDate): Long = date.year.toLong() * MONTHS_PER_YEAR + date.month.number</b>
+&nbsp;
+&nbsp;/** Ceiling division for non-negative [value] — how many whole [step]s it takes to reach it. */
+&nbsp;private fun ceilDiv(value: Long, step: Long): Long =
+<b class="fc">&nbsp;    if (value &lt;= 0) 0 else (value + step - 1) / step</b>
+&nbsp;
+&nbsp;/** See [UpcomingRecurring.isImminent] — today and tomorrow. */
+&nbsp;private const val IMMINENT_DAYS = 1
+&nbsp;
+&nbsp;private const val DAYS_PER_WEEK = 7
+&nbsp;private const val MONTHS_PER_YEAR = 12
+&nbsp;
+&nbsp;/** The aligned week [nextWeekly] probes plus the one [from] may already have run past. */
+&nbsp;private const val WEEK_PROBES = 2
+&nbsp;
+&nbsp;/** A year of aligned months — long enough for any day-of-month a short month can skip. */
+&nbsp;private const val MONTH_PROBES = 12
+&nbsp;
+&nbsp;/** Two leap cycles of aligned years, which covers a February 29th rule under any interval up to 4. */
+&nbsp;private const val YEAR_PROBES = 8
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

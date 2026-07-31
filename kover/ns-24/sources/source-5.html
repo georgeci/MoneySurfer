@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DefaultTransactionType</title>
+  <title>MoneySurfer Coverage Report > AccountExtraDetail</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: DefaultTransactionType (com.georgeci.moneysurfer.domain.preferences)</h1>
+<h1>Coverage Summary for Class: AccountExtraDetail (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DefaultTransactionType</td>
+  <td class="name">AccountExtraDetail</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,54 +58,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (25/25)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">DefaultTransactionType$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -125,10 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (26/26)
+    (16/16)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -136,25 +92,81 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
 &nbsp;/**
-&nbsp; * Which kind of transaction the creation screen should open on.
-&nbsp; *
-&nbsp; * Deliberately narrower than
-&nbsp; * [TransactionType][com.georgeci.moneysurfer.domain.primitives.TransactionType]: `OPENING_BALANCE`
-&nbsp; * is written by account creation and is never something the user starts, and a transfer is gated
-&nbsp; * by the `host.transfer_enabled` capability — offering it here would let the picker store a
-&nbsp; * default the host cannot open.
+&nbsp; * The keys the account screens offer as one-tap chips. They are keys, not columns: the same
+&nbsp; * screen also lets the user name a field themselves, so the storage has to be open-ended and
+&nbsp; * these are simply the six spellings we pre-fill for them.
 &nbsp; */
-&nbsp;enum class DefaultTransactionType {
-<b class="fc">&nbsp;    Expense,</b>
-<b class="fc">&nbsp;    Income,</b>
+&nbsp;enum class AccountExtraDetailKey { IBAN, DESCRIPTION, BIC, CARD_LAST4, BANK_URL, BRANCH_PHONE }
 &nbsp;
-&nbsp;    ;
+&nbsp;/**
+&nbsp; * One &quot;Extra details&quot; entry on an [Account].
+&nbsp; *
+&nbsp; * [key] is either the name of an [AccountExtraDetailKey] entry — in which case the UI renders a
+&nbsp; * localized label for it — or a label the user typed into the &quot;Custom field…&quot; chip, which is
+&nbsp; * shown verbatim. Keeping both in one string field is what lets a custom field round-trip
+&nbsp; * through Room and Firestore without a second schema.
+&nbsp; */
+<b class="fc">&nbsp;data class AccountExtraDetail(</b>
+<b class="fc">&nbsp;    val key: String,</b>
+<b class="fc">&nbsp;    val value: String,</b>
+&nbsp;) {
+&nbsp;    /** The well-known key this entry stands for, or null when the user named the field. */
+&nbsp;    val wellKnownKey: AccountExtraDetailKey?
+<b class="fc">&nbsp;        get() = AccountExtraDetails.wellKnownKey(key)</b>
+&nbsp;}
 &nbsp;
-&nbsp;    companion object {
-<b class="fc">&nbsp;        val DEFAULT: DefaultTransactionType = Expense</b>
+&nbsp;/**
+&nbsp; * Normalization for [Account.extraDetails].
+&nbsp; *
+&nbsp; * The list is an embedded key–value store rather than fixed columns, because the set of keys is
+&nbsp; * open: the creation screen ships six chips plus a &quot;Custom field…&quot; one, and a user-named field
+&nbsp; * cannot be a column. Normalizing here rather than at each call site is what keeps the invariants
+&nbsp; * the same whether the list came from the creation form or from another device over sync.
+&nbsp; *
+&nbsp; * Keys are compared case-insensitively so a custom field named &quot;iban&quot; cannot shadow the
+&nbsp; * well-known `IBAN` entry and produce two rows the UI would render with the same label.
+&nbsp; */
+&nbsp;object AccountExtraDetails {
+&nbsp;
+&nbsp;    /** Upper bound per account. Bounds both the stored column and the Firestore doc. */
+&nbsp;    const val MAX_DETAILS: Int = 12
+&nbsp;
+&nbsp;    /** Longest accepted key — a custom field name is a label, not a paragraph. */
+&nbsp;    const val MAX_KEY_LENGTH: Int = 40
+&nbsp;
+&nbsp;    /** Longest accepted value. Generous enough for a multi-line description. */
+&nbsp;    const val MAX_VALUE_LENGTH: Int = 500
+&nbsp;
+&nbsp;    private val WHITESPACE_RUN = Regex(&quot;\\s+&quot;)
+&nbsp;
+&nbsp;    /** The [AccountExtraDetailKey] [key] names, or null when it is a user-supplied label. */
+&nbsp;    fun wellKnownKey(key: String): AccountExtraDetailKey? =
+&nbsp;        AccountExtraDetailKey.entries.firstOrNull { it.name == key }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Trims both halves, collapses whitespace runs in keys, drops entries with a blank key or a
+&nbsp;     * blank value, removes case-insensitive duplicate keys keeping the first spelling, truncates
+&nbsp;     * over-long keys and values, and caps the list at [MAX_DETAILS].
+&nbsp;     *
+&nbsp;     * Blank values are dropped rather than stored: an added-but-never-filled chip is the user
+&nbsp;     * changing their mind, and an empty row on the details screen reads as a bug.
+&nbsp;     */
+&nbsp;    fun normalize(raw: List&lt;AccountExtraDetail&gt;): List&lt;AccountExtraDetail&gt; {
+&nbsp;        val seen = mutableSetOf&lt;String&gt;()
+&nbsp;        return raw.asSequence()
+&nbsp;            .map { detail -&gt;
+&nbsp;                AccountExtraDetail(
+&nbsp;                    key = detail.key.replace(WHITESPACE_RUN, &quot; &quot;).trim().take(MAX_KEY_LENGTH),
+&nbsp;                    value = detail.value.trim().take(MAX_VALUE_LENGTH),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            .filter { it.key.isNotEmpty() &amp;&amp; it.value.isNotEmpty() }
+&nbsp;            .filter { seen.add(it.key.lowercase()) }
+&nbsp;            .take(MAX_DETAILS)
+&nbsp;            .toList()
 &nbsp;    }
 &nbsp;}
 </code>
@@ -180,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

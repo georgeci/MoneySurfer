@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserConfigSyncPlugin</title>
+  <title>MoneySurfer Coverage Report > SyncCoordinatorWorkspaceSyncer</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: UserConfigSyncPlugin (com.georgeci.moneysurfer.data.sync.plugin)</h1>
+<h1>Coverage Summary for Class: SyncCoordinatorWorkspaceSyncer (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 
@@ -46,84 +46,84 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserConfigSyncPlugin</td>
+  <td class="name">SyncCoordinatorWorkspaceSyncer</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    80%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    25%
   </span>
   <span class="absValue">
-    (14/14)
+    (5/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    46.2%
   </span>
   <span class="absValue">
-    (46/46)
+    (12/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    45%
   </span>
   <span class="absValue">
-    (324/324)
+    (103/229)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">UserConfigSyncPlugin$applyDoc$1</td>
+    <td class="name">SyncCoordinatorWorkspaceSyncer$pushAll$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">UserConfigSyncPlugin$Companion</td>
+    <td class="name">SyncCoordinatorWorkspaceSyncer$syncAll$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">UserConfigSyncPlugin$push$1</td>
+    <td class="name">SyncCoordinatorWorkspaceSyncer$syncWorkspace$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    80%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    25%
   </span>
   <span class="absValue">
-    (14/14)
+    (5/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    46.2%
   </span>
   <span class="absValue">
-    (46/46)
+    (12/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    45%
   </span>
   <span class="absValue">
-    (324/324)
+    (103/229)
   </span>
 </td>
 </tr>
@@ -134,151 +134,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.ConfigEntryDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.ConfigEntryEntity
-&nbsp;import com.georgeci.moneysurfer.data.remote.UserConfigDoc
-&nbsp;import com.georgeci.moneysurfer.data.sync.UserConfigRemoteSource
-&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.PullScope
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
-&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictMetadata
-&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictResolution
-&nbsp;import com.georgeci.moneysurfer.sync.repository.ConflictResolver
-&nbsp;import com.georgeci.moneysurfer.sync.repository.MutationOperation
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
+&nbsp;import com.georgeci.moneysurfer.domain.config.SyncSettings
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 &nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Replicates the settings marked `sync = true` between a user&#39;s devices.
+&nbsp; * [WorkspaceSyncer] implementation that delegates to [SyncCoordinator].
 &nbsp; *
-&nbsp; * **One key is one entity.** Outbox rows carry no payload — `push` re-reads current local state —
-&nbsp; * so there is no field-merge concept to support and the mapping falls out naturally:
+&nbsp; * [pushAll] uses [SyncReason.LOCAL_CHANGE] → [SyncScope.UploadOnly]: drains the outbox
+&nbsp; * without a remote workspace-list fetch. Used post-create-workspace where the new workspace
+&nbsp; * and its member row need to land on Firestore before `addWorkspaceRef` is called.
 &nbsp; *
-&nbsp; * | | |
-&nbsp; * | --- | --- |
-&nbsp; * | `entityType` | [SyncEntityTypes.USER_CONFIG] |
-&nbsp; * | `entityId` | the key name, e.g. `ui.theme_mode` |
-&nbsp; * | `scopeKey` | `null` — settings belong to the user, not to a workspace |
-&nbsp; * | Firestore path | `users/{uid}/config/{keyName}` |
+&nbsp; * [syncAll] uses [SyncReason.MANUAL] → [SyncScope.AllUserData]: fetches
+&nbsp; * `users/{uid}.workspaceIds` via [UserWorkspacesProvider] and runs a cursor-based pull for
+&nbsp; * every workspace, including ones not yet in the local database.
 &nbsp; *
-&nbsp; * Per-key LWW then needs no new primitives: two devices changing *different* settings touch
-&nbsp; * different documents and both survive, and the same setting resolves by `updatedAt` through the
-&nbsp; * shared [ConflictResolver].
-&nbsp; *
-&nbsp; * It lives here with the other entity plugins rather than in `app-config/remote` because it is a
-&nbsp; * sync plugin first: it needs `PluginHelpers`, the resolver and the outbox, and it has nothing to
-&nbsp; * do with the RemoteGlobal layer.
+&nbsp; * [syncWorkspace] sets the session&#39;s current workspace to the target workspace and
+&nbsp; * uses [SyncReason.SWIPE_REFRESH] → [SyncScope.ActiveWorkspace]: pulls only that workspace.
+&nbsp; * Used after accepting an invite so only the newly joined workspace is hydrated.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [SyncEntityPlugin::class])</b>
-&nbsp;class UserConfigSyncPlugin(
-<b class="fc">&nbsp;    private val remote: UserConfigRemoteSource,</b>
-<b class="fc">&nbsp;    private val appInfo: AppInfo,</b>
-<b class="fc">&nbsp;    private val conflictResolver: ConflictResolver,</b>
-<b class="fc">&nbsp;    private val configEntryDao: ConfigEntryDao,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-&nbsp;) : SyncEntityPlugin {
+<b class="fc">&nbsp;@Single(binds = [WorkspaceSyncer::class])</b>
+&nbsp;class SyncCoordinatorWorkspaceSyncer(
+<b class="fc">&nbsp;    private val syncCoordinator: SyncCoordinator,</b>
+<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
+<b class="fc">&nbsp;    private val syncSettings: SyncSettings,</b>
+&nbsp;) : WorkspaceSyncer {
 &nbsp;
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;    // When sync is off we want every use-case-driven trigger
+&nbsp;    // (PostAuthBootstrap, CreateWorkspace, AcceptInvite, RefreshIncomingInvites)
+&nbsp;    // to no-op instead of hitting Firestore. Gating at the syncer keeps the
+&nbsp;    // use cases agnostic of the setting.
 &nbsp;
-<b class="fc">&nbsp;    override val entityType: String = SyncEntityTypes.USER_CONFIG</b>
-<b class="fc">&nbsp;    override val firestoreCollectionName: String = SyncCollection.USER_CONFIG</b>
-<b class="fc">&nbsp;    override val pullScope: PullScope = PullScope.User</b>
-<b class="fc">&nbsp;    override val pullPriority: Int = SyncPullPriorities.DEFAULT</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Pushes whatever the row holds *now*, then records it as pushed — but only if the row still
-&nbsp;     * carries the `updatedAt` that was sent, so a write that landed between the read and the write
-&nbsp;     * stays pending instead of being marked as delivered.
-&nbsp;     *
-&nbsp;     * A missing row is a no-op rather than an error: the account wipe deletes `config_entry` while
-&nbsp;     * outbox rows for it may still be queued, and a wiped setting must not be resurrected on the
-&nbsp;     * server from a stale queue entry.
-&nbsp;     *
-&nbsp;     * A missing uid, in contrast, **throws**. `UploadPendingChangesUseCaseImpl` treats any push
-&nbsp;     * that returns normally as delivered and deletes the row, so returning quietly here would drop
-&nbsp;     * the queue entry for a setting that never reached the server — recovered only at the next
-&nbsp;     * session start, and silently unsynced until then. Throwing routes it to `markFailed`, which is
-&nbsp;     * what puts it back to `PENDING` for the next drain.
-&nbsp;     */
-&nbsp;    override suspend fun push(mutation: PendingMutation) {
-<b class="fc">&nbsp;        if (mutation.operation == MutationOperation.DELETE) {</b>
-&nbsp;            // Nothing enqueues this: a setting is overwritten, never deleted. The account-deletion
-&nbsp;            // purge clears the collection directly, outside the outbox.
-<b class="fc">&nbsp;            log.w { &quot;[push] ignoring DELETE for ${mutation.entityId} — settings are not deletable&quot; }</b>
-&nbsp;            return
-&nbsp;        }
-<b class="fc">&nbsp;        val uid = session.currentFirebaseUid.first()</b>
-<b class="fc">&nbsp;        check(!uid.isNullOrEmpty()) {</b>
-<b class="fc">&nbsp;            &quot;no Firebase session — ${mutation.entityId} stays queued for the next drain&quot;</b>
-&nbsp;        }
-<b class="fc">&nbsp;        val row = configEntryDao.getByKey(mutation.entityId) ?: return</b>
-&nbsp;
-<b class="fc">&nbsp;        remote.write(</b>
-<b class="fc">&nbsp;            uid = uid,</b>
-<b class="fc">&nbsp;            key = row.key,</b>
-<b class="fc">&nbsp;            doc = UserConfigDoc(</b>
-<b class="fc">&nbsp;                value = row.value,</b>
-<b class="fc">&nbsp;                updatedAt = row.updatedAt,</b>
-<b class="fc">&nbsp;                clientVersionCode = appInfo.versionCode,</b>
-&nbsp;            ),
-&nbsp;        )
-<b class="fc">&nbsp;        configEntryDao.markPushed(key = row.key, pushedUpdatedAt = row.updatedAt)</b>
+&nbsp;    override suspend fun pushAll(): Boolean {
+<b class="fc">&nbsp;        if (!syncSettings.isEnabled.first()) return false</b>
+<b class="fc">&nbsp;        syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)</b>
+<b class="fc">&nbsp;            .result.await()</b>
+<b class="fc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
+<b class="fc">&nbsp;        return true</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    /**
-&nbsp;     * [scopeKey] is the uid here, not a workspace id — this plugin is [PullScope.User].
-&nbsp;     *
-&nbsp;     * &quot;Remote is not newer&quot; is the *normal* outcome, not a conflict: the user-scoped phase has no
-&nbsp;     * cursor, so every pull re-reads every document, and reporting each unchanged one as a conflict
-&nbsp;     * would make the sync summary meaningless. Only a value this device actually adopts counts.
-&nbsp;     *
-&nbsp;     * A key this build does not know is stored anyway. It costs one row, it is what a mixed-version
-&nbsp;     * pair of devices needs in order not to lose each other&#39;s settings, and resolution never looks
-&nbsp;     * up a name that has no key object.
-&nbsp;     */
-&nbsp;    override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-<b class="fc">&nbsp;        val dto = doc.decodeOrNull(UserConfigDoc.serializer()) ?: return SKIPPED_APPLY_RESULT</b>
-<b class="fc">&nbsp;        val local = configEntryDao.getByKey(doc.id)</b>
-<b class="fc">&nbsp;        val remoteRow = ConfigEntryEntity(</b>
-<b class="fc">&nbsp;            key = doc.id,</b>
-<b class="fc">&nbsp;            value = dto.value,</b>
-<b class="fc">&nbsp;            updatedAt = dto.updatedAt,</b>
-&nbsp;            // The server is where this value came from, so it is by definition already pushed —
-&nbsp;            // otherwise the sign-in reconciliation would push it straight back.
-<b class="fc">&nbsp;            lastPushedAt = dto.updatedAt,</b>
-&nbsp;        )
-<b class="fc">&nbsp;        val resolution = conflictResolver.resolve(</b>
-<b class="fc">&nbsp;            local = local,</b>
-<b class="fc">&nbsp;            remote = remoteRow,</b>
-<b class="fc">&nbsp;            metadata = ConflictMetadata(</b>
-<b class="fc">&nbsp;                entityType = SyncEntityTypes.USER_CONFIG,</b>
-<b class="fc">&nbsp;                entityId = doc.id,</b>
-<b class="fc">&nbsp;                localUpdatedAt = local?.updatedAt?.let(Instant::fromEpochMilliseconds),</b>
-<b class="fc">&nbsp;                remoteUpdatedAt = Instant.fromEpochMilliseconds(dto.updatedAt),</b>
-&nbsp;            ),
-&nbsp;        )
-<b class="fc">&nbsp;        if (resolution !is ConflictResolution.TakeRemote) return SKIPPED_APPLY_RESULT</b>
-&nbsp;
-<b class="fc">&nbsp;        configEntryDao.applyRemote(</b>
-<b class="fc">&nbsp;            key = remoteRow.key,</b>
-<b class="fc">&nbsp;            value = remoteRow.value,</b>
-<b class="fc">&nbsp;            updatedAt = remoteRow.updatedAt,</b>
-&nbsp;        )
-<b class="fc">&nbsp;        return EntityApplyResult(applied = true, wasConflict = false)</b>
+&nbsp;    override suspend fun syncAll() {
+<b class="pc">&nbsp;        if (!syncSettings.isEnabled.first()) return</b>
+<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.MANUAL)</b>
+<b class="nc">&nbsp;            .result.await()</b>
+<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;UserConfigSync&quot;
+&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) {
+&nbsp;        // Switch the active workspace pointer even when sync is off — callers
+&nbsp;        // (e.g. AcceptInviteUseCase) rely on this to move the session to the
+&nbsp;        // newly joined workspace. Only skip the network round-trip.
+<b class="fc">&nbsp;        sessionMutator.setCurrentWorkspace(workspaceId)</b>
+<b class="pc">&nbsp;        if (!syncSettings.isEnabled.first()) return</b>
+<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.SWIPE_REFRESH)</b>
+<b class="nc">&nbsp;            .result.await()</b>
+<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private fun SyncError.toException(): RuntimeException = when (this) {</b>
+<b class="nc">&nbsp;        SyncError.Cancelled -&gt; RuntimeException(&quot;Sync cancelled&quot;)</b>
+<b class="nc">&nbsp;        SyncError.NetworkUnavailable -&gt; RuntimeException(&quot;Network unavailable&quot;)</b>
+<b class="nc">&nbsp;        SyncError.AuthRequired -&gt; RuntimeException(&quot;Auth required&quot;)</b>
+<b class="nc">&nbsp;        SyncError.PermissionDenied -&gt; RuntimeException(&quot;PERMISSION_DENIED: workspace access denied&quot;)</b>
+<b class="nc">&nbsp;        is SyncError.UnsupportedAppVersion -&gt; RuntimeException(message)</b>
+<b class="nc">&nbsp;        is SyncError.StorageError -&gt; RuntimeException(&quot;Storage error&quot;, cause)</b>
+<b class="nc">&nbsp;        is SyncError.Unknown -&gt; RuntimeException(cause.message ?: &quot;Sync failed&quot;, cause)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -304,7 +232,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

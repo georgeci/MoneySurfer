@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionPeriodMode</title>
+  <title>MoneySurfer Coverage Report > BalanceTrendKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.preferences</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionPeriodMode (com.georgeci.moneysurfer.domain.preferences)</h1>
+<h1>Coverage Summary for Class: BalanceTrendKt (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionPeriodMode</td>
+  <td class="name">BalanceTrendKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,13 +58,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,66 +71,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (31/31)
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (99/99)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">TransactionPeriodMode$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (32/32)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,25 +99,99 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.preferences
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;
+&nbsp;/** What the workspace closed [month] holding, in the base currency. */
+&nbsp;data class BalanceTrendPoint(
+&nbsp;    val month: YearMonth,
+&nbsp;    val balance: Money,
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Date window the transactions list is scoped to. Lives in the preferences package because the
-&nbsp; * choice is persisted alongside the other UI preferences; the window maths itself is in
-&nbsp; * `domain.util.TransactionPeriodWindow`.
+&nbsp; * The curve the total balance drew over the trailing months, oldest point first, plus what the
+&nbsp; * newest month has changed it by.
+&nbsp; *
+&nbsp; * Monthly rather than daily, because a month is the coarsest grain the app can answer without a
+&nbsp; * new aggregate: [MonthlyNet] is the one rollup that counts income as well as spend, and
+&nbsp; * `SpendAnalyticsRepository.daily` is expenses-only, so a daily balance curve would need a query
+&nbsp; * that does not exist. Six points still show the shape the sparkline is there for.
+&nbsp; *
+&nbsp; * [delta] is the newest month&#39;s net, which is the same figure as &quot;balance now minus what the
+&nbsp; * workspace closed last month on&quot; — the two ends of the curve, without the rounding a subtraction
+&nbsp; * of two displayed figures would invite.
 &nbsp; */
-&nbsp;enum class TransactionPeriodMode {
-<b class="fc">&nbsp;    Month,</b>
-<b class="fc">&nbsp;    Week,</b>
-&nbsp;
-&nbsp;    /** No date bounds — the list is bounded by paging instead. */
-<b class="fc">&nbsp;    AllTime,</b>
-&nbsp;
-&nbsp;    ;
-&nbsp;
+&nbsp;data class BalanceTrend(
+&nbsp;    val points: List&lt;BalanceTrendPoint&gt;,
+&nbsp;    val delta: Money,
+&nbsp;) {
 &nbsp;    companion object {
-<b class="fc">&nbsp;        val DEFAULT: TransactionPeriodMode = Month</b>
+&nbsp;        /** Months the sparkline draws. Six matches the category trend&#39;s window. */
+&nbsp;        const val TREND_MONTHS: Int = 6
+&nbsp;
+&nbsp;        val Empty = BalanceTrend(points = emptyList(), delta = Money.zero())
 &nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The months a balance trend is folded over, the base-currency net each of them booked, and the
+&nbsp; * currency all of it is quoted in.
+&nbsp; *
+&nbsp; * Carries its own [currency] because it is a *filter* on the query behind [nets], not a formatting
+&nbsp; * hint — see [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository]. A caller
+&nbsp; * anchoring the fold on a total priced in some other currency has to refuse the pairing rather
+&nbsp; * than fold euros into dollars.
+&nbsp; */
+&nbsp;data class MonthlyNetHistory(
+&nbsp;    val months: List&lt;YearMonth&gt;,
+&nbsp;    val nets: List&lt;MonthlyNet&gt;,
+&nbsp;    val currency: CurrencyCode,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Walks [nets] backwards from [currentBalance] to rebuild what the workspace closed each of
+&nbsp; * [months] holding.
+&nbsp; *
+&nbsp; * Anchored on the balance the dashboard is already printing rather than summed forward from zero,
+&nbsp; * for the same reason [buildAccountBalanceSeries] is: the total is the authoritative figure, and a
+&nbsp; * curve summed independently would be free to end somewhere else than the headline above it.
+&nbsp; * Working backwards makes the newest point equal that total by construction.
+&nbsp; *
+&nbsp; * Pure, and tolerant of a sparse [nets] — the aggregate only returns months that booked something,
+&nbsp; * so a quiet month folds to zero here instead of dropping a point. Rows outside [months] are
+&nbsp; * ignored rather than trusted, so a caller passing a wider query result cannot bend the curve.
+&nbsp; *
+&nbsp; * What the curve cannot see: opening balances and transfers are outside [MonthlyNet] by
+&nbsp; * construction, and so is anything booked in another currency. An account opened inside the window
+&nbsp; * therefore reads as having always held its opening balance. That is a shape the sparkline may
+&nbsp; * overstate; [BalanceTrend.delta] is unaffected, being this month&#39;s income minus its spend and
+&nbsp; * nothing else.
+&nbsp; */
+&nbsp;fun buildBalanceTrend(
+&nbsp;    currentBalance: Money,
+&nbsp;    nets: List&lt;MonthlyNet&gt;,
+&nbsp;    months: List&lt;YearMonth&gt;,
+&nbsp;): BalanceTrend {
+<b class="fc">&nbsp;    if (months.isEmpty()) return BalanceTrend.Empty</b>
+&nbsp;
+<b class="fc">&nbsp;    val netByMonth = nets.groupBy { it.month }</b>
+<b class="fc">&nbsp;        .mapValues { (_, rows) -&gt; rows.fold(Money.zero()) { acc, row -&gt; acc + row.net } }</b>
+&nbsp;
+<b class="fc">&nbsp;    var running = currentBalance</b>
+<b class="fc">&nbsp;    val points = ArrayList&lt;BalanceTrendPoint&gt;(months.size)</b>
+<b class="fc">&nbsp;    for (month in months.asReversed()) {</b>
+<b class="fc">&nbsp;        points += BalanceTrendPoint(month = month, balance = running)</b>
+<b class="fc">&nbsp;        running -= netByMonth[month] ?: Money.zero()</b>
+&nbsp;    }
+<b class="fc">&nbsp;    points.reverse()</b>
+&nbsp;
+<b class="fc">&nbsp;    return BalanceTrend(</b>
+<b class="fc">&nbsp;        points = points,</b>
+<b class="fc">&nbsp;        delta = netByMonth[months.last()] ?: Money.zero(),</b>
+&nbsp;    )
 &nbsp;}
 </code>
 </pre>
@@ -179,7 +216,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

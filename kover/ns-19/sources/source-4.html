@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BackupExporter</title>
+  <title>MoneySurfer Coverage Report > InMemorySessionPointers</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.backup</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.auth</a>
 </div>
 
-<h1>Coverage Summary for Class: BackupExporter (com.georgeci.moneysurfer.domain.backup)</h1>
+<h1>Coverage Summary for Class: InMemorySessionPointers (com.georgeci.moneysurfer.domain.auth)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,16 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BackupExporter</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
+  <td class="name">InMemorySessionPointers</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -69,42 +63,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.5%
+  </span>
+  <span class="absValue">
+    (129/131)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">BackupExporter$DefaultImpls</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (18/18)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -112,46 +99,60 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.backup
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.auth
 &nbsp;
-&nbsp;import okio.BufferedSink
-&nbsp;import okio.BufferedSource
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
 &nbsp;
-&nbsp;interface BackupExporter {
-&nbsp;    /**
-&nbsp;     * Streams a complete backup ZIP into [sink].
-&nbsp;     *
-&nbsp;     * With a non-blank [passphrase] the data entries are sealed inside an
-&nbsp;     * encrypted `payload.enc` entry ([BackupEncryptionInfo.SCHEME_V1]); the
-&nbsp;     * container is still a plain ZIP with a readable manifest. With a null or
-&nbsp;     * blank passphrase the archive is fully unencrypted.
-&nbsp;     *
-&nbsp;     * Caller owns [sink] lifecycle and must close it after this returns.
-&nbsp;     * The function flushes but does not close. Suspends on a background
-&nbsp;     * dispatcher; safe to invoke from the main thread.
-&nbsp;     */
-<b class="fc">&nbsp;    suspend fun exportTo(sink: BufferedSink, passphrase: String? = null): Result&lt;BackupManifest&gt;</b>
-&nbsp;}
+&nbsp;/**
+&nbsp; * Volatile, RAM-only session store — does not persist across restarts. The production
+&nbsp; * Android/iOS/JVM app uses the DataStore-backed `SessionPointersImpl` from `:data-local`. This
+&nbsp; * class exists for unit tests and any non-persisting environment (REPL, scripts) that wants a
+&nbsp; * working session graph without dragging DataStore in.
+&nbsp; *
+&nbsp; * Implements both halves so one instance can serve a reader and a lifecycle use case in the same
+&nbsp; * test.
+&nbsp; */
+<b class="fc">&nbsp;class InMemorySessionPointers(</b>
+<b class="fc">&nbsp;    currentUserId: UserId? = null,</b>
+<b class="fc">&nbsp;    currentWorkspaceId: WorkspaceId? = null,</b>
+<b class="fc">&nbsp;    currentFirebaseUid: String? = null,</b>
+<b class="fc">&nbsp;    hasUsedDemo: Boolean = false,</b>
+&nbsp;) : SessionPointers, SessionMutator {
 &nbsp;
-&nbsp;interface BackupImporter {
-&nbsp;    /**
-&nbsp;     * Peeks at [source] without consuming it and reports whether the backup
-&nbsp;     * is passphrase-protected (so the UI can prompt before [importFrom]).
-&nbsp;     * Returns `false` for unreadable input — [importFrom] surfaces the real
-&nbsp;     * error in that case.
-&nbsp;     */
-&nbsp;    suspend fun isPassphraseProtected(source: BufferedSource): Boolean
+<b class="fc">&nbsp;    private val userIdState = MutableStateFlow(currentUserId)</b>
+<b class="fc">&nbsp;    private val workspaceIdState = MutableStateFlow(currentWorkspaceId)</b>
+<b class="fc">&nbsp;    private val firebaseUidState = MutableStateFlow(currentFirebaseUid)</b>
+<b class="fc">&nbsp;    private val hasUsedDemoState = MutableStateFlow(hasUsedDemo)</b>
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Reads a backup ZIP from [source] and replaces the current local data.
-&nbsp;     * Encrypted backups require the matching [passphrase]
-&nbsp;     * ([BackupError.PassphraseRequired] / [BackupError.WrongPassphrase]).
-&nbsp;     *
-&nbsp;     * On success the caller must immediately trigger an app restart via
-&nbsp;     * [AppRestarter] — the in-memory Koin singletons still reference closed
-&nbsp;     * Room handles. Caller owns [source] and must close it.
-&nbsp;     */
-&nbsp;    suspend fun importFrom(source: BufferedSource, passphrase: String? = null): Result&lt;BackupManifest&gt;
+<b class="fc">&nbsp;    override val currentUserId: Flow&lt;UserId?&gt; = userIdState</b>
+<b class="fc">&nbsp;    override val currentWorkspaceId: Flow&lt;WorkspaceId?&gt; = workspaceIdState</b>
+<b class="fc">&nbsp;    override val currentFirebaseUid: Flow&lt;String?&gt; = firebaseUidState</b>
+<b class="fc">&nbsp;    override val hasUsedDemo: Flow&lt;Boolean&gt; = hasUsedDemoState</b>
+&nbsp;
+&nbsp;    override suspend fun setCurrentUser(id: UserId?) {
+<b class="fc">&nbsp;        userIdState.value = id</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun setCurrentWorkspace(id: WorkspaceId?) {
+<b class="pc">&nbsp;        workspaceIdState.value = id</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun setFirebaseUid(uid: String?) {
+<b class="fc">&nbsp;        firebaseUidState.value = uid</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun setHasUsedDemo(value: Boolean) {
+<b class="fc">&nbsp;        hasUsedDemoState.value = value</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun clearSession() {
+<b class="fc">&nbsp;        userIdState.value = null</b>
+<b class="fc">&nbsp;        workspaceIdState.value = null</b>
+<b class="fc">&nbsp;        firebaseUidState.value = null</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -176,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

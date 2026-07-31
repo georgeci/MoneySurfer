@@ -149,9 +149,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * app is not released, so losing current dev/test settings is the cheaper side of the trade — a
 &nbsp; * decision ADR-004 marks as expiring at the first production release.
 &nbsp; *
-&nbsp; * The migration is not optional busywork. `getRoomDatabase` ends in
-&nbsp; * `fallbackToDestructiveMigration(dropAllTables = true)`, so a missing 33 → 34 path would not fail
-&nbsp; * loudly — it would silently drop every table on the first launch after the upgrade.
+&nbsp; * The migration is not optional busywork. On debuggable hosts `getRoomDatabase` still ends in
+&nbsp; * `fallbackToDestructiveMigration(dropAllTables = true)`, so a missing 33 → 34 path does not fail
+&nbsp; * loudly there — it silently drops every table on the first launch after the upgrade. Release
+&nbsp; * builds pass `allowDestructiveMigration = false` and crash on open instead; either way a hole in
+&nbsp; * the chain costs the local database. See `docs/architecture/persistence.md` → &quot;Room schema
+&nbsp; * versioning&quot;.
 &nbsp; *
 &nbsp; * The DDL is the one Room generates for `ConfigEntryEntity`; keep the two in step or Room&#39;s schema
 &nbsp; * validation fails at open time.
@@ -194,7 +197,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

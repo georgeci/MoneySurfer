@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferToolbarKt</title>
+  <title>MoneySurfer Coverage Report > SignInTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,77 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferToolbarKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SignInTestTags (com.georgeci.moneysurfer.feature.login)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SurferToolbarKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (9/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    24.4%
-  </span>
-  <span class="absValue">
-    (19/78)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    62.5%
-  </span>
-  <span class="absValue">
-    (70/112)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    59.5%
-  </span>
-  <span class="absValue">
-    (1159/1949)
-  </span>
-</td>
+  <td class="name">SignInTestTags</td>
+    <td class="coverageStat"/>
 </tr>
 
 </table>
@@ -99,318 +44,635 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.BoxWithConstraints
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.RowScope
+&nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.WindowInsets
+&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.heightIn
+&nbsp;import androidx.compose.foundation.layout.only
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.safeDrawing
 &nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.layout.widthIn
+&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
+&nbsp;import androidx.compose.foundation.rememberScrollState
 &nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
-&nbsp;import androidx.compose.material3.FilledTonalButton
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.material3.ButtonDefaults
+&nbsp;import androidx.compose.material3.Card
+&nbsp;import androidx.compose.material3.CardDefaults
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.OutlinedButton
+&nbsp;import androidx.compose.material3.OutlinedTextFieldDefaults
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TopAppBar
-&nbsp;import androidx.compose.material3.TopAppBarColors
-&nbsp;import androidx.compose.material3.TopAppBarDefaults
+&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.semantics.Role
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.input.ImeAction
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.text.style.TextDecoration
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.compose.ui.unit.sp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferPasswordField
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferTextField
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_back
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
+&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AuthColors
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.login.generated.resources.Res
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_anonymous
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_brand
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_demo_mode
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_email_label
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_ok
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_title
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_invalid
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_required
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_password_required
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_password_too_short
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_permission_denied
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_unknown
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_weak_password
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_subtitle
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_title
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_or
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_password_label
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_sheet_subtitle
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_sheet_title
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signin
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signup
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_terms
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signin
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
 &nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;object SignInTestTags {
+&nbsp;    const val Root = &quot;signIn:root&quot;
+&nbsp;    const val BrandHeader = &quot;signIn:brandHeader&quot;
+&nbsp;    const val HeroTitle = &quot;signIn:heroTitle&quot;
+&nbsp;    const val HeroSubtitle = &quot;signIn:heroSubtitle&quot;
+&nbsp;    const val Sheet = &quot;signIn:sheet&quot;
+&nbsp;    const val SheetTitle = &quot;signIn:sheetTitle&quot;
+&nbsp;    const val SheetSubtitle = &quot;signIn:sheetSubtitle&quot;
+&nbsp;    const val EmailField = &quot;signIn:email&quot;
+&nbsp;    const val PasswordField = &quot;signIn:password&quot;
+&nbsp;    const val SubmitButton = &quot;signIn:submit&quot;
+&nbsp;    const val ToggleModeButton = &quot;signIn:toggleMode&quot;
+&nbsp;    const val AnonymousButton = &quot;signIn:anonymous&quot;
+&nbsp;    const val DemoButton = &quot;signIn:demo&quot;
+&nbsp;    const val ErrorText = &quot;signIn:error&quot;
+&nbsp;    const val ErrorDialog = &quot;signIn:errorDialog&quot;
+&nbsp;    const val ErrorDialogConfirm = &quot;signIn:errorDialog:confirm&quot;
+&nbsp;    const val EmailError = &quot;$EmailField:error&quot;
+&nbsp;    const val PasswordError = &quot;$PasswordField:error&quot;
+&nbsp;    const val PasswordReveal = &quot;$PasswordField:reveal&quot;
+&nbsp;    const val Loader = &quot;signIn:loader&quot;
+&nbsp;    const val Terms = &quot;signIn:terms&quot;
+&nbsp;}
+&nbsp;
+&nbsp;private val SheetCorner: Dp = 28.dp
+&nbsp;private val PrimaryButtonHeight: Dp = 52.dp
+&nbsp;private val BrandIconSize: Dp = 42.dp
+&nbsp;private val HeroTitleSize = 40.sp
+&nbsp;private val HeroTitleLineHeight = 44.sp
+&nbsp;private val HeroSubtitleMaxWidth: Dp = 320.dp
+&nbsp;private val SheetPadding: Dp = 20.dp
+&nbsp;private val SheetElevation: Dp = 12.dp
+&nbsp;private val SheetTitleSize = 18.sp
+&nbsp;private val PasskeyIconSize: Dp = 18.dp
+&nbsp;private val OrLabelSize = 11.sp
+&nbsp;private val PrimaryLabelSize = 15.sp
+&nbsp;private val ContentMaxWidth: Dp = 480.dp
+&nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;fun SurferToolbar(</b>
-&nbsp;    title: String,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    onBack: (() -&gt; Unit)? = null,</b>
-<b class="fc">&nbsp;    navigationIcon: (@Composable () -&gt; Unit)? = null,</b>
-<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    SurferToolbar(</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        navigationIcon = {</b>
-<b class="fc">&nbsp;            when {</b>
-<b class="pc">&nbsp;                onBack != null -&gt; IconButton(onClick = onBack) {</b>
-&nbsp;                    Icon(
-&nbsp;                        imageVector = SurferIcons.Back,
-&nbsp;                        contentDescription = stringResource(Res.string.uikit_back),
+&nbsp;private fun SignInError.localized(): String = stringResource(
+&nbsp;    when (this) {
+&nbsp;        SignInError.EmailRequired -&gt; Res.string.sign_in_error_email_required
+&nbsp;        SignInError.EmailInvalid -&gt; Res.string.sign_in_error_email_invalid
+&nbsp;        SignInError.PasswordRequired -&gt; Res.string.sign_in_error_password_required
+&nbsp;        SignInError.PasswordTooShort -&gt; Res.string.sign_in_error_password_too_short
+&nbsp;        SignInError.InvalidCredentials -&gt; Res.string.sign_in_error_invalid_credentials
+&nbsp;        SignInError.EmailAlreadyInUse -&gt; Res.string.sign_in_error_email_in_use
+&nbsp;        SignInError.WeakPassword -&gt; Res.string.sign_in_error_weak_password
+&nbsp;        SignInError.PermissionDenied -&gt; Res.string.sign_in_error_permission_denied
+&nbsp;        SignInError.Unknown -&gt; Res.string.sign_in_error_unknown
+&nbsp;    },
+&nbsp;)
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun SignInScreen(
+&nbsp;    onNavigateToWorkspaceSelector: (cloudDataUnavailable: Boolean) -&gt; Unit,
+&nbsp;    onNavigateToLegal: () -&gt; Unit,
+&nbsp;    viewModel: SignInViewModel = koinViewModel(),
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            is SignInEffect.NavigateToWorkspaceSelector -&gt;
+&nbsp;                onNavigateToWorkspaceSelector(effect.cloudDataUnavailable)
+&nbsp;            SignInEffect.NavigateToLegal -&gt; onNavigateToLegal()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    SignInContent(
+&nbsp;        state = state,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Stateless body of the sign-in screen. Public so screen-state UI tests can mount it with an
+&nbsp; * injected [SignInState] instead of standing up a Koin-backed [SignInViewModel].
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SignInContent(
+&nbsp;    state: SignInState,
+&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    // The brand backdrop is drawn edge to edge, under the status bar and the navigation bar, and
+&nbsp;    // only the content is inset — that is what tints the system bars green. The gradient is light
+&nbsp;    // at the top and the wave band is dark at the bottom, so the two bars get opposite icon tints.
+&nbsp;    ConfigureSystemBars(darkStatusBarBackground = false, darkNavigationBarBackground = true)
+&nbsp;    Box(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxSize()
+&nbsp;            .surferTestTagAsId()
+&nbsp;            .testTag(SignInTestTags.Root),
+&nbsp;    ) {
+&nbsp;        SurferAuthBackground(modifier = Modifier.fillMaxSize())
+&nbsp;
+&nbsp;        // The bottom safe-drawing inset carries the IME, so the insets below already lift the
+&nbsp;        // content clear of the keyboard. What was still missing is somewhere to lift it TO: with
+&nbsp;        // a fixed-height column the sheet was squeezed off-screen and the &quot;Create account&quot; button
+&nbsp;        // became unreachable. Measuring inside the inset padding yields a viewport height that
+&nbsp;        // already accounts for the keyboard, and the scroll container covers the rest.
+&nbsp;        BoxWithConstraints(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferSafeInsets()
+&nbsp;                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
+&nbsp;        ) {
+&nbsp;            val viewportHeight = maxHeight
+&nbsp;            Column(
+&nbsp;                modifier = Modifier
+&nbsp;                    .align(Alignment.TopCenter)
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .widthIn(max = ContentMaxWidth)
+&nbsp;                    .verticalScroll(rememberScrollState())
+&nbsp;                    .heightIn(min = viewportHeight)
+&nbsp;                    .padding(
+&nbsp;                        start = AppTheme.spacing.default,
+&nbsp;                        end = AppTheme.spacing.default,
+&nbsp;                        top = AppTheme.spacing.xLarge,
+&nbsp;                        bottom = AppTheme.spacing.large,
+&nbsp;                    ),
+&nbsp;                verticalArrangement = Arrangement.SpaceBetween,
+&nbsp;            ) {
+&nbsp;                // Exactly two children so SpaceBetween reproduces the pinned-to-bottom sheet of
+&nbsp;                // the original weight(1f) layout, which a scrollable column cannot use.
+&nbsp;                Column(modifier = Modifier.padding(bottom = AppTheme.spacing.large)) {
+&nbsp;                    SignInBrandHeader()
+&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.xLarge))
+&nbsp;                    SignInHero()
+&nbsp;                }
+&nbsp;                SignInActionSheet(state = state, onEvent = onEvent)
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        if (state.isLoading) {
+&nbsp;            SurferFullScreenLoader(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .testTag(SignInTestTags.Loader),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        state.dialogError?.let { error -&gt;
+&nbsp;            SignInErrorDialog(
+&nbsp;                error = error,
+&nbsp;                onDismiss = { onEvent(SignInEvent.OnErrorDismiss) },
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInErrorDialog(
+&nbsp;    error: SignInError,
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    AlertDialog(
+&nbsp;        onDismissRequest = onDismiss,
+&nbsp;        title = { Text(stringResource(Res.string.sign_in_error_dialog_title)) },
+&nbsp;        text = { Text(error.localized()) },
+&nbsp;        confirmButton = {
+&nbsp;            TextButton(
+&nbsp;                onClick = onDismiss,
+&nbsp;                modifier = Modifier.testTag(SignInTestTags.ErrorDialogConfirm),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.sign_in_error_dialog_ok))
+&nbsp;            }
+&nbsp;        },
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        modifier = Modifier.testTag(SignInTestTags.ErrorDialog),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInBrandHeader(modifier: Modifier = Modifier) {
+&nbsp;    Row(
+&nbsp;        modifier = modifier.testTag(SignInTestTags.BrandHeader),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;    ) {
+&nbsp;        SurferAppIcon(size = BrandIconSize)
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_brand),
+&nbsp;            style = AppTheme.typography.titleLarge,
+&nbsp;            color = AuthColors.OnBrand,
+&nbsp;            fontWeight = FontWeight.Bold,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInHero(modifier: Modifier = Modifier) {
+&nbsp;    Column(modifier = modifier) {
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_hero_title),
+&nbsp;            color = AuthColors.OnBrand,
+&nbsp;            fontSize = HeroTitleSize,
+&nbsp;            lineHeight = HeroTitleLineHeight,
+&nbsp;            fontWeight = FontWeight.ExtraBold,
+&nbsp;            modifier = Modifier.testTag(SignInTestTags.HeroTitle),
+&nbsp;        )
+&nbsp;        Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_hero_subtitle),
+&nbsp;            color = AuthColors.OnBrandMuted,
+&nbsp;            style = AppTheme.typography.bodyLarge,
+&nbsp;            modifier = Modifier
+&nbsp;                .widthIn(max = HeroSubtitleMaxWidth)
+&nbsp;                .testTag(SignInTestTags.HeroSubtitle),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInActionSheet(
+&nbsp;    state: SignInState,
+&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Card(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .testTag(SignInTestTags.Sheet),
+&nbsp;        shape = RoundedCornerShape(SheetCorner),
+&nbsp;        colors = CardDefaults.cardColors(
+&nbsp;            containerColor = AuthColors.Sheet,
+&nbsp;            contentColor = AuthColors.Ink,
+&nbsp;        ),
+&nbsp;        elevation = CardDefaults.cardElevation(defaultElevation = SheetElevation),
+&nbsp;    ) {
+&nbsp;        Column(modifier = Modifier.padding(SheetPadding)) {
+&nbsp;            SheetHeader()
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;
+&nbsp;            if (state.emailPasswordEnabled) {
+&nbsp;                EmailPasswordForm(state = state, onEvent = onEvent)
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                // Only errors that belong to no single field land here; the rest are rendered
+&nbsp;                // as supporting text under the input that caused them.
+&nbsp;                val formError = state.formError
+&nbsp;                if (formError != null) {
+&nbsp;                    Text(
+&nbsp;                        text = formError.localized(),
+&nbsp;                        style = AppTheme.typography.bodySmall,
+&nbsp;                        color = AppTheme.materialColors.error,
+&nbsp;                        textAlign = TextAlign.Center,
+&nbsp;                        modifier = Modifier
+&nbsp;                            .fillMaxWidth()
+&nbsp;                            .testTag(SignInTestTags.ErrorText),
+&nbsp;                    )
+&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                }
+&nbsp;                PrimaryFilledButton(
+&nbsp;                    text = stringResource(
+&nbsp;                        when (state.mode) {
+&nbsp;                            AuthMode.SignIn -&gt; Res.string.sign_in_submit_signin
+&nbsp;                            AuthMode.SignUp -&gt; Res.string.sign_in_submit_signup
+&nbsp;                        },
+&nbsp;                    ),
+&nbsp;                    onClick = { onEvent(SignInEvent.OnSubmitClick) },
+&nbsp;                    enabled = state.canSubmit,
+&nbsp;                    modifier = Modifier.testTag(SignInTestTags.SubmitButton),
+&nbsp;                )
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.xSmall))
+&nbsp;                TextButton(
+&nbsp;                    onClick = { onEvent(SignInEvent.OnToggleModeClick) },
+&nbsp;                    enabled = !state.isLoading,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .testTag(SignInTestTags.ToggleModeButton),
+&nbsp;                ) {
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(
+&nbsp;                            when (state.mode) {
+&nbsp;                                AuthMode.SignIn -&gt; Res.string.sign_in_toggle_to_signup
+&nbsp;                                AuthMode.SignUp -&gt; Res.string.sign_in_toggle_to_signin
+&nbsp;                            },
+&nbsp;                        ),
+&nbsp;                        color = AuthColors.PrimaryDark,
+&nbsp;                        fontWeight = FontWeight.SemiBold,
 &nbsp;                    )
 &nbsp;                }
-<b class="nc">&nbsp;                navigationIcon != null -&gt; navigationIcon()</b>
-<b class="fc">&nbsp;            }</b>
-&nbsp;        },
-<b class="fc">&nbsp;        colors = colors,</b>
-<b class="fc">&nbsp;        actions = actions,</b>
-<b class="fc">&nbsp;        title = { Text(title) },</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
+&nbsp;            }
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SurferToolbar(</b>
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-&nbsp;    navigationIcon: @Composable () -&gt; Unit = {},
-<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-&nbsp;    title: @Composable () -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    TopAppBar(</b>
-<b class="fc">&nbsp;        title = title,</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        navigationIcon = navigationIcon,</b>
-<b class="fc">&nbsp;        actions = {</b>
-<b class="fc">&nbsp;            SurferSyncStatusBadge()</b>
-<b class="fc">&nbsp;            actions()</b>
-&nbsp;        },
-<b class="fc">&nbsp;        colors = colors,</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
+&nbsp;            if (state.anonymousEnabled) {
+&nbsp;                if (state.emailPasswordEnabled) {
+&nbsp;                    OrDivider()
+&nbsp;                }
+&nbsp;                PasskeyOutlinedButton(
+&nbsp;                    text = stringResource(Res.string.sign_in_anonymous),
+&nbsp;                    onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
+&nbsp;                    enabled = !state.isLoading,
+&nbsp;                    modifier = Modifier.testTag(SignInTestTags.AnonymousButton),
+&nbsp;                )
+&nbsp;            }
 &nbsp;
-&nbsp;/**
-&nbsp; * Icon action for the trailing edge of [SurferToolbar] / [SurferDashboardToolbar]. Wraps
-&nbsp; * [IconButton] so every toolbar action gets the same 48dp tap target, tint, and content-
-&nbsp; * description handling without repeating boilerplate at every call site.
-&nbsp; */
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SurferToolbarAction(</b>
-&nbsp;    icon: ImageVector,
-&nbsp;    contentDescription: String?,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    tint: Color = AppTheme.materialColors.onSurface,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    IconButton(onClick = onClick, modifier = modifier) {</b>
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = icon,</b>
-<b class="fc">&nbsp;            contentDescription = contentDescription,</b>
-<b class="fc">&nbsp;            tint = tint,</b>
-&nbsp;        )
+&nbsp;            if (state.demoEnabled) {
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                if (state.demoOnly) {
+&nbsp;                    PrimaryFilledButton(
+&nbsp;                        text = stringResource(Res.string.sign_in_demo_mode),
+&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+&nbsp;                        enabled = !state.isLoading,
+&nbsp;                        modifier = Modifier.testTag(SignInTestTags.DemoButton),
+&nbsp;                    )
+&nbsp;                } else {
+&nbsp;                    TextButton(
+&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+&nbsp;                        enabled = !state.isLoading,
+&nbsp;                        modifier = Modifier
+&nbsp;                            .fillMaxWidth()
+&nbsp;                            .testTag(SignInTestTags.DemoButton),
+&nbsp;                    ) {
+&nbsp;                        Text(
+&nbsp;                            text = stringResource(Res.string.sign_in_demo_mode),
+&nbsp;                            color = AuthColors.PrimaryDark,
+&nbsp;                            fontWeight = FontWeight.SemiBold,
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;            SignInTerms(onClick = { onEvent(SignInEvent.OnTermsClick) })
+&nbsp;        }
 &nbsp;    }
-<b class="fc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * Pill-shaped tonal button with a leading icon and a label, sized for the trailing edge of
-&nbsp; * [SurferToolbar]. Use for primary commit-style toolbar actions (&quot;Save&quot;, &quot;Update&quot;) that need
-&nbsp; * more weight than a [SurferToolbarAction] icon.
-&nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferToolbarButtonAction(
-&nbsp;    icon: ImageVector,
+&nbsp;private fun SheetHeader() {
+&nbsp;    Text(
+&nbsp;        text = stringResource(Res.string.sign_in_sheet_title),
+&nbsp;        color = AuthColors.Ink,
+&nbsp;        fontSize = SheetTitleSize,
+&nbsp;        fontWeight = FontWeight.Bold,
+&nbsp;        modifier = Modifier.testTag(SignInTestTags.SheetTitle),
+&nbsp;    )
+&nbsp;    Spacer(Modifier.height(AppTheme.spacing.xxSmall))
+&nbsp;    Text(
+&nbsp;        text = stringResource(Res.string.sign_in_sheet_subtitle),
+&nbsp;        color = AuthColors.SheetMuted,
+&nbsp;        style = AppTheme.typography.bodySmall,
+&nbsp;        modifier = Modifier.testTag(SignInTestTags.SheetSubtitle),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun EmailPasswordForm(
+&nbsp;    state: SignInState,
+&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val fieldColors = OutlinedTextFieldDefaults.colors(
+&nbsp;        focusedBorderColor = AuthColors.PrimaryDark,
+&nbsp;        unfocusedBorderColor = AuthColors.Divider,
+&nbsp;        focusedLabelColor = AuthColors.PrimaryDark,
+&nbsp;        unfocusedLabelColor = AuthColors.SheetSubtle,
+&nbsp;        cursorColor = AuthColors.PrimaryDark,
+&nbsp;        focusedTextColor = AuthColors.Ink,
+&nbsp;        unfocusedTextColor = AuthColors.Ink,
+&nbsp;    )
+&nbsp;    SurferTextField(
+&nbsp;        value = state.email,
+&nbsp;        onValueChange = { onEvent(SignInEvent.OnEmailChanged(it)) },
+&nbsp;        label = stringResource(Res.string.sign_in_email_label),
+&nbsp;        errorText = state.emailError?.localized(),
+&nbsp;        enabled = !state.isLoading,
+&nbsp;        keyboardOptions = KeyboardOptions(
+&nbsp;            keyboardType = KeyboardType.Email,
+&nbsp;            imeAction = ImeAction.Next,
+&nbsp;        ),
+&nbsp;        colors = fieldColors,
+&nbsp;        fieldTestTag = SignInTestTags.EmailField,
+&nbsp;    )
+&nbsp;    // No spacer: each field already reserves a message line under itself, which is the gap.
+&nbsp;    SurferPasswordField(
+&nbsp;        value = state.password,
+&nbsp;        onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },
+&nbsp;        label = stringResource(Res.string.sign_in_password_label),
+&nbsp;        errorText = state.passwordError?.localized(),
+&nbsp;        enabled = !state.isLoading,
+&nbsp;        colors = fieldColors,
+&nbsp;        fieldTestTag = SignInTestTags.PasswordField,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun PrimaryFilledButton(
 &nbsp;    text: String,
 &nbsp;    onClick: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    enabled: Boolean = true,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    FilledTonalButton(</b>
-<b class="nc">&nbsp;        onClick = onClick,</b>
-<b class="nc">&nbsp;        enabled = enabled,</b>
-<b class="nc">&nbsp;        shape = RoundedCornerShape(18.dp),</b>
-<b class="nc">&nbsp;        modifier = modifier.padding(end = 8.dp),</b>
-<b class="nc">&nbsp;    ) {</b>
-<b class="nc">&nbsp;        Icon(</b>
-<b class="nc">&nbsp;            imageVector = icon,</b>
-&nbsp;            // decorative — button text label provides the accessible label
-<b class="nc">&nbsp;            contentDescription = null,</b>
-<b class="nc">&nbsp;            modifier = Modifier.size(16.dp),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Spacer(Modifier.width(6.dp))</b>
-<b class="nc">&nbsp;        Text(text = text, style = AppTheme.typography.labelLarge)</b>
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Dashboard-flavoured top app bar: a colored letter bubble on the left, a two-line title
-&nbsp; * (small label + larger headline), and trailing actions. Use for the home/dashboard screen
-&nbsp; * where the toolbar needs to identify the active workspace.
-&nbsp; */
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SurferDashboardToolbar(</b>
-&nbsp;    letter: String,
-&nbsp;    primaryText: String,
-&nbsp;    secondaryText: String,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    letterBackgroundColor: Color = AppTheme.materialColors.primaryContainer,</b>
-<b class="fc">&nbsp;    letterContentColor: Color = AppTheme.materialColors.onPrimaryContainer,</b>
-<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    SurferToolbar(</b>
-<b class="fc">&nbsp;        modifier = modifier,</b>
-<b class="fc">&nbsp;        navigationIcon = {</b>
-<b class="fc">&nbsp;            Box(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .padding(start = 12.dp)</b>
-<b class="fc">&nbsp;                    .size(40.dp)</b>
-<b class="fc">&nbsp;                    .clip(CircleShape)</b>
-<b class="fc">&nbsp;                    .background(letterBackgroundColor),</b>
-<b class="fc">&nbsp;                contentAlignment = Alignment.Center,</b>
-&nbsp;            ) {
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = letter,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
-<b class="fc">&nbsp;                    color = letterContentColor,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-&nbsp;        },
-<b class="fc">&nbsp;        colors = colors,</b>
-<b class="fc">&nbsp;        actions = actions,</b>
-<b class="fc">&nbsp;        title = {</b>
-<b class="fc">&nbsp;            Column {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = primaryText,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;                )
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = secondaryText,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
-<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-&nbsp;        },
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferToolbarPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferToolbar(title = &quot;Screen Title&quot;)
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferToolbarWithBackPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferToolbar(
-&nbsp;            title = &quot;Details with back&quot;,
-&nbsp;//            onBack = {},
+&nbsp;    enabled: Boolean,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    Button(
+&nbsp;        onClick = onClick,
+&nbsp;        enabled = enabled,
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .height(PrimaryButtonHeight),
+&nbsp;        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
+&nbsp;        colors = ButtonDefaults.buttonColors(
+&nbsp;            containerColor = AuthColors.PrimaryDark,
+&nbsp;            contentColor = AuthColors.OnBrand,
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            fontSize = PrimaryLabelSize,
+&nbsp;            fontWeight = FontWeight.SemiBold,
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferToolbarWithActionsPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferToolbar(
-&nbsp;            title = &quot;Dashboard&quot;,
-&nbsp;            actions = {
-&nbsp;                SurferToolbarAction(
-&nbsp;                    icon = SurferIcons.Settings,
-&nbsp;                    contentDescription = &quot;Settings&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;            },
+&nbsp;private fun PasskeyOutlinedButton(
+&nbsp;    text: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    enabled: Boolean,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    OutlinedButton(
+&nbsp;        onClick = onClick,
+&nbsp;        enabled = enabled,
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .height(PrimaryButtonHeight),
+&nbsp;        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
+&nbsp;        colors = ButtonDefaults.outlinedButtonColors(
+&nbsp;            contentColor = AuthColors.PrimaryDark,
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        Icon(
+&nbsp;            imageVector = SurferIcons.Fingerprint,
+&nbsp;            contentDescription = SurferSemantics.Decorative,
+&nbsp;            modifier = Modifier.size(PasskeyIconSize),
+&nbsp;        )
+&nbsp;        Spacer(Modifier.width(AppTheme.spacing.small))
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            fontSize = PrimaryLabelSize,
+&nbsp;            fontWeight = FontWeight.SemiBold,
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferToolbarFullPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferToolbar(
-&nbsp;            title = &quot;Edit Account&quot;,
-&nbsp;            onBack = {},
-&nbsp;            actions = {
-&nbsp;                SurferToolbarAction(
-&nbsp;                    icon = SurferIcons.Delete,
-&nbsp;                    contentDescription = &quot;Delete&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;            },
+&nbsp;private fun OrDivider() {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(vertical = AppTheme.spacing.small),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .weight(1f)
+&nbsp;                .height(1.dp)
+&nbsp;                .background(AuthColors.Divider),
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_or).uppercase(),
+&nbsp;            color = AuthColors.SheetSubtle,
+&nbsp;            fontSize = OrLabelSize,
+&nbsp;            fontWeight = FontWeight.Medium,
+&nbsp;            modifier = Modifier.padding(horizontal = AppTheme.spacing.small),
+&nbsp;        )
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .weight(1f)
+&nbsp;                .height(1.dp)
+&nbsp;                .background(AuthColors.Divider),
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferToolbarWithButtonActionPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferToolbar(
-&nbsp;            title = &quot;New transaction&quot;,
-&nbsp;            onBack = {},
-&nbsp;            actions = {
-&nbsp;                SurferToolbarButtonAction(
-&nbsp;                    icon = SurferIcons.Check,
-&nbsp;                    text = &quot;Save&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;            },
+&nbsp;private fun SignInTerms(onClick: () -&gt; Unit) {
+&nbsp;    Box(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        contentAlignment = Alignment.Center,
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_terms),
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = AuthColors.PrimaryDark,
+&nbsp;            textAlign = TextAlign.Center,
+&nbsp;            textDecoration = TextDecoration.Underline,
+&nbsp;            modifier = Modifier
+&nbsp;                .clickable(role = Role.Button, onClick = onClick)
+&nbsp;                .testTag(SignInTestTags.Terms),
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferToolbarWithButtonActionDisabledPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferToolbar(
-&nbsp;            title = &quot;Edit account&quot;,
-&nbsp;            onBack = {},
-&nbsp;            actions = {
-&nbsp;                SurferToolbarButtonAction(
-&nbsp;                    icon = SurferIcons.Check,
-&nbsp;                    text = &quot;Update&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                    enabled = false,
-&nbsp;                )
-&nbsp;            },
+&nbsp;private fun SignInScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        SignInContent(
+&nbsp;            state = SignInState(),
+&nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferDashboardToolbarPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferDashboardToolbar(
-&nbsp;            letter = &quot;F&quot;,
-&nbsp;            primaryText = &quot;Family&quot;,
-&nbsp;            secondaryText = &quot;Good evening, Kasia&quot;,
-&nbsp;            actions = {
-&nbsp;                SurferToolbarAction(
-&nbsp;                    icon = SurferIcons.Notifications,
-&nbsp;                    contentDescription = &quot;Notifications&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;                SurferToolbarAction(
-&nbsp;                    icon = SurferIcons.Settings,
-&nbsp;                    contentDescription = &quot;Settings&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;            },
+&nbsp;private fun SignInScreenFieldErrorPreview() {
+&nbsp;    AppTheme {
+&nbsp;        SignInContent(
+&nbsp;            state = SignInState(
+&nbsp;                email = &quot;surfer@example&quot;,
+&nbsp;                password = &quot;123&quot;,
+&nbsp;                mode = AuthMode.SignUp,
+&nbsp;                error = SignInError.PasswordTooShort,
+&nbsp;            ),
+&nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SignInScreenDemoOnlyPreview() {
+&nbsp;    AppTheme {
+&nbsp;        SignInContent(
+&nbsp;            state = SignInState(
+&nbsp;                emailPasswordEnabled = false,
+&nbsp;                anonymousEnabled = false,
+&nbsp;                demoEnabled = true,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -434,7 +696,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

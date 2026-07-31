@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionFilter</title>
+  <title>MoneySurfer Coverage Report > InitialBalanceInputKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.account.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionFilter (com.georgeci.moneysurfer.feature.account.details)</h1>
+<h1>Coverage Summary for Class: InitialBalanceInputKt (com.georgeci.moneysurfer.feature.account.creation)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionFilter</td>
+  <td class="name">InitialBalanceInputKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -66,7 +66,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (6/6)
   </span>
 </td>
 </tr>
@@ -92,251 +99,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.details
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.creation
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
-&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.AccountBalanceSeries
-&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountBalanceSeriesUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
-&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.Res
-&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transaction_delete_undo
-&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transaction_deleted_snackbar
-&nbsp;import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;@KoinViewModel
-&nbsp;class AccountDetailsViewModel(
-&nbsp;    accountId: AccountId,
-&nbsp;    private val getAccountById: GetAccountByIdUseCase,
-&nbsp;    private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
-&nbsp;    private val getAccountBalanceSeries: GetAccountBalanceSeriesUseCase,
-&nbsp;    private val hostCapabilities: HostCapabilities,
-&nbsp;    private val deleteWithUndo: DeleteTransactionWithUndo,
-&nbsp;) : MviViewModel&lt;AccountDetailsState, AccountDetailsEvent, AccountDetailsEffect&gt;(
-&nbsp;    initialState = AccountDetailsState.Loading(accountId),
-&nbsp;) {
+&nbsp;/**
+&nbsp; * Input filtering + validation for the account creation &quot;Opening balance&quot; field.
+&nbsp; * Lives outside the ViewModel so the parsing rules can be unit-tested directly.
+&nbsp; */
+&nbsp;object InitialBalanceInput {
 &nbsp;
-&nbsp;    init {
-&nbsp;        loadData()
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun onEvent(event: AccountDetailsEvent) {
-&nbsp;        when (event) {
-&nbsp;            AccountDetailsEvent.OnBackClick -&gt; postSideEffect(AccountDetailsEffect.NavigateBack)
-&nbsp;            is AccountDetailsEvent.OnTransactionClick -&gt;
-&nbsp;                postSideEffect(AccountDetailsEffect.NavigateToTransactionDetails(event.transactionId))
-&nbsp;            AccountDetailsEvent.OnAddTransactionClick -&gt;
-&nbsp;                postSideEffect(AccountDetailsEffect.NavigateToTransactionCreation)
-&nbsp;            AccountDetailsEvent.OnEditClick -&gt;
-&nbsp;                postSideEffect(AccountDetailsEffect.NavigateToAccountEdit(currentState.accountId))
-&nbsp;            AccountDetailsEvent.OnSeeAllTransactionsClick -&gt;
-&nbsp;                postSideEffect(AccountDetailsEffect.NavigateToTransactionsList(currentState.accountId))
-&nbsp;            is AccountDetailsEvent.OnFilterChanged -&gt;
-&nbsp;                updateState {
-&nbsp;                    AccountDetailsState.content.filter.modify(this) { event.filter }
-&nbsp;                }
-&nbsp;            // The list is a database Flow, so the row leaves — and returns on Undo — on its own.
-&nbsp;            is AccountDetailsEvent.OnDeleteTransaction -&gt; launch {
-&nbsp;                deleteWithUndo(
-&nbsp;                    transactionId = event.transactionId,
-&nbsp;                    message = Res.string.account_details_transaction_deleted_snackbar,
-&nbsp;                    undoLabel = Res.string.account_details_transaction_delete_undo,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun loadData() {
-&nbsp;        launch {
-&nbsp;            val accountId = currentState.accountId
-&nbsp;            getTransactionsByAccount(accountId).collect { transactions -&gt;
-&nbsp;                // Re-read per emission rather than once up front: deleting a row from this screen
-&nbsp;                // moves the account&#39;s balance, and a value captured before the flow started would
-&nbsp;                // leave the hero card printing the pre-delete number until the screen is reopened.
-&nbsp;                val account = getAccountById(accountId)
-&nbsp;                val currency = account?.currencyCode ?: CurrencyCode(&quot;USD&quot;)
-&nbsp;                val visible = transactions.filter { it.type != TransactionType.OPENING_BALANCE }
-&nbsp;                val totals = visible.formatTotals(currency)
-&nbsp;                val txnUi = visible.map { it.toUi(currency) }
-&nbsp;                // The chart is anchored on the same balance the hero card prints, and folds the
-&nbsp;                // history already collected above rather than issuing a second query.
-&nbsp;                val series = getAccountBalanceSeries(
-&nbsp;                    accountId = accountId,
-&nbsp;                    currentBalance = account?.balance ?: Money.zero(),
-&nbsp;                    transactions = transactions,
-&nbsp;                )
-&nbsp;                val chart = series.toUi(currency)
-&nbsp;                updateState {
-&nbsp;                    when (this) {
-&nbsp;                        is AccountDetailsState.Loading -&gt;
-&nbsp;                            account.toContent(accountId, txnUi, totals, chart)
-&nbsp;                        is AccountDetailsState.Content -&gt; copy(
-&nbsp;                            transactions = txnUi,
-&nbsp;                            formattedBalance = account
-&nbsp;                                ?.let { MoneyFormatter.format(it.balance, it.currencyCode) }
-&nbsp;                                ?: formattedBalance,
-&nbsp;                            formattedIncome = totals.income,
-&nbsp;                            formattedExpenses = totals.expenses,
-&nbsp;                            chart = chart,
-&nbsp;                        )
-&nbsp;                    }
+&nbsp;    /**
+&nbsp;     * Reduces a raw text-field value to a parseable money string: digits, an
+&nbsp;     * optional leading minus, and at most one decimal separator (&#39;,&#39; normalised
+&nbsp;     * to &#39;.&#39;). Letters and any extra separators are dropped, so the field can
+&nbsp;     * never hold an unparseable amount.
+&nbsp;     */
+&nbsp;    fun sanitize(raw: String): String {
+&nbsp;        val negative = raw.startsWith(&#39;-&#39;)
+&nbsp;        val digits = StringBuilder()
+&nbsp;        var separatorUsed = false
+&nbsp;        for (ch in raw) {
+&nbsp;            when {
+&nbsp;                ch.isDigit() -&gt; digits.append(ch)
+&nbsp;                (ch == &#39;.&#39; || ch == &#39;,&#39;) &amp;&amp; !separatorUsed -&gt; {
+&nbsp;                    separatorUsed = true
+&nbsp;                    digits.append(&#39;.&#39;)
 &nbsp;                }
 &nbsp;            }
 &nbsp;        }
+&nbsp;        return if (negative) &quot;-$digits&quot; else digits.toString()
 &nbsp;    }
 &nbsp;
-&nbsp;    /** Per-direction sums over the visible transactions, already formatted for display. */
-&nbsp;    private fun List&lt;Transaction&gt;.formatTotals(currency: CurrencyCode): FormattedTotals {
-&nbsp;        val income = sumOf(TransactionType.INCOME)
-&nbsp;        val expenses = sumOf(TransactionType.EXPENSE)
-&nbsp;        return FormattedTotals(
-&nbsp;            income = MoneyFormatter.format(income, currency),
-&nbsp;            expenses = MoneyFormatter.format(expenses, currency),
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun List&lt;Transaction&gt;.sumOf(type: TransactionType): Money =
-&nbsp;        fold(Money.zero()) { acc, t -&gt; if (t.type == type) acc + t.money.abs() else acc }
-&nbsp;
-&nbsp;    /** First resolved state for the screen. A null account means it was deleted underneath us. */
-&nbsp;    private fun Account?.toContent(
-&nbsp;        accountId: AccountId,
-&nbsp;        transactions: List&lt;AccountTransactionUi&gt;,
-&nbsp;        totals: FormattedTotals,
-&nbsp;        chart: AccountBalanceChartUi,
-&nbsp;    ) = AccountDetailsState.Content(
-&nbsp;        accountId = accountId,
-&nbsp;        name = this?.name.orEmpty(),
-&nbsp;        formattedBalance = this?.let { MoneyFormatter.format(it.balance, it.currencyCode) }.orEmpty(),
-&nbsp;        type = this?.type,
-&nbsp;        formattedIncome = totals.income,
-&nbsp;        formattedExpenses = totals.expenses,
-&nbsp;        chart = chart,
-&nbsp;        transactions = transactions,
-&nbsp;        filter = TransactionFilter.All,
-&nbsp;        // Mirrors the creation screen: the offline build has no place to put these, so it does
-&nbsp;        // not offer to collect them and does not show them.
-&nbsp;        extraDetails = if (hostCapabilities.isOffline) emptyList() else this?.extraDetails.orEmpty(),
-&nbsp;    )
+&nbsp;    /** Parses a [sanitize]d value to a [Double], or null while it is still incomplete (e.g. &quot;&quot; or &quot;-&quot;). */
+&nbsp;    fun parse(value: String): Double? = value.toDoubleOrNull()
 &nbsp;
 &nbsp;    /**
-&nbsp;     * The card scales its own axes, so the y values stay in major units and x is just the day
-&nbsp;     * index — the series is evenly spaced by construction.
+&nbsp;     * The inline error to surface for [balance] given the selected [type], or
+&nbsp;     * null when the amount is acceptable. A negative opening balance is only
+&nbsp;     * valid for account types that can carry debt (see [allowsNegativeBalance]).
 &nbsp;     */
-&nbsp;    private fun AccountBalanceSeries.toUi(currency: CurrencyCode): AccountBalanceChartUi {
-&nbsp;        val formatted = MoneyFormatter.format(delta, currency)
-&nbsp;        return AccountBalanceChartUi(
-&nbsp;            points = points.mapIndexed { index, point -&gt;
-&nbsp;                index.toFloat() to (point.balance.minor / Money.MINOR_PER_MAJOR).toFloat()
-&nbsp;            },
-&nbsp;            // Locale formatting only signs negatives; a flat period reads as &quot;+&quot; too, since
-&nbsp;            // &quot;no change&quot; is not a loss.
-&nbsp;            formattedDelta = if (delta.isNegative()) formatted else &quot;+$formatted&quot;,
-&nbsp;            isDeltaNegative = delta.isNegative(),
-&nbsp;        )
+&nbsp;    fun errorFor(balance: String, type: AccountType): InitialBalanceError? {
+&nbsp;        val parsed = parse(balance) ?: return null
+&nbsp;        return if (parsed &lt; 0 &amp;&amp; !type.allowsNegativeBalance) {
+&nbsp;            InitialBalanceError.NEGATIVE_NOT_ALLOWED
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
 &nbsp;    }
-&nbsp;
-&nbsp;    private fun Transaction.toUi(currency: CurrencyCode) = AccountTransactionUi(
-&nbsp;        id = id,
-&nbsp;        title = note.ifBlank { &quot;No description&quot; },
-&nbsp;        formattedAmount = MoneyFormatter.format(money.abs(), currency),
-&nbsp;        isExpense = type == TransactionType.EXPENSE,
-&nbsp;        categoryHueSeed = categoryId?.value.orEmpty(),
-&nbsp;        isTransfer = transferId != null,
-&nbsp;        isSplitLeg = splitId != null,
-&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;@optics
-&nbsp;sealed interface AccountDetailsState {
-&nbsp;    val accountId: AccountId
+&nbsp;/** Validation failures for the opening balance field. */
+&nbsp;enum class InitialBalanceError { NEGATIVE_NOT_ALLOWED, }
 &nbsp;
-&nbsp;    @optics
-&nbsp;    data class Loading(override val accountId: AccountId) : AccountDetailsState {
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        override val accountId: AccountId,
-&nbsp;        val name: String,
-&nbsp;        val formattedBalance: String,
-&nbsp;        /** Drives the hero meta line. Null only while the account row is still being read. */
-&nbsp;        val type: AccountType?,
-&nbsp;        val formattedIncome: String,
-&nbsp;        val formattedExpenses: String,
-&nbsp;        val chart: AccountBalanceChartUi,
-&nbsp;        val transactions: List&lt;AccountTransactionUi&gt;,
-&nbsp;        val filter: TransactionFilter,
-&nbsp;        /** User-entered key–value details; empty when there are none or in the offline build. */
-&nbsp;        val extraDetails: List&lt;AccountExtraDetail&gt; = emptyList(),
-&nbsp;    ) : AccountDetailsState {
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object
-&nbsp;}
-&nbsp;
-&nbsp;/** Display-ready income/expense totals for the quick-stats row. */
-&nbsp;private data class FormattedTotals(val income: String, val expenses: String)
-&nbsp;
-<b class="fc">&nbsp;enum class TransactionFilter { All, Expenses, Income }</b>
-&nbsp;
-&nbsp;/** Balance curve for the details chart: `x to y` pairs the card plots, plus its signed delta. */
-&nbsp;data class AccountBalanceChartUi(
-&nbsp;    val points: List&lt;Pair&lt;Float, Float&gt;&gt;,
-&nbsp;    val formattedDelta: String,
-&nbsp;    val isDeltaNegative: Boolean,
-&nbsp;)
-&nbsp;
-&nbsp;data class AccountTransactionUi(
-&nbsp;    val id: TransactionId,
-&nbsp;    val title: String,
-&nbsp;    val formattedAmount: String,
-&nbsp;    val isExpense: Boolean,
-&nbsp;    val categoryHueSeed: String,
-&nbsp;    /** One leg of a transfer, which deleting takes down together with its sibling. */
-&nbsp;    val isTransfer: Boolean = false,
-&nbsp;    /**
-&nbsp;     * One leg of a receipt split across categories. This screen deliberately lists the legs
-&nbsp;     * separately — a leg is its own row under its own category here — but deleting one still takes
-&nbsp;     * the whole receipt, so the confirmation has to say so.
-&nbsp;     */
-&nbsp;    val isSplitLeg: Boolean = false,
-&nbsp;)
-&nbsp;
-&nbsp;sealed interface AccountDetailsEvent {
-&nbsp;    data object OnBackClick : AccountDetailsEvent
-&nbsp;    data object OnEditClick : AccountDetailsEvent
-&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : AccountDetailsEvent
-&nbsp;    data object OnAddTransactionClick : AccountDetailsEvent
-&nbsp;    data object OnSeeAllTransactionsClick : AccountDetailsEvent
-&nbsp;    data class OnFilterChanged(val filter: TransactionFilter) : AccountDetailsEvent
-&nbsp;
-&nbsp;    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
-&nbsp;    data class OnDeleteTransaction(val transactionId: TransactionId) : AccountDetailsEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface AccountDetailsEffect {
-&nbsp;    data object NavigateBack : AccountDetailsEffect
-&nbsp;    data class NavigateToTransactionDetails(val transactionId: TransactionId) : AccountDetailsEffect
-&nbsp;    data object NavigateToTransactionCreation : AccountDetailsEffect
-&nbsp;    data class NavigateToAccountEdit(val accountId: AccountId) : AccountDetailsEffect
-&nbsp;    data class NavigateToTransactionsList(val accountId: AccountId) : AccountDetailsEffect
-&nbsp;}
+&nbsp;/**
+&nbsp; * Whether an account of this type can be created with a negative opening
+&nbsp; * balance. Only credit-style accounts (Card) carry debt; cash/bank/savings
+&nbsp; * balances start at zero or above.
+&nbsp; */
+&nbsp;internal val AccountType.allowsNegativeBalance: Boolean
+<b class="fc">&nbsp;    get() = this == AccountType.CARD</b>
 </code>
 </pre>
 </div>
@@ -360,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoryAppearancePickerKt</title>
+  <title>MoneySurfer Coverage Report > ArcSpan</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoryAppearancePickerKt (com.georgeci.moneysurfer.uikit.components.category)</h1>
+<h1>Coverage Summary for Class: ArcSpan (com.georgeci.moneysurfer.uikit.components.budget)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,89 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCategoryAppearancePickerKt</td>
+  <td class="name">ArcSpan</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    100%
   </span>
   <span class="absValue">
-    (7/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    54.4%
-  </span>
-  <span class="absValue">
-    (37/68)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    99.1%
-  </span>
-  <span class="absValue">
-    (108/109)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    96.1%
-  </span>
-  <span class="absValue">
-    (1292/1344)
+    (40/40)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">ArcSpan$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (42/42)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,238 +136,230 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.category
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.Canvas
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.aspectRatio
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.selection.selectable
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.geometry.Offset
+&nbsp;import androidx.compose.ui.geometry.Size
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.semantics.Role
-&nbsp;import androidx.compose.ui.semantics.contentDescription
-&nbsp;import androidx.compose.ui.semantics.semantics
+&nbsp;import androidx.compose.ui.graphics.StrokeCap
+&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_amber
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_green
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_lime
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_magenta
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_red
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_rose
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_teal
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_color_violet
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_card
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_cash
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_category
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_event
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_receipt
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_savings
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_tag
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_palette_icon_wallet
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
 &nbsp;/**
-&nbsp; * Grid of the palette icons, one selectable cell each.
+&nbsp; * Donut version of [SurferBudgetProgressBar] — the hero on Budget details. Sweeps clockwise
+&nbsp; * from twelve o&#39;clock, capped at a full turn so an overspent budget shows a closed ring in the
+&nbsp; * error colour rather than lapping itself.
 &nbsp; *
-&nbsp; * Cells are keyed by [SurferCategoryPalette.iconKeys] rather than by position, because the key is
-&nbsp; * what gets stored — the grid never has to agree with the palette on what slot three means.
+&nbsp; * [content] is stacked in the hole (percent, spent, &quot;of limit&quot;); the caller owns that text so
+&nbsp; * the ring stays free of formatting concerns.
 &nbsp; *
-&nbsp; * Each cell is a `selectable` with the icon&#39;s own name, so a screen reader announces &quot;Wallet,
-&nbsp; * selected&quot; instead of walking silently across eight unlabelled boxes.
+&nbsp; * [color] defaults to the colour [status] maps to, which is what a budget screen wants. A caller
+&nbsp; * whose shape is not primarily about a budget overrides it — the dashboard&#39;s spent-by-category card
+&nbsp; * paints a category in its own tint until its cap has something to report, and passes that decision
+&nbsp; * here so its ring cannot disagree with the legend beside it.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferIconPickerGrid(
-&nbsp;    selectedKey: String,
-&nbsp;    tint: Color,
-&nbsp;    onSelect: (String) -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    columns: Int = DEFAULT_COLUMNS,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val entries = SurferCategoryPalette.iconKeys.zip(SurferCategoryPalette.icons)</b>
-<b class="fc">&nbsp;    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(GridGap)) {</b>
-<b class="fc">&nbsp;        entries.chunked(columns).forEach { row -&gt;</b>
-<b class="fc">&nbsp;            Row(horizontalArrangement = Arrangement.spacedBy(GridGap)) {</b>
-<b class="fc">&nbsp;                row.forEach { (key, icon) -&gt;</b>
-<b class="fc">&nbsp;                    IconCell(</b>
-<b class="fc">&nbsp;                        icon = icon,</b>
-<b class="fc">&nbsp;                        label = stringResource(iconLabelFor(key)),</b>
-<b class="fc">&nbsp;                        selected = key == selectedKey,</b>
-<b class="fc">&nbsp;                        tint = tint,</b>
-<b class="fc">&nbsp;                        onClick = { onSelect(key) },</b>
-<b class="fc">&nbsp;                        modifier = Modifier.weight(1f),</b>
-&nbsp;                    )
-<b class="fc">&nbsp;                }</b>
-<b class="pc">&nbsp;                repeat(columns - row.size) {</b>
-<b class="nc">&nbsp;                    Box(modifier = Modifier.weight(1f))</b>
-<b class="fc">&nbsp;                }</b>
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;fun SurferBudgetRing(
+&nbsp;    progress: Float,
+&nbsp;    status: SurferBudgetStatus,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    size: Dp = 176.dp,
+&nbsp;    strokeWidth: Dp = 14.dp,
+&nbsp;    color: Color = status.color,
+&nbsp;    content: @Composable () -&gt; Unit = {},
+&nbsp;) {
+&nbsp;    ArcMeter(
+&nbsp;        progress = progress,
+&nbsp;        color = color,
+&nbsp;        span = ArcSpan.FullTurn,
+&nbsp;        modifier = modifier,
+&nbsp;        width = size,
+&nbsp;        strokeWidth = strokeWidth,
+&nbsp;        content = content,
+&nbsp;    )
+&nbsp;}
 &nbsp;
-&nbsp;/** Row of the palette tints, one selectable swatch each. */
+&nbsp;/**
+&nbsp; * Half-turn sibling of [SurferBudgetRing] — the dial the dashboard&#39;s spent-by-category card draws
+&nbsp; * for a single category. Sweeps clockwise from nine o&#39;clock through twelve to three, so [content]
+&nbsp; * sits under the arc rather than inside a hole, and the card only pays for the height the dial
+&nbsp; * actually uses.
+&nbsp; *
+&nbsp; * Shares [ArcMeter] with the ring on purpose: the two differ in the arc they span and nothing else,
+&nbsp; * and a second copy of the geometry is how a status colour or a cap ends up fixed in one shape and
+&nbsp; * not the other. [color] overrides the status colour exactly as it does on [SurferBudgetRing].
+&nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferColorSwatchRow(
-&nbsp;    selectedHue: Int,
-&nbsp;    onSelect: (Int) -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(SwatchGap)) {</b>
-<b class="fc">&nbsp;        SurferCategoryPalette.hues.zip(SurferCategoryPalette.tints).forEach { (hue, color) -&gt;</b>
-<b class="fc">&nbsp;            ColorSwatch(</b>
-<b class="fc">&nbsp;                color = color,</b>
-<b class="fc">&nbsp;                label = stringResource(colorLabelFor(hue)),</b>
-<b class="fc">&nbsp;                selected = hue == selectedHue,</b>
-<b class="fc">&nbsp;                onClick = { onSelect(hue) },</b>
-<b class="fc">&nbsp;                modifier = Modifier.weight(1f),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;fun SurferBudgetGauge(
+&nbsp;    progress: Float,
+&nbsp;    status: SurferBudgetStatus,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    width: Dp = 176.dp,
+&nbsp;    strokeWidth: Dp = 12.dp,
+&nbsp;    color: Color = status.color,
+&nbsp;    content: @Composable () -&gt; Unit = {},
+&nbsp;) {
+&nbsp;    ArcMeter(
+&nbsp;        progress = progress,
+&nbsp;        color = color,
+&nbsp;        span = ArcSpan.TopHalf,
+&nbsp;        modifier = modifier,
+&nbsp;        width = width,
+&nbsp;        strokeWidth = strokeWidth,
+&nbsp;        content = content,
+&nbsp;    )
+&nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun IconCell(
-&nbsp;    icon: ImageVector,
-&nbsp;    label: String,
-&nbsp;    selected: Boolean,
-&nbsp;    tint: Color,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .aspectRatio(1f)</b>
-<b class="fc">&nbsp;            .clip(RoundedCornerShape(CellCorner))</b>
-<b class="fc">&nbsp;            .background(if (selected) tint.copy(alpha = SelectedFill) else Color.Transparent)</b>
-<b class="fc">&nbsp;            .border(</b>
-<b class="fc">&nbsp;                if (selected) 2.dp else 1.dp,</b>
-<b class="fc">&nbsp;                if (selected) tint else AppTheme.materialColors.outlineVariant,</b>
-<b class="fc">&nbsp;                RoundedCornerShape(CellCorner),</b>
-&nbsp;            )
-<b class="fc">&nbsp;            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)</b>
-<b class="fc">&nbsp;            .semantics { contentDescription = label },</b>
-<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Icon(</b>
-<b class="fc">&nbsp;            imageVector = icon,</b>
-<b class="fc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;            tint = if (selected) tint else AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;            modifier = Modifier.size(IconSize),</b>
+&nbsp;/**
+&nbsp; * How much of the circle a meter draws, and what that leaves for its content.
+&nbsp; *
+&nbsp; * [heightRatio] is the share of the meter&#39;s width the box keeps: a full turn needs a square, a top
+&nbsp; * half only needs enough for the arc plus the line under it.
+&nbsp; */
+<b class="fc">&nbsp;private data class ArcSpan(</b>
+<b class="fc">&nbsp;    val startDegrees: Float,</b>
+<b class="fc">&nbsp;    val sweepDegrees: Float,</b>
+<b class="fc">&nbsp;    val heightRatio: Float,</b>
+<b class="fc">&nbsp;    val contentAlignment: Alignment,</b>
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        /** Twelve o&#39;clock all the way round — Compose measures arc angles from three o&#39;clock. */
+<b class="fc">&nbsp;        val FullTurn = ArcSpan(</b>
+<b class="fc">&nbsp;            startDegrees = -90f,</b>
+<b class="fc">&nbsp;            sweepDegrees = 360f,</b>
+<b class="fc">&nbsp;            heightRatio = 1f,</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;        /** Nine o&#39;clock to three o&#39;clock over the top. */
+<b class="fc">&nbsp;        val TopHalf = ArcSpan(</b>
+<b class="fc">&nbsp;            startDegrees = 180f,</b>
+<b class="fc">&nbsp;            sweepDegrees = 180f,</b>
+<b class="fc">&nbsp;            heightRatio = 0.62f,</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.BottomCenter,</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;private fun ColorSwatch(
+&nbsp;private fun ArcMeter(
+&nbsp;    progress: Float,
 &nbsp;    color: Color,
-&nbsp;    label: String,
-&nbsp;    selected: Boolean,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val ring = if (selected) {</b>
-<b class="fc">&nbsp;        Modifier</b>
-<b class="fc">&nbsp;            .border(3.dp, AppTheme.materialColors.surface, CircleShape)</b>
-<b class="fc">&nbsp;            .border(5.dp, color, CircleShape)</b>
-<b class="fc">&nbsp;    } else {</b>
-<b class="fc">&nbsp;        Modifier</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;    Box(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .aspectRatio(1f)</b>
-<b class="fc">&nbsp;            .clip(CircleShape)</b>
-<b class="fc">&nbsp;            .background(color.copy(alpha = SwatchFill))</b>
-<b class="fc">&nbsp;            .then(ring)</b>
-<b class="fc">&nbsp;            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)</b>
-<b class="fc">&nbsp;            .semantics { contentDescription = label },</b>
-<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    span: ArcSpan,
+&nbsp;    modifier: Modifier,
+&nbsp;    width: Dp,
+&nbsp;    strokeWidth: Dp,
+&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val track = AppTheme.materialColors.surfaceContainerHighest
+&nbsp;    val capped = progress.coerceIn(0f, 1f)
+&nbsp;
+&nbsp;    Box(
+&nbsp;        modifier = modifier
+&nbsp;            .width(width)
+&nbsp;            .height(width * span.heightRatio),
+&nbsp;        contentAlignment = span.contentAlignment,
 &nbsp;    ) {
-&nbsp;        // The ring alone is easy to miss against a pale wash, and it is the only thing
-&nbsp;        // distinguishing the chosen colour from the seven beside it.
-<b class="fc">&nbsp;        if (selected) {</b>
-<b class="fc">&nbsp;            Icon(</b>
-<b class="fc">&nbsp;                imageVector = SurferIcons.Check,</b>
-<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
-<b class="fc">&nbsp;                tint = color,</b>
-<b class="fc">&nbsp;                modifier = Modifier.size(CheckSize),</b>
+&nbsp;        Canvas(modifier = Modifier.fillMaxSize()) {
+&nbsp;            // The arc always lives in a square the width of the box, anchored at its top — a
+&nbsp;            // partial span simply leaves the rest of that square outside the box, unpainted.
+&nbsp;            val stroke = strokeWidth.toPx()
+&nbsp;            val inset = stroke / 2f
+&nbsp;            val arcSize = Size(size.width - stroke, size.width - stroke)
+&nbsp;            drawArc(
+&nbsp;                color = track,
+&nbsp;                startAngle = span.startDegrees,
+&nbsp;                sweepAngle = span.sweepDegrees,
+&nbsp;                useCenter = false,
+&nbsp;                topLeft = Offset(inset, inset),
+&nbsp;                size = arcSize,
+&nbsp;                style = Stroke(width = stroke),
 &nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;            if (capped &gt; 0f) {
+&nbsp;                drawArc(
+&nbsp;                    color = color,
+&nbsp;                    startAngle = span.startDegrees,
+&nbsp;                    sweepAngle = span.sweepDegrees * capped,
+&nbsp;                    useCenter = false,
+&nbsp;                    topLeft = Offset(inset, inset),
+&nbsp;                    size = arcSize,
+&nbsp;                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;        content()
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;private const val DEFAULT_COLUMNS = 4
-&nbsp;private const val SelectedFill = 0.15f
-&nbsp;private const val SwatchFill = 0.18f
-<b class="fc">&nbsp;private val GridGap = 8.dp</b>
-<b class="fc">&nbsp;private val SwatchGap = 6.dp</b>
-<b class="fc">&nbsp;private val CellCorner = 14.dp</b>
-<b class="fc">&nbsp;private val IconSize = 22.dp</b>
-<b class="fc">&nbsp;private val CheckSize = 18.dp</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Names in palette order, not keyed by icon key or hue value — the palette lists are already the
-&nbsp; * single source of that ordering, and `CategoryPaletteParityTest` guards it against the domain.
-&nbsp; * A lookup by position cannot drift from the swatch it labels.
-&nbsp; */
-<b class="fc">&nbsp;private val IconLabels: List&lt;StringResource&gt; = listOf(</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_category,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_card,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_savings,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_cash,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_wallet,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_receipt,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_event,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_icon_tag,</b>
+&nbsp;private val previewSamples = listOf(
+&nbsp;    0.42f to SurferBudgetStatus.Ok,
+&nbsp;    0.86f to SurferBudgetStatus.Warn,
+&nbsp;    1.2f to SurferBudgetStatus.Over,
 &nbsp;)
-&nbsp;
-<b class="fc">&nbsp;private val ColorLabels: List&lt;StringResource&gt; = listOf(</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_teal,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_amber,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_violet,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_lime,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_magenta,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_rose,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_red,</b>
-<b class="fc">&nbsp;    Res.string.uikit_palette_color_green,</b>
-&nbsp;)
-&nbsp;
-&nbsp;private fun iconLabelFor(key: String): StringResource =
-<b class="pc">&nbsp;    IconLabels.getOrElse(SurferCategoryPalette.iconKeys.indexOf(key)) { IconLabels.first() }</b>
-&nbsp;
-&nbsp;private fun colorLabelFor(hue: Int): StringResource =
-<b class="pc">&nbsp;    ColorLabels.getOrElse(SurferCategoryPalette.hues.indexOf(hue)) { ColorLabels.first() }</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferCategoryAppearancePickerPreview() {
+&nbsp;private fun SurferBudgetRingPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.large)) {
-&nbsp;            SurferIconPickerGrid(
-&nbsp;                selectedKey = SurferCategoryPalette.iconKeys[1],
-&nbsp;                tint = SurferCategoryPalette.tints[1],
-&nbsp;                onSelect = {},
-&nbsp;            )
-&nbsp;            SurferColorSwatchRow(selectedHue = SurferCategoryPalette.hues[1], onSelect = {})
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(16.dp),
+&nbsp;        ) {
+&nbsp;            previewSamples.forEach { (progress, status) -&gt;
+&nbsp;                SurferBudgetRing(progress = progress, status = status, size = 120.dp) {
+&nbsp;                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+&nbsp;                        Text(
+&nbsp;                            text = &quot;${(progress * 100).toInt()}%&quot;,
+&nbsp;                            style = AppTheme.typography.headlineSmall,
+&nbsp;                            color = AppTheme.materialColors.onSurface,
+&nbsp;                        )
+&nbsp;                        Text(
+&nbsp;                            text = &quot;of €400&quot;,
+&nbsp;                            style = AppTheme.typography.bodySmall,
+&nbsp;                            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferBudgetGaugePreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(16.dp),
+&nbsp;        ) {
+&nbsp;            previewSamples.forEach { (progress, status) -&gt;
+&nbsp;                SurferBudgetGauge(progress = progress, status = status, width = 120.dp) {
+&nbsp;                    Text(
+&nbsp;                        text = &quot;${(progress * 100).toInt()}%&quot;,
+&nbsp;                        style = AppTheme.typography.titleMedium,
+&nbsp;                        color = AppTheme.materialColors.onSurface,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
@@ -357,7 +386,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryModule</title>
+  <title>MoneySurfer Coverage Report > CategoryDetailsEffect</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.category.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.details</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryModule (com.georgeci.moneysurfer.feature.category.di)</h1>
+<h1>Coverage Summary for Class: CategoryDetailsEffect (com.georgeci.moneysurfer.feature.category.details)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,16 +45,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">CategoryModule</td>
+  <tr>
+    <td class="name">CategoryDetailsEffect$NavigateBack</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryDetailsEffect$NavigateToCategoryDetails</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,11 +97,122 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryDetailsEffect$NavigateToCategoryEdit</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryDetailsEffect$NavigateToTransactionCreation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryDetailsEffect$NavigateToTransactionDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84%
+  </span>
+  <span class="absValue">
+    (21/25)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,14 +220,256 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.di
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.details
 &nbsp;
-&nbsp;import org.koin.core.annotation.ComponentScan
-&nbsp;import org.koin.core.annotation.Module
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpendHistory
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendHistoryUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByCategoryUseCase
+&nbsp;import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.datetime.Month
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;import moneysurfer.feature.category.generated.resources.Res
+&nbsp;import moneysurfer.feature.category.generated.resources.category_details_transaction_delete_undo
+&nbsp;import moneysurfer.feature.category.generated.resources.category_details_transaction_deleted_snackbar
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-<b class="fc">&nbsp;@Module</b>
-&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.feature.category&quot;)
-&nbsp;class CategoryModule
+&nbsp;@KoinViewModel
+&nbsp;class CategoryDetailsViewModel(
+&nbsp;    categoryId: CategoryId,
+&nbsp;    private val getCategories: GetCategoriesUseCase,
+&nbsp;    private val getCategorySpendHistory: GetCategorySpendHistoryUseCase,
+&nbsp;    private val getTransactionsByCategory: GetTransactionsByCategoryUseCase,
+&nbsp;    private val deleteWithUndo: DeleteTransactionWithUndo,
+&nbsp;) : MviViewModel&lt;CategoryDetailsState, CategoryDetailsEvent, CategoryDetailsEffect&gt;(
+&nbsp;    initialState = CategoryDetailsState.Loading(categoryId),
+&nbsp;) {
+&nbsp;
+&nbsp;    init {
+&nbsp;        observe()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onEvent(event: CategoryDetailsEvent) {
+&nbsp;        when (event) {
+&nbsp;            CategoryDetailsEvent.OnBackClick -&gt; postSideEffect(CategoryDetailsEffect.NavigateBack)
+&nbsp;            CategoryDetailsEvent.OnEditClick -&gt;
+&nbsp;                postSideEffect(CategoryDetailsEffect.NavigateToCategoryEdit(currentState.categoryId))
+&nbsp;            CategoryDetailsEvent.OnAddTransactionClick -&gt;
+&nbsp;                postSideEffect(CategoryDetailsEffect.NavigateToTransactionCreation)
+&nbsp;            is CategoryDetailsEvent.OnSubcategoryClick -&gt;
+&nbsp;                postSideEffect(CategoryDetailsEffect.NavigateToCategoryDetails(event.categoryId))
+&nbsp;            is CategoryDetailsEvent.OnTransactionClick -&gt;
+&nbsp;                postSideEffect(CategoryDetailsEffect.NavigateToTransactionDetails(event.transactionId))
+&nbsp;            // The list is a database Flow, so the row leaves — and returns on Undo — on its own.
+&nbsp;            is CategoryDetailsEvent.OnDeleteTransaction -&gt; launch {
+&nbsp;                deleteWithUndo(
+&nbsp;                    transactionId = event.transactionId,
+&nbsp;                    message = Res.string.category_details_transaction_deleted_snackbar,
+&nbsp;                    undoLabel = Res.string.category_details_transaction_delete_undo,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observe() {
+&nbsp;        val categoryId = currentState.categoryId
+&nbsp;        launch {
+&nbsp;            combine(
+&nbsp;                getCategories(),
+&nbsp;                getCategorySpendHistory(categoryId),
+&nbsp;                getTransactionsByCategory(categoryId),
+&nbsp;            ) { categories, history, transactions -&gt;
+&nbsp;                Triple(categories, history, transactions)
+&nbsp;            }.collect { (categories, history, transactions) -&gt;
+&nbsp;                val category = categories.firstOrNull { it.id == categoryId }
+&nbsp;                // The category can vanish under an open screen — a delete on this device, or a
+&nbsp;                // sync pull from another. Falling back to Missing gives the screen something
+&nbsp;                // honest to render instead of a half-populated page about nothing.
+&nbsp;                if (category == null) {
+&nbsp;                    updateState { CategoryDetailsState.Missing(categoryId) }
+&nbsp;                    return@collect
+&nbsp;                }
+&nbsp;                val content = buildContent(category, categories, history, transactions)
+&nbsp;                updateState { content }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun buildContent(
+&nbsp;        category: Category,
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        history: CategorySpendHistory,
+&nbsp;        transactions: List&lt;Transaction&gt;,
+&nbsp;    ): CategoryDetailsState.Content {
+&nbsp;        // Currency follows the transactions actually booked here. A category with none yet has
+&nbsp;        // nothing to read it from, so it falls back to USD — the same placeholder Account
+&nbsp;        // Details uses, and it is replaced as soon as the first transaction lands.
+&nbsp;        val currency = transactions.firstOrNull()?.currencyCode ?: DefaultCurrency
+&nbsp;        val byId = categories.associateBy { it.id }
+&nbsp;        val parentTotal = history.currentMonth
+&nbsp;
+&nbsp;        return CategoryDetailsState.Content(
+&nbsp;            categoryId = category.id,
+&nbsp;            name = category.name,
+&nbsp;            type = category.type,
+&nbsp;            iconKey = category.iconKey,
+&nbsp;            hue = category.hue,
+&nbsp;            systemKind = category.systemKind?.name,
+&nbsp;            isLeaf = history.subcategories.isEmpty(),
+&nbsp;            formattedTotal = MoneyFormatter.format(parentTotal, currency),
+&nbsp;            formattedAverage = MoneyFormatter.format(history.monthlyAverage, currency),
+&nbsp;            formattedPerTransaction = history.perTransaction?.let {
+&nbsp;                MoneyFormatter.format(it, currency)
+&nbsp;            },
+&nbsp;            transactionCount = history.transactionCount,
+&nbsp;            months = history.months.map { month -&gt;
+&nbsp;                CategoryTrendMonthUi(
+&nbsp;                    month = month.month,
+&nbsp;                    minorValue = month.total.minor,
+&nbsp;                    formattedValue = MoneyFormatter.format(month.total, currency),
+&nbsp;                )
+&nbsp;            },
+&nbsp;            subcategories = history.subcategories.map { child -&gt;
+&nbsp;                CategorySubcategoryUi(
+&nbsp;                    id = child.categoryId,
+&nbsp;                    name = byId[child.categoryId]?.name.orEmpty(),
+&nbsp;                    iconKey = byId[child.categoryId]?.iconKey.orEmpty(),
+&nbsp;                    hue = byId[child.categoryId]?.hue ?: UnsetHue,
+&nbsp;                    formattedAmount = MoneyFormatter.format(child.total, currency),
+&nbsp;                    share = shareOf(child.total, parentTotal),
+&nbsp;                )
+&nbsp;            },
+&nbsp;            transactions = transactions.map { it.toUi(currency) },
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun Transaction.toUi(currency: CurrencyCode) = CategoryTransactionUi(
+&nbsp;        id = id,
+&nbsp;        title = note,
+&nbsp;        formattedAmount = MoneyFormatter.format(money.abs(), currency),
+&nbsp;        isExpense = type == TransactionType.EXPENSE,
+&nbsp;        categoryHueSeed = categoryId?.value.orEmpty(),
+&nbsp;        isTransfer = transferId != null,
+&nbsp;        isSplitLeg = splitId != null,
+&nbsp;    )
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        val DefaultCurrency = CurrencyCode(&quot;USD&quot;)
+&nbsp;
+&nbsp;        /** Matches `CategoryAppearance.UNSET_HUE` — the palette resolves it to the id-hashed default. */
+&nbsp;        const val UnsetHue = -1
+&nbsp;
+&nbsp;        /**
+&nbsp;         * A child&#39;s slice of the parent. Zero when the parent booked nothing, rather than a
+&nbsp;         * division by zero — with no total there is no share to draw.
+&nbsp;         */
+&nbsp;        fun shareOf(part: Money, whole: Money): Float =
+&nbsp;            if (whole.minor &lt;= 0L) 0f else (part.minor.toFloat() / whole.minor).coerceIn(0f, 1f)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface CategoryDetailsState {
+&nbsp;    val categoryId: CategoryId
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Loading(override val categoryId: CategoryId) : CategoryDetailsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    /** The category is gone — deleted here or removed by a sync pull while the screen was open. */
+&nbsp;    @optics
+&nbsp;    data class Missing(override val categoryId: CategoryId) : CategoryDetailsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Content(
+&nbsp;        override val categoryId: CategoryId,
+&nbsp;        val name: String,
+&nbsp;        val type: CategoryType,
+&nbsp;        val iconKey: String,
+&nbsp;        val hue: Int,
+&nbsp;        val systemKind: String?,
+&nbsp;        val isLeaf: Boolean,
+&nbsp;        val formattedTotal: String,
+&nbsp;        val formattedAverage: String,
+&nbsp;        val formattedPerTransaction: String?,
+&nbsp;        val transactionCount: Int,
+&nbsp;        val months: List&lt;CategoryTrendMonthUi&gt;,
+&nbsp;        val subcategories: List&lt;CategorySubcategoryUi&gt;,
+&nbsp;        val transactions: List&lt;CategoryTransactionUi&gt;,
+&nbsp;    ) : CategoryDetailsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
+&nbsp;}
+&nbsp;
+&nbsp;/** One trend column. [minorValue] stays raw so the bar can scale against its siblings. */
+&nbsp;data class CategoryTrendMonthUi(
+&nbsp;    val month: YearMonth,
+&nbsp;    val minorValue: Long,
+&nbsp;    val formattedValue: String,
+&nbsp;) {
+&nbsp;    val monthOfYear: Month get() = month.month
+&nbsp;}
+&nbsp;
+&nbsp;data class CategorySubcategoryUi(
+&nbsp;    val id: CategoryId,
+&nbsp;    val name: String,
+&nbsp;    val iconKey: String,
+&nbsp;    val hue: Int,
+&nbsp;    val formattedAmount: String,
+&nbsp;    val share: Float,
+&nbsp;)
+&nbsp;
+&nbsp;data class CategoryTransactionUi(
+&nbsp;    val id: TransactionId,
+&nbsp;    val title: String,
+&nbsp;    val formattedAmount: String,
+&nbsp;    val isExpense: Boolean,
+&nbsp;    val categoryHueSeed: String,
+&nbsp;    /** One leg of a transfer, which deleting takes down together with its sibling. */
+&nbsp;    val isTransfer: Boolean = false,
+&nbsp;    /**
+&nbsp;     * One leg of a receipt split across categories. The legs are listed separately here — that is
+&nbsp;     * the point of a category screen — but deleting one takes the whole receipt, so the
+&nbsp;     * confirmation has to say so.
+&nbsp;     */
+&nbsp;    val isSplitLeg: Boolean = false,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface CategoryDetailsEvent {
+&nbsp;    data object OnBackClick : CategoryDetailsEvent
+&nbsp;    data object OnEditClick : CategoryDetailsEvent
+&nbsp;    data object OnAddTransactionClick : CategoryDetailsEvent
+&nbsp;    data class OnSubcategoryClick(val categoryId: CategoryId) : CategoryDetailsEvent
+&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : CategoryDetailsEvent
+&nbsp;
+&nbsp;    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
+&nbsp;    data class OnDeleteTransaction(val transactionId: TransactionId) : CategoryDetailsEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CategoryDetailsEffect {
+<b class="nc">&nbsp;    data object NavigateBack : CategoryDetailsEffect</b>
+<b class="nc">&nbsp;    data object NavigateToTransactionCreation : CategoryDetailsEffect</b>
+<b class="fc">&nbsp;    data class NavigateToCategoryEdit(val categoryId: CategoryId) : CategoryDetailsEffect</b>
+<b class="fc">&nbsp;    data class NavigateToCategoryDetails(val categoryId: CategoryId) : CategoryDetailsEffect</b>
+<b class="fc">&nbsp;    data class NavigateToTransactionDetails(val transactionId: TransactionId) : CategoryDetailsEffect</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -123,7 +493,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

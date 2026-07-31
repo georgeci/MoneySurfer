@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncedSettingsSession</title>
+  <title>MoneySurfer Coverage Report > BackupStorageLocator</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncedSettingsSession (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: BackupStorageLocator (com.georgeci.moneysurfer.domain.backup)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncedSettingsSession</td>
+  <td class="name">BackupStorageLocator</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,33 +44,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.backup
+&nbsp;
+&nbsp;import okio.Path
 &nbsp;
 &nbsp;/**
-&nbsp; * Session-boundary maintenance for the settings that replicate per user.
-&nbsp; *
-&nbsp; * A domain facade for the same reason `ConfigHydration` and `RemoteConfigRefresh` are: the callers
-&nbsp; * are session-lifecycle use cases in `domain`, which must not see `app-config` any more than a
-&nbsp; * feature may.
+&nbsp; * Locates the on-disk files that participate in a backup, per platform.
+&nbsp; * Implementations live in `:data-local` (`{Android,Ios,Jvm}BackupStorageLocator`)
+&nbsp; * and are bound to this interface in `SharedPlatformModule`.
 &nbsp; */
-&nbsp;fun interface SyncedSettingsSession {
+&nbsp;interface BackupStorageLocator {
+&nbsp;    val platformName: String
+&nbsp;    fun moneySurferDbFile(): Path
+&nbsp;    fun syncDbFile(): Path
+&nbsp;    fun dataStoreFile(): Path
+&nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Restarts the host process so newly-imported on-disk state is observed.
+&nbsp; *
+&nbsp; * iOS implementations cannot relaunch programmatically; they exit cleanly
+&nbsp; * and the calling layer surfaces a &quot;please reopen&quot; message.
+&nbsp; */
+&nbsp;interface AppRestarter {
 &nbsp;    /**
-&nbsp;     * Run at the start of every session, before its first pull. Two jobs, both of which have to
-&nbsp;     * happen there and nowhere else:
-&nbsp;     *
-&nbsp;     * - **Drop the logout overlay.** The previous user&#39;s theme is held in memory so the UI does not
-&nbsp;     *   snap to defaults mid-session; left in place it would shadow whatever this user&#39;s pull writes
-&nbsp;     *   into local storage, which is the leak the account wipe exists to prevent.
-&nbsp;     * - **Re-enqueue writes the outbox refused.** `OutboxEnqueuerImpl` silently no-ops for demo and
-&nbsp;     *   signed-out sessions and nothing else replays those writes, so every setting whose stored
-&nbsp;     *   value never reached the server is queued now. This also closes the window between a local
-&nbsp;     *   write and its enqueue, which no shared transaction can protect — the two stores are
-&nbsp;     *   different databases.
-&nbsp;     *
-&nbsp;     * Idempotent, and safe without a Firebase session: the enqueue itself no-ops there.
+&nbsp;     * `true` when [restart] only terminates the process and the user has to
+&nbsp;     * open the app again by hand (iOS). Callers must show that as an explicit
+&nbsp;     * message *before* invoking [restart], or a successful restore looks like
+&nbsp;     * a crash.
 &nbsp;     */
-&nbsp;    suspend fun onSessionStart()
+&nbsp;    val requiresManualRelaunch: Boolean get() = false
+&nbsp;
+&nbsp;    fun restart()
 &nbsp;}
 </code>
 </pre>
@@ -95,7 +100,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

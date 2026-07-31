@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteUserAccountTestTags</title>
+  <title>MoneySurfer Coverage Report > SettingsTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteUserAccountTestTags (com.georgeci.moneysurfer.feature.settings.account)</h1>
+<h1>Coverage Summary for Class: SettingsTestTags (com.georgeci.moneysurfer.feature.settings)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DeleteUserAccountTestTags</td>
+  <td class="name">SettingsTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,230 +44,415 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
 &nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.verticalScroll
 &nbsp;import androidx.compose.material3.AlertDialog
 &nbsp;import androidx.compose.material3.Button
 &nbsp;import androidx.compose.material3.ButtonDefaults
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedTextField
-&nbsp;import androidx.compose.material3.SnackbarDuration
-&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.LaunchedEffect
 &nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
 &nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferNameBlock
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferPendingBadge
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;import moneysurfer.feature.settings.generated.resources.Res
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_button
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_cancel
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_confirm
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_message
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_memberships
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_section
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_sync
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_workspaces
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_intro
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_local
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_section
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_shared
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_auth_failed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_cleanup_failed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_generic
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_recent_login
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_wrong_password
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_label
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_missing
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_supporting_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting_dynamic
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_budgets_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_budgets_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_categories_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_categories_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_change_workspace
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_csv_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_goals_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_goals_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_cancel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_message
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_members
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_members_count_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_empty
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_data
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_help
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_personalization
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_workspace
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hub_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hub_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_user_name
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_version_format
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/** Stable selectors — see docs/testing/testing-strategy.md. */
-&nbsp;object DeleteUserAccountTestTags {
-&nbsp;    const val PasswordField = &quot;deleteAccount:passwordField&quot;
-&nbsp;    const val DeleteButton = &quot;deleteAccount:deleteButton&quot;
+&nbsp;/**
+&nbsp; * Stable selectors for the Settings screen — see docs/testing/testing-strategy.md.
+&nbsp; *
+&nbsp; * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
+&nbsp; * their absence is what the offline golden Maestro flow asserts via `notVisible`.
+&nbsp; * Everything else — including [GoalsRow], [PreferencesRow] and [BackupRow] — is composed in both
+&nbsp; * variants, and the same flow asserts those positively.
+&nbsp; *
+&nbsp; * [ProfileName] and [MembersRow] are state-gated rather than build-gated: the first needs a
+&nbsp; * profile to show, the second a workspace with members, so assert them only where the flow
+&nbsp; * has put the app in that state.
+&nbsp; *
+&nbsp; * [DebugConfigRow] is the one tag that varies by *build type* rather than by host: it appears
+&nbsp; * whenever a real debug-overrides layer is bound, and never in a release build. No Maestro flow
+&nbsp; * asserts it either way, precisely so the golden path stays independent of build type.
+&nbsp; */
+&nbsp;object SettingsTestTags {
+&nbsp;    const val Root = &quot;settings:root&quot;
+&nbsp;    const val ProfileName = &quot;settings:profileName&quot;
+&nbsp;    const val WorkspaceRow = &quot;settings:workspaceRow&quot;
+&nbsp;    const val MembersRow = &quot;settings:membersRow&quot;
+&nbsp;    const val CategoriesRow = &quot;settings:categoriesRow&quot;
+&nbsp;    const val BudgetsRow = &quot;settings:budgetsRow&quot;
+&nbsp;    const val GoalsRow = &quot;settings:goalsRow&quot;
+&nbsp;    const val AppearanceRow = &quot;settings:appearanceRow&quot;
+&nbsp;    const val PreferencesRow = &quot;settings:preferencesRow&quot;
+&nbsp;    const val AboutRow = &quot;settings:aboutRow&quot;
+&nbsp;    const val SyncRow = &quot;settings:syncRow&quot;
+&nbsp;    const val BackupRow = &quot;settings:backupRow&quot;
+&nbsp;    const val CsvRow = &quot;settings:csvRow&quot;
+&nbsp;    const val LogoutRow = &quot;settings:logoutRow&quot;
+&nbsp;    const val DeleteAccountRow = &quot;settings:deleteAccountRow&quot;
+&nbsp;    const val DebugConfigRow = &quot;settings:debugConfigRow&quot;
 &nbsp;}
 &nbsp;
+&nbsp;// The effect dispatch below is one straight-line branch per destination — flat, exhaustive, and
+&nbsp;// checked by the compiler. Its &quot;complexity&quot; is the number of settings rows, not tangled logic.
+&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
 &nbsp;@Composable
-&nbsp;fun DeleteUserAccountScreen(
+&nbsp;fun SettingsScreen(
 &nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    viewModel: DeleteUserAccountViewModel = koinViewModel(),
+&nbsp;    onNavigateToWorkspaceSelector: () -&gt; Unit,
+&nbsp;    onNavigateToIncomingInvites: () -&gt; Unit,
+&nbsp;    onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -&gt; Unit,
+&nbsp;    onNavigateToCategories: () -&gt; Unit,
+&nbsp;    onNavigateToBudgets: () -&gt; Unit,
+&nbsp;    onNavigateToGoals: () -&gt; Unit,
+&nbsp;    onNavigateToAppearance: () -&gt; Unit,
+&nbsp;    onNavigateToPreferences: () -&gt; Unit,
+&nbsp;    onNavigateToSync: () -&gt; Unit,
+&nbsp;    onNavigateToBackup: () -&gt; Unit,
+&nbsp;    onNavigateToCsvBackup: () -&gt; Unit,
+&nbsp;    onNavigateToAbout: () -&gt; Unit,
+&nbsp;    onNavigateToDeleteAccount: () -&gt; Unit,
+&nbsp;    onNavigateToDebugConfig: () -&gt; Unit,
+&nbsp;    viewModel: SettingsViewModel = koinViewModel(),
 &nbsp;) {
 &nbsp;    val state by viewModel.collectAsStateWithLifecycle()
-&nbsp;    val snackbarHostState = remember { SnackbarHostState() }
-&nbsp;    var pendingNotice by remember { mutableStateOf&lt;DeleteUserAccountNotice?&gt;(null) }
-&nbsp;
-&nbsp;    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }
-&nbsp;    LaunchedEffect(pendingNoticeText) {
-&nbsp;        val text = pendingNoticeText ?: return@LaunchedEffect
-&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
-&nbsp;        pendingNotice = null
-&nbsp;    }
 &nbsp;
 &nbsp;    viewModel.HandleSideEffect { effect -&gt;
 &nbsp;        when (effect) {
-&nbsp;            DeleteUserAccountEffect.NavigateBack -&gt; onNavigateBack()
-&nbsp;            is DeleteUserAccountEffect.Notify -&gt; pendingNotice = effect.notice
+&nbsp;            SettingsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            SettingsEffect.NavigateToWorkspaceSelector -&gt; onNavigateToWorkspaceSelector()
+&nbsp;            SettingsEffect.NavigateToIncomingInvites -&gt; onNavigateToIncomingInvites()
+&nbsp;            is SettingsEffect.NavigateToMembers -&gt; onNavigateToMembers(effect.workspaceId)
+&nbsp;            SettingsEffect.NavigateToCategories -&gt; onNavigateToCategories()
+&nbsp;            SettingsEffect.NavigateToBudgets -&gt; onNavigateToBudgets()
+&nbsp;            SettingsEffect.NavigateToGoals -&gt; onNavigateToGoals()
+&nbsp;            SettingsEffect.NavigateToAppearance -&gt; onNavigateToAppearance()
+&nbsp;            SettingsEffect.NavigateToPreferences -&gt; onNavigateToPreferences()
+&nbsp;            SettingsEffect.NavigateToSync -&gt; onNavigateToSync()
+&nbsp;            SettingsEffect.NavigateToBackup -&gt; onNavigateToBackup()
+&nbsp;            SettingsEffect.NavigateToCsvBackup -&gt; onNavigateToCsvBackup()
+&nbsp;            SettingsEffect.NavigateToAbout -&gt; onNavigateToAbout()
+&nbsp;            SettingsEffect.NavigateToDeleteAccount -&gt; onNavigateToDeleteAccount()
+&nbsp;            SettingsEffect.NavigateToDebugConfig -&gt; onNavigateToDebugConfig()
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    DeleteUserAccountContent(
+&nbsp;    SettingsContent(
 &nbsp;        state = state,
-&nbsp;        snackbarHostState = snackbarHostState,
 &nbsp;        onEvent = viewModel::onEvent,
 &nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;private fun noticeText(notice: DeleteUserAccountNotice): String = when (notice) {
-&nbsp;    DeleteUserAccountNotice.WrongPassword -&gt;
-&nbsp;        stringResource(Res.string.settings_delete_account_notice_wrong_password)
-&nbsp;    DeleteUserAccountNotice.RequiresRecentLogin -&gt;
-&nbsp;        stringResource(Res.string.settings_delete_account_notice_recent_login)
-&nbsp;    DeleteUserAccountNotice.CleanupFailed -&gt;
-&nbsp;        stringResource(Res.string.settings_delete_account_notice_cleanup_failed)
-&nbsp;    DeleteUserAccountNotice.AuthDeletionFailed -&gt;
-&nbsp;        stringResource(Res.string.settings_delete_account_notice_auth_failed)
-&nbsp;    DeleteUserAccountNotice.Generic -&gt;
-&nbsp;        stringResource(Res.string.settings_delete_account_notice_generic)
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun DeleteUserAccountContent(
-&nbsp;    state: DeleteUserAccountState,
-&nbsp;    snackbarHostState: SnackbarHostState,
-&nbsp;    onEvent: (DeleteUserAccountEvent) -&gt; Unit,
+&nbsp;private fun SettingsContent(
+&nbsp;    state: SettingsState,
+&nbsp;    onEvent: (SettingsEvent) -&gt; Unit,
 &nbsp;) {
-&nbsp;    if (state.showConfirmDialog) {
-&nbsp;        ConfirmDeleteUserAccountDialog(
-&nbsp;            onConfirm = { onEvent(DeleteUserAccountEvent.OnConfirmAccepted) },
-&nbsp;            onDismiss = { onEvent(DeleteUserAccountEvent.OnConfirmDismissed) },
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    SettingsSubScreenScaffold(
-&nbsp;        title = stringResource(Res.string.settings_delete_account_title),
-&nbsp;        snackbarHostState = snackbarHostState,
-&nbsp;        onBack = { onEvent(DeleteUserAccountEvent.OnBackClick) },
-&nbsp;        showProgressOverlay = state.isDeleting,
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .surferTestTagAsId()
+&nbsp;            .testTag(SettingsTestTags.Root),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.settings_title),
+&nbsp;                onBack = { onEvent(SettingsEvent.OnBackClick) },
+&nbsp;                colors = TopAppBarDefaults.topAppBarColors(
+&nbsp;                    containerColor = AppTheme.materialColors.surface,
+&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        },
 &nbsp;    ) { padding -&gt;
 &nbsp;        Column(
-&nbsp;            modifier = Modifier.padding(horizontal = 16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .verticalScroll(rememberScrollState()),
 &nbsp;        ) {
-&nbsp;            Spacer(Modifier.height(4.dp))
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_delete_account_intro),
-&nbsp;                style = AppTheme.typography.bodyMedium,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;            )
+&nbsp;            if (state.showProfile) {
+&nbsp;                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
+&nbsp;                    SurferNameBlock(
+&nbsp;                        name = stringResource(Res.string.settings_user_name),
+&nbsp;                        email = userEmailText(state),
+&nbsp;                        trailing = null,
+&nbsp;                        nameTestTag = SettingsTestTags.ProfileName,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
 &nbsp;
-&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_deleted_section))
-&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_workspaces))
-&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_memberships))
-&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_sync))
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_workspace)) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.People,
+&nbsp;                    title = stringResource(Res.string.settings_change_workspace),
+&nbsp;                    supportingText = stringResource(Res.string.settings_change_workspace_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.WorkspaceRow),
+&nbsp;                )
+&nbsp;                if (state.showWorkspaceMembers &amp;&amp; state.currentWorkspaceId != null) {
+&nbsp;                    SurferSettingsRow(
+&nbsp;                        icon = SurferIcons.Sparkle,
+&nbsp;                        title = stringResource(Res.string.settings_members),
+&nbsp;                        supportingText = pluralStringResource(
+&nbsp;                            Res.plurals.settings_members_count_format,
+&nbsp;                            state.activeMemberCount,
+&nbsp;                            state.activeMemberCount,
+&nbsp;                        ),
+&nbsp;                        onClick = { onEvent(SettingsEvent.OnMembersClick) },
+&nbsp;                        trailing = { SurferSettingsChevron() },
+&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.MembersRow),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                if (state.showPendingInvites) {
+&nbsp;                    SurferSettingsRow(
+&nbsp;                        icon = SurferIcons.Mail,
+&nbsp;                        title = stringResource(Res.string.settings_pending_invites),
+&nbsp;                        supporting = if (state.pendingInviteCount &gt; 0) {
+&nbsp;                            {
+&nbsp;                                SurferPendingBadge(
+&nbsp;                                    text = pluralStringResource(
+&nbsp;                                        Res.plurals.settings_pending_invites_supporting_format,
+&nbsp;                                        state.pendingInviteCount,
+&nbsp;                                        state.pendingInviteCount,
+&nbsp;                                    ),
+&nbsp;                                )
+&nbsp;                            }
+&nbsp;                        } else {
+&nbsp;                            null
+&nbsp;                        },
+&nbsp;                        supportingText = if (state.pendingInviteCount == 0) {
+&nbsp;                            stringResource(Res.string.settings_pending_invites_supporting_empty)
+&nbsp;                        } else {
+&nbsp;                            null
+&nbsp;                        },
+&nbsp;                        onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },
+&nbsp;                        trailing = { SurferSettingsChevron() },
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
 &nbsp;
-&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_kept_section))
-&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_shared))
-&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_local))
-&nbsp;
-&nbsp;            if (state.showPasswordField) {
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;                OutlinedTextField(
-&nbsp;                    value = state.password,
-&nbsp;                    onValueChange = { onEvent(DeleteUserAccountEvent.OnPasswordChange(it)) },
-&nbsp;                    label = { Text(stringResource(Res.string.settings_delete_account_password_label)) },
-&nbsp;                    singleLine = true,
-&nbsp;                    visualTransformation = PasswordVisualTransformation(),
-&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-&nbsp;                    isError = state.passwordMissing,
-&nbsp;                    supportingText = {
-&nbsp;                        if (state.passwordMissing) {
-&nbsp;                            Text(stringResource(Res.string.settings_delete_account_password_missing))
-&nbsp;                        }
-&nbsp;                    },
-&nbsp;                    enabled = !state.isDeleting,
-&nbsp;                    modifier = Modifier
-&nbsp;                        .fillMaxWidth()
-&nbsp;                        .testTag(DeleteUserAccountTestTags.PasswordField),
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_personalization)) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Category,
+&nbsp;                    title = stringResource(Res.string.settings_categories_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_categories_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnCategoriesClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.CategoriesRow),
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Savings,
+&nbsp;                    title = stringResource(Res.string.settings_budgets_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_budgets_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnBudgetsClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.BudgetsRow),
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Flag,
+&nbsp;                    title = stringResource(Res.string.settings_goals_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_goals_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnGoalsClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.GoalsRow),
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Palette,
+&nbsp;                    title = stringResource(Res.string.settings_appearance_hub_title),
+&nbsp;                    supportingText = appearanceSupporting(state.isDynamicColorEnabled),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnAppearanceClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.AppearanceRow),
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Globe,
+&nbsp;                    title = stringResource(Res.string.settings_preferences_hub_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_hub_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnPreferencesClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.PreferencesRow),
 &nbsp;                )
 &nbsp;            }
 &nbsp;
-&nbsp;            Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;            Button(
-&nbsp;                onClick = { onEvent(DeleteUserAccountEvent.OnDeleteClick) },
-&nbsp;                enabled = !state.isDeleting,
-&nbsp;                colors = ButtonDefaults.buttonColors(
-&nbsp;                    containerColor = AppTheme.materialColors.error,
-&nbsp;                    contentColor = AppTheme.materialColors.onError,
-&nbsp;                ),
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
+&nbsp;                if (state.showSyncSection) {
+&nbsp;                    SurferSettingsRow(
+&nbsp;                        icon = SurferIcons.Sync,
+&nbsp;                        title = stringResource(Res.string.settings_sync_hub_title),
+&nbsp;                        supportingText = stringResource(Res.string.settings_sync_hub_supporting),
+&nbsp;                        onClick = { onEvent(SettingsEvent.OnSyncClick) },
+&nbsp;                        trailing = { SurferSettingsChevron() },
+&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.SyncRow),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Archive,
+&nbsp;                    title = stringResource(Res.string.settings_backup),
+&nbsp;                    supportingText = stringResource(Res.string.settings_backup_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnBackupClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.BackupRow),
+&nbsp;                )
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Download,
+&nbsp;                    title = stringResource(Res.string.settings_csv_title),
+&nbsp;                    supportingText = stringResource(Res.string.settings_csv_supporting),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnCsvBackupClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.CsvRow),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_help)) {
+&nbsp;                SurferSettingsRow(
+&nbsp;                    icon = SurferIcons.Info,
+&nbsp;                    title = stringResource(Res.string.settings_about),
+&nbsp;                    supportingText = stringResource(
+&nbsp;                        Res.string.settings_about_supporting_format,
+&nbsp;                        state.appVersion,
+&nbsp;                    ),
+&nbsp;                    onClick = { onEvent(SettingsEvent.OnAboutClick) },
+&nbsp;                    trailing = { SurferSettingsChevron() },
+&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.AboutRow),
+&nbsp;                )
+&nbsp;                if (state.showDebugConfig) {
+&nbsp;                    SurferSettingsRow(
+&nbsp;                        icon = SurferIcons.Code,
+&nbsp;                        title = stringResource(Res.string.settings_debug_config),
+&nbsp;                        supportingText = stringResource(Res.string.settings_debug_config_supporting),
+&nbsp;                        onClick = { onEvent(SettingsEvent.OnDebugConfigClick) },
+&nbsp;                        trailing = { SurferSettingsChevron() },
+&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.DebugConfigRow),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            if (state.showLogout) {
+&nbsp;                Spacer(Modifier.height(8.dp))
+&nbsp;                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+&nbsp;                    SurferSettingsRow(
+&nbsp;                        icon = SurferIcons.Logout,
+&nbsp;                        title = stringResource(Res.string.settings_logout),
+&nbsp;                        danger = true,
+&nbsp;                        onClick = { onEvent(SettingsEvent.OnLogoutClick) },
+&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.LogoutRow),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            if (state.showDeleteAccount) {
+&nbsp;                Spacer(Modifier.height(8.dp))
+&nbsp;                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+&nbsp;                    SurferSettingsRow(
+&nbsp;                        icon = SurferIcons.Delete,
+&nbsp;                        title = stringResource(Res.string.settings_delete_account),
+&nbsp;                        danger = true,
+&nbsp;                        onClick = { onEvent(SettingsEvent.OnDeleteAccountClick) },
+&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.DeleteAccountRow),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.large))
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_version_format, state.appVersion),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                textAlign = TextAlign.Center,
 &nbsp;                modifier = Modifier
 &nbsp;                    .fillMaxWidth()
-&nbsp;                    .testTag(DeleteUserAccountTestTags.DeleteButton),
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.settings_delete_account_button))
-&nbsp;            }
+&nbsp;                    .padding(horizontal = 24.dp, vertical = AppTheme.spacing.small),
+&nbsp;            )
 &nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SectionTitle(text: String) {
-&nbsp;    Text(
-&nbsp;        text = text,
-&nbsp;        style = AppTheme.typography.titleSmall,
-&nbsp;        color = AppTheme.materialColors.onSurface,
-&nbsp;        modifier = Modifier.padding(top = AppTheme.spacing.small),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun BulletLine(text: String) {
-&nbsp;    Row {
-&nbsp;        Text(
-&nbsp;            text = &quot;•&quot;,
-&nbsp;            style = AppTheme.typography.bodyMedium,
-&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;        )
-&nbsp;        Spacer(Modifier.width(8.dp))
-&nbsp;        Text(
-&nbsp;            text = text,
-&nbsp;            style = AppTheme.typography.bodyMedium,
-&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;    if (state.showGuestLogoutWarning) {
+&nbsp;        GuestLogoutWarningDialog(
+&nbsp;            onConfirm = { onEvent(SettingsEvent.OnGuestLogoutConfirmed) },
+&nbsp;            onDismiss = { onEvent(SettingsEvent.OnGuestLogoutDismissed) },
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Final confirmation — mirrors the M3 dialog shape used by the financial-account delete. */
+&nbsp;/** Guest sessions are local-only — warn that logging out wipes the on-device data for good. */
 &nbsp;@Composable
-&nbsp;private fun ConfirmDeleteUserAccountDialog(
+&nbsp;private fun GuestLogoutWarningDialog(
 &nbsp;    onConfirm: () -&gt; Unit,
 &nbsp;    onDismiss: () -&gt; Unit,
 &nbsp;) {
@@ -275,20 +460,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        onDismissRequest = onDismiss,
 &nbsp;        icon = {
 &nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Delete,
+&nbsp;                imageVector = SurferIcons.Logout,
 &nbsp;                contentDescription = SurferSemantics.Decorative,
 &nbsp;                tint = AppTheme.materialColors.error,
 &nbsp;            )
 &nbsp;        },
 &nbsp;        title = {
 &nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_title),
+&nbsp;                text = stringResource(Res.string.settings_logout_guest_warning_title),
 &nbsp;                textAlign = TextAlign.Center,
 &nbsp;            )
 &nbsp;        },
 &nbsp;        text = {
 &nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_message),
+&nbsp;                text = stringResource(Res.string.settings_logout_guest_warning_message),
 &nbsp;                textAlign = TextAlign.Center,
 &nbsp;            )
 &nbsp;        },
@@ -300,24 +485,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    contentColor = AppTheme.materialColors.onError,
 &nbsp;                ),
 &nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_confirm))
+&nbsp;                Text(stringResource(Res.string.settings_logout_guest_warning_confirm))
 &nbsp;            }
 &nbsp;        },
 &nbsp;        dismissButton = {
 &nbsp;            TextButton(onClick = onDismiss) {
-&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_cancel))
+&nbsp;                Text(stringResource(Res.string.settings_logout_guest_warning_cancel))
 &nbsp;            }
 &nbsp;        },
 &nbsp;    )
 &nbsp;}
 &nbsp;
+&nbsp;@Composable
+&nbsp;private fun appearanceSupporting(isDynamicColorEnabled: Boolean): String =
+&nbsp;    if (isDynamicColorEnabled) {
+&nbsp;        stringResource(Res.string.settings_appearance_hub_supporting_dynamic)
+&nbsp;    } else {
+&nbsp;        stringResource(Res.string.settings_appearance_hub_supporting)
+&nbsp;    }
+&nbsp;
+&nbsp;private fun userEmailText(state: SettingsState): String =
+&nbsp;    when {
+&nbsp;        state.isAnonymousUser -&gt; &quot;anon&quot;
+&nbsp;        !state.userEmail.isNullOrBlank() -&gt; state.userEmail
+&nbsp;        else -&gt; &quot;anon&quot;
+&nbsp;    }
+&nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun DeleteUserAccountScreenPreview() {
+&nbsp;private fun SettingsScreenPreview() {
 &nbsp;    AppTheme {
-&nbsp;        DeleteUserAccountContent(
-&nbsp;            state = DeleteUserAccountState(userEmail = &quot;kasia@georgeci.com&quot;),
-&nbsp;            snackbarHostState = SnackbarHostState(),
+&nbsp;        SettingsContent(
+&nbsp;            state = SettingsState(),
 &nbsp;            onEvent = {},
 &nbsp;        )
 &nbsp;    }
@@ -345,7 +544,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

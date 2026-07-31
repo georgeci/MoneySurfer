@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncSettings</title>
+  <title>MoneySurfer Coverage Report > RemoteConfigRefresh</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncSettings (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: RemoteConfigRefresh (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncSettings</td>
+  <td class="name">RemoteConfigRefresh</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,23 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;
 &nbsp;/**
-&nbsp; * Whether sync may run at all. Replaces `SyncFeatureFlag`.
+&nbsp; * Re-reads the server-owned flag document into the configuration engine&#39;s RemoteGlobal layer.
 &nbsp; *
-&nbsp; * Gates the Settings → Sync screen, the manual &quot;Force sync&quot; action, the in-process periodic
-&nbsp; * ticker, and every use-case-driven trigger (post-auth bootstrap, create-workspace push,
-&nbsp; * accept-invite hydration, incoming-invite refresh).
+&nbsp; * Called on launch and on every foreground return, which is the whole propagation model: there is no
+&nbsp; * snapshot listener, so a flag flipped in the console reaches a running app the next time it comes
+&nbsp; * back to the front, and reaches a cold one on its next start.
 &nbsp; *
-&nbsp; * [isEnabled] combines **three** terms — build AND server kill switch AND user toggle. The build
-&nbsp; * term matters: the offline host has no Firebase to sync against, and a server/user pair would
-&nbsp; * have no slot for that, so dropping it would switch sync on there.
+&nbsp; * Deliberately separate from [ConfigHydration]. Hydration is local, fast and awaited before the start
+&nbsp; * route is resolved; this one reaches the network and must never be awaited there — its result lands
+&nbsp; * in the mirror and is picked up by `Config.observe`. Failures are swallowed by the layer, so callers
+&nbsp; * have nothing to handle: an unreachable server leaves the last mirrored values in place.
 &nbsp; *
-&nbsp; * A flow rather than a `Boolean`, because a server-side kill switch can retract mid-session.
+&nbsp; * A domain facade for the same reason [ConfigHydration] is one — `navigation` must not depend on
+&nbsp; * `app-config`. The offline build binds it over `RemoteGlobalConfigSource.Empty`, where it no-ops.
 &nbsp; */
-&nbsp;interface SyncSettings {
-&nbsp;    val isEnabled: Flow&lt;Boolean&gt;
+&nbsp;fun interface RemoteConfigRefresh {
+&nbsp;    suspend fun refresh()
 &nbsp;}
 </code>
 </pre>
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

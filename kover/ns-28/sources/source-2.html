@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CrashReportingLogWriter</title>
+  <title>MoneySurfer Coverage Report > ProjectionSummary</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.telemetry</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: CrashReportingLogWriter (com.georgeci.moneysurfer.domain.telemetry)</h1>
+<h1>Coverage Summary for Class: ProjectionSummary (com.georgeci.moneysurfer.domain.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CrashReportingLogWriter</td>
+  <td class="name">ProjectionSummary</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    100%
   </span>
   <span class="absValue">
-    (7/8)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (49/49)
+    (7/7)
   </span>
 </td>
 </tr>
@@ -99,40 +92,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.telemetry
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.sync
 &nbsp;
-&nbsp;import co.touchlab.kermit.LogWriter
-&nbsp;import co.touchlab.kermit.Severity
-&nbsp;
-&nbsp;/**
-&nbsp; * Bridges Kermit into [CrashReporter]: every Warn-and-above line becomes a Crashlytics
-&nbsp; * breadcrumb, and every Warn-and-above line that carries a [Throwable] is additionally
-&nbsp; * recorded as a non-fatal.
-&nbsp; *
-&nbsp; * The [Severity.Warn] floor is deliberate and matches the release min-severity set by
-&nbsp; * `configureLogging`: Verbose/Debug/Info are the severities that historically carried
-&nbsp; * PII (issue #154) and are dropped before their message lambda is even evaluated in
-&nbsp; * release builds, so nothing below Warn can reach a crash report in the first place.
-&nbsp; */
-<b class="fc">&nbsp;class CrashReportingLogWriter(</b>
-<b class="fc">&nbsp;    private val crashReporter: CrashReporter,</b>
-&nbsp;) : LogWriter() {
-&nbsp;
-<b class="fc">&nbsp;    override fun isLoggable(tag: String, severity: Severity): Boolean = severity &gt;= Severity.Warn</b>
-&nbsp;
-&nbsp;    override fun log(
-&nbsp;        severity: Severity,
-&nbsp;        message: String,
-&nbsp;        tag: String,
-&nbsp;        throwable: Throwable?,
-&nbsp;    ) {
-<b class="fc">&nbsp;        crashReporter.log(&quot;${severity.name.uppercase()}/${tag.ifBlank { &quot;NoTag&quot; }}: $message&quot;)</b>
-&nbsp;
-<b class="pc">&nbsp;        if (severity &gt;= Severity.Warn &amp;&amp; throwable != null) {</b>
-<b class="fc">&nbsp;            crashReporter.record(throwable)</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
+<b class="fc">&nbsp;data class ProjectionSummary(val recalculatedCount: Int)</b>
 </code>
 </pre>
 </div>
@@ -156,7 +118,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

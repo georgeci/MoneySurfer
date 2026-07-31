@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > PendingMutationQueue</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: PendingMutationQueue (com.georgeci.moneysurfer.sync.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">PendingMutationQueue</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (34/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PendingMutationQueue$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PendingMutationQueue$DefaultImpls</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (34/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;/**
+&nbsp; * Outbox of local mutations waiting to be pushed to the remote backend.
+&nbsp; *
+&nbsp; * Lifecycle of a row:
+&nbsp; * 1. [enqueue] — produced by a repository&#39;s dual-write, right after the local write. **Not** in the
+&nbsp; *    same transaction, and no transaction can make it so: the outbox lives in `SyncDatabase`
+&nbsp; *    (`moneysurfer_sync.db`), a different database from `MoneySurferDatabase`, so the two writes are
+&nbsp; *    always two sequential calls and a crash in between leaves a local change with nothing queued
+&nbsp; *    for it. What closes that window is reconciliation at session start, not atomicity.
+&nbsp; *    Enqueueing is insert-if-absent among `PENDING` rows with the same type, id, operation **and
+&nbsp; *    scope**, so repeated edits of one entity queue one push rather than N identical ones while the
+&nbsp; *    same id under two workspaces still queues two. Status = `PENDING`.
+&nbsp; * 2. [pending] — read by [com.georgeci.moneysurfer.sync.usecase.UploadPendingChangesUseCase]
+&nbsp; *    when sync runs. Caller then flips status via [markInFlight].
+&nbsp; * 3. [markCompleted] — successful push removes the row.
+&nbsp; * 4. [markFailed] — push exception bumps `attempts` and resets status to `PENDING`
+&nbsp; *    (next sync cycle picks it up again, possibly with backoff in a later phase).
+&nbsp; *
+&nbsp; * See SyncCoordinatorFAQ.md №13.
+&nbsp; */
+&nbsp;interface PendingMutationQueue {
+&nbsp;    suspend fun enqueue(mutation: PendingMutation)
+&nbsp;
+<b class="fc">&nbsp;    suspend fun pending(scope: SyncScope, limit: Int = DEFAULT_BATCH_LIMIT): List&lt;PendingMutation&gt;</b>
+&nbsp;
+&nbsp;    suspend fun markInFlight(ids: List&lt;String&gt;)
+&nbsp;
+&nbsp;    suspend fun markCompleted(ids: List&lt;String&gt;)
+&nbsp;
+&nbsp;    suspend fun markFailed(id: String, error: String)
+&nbsp;
+&nbsp;    val pendingCount: Flow&lt;Int&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Live view of the outbox rows themselves, oldest first — the Settings → Sync screen&#39;s
+&nbsp;     * outbox section. Unlike [pendingCount] this includes rows currently `IN_FLIGHT`: a push
+&nbsp;     * that never completes leaves the row in that status, and hiding it would make a stuck
+&nbsp;     * outbox look like an empty one.
+&nbsp;     *
+&nbsp;     * Diagnostics only — the push path reads [pending] instead, because it needs the scope
+&nbsp;     * filter and the `markInFlight` handshake that goes with it.
+&nbsp;     */
+<b class="fc">&nbsp;    fun observeOutbox(limit: Int = DEFAULT_OUTBOX_LIMIT): Flow&lt;List&lt;PendingMutation&gt;&gt;</b>
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        const val DEFAULT_BATCH_LIMIT: Int = 100
+&nbsp;
+&nbsp;        /** Enough rows to diagnose a stuck outbox without rendering thousands of them. */
+&nbsp;        const val DEFAULT_OUTBOX_LIMIT: Int = 50
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

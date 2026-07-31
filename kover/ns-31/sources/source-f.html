@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncSummary</title>
+  <title>MoneySurfer Coverage Report > AccountsManageTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.manage</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncSummary (com.georgeci.moneysurfer.sync.api)</h1>
+<h1>Coverage Summary for Class: AccountsManageTestTags (com.georgeci.moneysurfer.feature.account.manage)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SyncSummary</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">AccountsManageTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (28/28)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,14 +44,455 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.manage
 &nbsp;
-&nbsp;data class SyncSummary(
-<b class="fc">&nbsp;    val uploadedCount: Int = 0,</b>
-<b class="fc">&nbsp;    val downloadedCount: Int = 0,</b>
-<b class="fc">&nbsp;    val conflictCount: Int = 0,</b>
-<b class="fc">&nbsp;    val recalculatedCount: Int = 0,</b>
-&nbsp;)
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.foundation.lazy.rememberLazyListState
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_active_header
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_add_account
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_at
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_footnote
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_header
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_hint
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_done
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_drag_to_reorder
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_edit
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_empty
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_remove
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_restore
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_active_count
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_archived_count
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_total
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_title
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.month_short
+&nbsp;import com.georgeci.moneysurfer.feature.account.icon
+&nbsp;import com.georgeci.moneysurfer.feature.account.labelRes
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferTotalBalanceCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDragHandle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToggleChipButton
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.rememberSurferReorderState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import kotlinx.datetime.number
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringArrayResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;
+&nbsp;/**
+&nbsp; * This screen owns the only add-account affordance that survives a non-empty list — the
+&nbsp; * dashboard&#39;s own CTA is empty-state-only — so E2E flows that create a second account come
+&nbsp; * through here.
+&nbsp; */
+&nbsp;object AccountsManageTestTags {
+&nbsp;    const val Root = &quot;accountsManage:root&quot;
+&nbsp;    const val Add = &quot;accountsManage:add&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun AccountsManageScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToAccountCreation: () -&gt; Unit,
+&nbsp;    onNavigateToAccountEdit: (AccountId) -&gt; Unit,
+&nbsp;    onNavigateToAccountDetails: (AccountId) -&gt; Unit,
+&nbsp;    viewModel: AccountsManageViewModel = koinViewModel(),
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            AccountsManageEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            AccountsManageEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()
+&nbsp;            is AccountsManageEffect.NavigateToAccountDetails -&gt; onNavigateToAccountDetails(effect.accountId)
+&nbsp;            is AccountsManageEffect.NavigateToAccountEdit -&gt; onNavigateToAccountEdit(effect.accountId)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    when (val current = state) {
+&nbsp;        AccountsManageState.Loading -&gt; AccountsManageLoading(onEvent = viewModel::onEvent)
+&nbsp;        is AccountsManageState.Content -&gt; AccountsManageContent(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -&gt; Unit) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier.surferSafeInsets(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.accounts_manage_title),
+&nbsp;                onBack = { onEvent(AccountsManageEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(padding)
+&nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(14.dp),
+&nbsp;        ) {
+&nbsp;            repeat(ACCOUNTS_SKELETON_ROWS) {
+&nbsp;                SurferSkeletonRow()
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private const val ACCOUNTS_SKELETON_ROWS = 5
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun AccountsManageContent(
+&nbsp;    state: AccountsManageState.Content,
+&nbsp;    onEvent: (AccountsManageEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val hasContent = state.activeAccounts.isNotEmpty() || state.archivedAccounts.isNotEmpty()
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(AccountsManageTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.accounts_manage_title),
+&nbsp;                onBack = { onEvent(AccountsManageEvent.OnBackClick) },
+&nbsp;                actions = {
+&nbsp;                    SurferToggleChipButton(
+&nbsp;                        label = stringResource(
+&nbsp;                            if (state.isEditing) {
+&nbsp;                                Res.string.accounts_manage_done
+&nbsp;                            } else {
+&nbsp;                                Res.string.accounts_manage_edit
+&nbsp;                            },
+&nbsp;                        ),
+&nbsp;                        icon = if (state.isEditing) SurferIcons.Check else SurferIcons.Edit,
+&nbsp;                        active = state.isEditing,
+&nbsp;                        onClick = { onEvent(AccountsManageEvent.OnToggleEditMode) },
+&nbsp;                        modifier = Modifier.padding(end = AppTheme.spacing.small),
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        floatingActionButton = {
+&nbsp;            SurferAddFab(
+&nbsp;                label = stringResource(Res.string.accounts_manage_add_account),
+&nbsp;                onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
+&nbsp;                modifier = Modifier.testTag(AccountsManageTestTags.Add),
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        if (!hasContent) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                SurferEmptyState(
+&nbsp;                    title = stringResource(Res.string.accounts_manage_empty),
+&nbsp;                    icon = SurferIcons.Wallet,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            return@Scaffold
+&nbsp;        }
+&nbsp;
+&nbsp;        val listState = rememberLazyListState()
+&nbsp;        val reorderState = rememberSurferReorderState(
+&nbsp;            listState = listState,
+&nbsp;            keys = state.activeAccounts.map { activeRowKey(it.id) },
+&nbsp;            onMove = { from, to -&gt;
+&nbsp;                val fromId = state.activeAccounts.firstOrNull { activeRowKey(it.id) == from }?.id
+&nbsp;                val toId = state.activeAccounts.firstOrNull { activeRowKey(it.id) == to }?.id
+&nbsp;                if (fromId != null &amp;&amp; toId != null) {
+&nbsp;                    onEvent(AccountsManageEvent.OnAccountMove(from = fromId, to = toId))
+&nbsp;                }
+&nbsp;            },
+&nbsp;            onMoveEnd = { onEvent(AccountsManageEvent.OnAccountMoveEnd) },
+&nbsp;        )
+&nbsp;
+&nbsp;        LazyColumn(
+&nbsp;            state = listState,
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding()),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                top = AppTheme.spacing.xSmall,
+&nbsp;                bottom = padding.calculateBottomPadding() + 96.dp,
+&nbsp;            ),
+&nbsp;        ) {
+&nbsp;            item(key = &quot;aggregate&quot;) {
+&nbsp;                SurferTotalBalanceCard(
+&nbsp;                    label = stringResource(Res.string.accounts_manage_stat_total),
+&nbsp;                    formattedTotal = state.formattedTotal,
+&nbsp;                    activeChipText = pluralStringResource(
+&nbsp;                        Res.plurals.accounts_manage_stat_active_count,
+&nbsp;                        state.activeAccounts.size,
+&nbsp;                        state.activeAccounts.size,
+&nbsp;                    ),
+&nbsp;                    archivedChipText = state.archivedAccounts.size
+&nbsp;                        .takeIf { it &gt; 0 }
+&nbsp;                        ?.let {
+&nbsp;                            pluralStringResource(Res.plurals.accounts_manage_stat_archived_count, it, it)
+&nbsp;                        },
+&nbsp;                    otherCurrencyChipTexts = state.otherCurrencyTotals,
+&nbsp;                    modifier = Modifier.padding(
+&nbsp;                        horizontal = AppTheme.spacing.default,
+&nbsp;                        vertical = AppTheme.spacing.xSmall,
+&nbsp;                    ),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            item(key = &quot;active-header&quot;) {
+&nbsp;                SurferSectionHeader(
+&nbsp;                    title = stringResource(Res.string.accounts_manage_active_header),
+&nbsp;                    trailing = if (state.isEditing) {
+&nbsp;                        {
+&nbsp;                            SurferSectionHeaderHint(
+&nbsp;                                text = stringResource(Res.string.accounts_manage_drag_to_reorder),
+&nbsp;                            )
+&nbsp;                        }
+&nbsp;                    } else {
+&nbsp;                        null
+&nbsp;                    },
+&nbsp;                    modifier = Modifier
+&nbsp;                        .padding(horizontal = AppTheme.spacing.large)
+&nbsp;                        .padding(top = AppTheme.spacing.small, bottom = 6.dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            items(state.activeAccounts, key = { activeRowKey(it.id) }) { account -&gt;
+&nbsp;                val rowKey = activeRowKey(account.id)
+&nbsp;                ActiveAccountRow(
+&nbsp;                    account = account,
+&nbsp;                    editing = state.isEditing,
+&nbsp;                    archiveLabel = stringResource(Res.string.accounts_manage_archive),
+&nbsp;                    deleteLabel = stringResource(Res.string.accounts_manage_remove),
+&nbsp;                    onClick = { onEvent(AccountsManageEvent.OnAccountClick(account.id)) },
+&nbsp;                    onArchiveClick = { onEvent(AccountsManageEvent.OnArchiveAccountClick(account.id)) },
+&nbsp;                    onRemoveClick = { onEvent(AccountsManageEvent.OnRemoveAccountClick(account.id)) },
+&nbsp;                    handleModifier = Modifier.surferReorderHandle(reorderState, rowKey),
+&nbsp;                    modifier = surferReorderableItem(reorderState, rowKey)
+&nbsp;                        .padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            if (state.archivedAccounts.isNotEmpty()) {
+&nbsp;                item(key = &quot;archived-header&quot;) {
+&nbsp;                    SurferSectionHeader(
+&nbsp;                        title = stringResource(Res.string.accounts_manage_archived_header),
+&nbsp;                        trailing = {
+&nbsp;                            SurferSectionHeaderHint(
+&nbsp;                                text = stringResource(Res.string.accounts_manage_archived_hint),
+&nbsp;                            )
+&nbsp;                        },
+&nbsp;                        modifier = Modifier
+&nbsp;                            .padding(horizontal = AppTheme.spacing.large)
+&nbsp;                            .padding(top = 20.dp, bottom = 6.dp),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;
+&nbsp;                items(state.archivedAccounts, key = { &quot;archived-${it.id.value}&quot; }) { account -&gt;
+&nbsp;                    SurferArchivedAccountCard(
+&nbsp;                        name = account.name,
+&nbsp;                        subtitle = archivedSubtitle(account),
+&nbsp;                        icon = account.type.icon(),
+&nbsp;                        restoreLabel = stringResource(Res.string.accounts_manage_restore),
+&nbsp;                        onRestoreClick = { onEvent(AccountsManageEvent.OnRestoreAccountClick(account.id)) },
+&nbsp;                        modifier = Modifier.padding(
+&nbsp;                            horizontal = AppTheme.spacing.default,
+&nbsp;                            vertical = AppTheme.spacing.xSmall,
+&nbsp;                        ),
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            item(key = &quot;footnote&quot;) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.accounts_manage_archived_footnote),
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .padding(horizontal = AppTheme.spacing.large)
+&nbsp;                        .padding(top = 18.dp, bottom = AppTheme.spacing.small),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    state.pendingDelete?.let { pending -&gt;
+&nbsp;        DeleteAccountDialog(
+&nbsp;            accountName = pending.name,
+&nbsp;            onConfirm = { onEvent(AccountsManageEvent.OnDeleteConfirm) },
+&nbsp;            onDismiss = { onEvent(AccountsManageEvent.OnDeleteCancel) },
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    state.pendingArchive?.let { pending -&gt;
+&nbsp;        ArchiveAccountDialog(
+&nbsp;            accountName = pending.name,
+&nbsp;            onConfirm = { onEvent(AccountsManageEvent.OnArchiveConfirm) },
+&nbsp;            onDismiss = { onEvent(AccountsManageEvent.OnArchiveCancel) },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Row key of an active account. Shared by the `LazyColumn` item and the reorder state — the
+&nbsp; * drag reports moves as keys, and the two have to be the same string for a drop to land.
+&nbsp; */
+&nbsp;private fun activeRowKey(id: AccountId): String = &quot;active-${id.value}&quot;
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ActiveAccountRow(
+&nbsp;    account: AccountManageUi,
+&nbsp;    editing: Boolean,
+&nbsp;    archiveLabel: String,
+&nbsp;    deleteLabel: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    onArchiveClick: () -&gt; Unit,
+&nbsp;    onRemoveClick: () -&gt; Unit,
+&nbsp;    handleModifier: Modifier,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    val typeLabel = stringResource(account.type.labelRes())
+&nbsp;    SurferSwipeRevealRow(
+&nbsp;        revealWidth = 156.dp,
+&nbsp;        modifier = modifier.fillMaxWidth(),
+&nbsp;        enabled = !editing,
+&nbsp;        actions = {
+&nbsp;            SurferSwipeAction(
+&nbsp;                icon = SurferIcons.Archive,
+&nbsp;                label = archiveLabel,
+&nbsp;                onClick = onArchiveClick,
+&nbsp;            )
+&nbsp;            SurferSwipeAction(
+&nbsp;                icon = SurferIcons.Delete,
+&nbsp;                label = deleteLabel,
+&nbsp;                onClick = onRemoveClick,
+&nbsp;                destructive = true,
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) {
+&nbsp;        SurferAccountManageCard(
+&nbsp;            name = account.name,
+&nbsp;            subtitle = typeLabel,
+&nbsp;            icon = account.type.icon(),
+&nbsp;            formattedBalance = account.formattedBalance,
+&nbsp;            onClick = if (editing) null else onClick,
+&nbsp;            trailing = if (editing) {
+&nbsp;                { SurferDragHandle(modifier = handleModifier) }
+&nbsp;            } else {
+&nbsp;                null
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun archivedSubtitle(account: AccountManageUi): String {
+&nbsp;    val typeLabel = stringResource(account.type.labelRes())
+&nbsp;    // Accounts archived before `archivedAt` existed carry no date; the type label alone is the
+&nbsp;    // honest fallback.
+&nbsp;    val archivedOn = account.archivedOn ?: return typeLabel
+&nbsp;    val months = stringArrayResource(Res.array.month_short)
+&nbsp;    val archivedLabel = stringResource(
+&nbsp;        Res.string.accounts_manage_archived_at,
+&nbsp;        months[archivedOn.month.number - 1],
+&nbsp;        archivedOn.year.toString(),
+&nbsp;    )
+&nbsp;    return &quot;$typeLabel · $archivedLabel&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun AccountsManageScreenViewPreview() {
+&nbsp;    AppTheme {
+&nbsp;        AccountsManageContent(
+&nbsp;            state = AccountsManageState.Content(
+&nbsp;                isEditing = false,
+&nbsp;                activeAccounts = PreviewActiveAccountsFull,
+&nbsp;                archivedAccounts = PreviewArchivedAccounts,
+&nbsp;                formattedTotal = &quot;€11,575.32&quot;,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun AccountsManageScreenEditingPreview() {
+&nbsp;    AppTheme {
+&nbsp;        AccountsManageContent(
+&nbsp;            state = AccountsManageState.Content(
+&nbsp;                isEditing = true,
+&nbsp;                activeAccounts = PreviewActiveAccountsEditing,
+&nbsp;                archivedAccounts = emptyList(),
+&nbsp;                formattedTotal = &quot;€11,395.32&quot;,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun AccountsManageEmptyPreview() {
+&nbsp;    AppTheme {
+&nbsp;        AccountsManageContent(
+&nbsp;            state = AccountsManageState.Content(
+&nbsp;                isEditing = false,
+&nbsp;                activeAccounts = emptyList(),
+&nbsp;                archivedAccounts = emptyList(),
+&nbsp;                formattedTotal = null,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -123,7 +516,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

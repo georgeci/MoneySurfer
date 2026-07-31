@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/3)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/7)
+    (0/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/31)
+    (0/25)
   </span>
 </td>
 </tr>
@@ -102,9 +102,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
 &nbsp;import android.content.Context
-&nbsp;import android.content.pm.ApplicationInfo
 &nbsp;import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 &nbsp;import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
+&nbsp;import com.georgeci.moneysurfer.data.platform.isDebuggableBuild
 &nbsp;import kotlinx.coroutines.CoroutineScope
 &nbsp;
 &nbsp;/**
@@ -117,7 +117,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * in a file that already exists per platform.
 &nbsp; */
 &nbsp;fun createDebugConfigSource(context: Context, scope: CoroutineScope): DebugConfigSource =
-<b class="nc">&nbsp;    if (context.isDebuggable()) {</b>
+<b class="nc">&nbsp;    if (context.isDebuggableBuild()) {</b>
 <b class="nc">&nbsp;        DebugConfigSourceImpl(</b>
 <b class="nc">&nbsp;            createReplaceOnCorruptionDataStore(</b>
 <b class="nc">&nbsp;                producePath = { context.filesDir.resolve(DEBUG_OVERRIDES_FILE_NAME).absolutePath },</b>
@@ -127,14 +127,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    } else {
 <b class="nc">&nbsp;        DebugConfigSource.Empty</b>
 &nbsp;    }
-&nbsp;
-&nbsp;/**
-&nbsp; * `BuildConfig.DEBUG` belongs to whichever Gradle module it is generated in, and this is a library
-&nbsp; * module — the installed application&#39;s own `FLAG_DEBUGGABLE` is the signal that actually tracks the
-&nbsp; * APK the user is running.
-&nbsp; */
-&nbsp;private fun Context.isDebuggable(): Boolean =
-<b class="nc">&nbsp;    applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0</b>
 </code>
 </pre>
 </div>
@@ -158,7 +150,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

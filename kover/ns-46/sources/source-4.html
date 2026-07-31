@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InsightsMerchantUi</title>
+  <title>MoneySurfer Coverage Report > GoalsEvent</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.insights</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.list</a>
 </div>
 
-<h1>Coverage Summary for Class: InsightsMerchantUi (com.georgeci.moneysurfer.feature.insights)</h1>
+<h1>Coverage Summary for Class: GoalsEvent (com.georgeci.moneysurfer.feature.goal.list)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,43 +45,118 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">InsightsMerchantUi</td>
+  <tr>
+    <td class="name">GoalsEvent$OnAddGoalClick</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (4/4)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (17/17)
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GoalsEvent$OnBackClick</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GoalsEvent$OnGoalClick</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,111 +164,91 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.insights
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal.list
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
-&nbsp;import kotlin.math.roundToInt
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
+&nbsp;import com.georgeci.moneysurfer.utils.AsyncState
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;/** [share] is a fraction; this is it as whole percent. */
-&nbsp;private const val PERCENT = 100
+&nbsp;@KoinViewModel
+&nbsp;class GoalsViewModel(
+&nbsp;    private val getGoals: GetGoalsUseCase,
+&nbsp;) : MviViewModel&lt;AsyncState&lt;GoalsContent&gt;, GoalsEvent, GoalsEffect&gt;(
+&nbsp;    initialState = AsyncState.Loading,
+&nbsp;) {
 &nbsp;
-&nbsp;@optics
-&nbsp;sealed interface InsightsState {
-&nbsp;    data object Loading : InsightsState
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Everything the screen draws for the period the pager is on, already formatted against the
-&nbsp;     * workspace base currency — `domain` owns no copy and `MoneyFormatter` needs a currency the
-&nbsp;     * composable has no business resolving.
-&nbsp;     *
-&nbsp;     * [inFlight] covers the one thing the user can wait for here: paging or re-cadencing the period
-&nbsp;     * re-runs four `GROUP BY` rollups, and on a large workspace the answer does not arrive in the
-&nbsp;     * same frame as the new label. One flag rather than one per control, per AGENTS.md — the pager
-&nbsp;     * only ever has one change in the air.
-&nbsp;     */
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        val mode: DashboardPeriod,
-&nbsp;        val period: InsightsPeriodUi,
-&nbsp;        /** False once the period contains today; there is nothing to page forward into. */
-&nbsp;        val canGoToNextPeriod: Boolean,
-&nbsp;        val baseCurrency: String,
-&nbsp;        val totalFormatted: String,
-&nbsp;        val categories: List&lt;InsightsCategoryUi&gt;,
-&nbsp;        val months: List&lt;InsightsMonthUi&gt;,
-&nbsp;        val merchants: List&lt;InsightsMerchantUi&gt;,
-&nbsp;        /** Currency codes the base-currency filter left out of every figure above, largest first. */
-&nbsp;        val hiddenCurrencies: List&lt;String&gt;,
-&nbsp;        /** Whether [hiddenCurrencies] is *why* the period looks empty — see `SpendInsights`. */
-&nbsp;        val hiddenByBaseCurrency: Boolean,
-&nbsp;        val inFlight: Boolean = false,
-&nbsp;    ) : InsightsState {
-&nbsp;
-&nbsp;        val isEmpty: Boolean get() = categories.isEmpty()
-&nbsp;
-&nbsp;        companion object
+&nbsp;    init {
+&nbsp;        observeGoals()
 &nbsp;    }
 &nbsp;
-&nbsp;    companion object
+&nbsp;    override fun onEvent(event: GoalsEvent) {
+&nbsp;        when (event) {
+&nbsp;            GoalsEvent.OnBackClick -&gt; postSideEffect(GoalsEffect.NavigateBack)
+&nbsp;            GoalsEvent.OnAddGoalClick -&gt; postSideEffect(GoalsEffect.NavigateToGoalCreation)
+&nbsp;            is GoalsEvent.OnGoalClick -&gt; postSideEffect(GoalsEffect.NavigateToGoalDetails(event.goalId))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeGoals() {
+&nbsp;        launch {
+&nbsp;            getGoals().collect { summaries -&gt;
+&nbsp;                val items = summaries.map { it.toUi() }
+&nbsp;                updateState { AsyncState.Content(GoalsContent(goals = items)) }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun SavingsGoalSummary.toUi() = GoalListItem(
+&nbsp;        id = goal.id,
+&nbsp;        title = goal.title,
+&nbsp;        emoji = goal.emoji,
+&nbsp;        hue = goal.hue,
+&nbsp;        status = goal.status,
+&nbsp;        targetDate = goal.targetDate,
+&nbsp;        progress = progress.percent.toFloat(),
+&nbsp;        percentLabel = &quot;${(progress.percent * PERCENT_SCALE).toInt()}%&quot;,
+&nbsp;        savedLabel = MoneyFormatter.format(progress.saved, goal.currencyCode),
+&nbsp;        targetLabel = MoneyFormatter.format(progress.target, goal.currencyCode),
+&nbsp;    )
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val PERCENT_SCALE = 100
+&nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The pager&#39;s label reduced to the numbers its copy needs, so the composable resolves month names
-&nbsp; * and week wording from its own resources and the view model stays free of `@Composable`.
-&nbsp; */
-&nbsp;sealed interface InsightsPeriodUi {
-&nbsp;    /** [monthNumber] is 1-based, matching `Month.number`. */
-&nbsp;    data class Month(val monthNumber: Int, val year: Int) : InsightsPeriodUi
-&nbsp;
-&nbsp;    /** ISO week; [weekYear] can differ from the calendar year around New Year. */
-&nbsp;    data class Week(val weekNumber: Int, val weekYear: Int) : InsightsPeriodUi
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * One row of the category breakdown, and one slice of the donut above it.
-&nbsp; *
-&nbsp; * [name] and [hue] are null for the uncategorized bucket, which has no stored appearance and no
-&nbsp; * name of its own — the screen supplies both, so the bucket keeps its colour when the user switches
-&nbsp; * language.
-&nbsp; */
-&nbsp;data class InsightsCategoryUi(
-&nbsp;    val id: String,
-&nbsp;    val name: String?,
-&nbsp;    val hue: Int?,
-&nbsp;    val spentFormatted: String,
-&nbsp;    val share: Float,
-&nbsp;) {
-&nbsp;    val sharePercent: Int get() = (share * PERCENT).roundToInt()
-&nbsp;}
-&nbsp;
-&nbsp;/** One column of the income-vs-expense chart. The two magnitudes drive the bars, the strings the a11y copy. */
-&nbsp;data class InsightsMonthUi(
-&nbsp;    /** 1-based, matching `Month.number`. */
-&nbsp;    val monthNumber: Int,
-&nbsp;    val year: Int,
-&nbsp;    val income: Long,
-&nbsp;    val expense: Long,
-&nbsp;    val incomeFormatted: String,
-&nbsp;    val expenseFormatted: String,
+&nbsp;data class GoalsContent(
+&nbsp;    val goals: List&lt;GoalListItem&gt;,
 &nbsp;)
 &nbsp;
-&nbsp;/** One row of the top-merchants list. [merchant] is never blank — the aggregate excludes those rows. */
-<b class="fc">&nbsp;data class InsightsMerchantUi(</b>
-<b class="fc">&nbsp;    val merchant: String,</b>
-<b class="fc">&nbsp;    val spentFormatted: String,</b>
-<b class="fc">&nbsp;    val transactionCount: Int,</b>
+&nbsp;data class GoalListItem(
+&nbsp;    val id: GoalId,
+&nbsp;    val title: String,
+&nbsp;    val emoji: String,
+&nbsp;    val hue: Int,
+&nbsp;    val status: GoalStatus,
+&nbsp;    val targetDate: LocalDate?,
+&nbsp;    val progress: Float,
+&nbsp;    val percentLabel: String,
+&nbsp;    val savedLabel: String,
+&nbsp;    val targetLabel: String,
 &nbsp;)
 &nbsp;
-&nbsp;sealed interface InsightsEvent {
-&nbsp;    data object OnBackClick : InsightsEvent
-&nbsp;    data object OnPreviousPeriodClick : InsightsEvent
-&nbsp;    data object OnNextPeriodClick : InsightsEvent
-&nbsp;    data class OnPeriodModeChanged(val mode: DashboardPeriod) : InsightsEvent
+&nbsp;sealed interface GoalsEvent {
+<b class="nc">&nbsp;    data object OnBackClick : GoalsEvent</b>
+<b class="nc">&nbsp;    data object OnAddGoalClick : GoalsEvent</b>
+<b class="nc">&nbsp;    data class OnGoalClick(val goalId: GoalId) : GoalsEvent</b>
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface InsightsEffect {
-&nbsp;    data object NavigateBack : InsightsEffect
+&nbsp;sealed interface GoalsEffect {
+&nbsp;    data object NavigateBack : GoalsEffect
+&nbsp;    data object NavigateToGoalCreation : GoalsEffect
+&nbsp;    data class NavigateToGoalDetails(val goalId: GoalId) : GoalsEffect
 &nbsp;}
 </code>
 </pre>
@@ -221,7 +273,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

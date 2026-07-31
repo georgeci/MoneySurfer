@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > AccountSeed</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.debug</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt (com.georgeci.moneysurfer.domain.di)</h1>
+<h1>Coverage Summary for Class: AccountSeed (com.georgeci.moneysurfer.domain.debug)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt</td>
+  <td class="name">AccountSeed</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2939)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -90,7 +90,493 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.debug
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.atStartOfDayIn
+&nbsp;import kotlinx.datetime.daysUntil
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlin.random.Random
+&nbsp;import kotlin.time.Duration.Companion.hours
+&nbsp;import kotlin.time.Duration.Companion.minutes
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * What the generator is allowed to know about the workspace it is filling. Assembled by
+&nbsp; * `DemoDataWriter`, which owns every repository; the generator itself does no IO so its output is
+&nbsp; * reproducible for a given seed and clock.
+&nbsp; */
+&nbsp;internal data class DemoDataSnapshot(
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;    val currency: CurrencyCode,
+&nbsp;    val accounts: List&lt;Account&gt;,
+&nbsp;    val categories: List&lt;Category&gt;,
+&nbsp;    val budgetNames: Set&lt;String&gt;,
+&nbsp;    val goalTitles: Set&lt;String&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Rows to insert, in dependency order: [accounts] before [transactions] (which reference them),
+&nbsp; * [goals] before [contributions].
+&nbsp; */
+&nbsp;internal data class DemoDataPlan(
+&nbsp;    val accounts: List&lt;Account&gt;,
+&nbsp;    val transactions: List&lt;Transaction&gt;,
+&nbsp;    val budgets: List&lt;Budget&gt;,
+&nbsp;    val goals: List&lt;SavingsGoal&gt;,
+&nbsp;    val contributions: List&lt;GoalContribution&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/** A year of history is what the dashboard&#39;s trailing-months widgets need to draw a full curve. */
+&nbsp;private const val HISTORY_MONTHS = 12
+&nbsp;
+&nbsp;/** Rows per run, chosen so lists page and charts look inhabited without a slow first launch. */
+&nbsp;private const val TRANSACTION_COUNT = 300
+&nbsp;
+&nbsp;private const val EARLIEST_HOUR = 8
+&nbsp;private const val LATEST_HOUR = 22
+&nbsp;private const val MINUTES_PER_HOUR = 60
+&nbsp;
+&nbsp;/**
+&nbsp; * The default [buildDemoDataPlan] seed. Derived from the clock rather than fixed: the only other
+&nbsp; * input that moves between two runs is the calendar day, so a constant would make a second run the
+&nbsp; * same day replay the first one row for row — 300 duplicates instead of a denser year. Pass an
+&nbsp; * explicit `seed` where reproducibility is the point (screenshot diffs, tests).
+&nbsp; */
+&nbsp;private fun seedFrom(now: Instant): Int = now.toEpochMilliseconds().toInt()
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds one batch of demo rows against [snapshot].
+&nbsp; *
+&nbsp; * Accounts, budgets and goals already present under the same name are left alone, so a second run
+&nbsp; * only deepens the transaction history instead of duplicating the scaffolding around it.
+&nbsp; */
+&nbsp;internal fun buildDemoDataPlan(
+&nbsp;    snapshot: DemoDataSnapshot,
+&nbsp;    now: Instant,
+&nbsp;    zone: TimeZone = TimeZone.currentSystemDefault(),
+&nbsp;    seed: Int = seedFrom(now),
+&nbsp;): DemoDataPlan {
+&nbsp;    val random = Random(seed)
+&nbsp;    val today = now.toLocalDateTime(zone).date
+&nbsp;    val windowStart = LocalDate(today.year, today.month, 1).minus(HISTORY_MONTHS - 1, DateTimeUnit.MONTH)
+&nbsp;
+&nbsp;    val newAccounts = snapshot.newAccounts(now)
+&nbsp;    // Archived accounts are hidden from every list and dropped from total and budget rollups, so a
+&nbsp;    // row written against one is invisible in the app while still counted in the report. Plan
+&nbsp;    // against the active set only — `newAccounts` applies the same filter to its name dedup, so an
+&nbsp;    // archived &quot;Cash&quot; gets an active replacement rather than silently absorbing the batch.
+&nbsp;    val accounts = (snapshot.accounts + newAccounts).filterNot { it.archived }
+&nbsp;    // Nothing to hang transactions off. Only reachable if the account seeds below are emptied.
+&nbsp;    if (accounts.isEmpty()) return DemoDataPlan(newAccounts, emptyList(), emptyList(), emptyList(), emptyList())
+&nbsp;
+&nbsp;    val ledger = LedgerContext(
+&nbsp;        workspaceId = snapshot.workspaceId,
+&nbsp;        accounts = accounts,
+&nbsp;        categories = snapshot.categories,
+&nbsp;        now = now,
+&nbsp;        zone = zone,
+&nbsp;        random = random,
+&nbsp;    )
+&nbsp;
+&nbsp;    val openings = newAccounts.map { account -&gt; ledger.openingBalance(account, windowStart) }
+&nbsp;    val bills = ledger.monthlyBills(windowStart, today)
+&nbsp;    val discretionary = ledger.discretionary(windowStart, today, TRANSACTION_COUNT - bills.size)
+&nbsp;
+&nbsp;    return DemoDataPlan(
+&nbsp;        accounts = newAccounts,
+&nbsp;        transactions = openings + bills + discretionary,
+&nbsp;        budgets = snapshot.newBudgets(today, now),
+&nbsp;        goals = snapshot.newGoals(accounts, today, now),
+&nbsp;        contributions = emptyList(),
+&nbsp;    ).withGoalContributions(now)
+&nbsp;}
+&nbsp;
+&nbsp;// --- accounts -------------------------------------------------------------------------------
+&nbsp;
+<b class="fc">&nbsp;private data class AccountSeed(val name: String, val type: AccountType, val openingMinor: Long)</b>
+&nbsp;
+&nbsp;private val ACCOUNT_SEEDS = listOf(
+&nbsp;    AccountSeed(&quot;Cash&quot;, AccountType.CASH, 32_000),
+&nbsp;    AccountSeed(&quot;Checking&quot;, AccountType.BANK, 425_000),
+&nbsp;    AccountSeed(&quot;Savings&quot;, AccountType.SAVINGS, 1_200_000),
+&nbsp;)
+&nbsp;
+&nbsp;private fun DemoDataSnapshot.newAccounts(now: Instant): List&lt;Account&gt; {
+&nbsp;    // Archived rows do not count as taken: the seed name is free again, and re-using an archived
+&nbsp;    // account would file the whole batch somewhere the app never shows.
+&nbsp;    val taken = accounts.filterNot { it.archived }.map { it.name }.toSet()
+&nbsp;    // Positions are still assigned past every row, archived included, so nothing collides.
+&nbsp;    val nextSortOrder = (accounts.maxOfOrNull { it.sortOrder } ?: -1) + 1
+&nbsp;    return ACCOUNT_SEEDS
+&nbsp;        .filterNot { it.name in taken }
+&nbsp;        .mapIndexed { index, seed -&gt;
+&nbsp;            Account(
+&nbsp;                id = AccountId.uuid(),
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                name = seed.name,
+&nbsp;                type = seed.type,
+&nbsp;                currencyCode = currency,
+&nbsp;                // Zero on the row: the opening amount arrives as its own OPENING_BALANCE
+&nbsp;                // transaction, so the cached balance stays a projection of the ledger.
+&nbsp;                balance = Money.zero(),
+&nbsp;                updatedAt = now,
+&nbsp;                sortOrder = nextSortOrder + index,
+&nbsp;            )
+&nbsp;        }
+&nbsp;}
+&nbsp;
+&nbsp;private fun openingMinorFor(account: Account): Long =
+&nbsp;    ACCOUNT_SEEDS.firstOrNull { it.name == account.name }?.openingMinor ?: 0
+&nbsp;
+&nbsp;// --- transactions ---------------------------------------------------------------------------
+&nbsp;
+&nbsp;/** A predictable row that repeats every month — what makes the monthly charts look like a life. */
+&nbsp;private data class MonthlyBill(
+&nbsp;    val categoryName: String,
+&nbsp;    val merchant: String,
+&nbsp;    val dayOfMonth: Int,
+&nbsp;    val minMinor: Long,
+&nbsp;    val maxMinor: Long,
+&nbsp;    val type: TransactionType,
+&nbsp;)
+&nbsp;
+&nbsp;private val MONTHLY_BILLS = listOf(
+&nbsp;    MonthlyBill(&quot;Salary&quot;, &quot;Acme Corp&quot;, 5, 320_000, 340_000, TransactionType.INCOME),
+&nbsp;    MonthlyBill(&quot;Rent&quot;, &quot;Landlord&quot;, 3, 115_000, 115_000, TransactionType.EXPENSE),
+&nbsp;    MonthlyBill(&quot;Utilities&quot;, &quot;City Utilities&quot;, 12, 8_500, 14_000, TransactionType.EXPENSE),
+&nbsp;    MonthlyBill(&quot;Subscriptions&quot;, &quot;Streaming Plus&quot;, 20, 999, 2_999, TransactionType.EXPENSE),
+&nbsp;)
+&nbsp;
+&nbsp;/** One spending habit. [weight] is how many of the random rows it claims, relative to its peers. */
+&nbsp;private data class SpendProfile(
+&nbsp;    val categoryName: String,
+&nbsp;    val type: TransactionType,
+&nbsp;    val weight: Int,
+&nbsp;    val minMinor: Long,
+&nbsp;    val maxMinor: Long,
+&nbsp;    val merchants: List&lt;String&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;private val SPEND_PROFILES = listOf(
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Groceries&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 26,
+&nbsp;        minMinor = 1_200,
+&nbsp;        maxMinor = 14_000,
+&nbsp;        merchants = listOf(&quot;Green Market&quot;, &quot;Corner Grocer&quot;, &quot;Farmers Market&quot;, &quot;SuperFresh&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Restaurants&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 20,
+&nbsp;        minMinor = 800,
+&nbsp;        maxMinor = 9_500,
+&nbsp;        merchants = listOf(&quot;Ramen Ya&quot;, &quot;Blue Bottle&quot;, &quot;Pizzeria Napoli&quot;, &quot;Sushi Bar&quot;, &quot;Cafe Roma&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Transport&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 16,
+&nbsp;        minMinor = 250,
+&nbsp;        maxMinor = 6_000,
+&nbsp;        merchants = listOf(&quot;City Metro&quot;, &quot;Ride Share&quot;, &quot;Fuel Station&quot;, &quot;Bike Rental&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Shopping&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 10,
+&nbsp;        minMinor = 1_500,
+&nbsp;        maxMinor = 25_000,
+&nbsp;        merchants = listOf(&quot;Home Store&quot;, &quot;Outfitters&quot;, &quot;Electronics Hub&quot;, &quot;Bookshop&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Entertainment&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 8,
+&nbsp;        minMinor = 900,
+&nbsp;        maxMinor = 7_000,
+&nbsp;        merchants = listOf(&quot;Cinema City&quot;, &quot;Game Store&quot;, &quot;Concert Hall&quot;, &quot;Bowling Lane&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Health&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 6,
+&nbsp;        minMinor = 1_000,
+&nbsp;        maxMinor = 18_000,
+&nbsp;        merchants = listOf(&quot;Pharmacy&quot;, &quot;Dental Clinic&quot;, &quot;Optics&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Travel&quot;,
+&nbsp;        TransactionType.EXPENSE,
+&nbsp;        weight = 4,
+&nbsp;        minMinor = 6_000,
+&nbsp;        maxMinor = 60_000,
+&nbsp;        merchants = listOf(&quot;Airline&quot;, &quot;Hotel Booking&quot;, &quot;Rail Europe&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Refunds&quot;,
+&nbsp;        TransactionType.INCOME,
+&nbsp;        weight = 3,
+&nbsp;        minMinor = 1_200,
+&nbsp;        maxMinor = 12_000,
+&nbsp;        merchants = listOf(&quot;Online Store&quot;, &quot;Tax Office&quot;),
+&nbsp;    ),
+&nbsp;    SpendProfile(
+&nbsp;        &quot;Bonus&quot;,
+&nbsp;        TransactionType.INCOME,
+&nbsp;        weight = 2,
+&nbsp;        minMinor = 40_000,
+&nbsp;        maxMinor = 90_000,
+&nbsp;        merchants = listOf(&quot;Acme Corp&quot;),
+&nbsp;    ),
+&nbsp;)
+&nbsp;
+&nbsp;/** Everything a single transaction needs that does not vary row to row. */
+&nbsp;private class LedgerContext(
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;    val accounts: List&lt;Account&gt;,
+&nbsp;    categories: List&lt;Category&gt;,
+&nbsp;    val now: Instant,
+&nbsp;    val zone: TimeZone,
+&nbsp;    val random: Random,
+&nbsp;) {
+&nbsp;    private val byName: Map&lt;String, Category&gt; = categories.associateBy { it.name }
+&nbsp;    private val fallbackByType: Map&lt;CategoryType, Category&gt; =
+&nbsp;        categories.groupBy { it.type }.mapValues { (_, group) -&gt; group.first() }
+&nbsp;
+&nbsp;    /** Savings sit out day-to-day spending, so the balance curve on them stays a savings curve. */
+&nbsp;    private val spendAccounts: List&lt;Account&gt; =
+&nbsp;        accounts.filterNot { it.type == AccountType.SAVINGS }.ifEmpty { accounts }
+&nbsp;
+&nbsp;    private val salaryAccount: Account =
+&nbsp;        accounts.firstOrNull { it.type == AccountType.BANK } ?: spendAccounts.first()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Named category if the workspace still has it, otherwise any category of the right type — a
+&nbsp;     * renamed default must not silently produce uncategorized rows.
+&nbsp;     */
+&nbsp;    private fun categoryId(name: String, type: TransactionType): CategoryId? {
+&nbsp;        val wanted = if (type == TransactionType.INCOME) CategoryType.INCOME else CategoryType.EXPENSE
+&nbsp;        return byName[name]?.takeIf { it.type == wanted }?.id ?: fallbackByType[wanted]?.id
+&nbsp;    }
+&nbsp;
+&nbsp;    fun openingBalance(account: Account, date: LocalDate): Transaction = transaction(
+&nbsp;        account = account,
+&nbsp;        money = Money.fromMinor(openingMinorFor(account)),
+&nbsp;        categoryId = null,
+&nbsp;        merchant = &quot;&quot;,
+&nbsp;        date = date,
+&nbsp;        type = TransactionType.OPENING_BALANCE,
+&nbsp;    )
+&nbsp;
+&nbsp;    fun monthlyBills(windowStart: LocalDate, today: LocalDate): List&lt;Transaction&gt; =
+&nbsp;        (0 until HISTORY_MONTHS).flatMap { monthIndex -&gt;
+&nbsp;            val anchor = windowStart.plus(monthIndex, DateTimeUnit.MONTH)
+&nbsp;            MONTHLY_BILLS.mapNotNull { bill -&gt;
+&nbsp;                val date = anchor.plus(bill.dayOfMonth - 1, DateTimeUnit.DAY)
+&nbsp;                // The current month is only part-way through; a rent row dated next week would
+&nbsp;                // read as a planned expense the app has no concept of here.
+&nbsp;                if (date &gt; today) return@mapNotNull null
+&nbsp;                transaction(
+&nbsp;                    // Salary in and the fixed bills out both run through the current account.
+&nbsp;                    account = salaryAccount,
+&nbsp;                    money = Money.fromMinor(random.nextLong(bill.minMinor, bill.maxMinor + 1)),
+&nbsp;                    categoryId = categoryId(bill.categoryName, bill.type),
+&nbsp;                    merchant = bill.merchant,
+&nbsp;                    date = date,
+&nbsp;                    type = bill.type,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    fun discretionary(windowStart: LocalDate, today: LocalDate, count: Int): List&lt;Transaction&gt; {
+&nbsp;        if (count &lt;= 0) return emptyList()
+&nbsp;        val weighted = SPEND_PROFILES.flatMap { profile -&gt; List(profile.weight) { profile } }
+&nbsp;        val daySpan = windowStart.daysUntil(today)
+&nbsp;        return List(count) {
+&nbsp;            val profile = weighted[random.nextInt(weighted.size)]
+&nbsp;            transaction(
+&nbsp;                account = spendAccounts[random.nextInt(spendAccounts.size)],
+&nbsp;                money = Money.fromMinor(random.nextLong(profile.minMinor, profile.maxMinor + 1)),
+&nbsp;                categoryId = categoryId(profile.categoryName, profile.type),
+&nbsp;                merchant = profile.merchants[random.nextInt(profile.merchants.size)],
+&nbsp;                date = windowStart.plus(random.nextInt(daySpan + 1), DateTimeUnit.DAY),
+&nbsp;                type = profile.type,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun transaction(
+&nbsp;        account: Account,
+&nbsp;        money: Money,
+&nbsp;        categoryId: CategoryId?,
+&nbsp;        merchant: String,
+&nbsp;        date: LocalDate,
+&nbsp;        type: TransactionType,
+&nbsp;    ): Transaction = Transaction(
+&nbsp;        id = TransactionId.uuid(),
+&nbsp;        workspaceId = workspaceId,
+&nbsp;        accountId = account.id,
+&nbsp;        money = money,
+&nbsp;        currencyCode = account.currencyCode,
+&nbsp;        categoryId = categoryId,
+&nbsp;        note = &quot;&quot;,
+&nbsp;        merchant = merchant,
+&nbsp;        operationAt = operationAt(date),
+&nbsp;        operationDate = date,
+&nbsp;        type = type,
+&nbsp;        createdAt = now,
+&nbsp;        updatedAt = now,
+&nbsp;    )
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A plausible time of day, clamped to [now] so a row dated today cannot land in the future and
+&nbsp;     * sort ahead of everything the tester adds by hand afterwards.
+&nbsp;     */
+&nbsp;    private fun operationAt(date: LocalDate): Instant {
+&nbsp;        val at = date.atStartOfDayIn(zone) +
+&nbsp;            random.nextInt(EARLIEST_HOUR, LATEST_HOUR).hours +
+&nbsp;            random.nextInt(MINUTES_PER_HOUR).minutes
+&nbsp;        return if (at &gt; now) now else at
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;// --- budgets --------------------------------------------------------------------------------
+&nbsp;
+&nbsp;private data class BudgetSeed(val name: String, val categoryNames: List&lt;String&gt;, val amountMinor: Long)
+&nbsp;
+&nbsp;private val BUDGET_SEEDS = listOf(
+&nbsp;    BudgetSeed(&quot;Food&quot;, listOf(&quot;Groceries&quot;, &quot;Restaurants&quot;), 60_000),
+&nbsp;    // No categories at all — the &quot;everything&quot; shape, which resolves to every expense category.
+&nbsp;    BudgetSeed(&quot;Monthly cap&quot;, emptyList(), 250_000),
+&nbsp;)
+&nbsp;
+&nbsp;private fun DemoDataSnapshot.newBudgets(today: LocalDate, now: Instant): List&lt;Budget&gt; {
+&nbsp;    val byName = categories.associateBy { it.name }
+&nbsp;    return BUDGET_SEEDS
+&nbsp;        .filterNot { it.name in budgetNames }
+&nbsp;        .map { seed -&gt;
+&nbsp;            Budget(
+&nbsp;                id = BudgetId.uuid(),
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                name = seed.name,
+&nbsp;                categoryIds = seed.categoryNames.mapNotNull { byName[it]?.id },
+&nbsp;                amount = Money.fromMinor(seed.amountMinor),
+&nbsp;                period = BudgetPeriod.MONTHLY,
+&nbsp;                startDate = LocalDate(today.year, today.month, 1),
+&nbsp;                createdAt = now,
+&nbsp;            )
+&nbsp;        }
+&nbsp;}
+&nbsp;
+&nbsp;// --- goals ----------------------------------------------------------------------------------
+&nbsp;
+&nbsp;private data class GoalSeed(
+&nbsp;    val title: String,
+&nbsp;    val emoji: String,
+&nbsp;    val hue: Int,
+&nbsp;    val targetMinor: Long,
+&nbsp;    val startedMonthsAgo: Int,
+&nbsp;    val dueInMonths: Int,
+&nbsp;    val contributions: Int,
+&nbsp;    val contributionMinor: Long,
+&nbsp;)
+&nbsp;
+&nbsp;private val GOAL_SEEDS = listOf(
+&nbsp;    GoalSeed(
+&nbsp;        title = &quot;Trip to Lisbon&quot;,
+&nbsp;        emoji = &quot;🏖&quot;,
+&nbsp;        hue = 200,
+&nbsp;        targetMinor = 250_000,
+&nbsp;        startedMonthsAgo = 6,
+&nbsp;        dueInMonths = 6,
+&nbsp;        contributions = 5,
+&nbsp;        contributionMinor = 30_000,
+&nbsp;    ),
+&nbsp;    GoalSeed(
+&nbsp;        title = &quot;New laptop&quot;,
+&nbsp;        emoji = &quot;💻&quot;,
+&nbsp;        hue = 265,
+&nbsp;        targetMinor = 180_000,
+&nbsp;        startedMonthsAgo = 3,
+&nbsp;        dueInMonths = 9,
+&nbsp;        contributions = 3,
+&nbsp;        contributionMinor = 25_000,
+&nbsp;    ),
+&nbsp;)
+&nbsp;
+&nbsp;private fun DemoDataSnapshot.newGoals(accounts: List&lt;Account&gt;, today: LocalDate, now: Instant): List&lt;SavingsGoal&gt; {
+&nbsp;    val savings = accounts.firstOrNull { it.type == AccountType.SAVINGS }
+&nbsp;    return GOAL_SEEDS
+&nbsp;        .filterNot { it.title in goalTitles }
+&nbsp;        .map { seed -&gt;
+&nbsp;            val startDate = today.minus(seed.startedMonthsAgo, DateTimeUnit.MONTH)
+&nbsp;            SavingsGoal(
+&nbsp;                id = GoalId.uuid(),
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                title = seed.title,
+&nbsp;                emoji = seed.emoji,
+&nbsp;                hue = seed.hue,
+&nbsp;                target = Money.fromMinor(seed.targetMinor),
+&nbsp;                currencyCode = currency,
+&nbsp;                startDate = startDate,
+&nbsp;                targetDate = today.plus(seed.dueInMonths, DateTimeUnit.MONTH),
+&nbsp;                accountId = savings?.id,
+&nbsp;                createdAt = now,
+&nbsp;            )
+&nbsp;        }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Back-fills each freshly created goal with monthly contributions, so the progress ring shows
+&nbsp; * something other than zero. Attached after the fact because a contribution needs the goal&#39;s id.
+&nbsp; */
+&nbsp;private fun DemoDataPlan.withGoalContributions(now: Instant): DemoDataPlan {
+&nbsp;    val byTitle = GOAL_SEEDS.associateBy { it.title }
+&nbsp;    val contributions = goals.flatMap { goal -&gt;
+&nbsp;        val seed = byTitle[goal.title] ?: return@flatMap emptyList()
+&nbsp;        List(seed.contributions) { index -&gt;
+&nbsp;            GoalContribution(
+&nbsp;                id = GoalContributionId.uuid(),
+&nbsp;                workspaceId = goal.workspaceId,
+&nbsp;                goalId = goal.id,
+&nbsp;                amount = Money.fromMinor(seed.contributionMinor),
+&nbsp;                occurredOn = goal.startDate.plus(index, DateTimeUnit.MONTH),
+&nbsp;                createdAt = now,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;    return copy(contributions = contributions)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +598,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

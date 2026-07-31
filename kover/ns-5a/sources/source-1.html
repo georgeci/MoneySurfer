@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DetailRowSpec</title>
+  <title>MoneySurfer Coverage Report > AccountSlot</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: DetailRowSpec (com.georgeci.moneysurfer.feature.transaction.details)</h1>
+<h1>Coverage Summary for Class: AccountSlot (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DetailRowSpec</td>
+  <td class="name">AccountSlot</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (17/17)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -92,218 +92,78 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Card
-&nbsp;import androidx.compose.material3.CardDefaults
-&nbsp;import androidx.compose.material3.HorizontalDivider
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_account_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_category_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_category_nested
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_from_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_merchant_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_reference_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_tags_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_to_account_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_to_label
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
 &nbsp;
-&nbsp;private const val TAG_SEPARATOR = &quot; · &quot;
+&nbsp;sealed interface TransactionCreationEvent {
+&nbsp;    data class OnAmountChanged(val amount: String) : TransactionCreationEvent
+&nbsp;    data class OnToAmountChanged(val amount: String) : TransactionCreationEvent
+&nbsp;    data class OnNoteChanged(val note: String) : TransactionCreationEvent
+&nbsp;    data class OnAccountSelected(val account: Account) : TransactionCreationEvent
+&nbsp;    data class OnCategorySelected(val category: Category) : TransactionCreationEvent
+&nbsp;    data class OnCategoryPicked(val id: CategoryId) : TransactionCreationEvent
+&nbsp;    data class OnAccountPicked(val id: AccountId) : TransactionCreationEvent
+&nbsp;    data class OnTypeChanged(val type: TransactionTypeUi) : TransactionCreationEvent
+&nbsp;    data class OnDateChanged(val timestamp: Long) : TransactionCreationEvent
+&nbsp;    data object OnTodayClick : TransactionCreationEvent
+&nbsp;    data object OnOpenCategoryChooser : TransactionCreationEvent
+&nbsp;    data object OnOpenCategoryCreation : TransactionCreationEvent
+&nbsp;    data object OnOpenAccountChooser : TransactionCreationEvent
+&nbsp;    data object OnOpenFromAccountChooser : TransactionCreationEvent
+&nbsp;    data object OnOpenToAccountChooser : TransactionCreationEvent
+&nbsp;    data object OnSwapAccountsClick : TransactionCreationEvent
 &nbsp;
-<b class="fc">&nbsp;private data class DetailRowSpec(val icon: ImageVector, val label: String, val value: String)</b>
+&nbsp;    /** Turn the split editor on (seeded with two lines) or off, discarding its lines. */
+&nbsp;    data object OnSplitToggled : TransactionCreationEvent
+&nbsp;    data object OnSplitLineAdded : TransactionCreationEvent
+&nbsp;    data class OnSplitLineRemoved(val key: Int) : TransactionCreationEvent
+&nbsp;    data class OnSplitLineAmountChanged(val key: Int, val amount: String) : TransactionCreationEvent
+&nbsp;
+&nbsp;    /** Open the category chooser for one split line rather than for the transaction as a whole. */
+&nbsp;    data class OnOpenSplitLineCategoryChooser(val key: Int) : TransactionCreationEvent
+&nbsp;    data object OnSaveClick : TransactionCreationEvent
+&nbsp;    data object OnDeleteClick : TransactionCreationEvent
+&nbsp;    data object OnDeleteConfirmed : TransactionCreationEvent
+&nbsp;    data object OnDeleteDismissed : TransactionCreationEvent
+&nbsp;    data object OnBackClick : TransactionCreationEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface TransactionCreationEffect {
+&nbsp;    data object NavigateBack : TransactionCreationEffect
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The edited transaction is gone, so the screen that opened this one — the details of that very
+&nbsp;     * row — must not be returned to. Distinct from [NavigateBack] because only the caller knows how
+&nbsp;     * far back that is.
+&nbsp;     */
+&nbsp;    data object NavigateBackAfterDelete : TransactionCreationEffect
+&nbsp;    data class NavigateToCategoryChooser(
+&nbsp;        val selectedCategoryId: CategoryId?,
+&nbsp;        val filterType: CategoryType,
+&nbsp;    ) : TransactionCreationEffect
+&nbsp;    data object NavigateToCategoryCreation : TransactionCreationEffect
+&nbsp;    data class NavigateToAccountChooser(
+&nbsp;        val selectedAccountId: AccountId?,
+&nbsp;        val excludeAccountId: AccountId? = null,
+&nbsp;        val showTransferShortcut: Boolean = false,
+&nbsp;    ) : TransactionCreationEffect
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;internal enum class AccountSlot { Single, From, To }</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * Account, Merchant, Category, Tags, Reference — the rows the design asks for. Date is not among
-&nbsp; * them: the hero already carries it, and the currency is legible in every formatted amount on the
-&nbsp; * screen, so neither earns a row of its own.
-&nbsp; *
-&nbsp; * A transfer swaps the account and category rows for `From` / `To`, since &quot;which account&quot; has two
-&nbsp; * answers and the category is always the seeded system one.
+&nbsp; * Where a category coming back from the chooser belongs: the transaction itself, or one line of the
+&nbsp; * split editor. The chooser returns only an id, so the screen has to remember what it was opened
+&nbsp; * for — the same shape [AccountSlot] serves for the account chooser&#39;s three slots.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun DetailsCard(state: TransactionDetailsState.Content) {
-&nbsp;    val rows = detailRows(state)
-&nbsp;    if (rows.isEmpty()) return
-&nbsp;    Card(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(horizontal = 16.dp)
-&nbsp;            .padding(bottom = 16.dp),
-&nbsp;        colors = CardDefaults.cardColors(
-&nbsp;            containerColor = AppTheme.materialColors.surfaceContainerHigh,
-&nbsp;            contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        ),
-&nbsp;        shape = RoundedCornerShape(20.dp),
-&nbsp;    ) {
-&nbsp;        Column(modifier = Modifier.padding(vertical = 4.dp)) {
-&nbsp;            rows.forEachIndexed { index, spec -&gt;
-&nbsp;                DetailRow(spec)
-&nbsp;                if (index &lt; rows.lastIndex) {
-&nbsp;                    HorizontalDivider(
-&nbsp;                        color = AppTheme.materialColors.outlineVariant,
-&nbsp;                        modifier = Modifier.padding(start = 62.dp),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun detailRows(state: TransactionDetailsState.Content): List&lt;DetailRowSpec&gt; = buildList {
-&nbsp;    val transfer = state.transfer
-&nbsp;    if (transfer != null) {
-&nbsp;        if (transfer.fromAccountName.isNotBlank()) {
-&nbsp;            add(
-&nbsp;                DetailRowSpec(
-&nbsp;                    SurferIcons.ArrowUp,
-&nbsp;                    stringResource(Res.string.transaction_details_from_label),
-&nbsp;                    transfer.fromAccountName,
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        if (transfer.toAccountName.isNotBlank()) {
-&nbsp;            add(
-&nbsp;                DetailRowSpec(
-&nbsp;                    SurferIcons.ArrowDown,
-&nbsp;                    stringResource(Res.string.transaction_details_to_label),
-&nbsp;                    transfer.toAccountName,
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    } else {
-&nbsp;        addSingleLegRows(state)
-&nbsp;    }
-&nbsp;    if (state.tags.isNotEmpty()) {
-&nbsp;        add(
-&nbsp;            DetailRowSpec(
-&nbsp;                SurferIcons.Tag,
-&nbsp;                stringResource(Res.string.transaction_details_tags_label),
-&nbsp;                state.tags.joinToString(TAG_SEPARATOR),
-&nbsp;            ),
-&nbsp;        )
-&nbsp;    }
-&nbsp;    if (state.reference.isNotBlank()) {
-&nbsp;        add(
-&nbsp;            DetailRowSpec(
-&nbsp;                SurferIcons.Code,
-&nbsp;                stringResource(Res.string.transaction_details_reference_label),
-&nbsp;                state.reference,
-&nbsp;            ),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** Account, merchant and category — the rows an ordinary income or expense answers. */
-&nbsp;@Composable
-&nbsp;private fun MutableList&lt;DetailRowSpec&gt;.addSingleLegRows(state: TransactionDetailsState.Content) {
-&nbsp;    if (state.accountName.isNotBlank()) {
-&nbsp;        add(
-&nbsp;            DetailRowSpec(
-&nbsp;                SurferIcons.CreditCard,
-&nbsp;                // Income lands *in* the account; naming it &quot;To account&quot; keeps the row
-&nbsp;                // readable next to the &quot;From&quot; sender below it.
-&nbsp;                if (state.isIncome) {
-&nbsp;                    stringResource(Res.string.transaction_details_to_account_label)
-&nbsp;                } else {
-&nbsp;                    stringResource(Res.string.transaction_details_account_label)
-&nbsp;                },
-&nbsp;                state.accountName,
-&nbsp;            ),
-&nbsp;        )
-&nbsp;    }
-&nbsp;    if (state.merchant.isNotBlank()) {
-&nbsp;        add(
-&nbsp;            DetailRowSpec(
-&nbsp;                SurferIcons.Receipt,
-&nbsp;                if (state.isIncome) {
-&nbsp;                    stringResource(Res.string.transaction_details_from_label)
-&nbsp;                } else {
-&nbsp;                    stringResource(Res.string.transaction_details_merchant_label)
-&nbsp;                },
-&nbsp;                state.merchant,
-&nbsp;            ),
-&nbsp;        )
-&nbsp;    }
-&nbsp;    if (state.categoryName.isNotBlank()) {
-&nbsp;        add(
-&nbsp;            DetailRowSpec(
-&nbsp;                SurferIcons.Category,
-&nbsp;                stringResource(Res.string.transaction_details_category_label),
-&nbsp;                categoryValue(state),
-&nbsp;            ),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** `Coffee · in Dining` for a nested category, plain `Dining` for a top-level one. */
-&nbsp;@Composable
-&nbsp;private fun categoryValue(state: TransactionDetailsState.Content): String {
-&nbsp;    val parent = state.parentCategoryName
-&nbsp;    return if (parent.isNullOrBlank()) {
-&nbsp;        state.categoryName
-&nbsp;    } else {
-&nbsp;        stringResource(Res.string.transaction_details_category_nested, state.categoryName, parent)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun DetailRow(spec: DetailRowSpec) {
-&nbsp;    Row(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(horizontal = 12.dp, vertical = 10.dp),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(36.dp)
-&nbsp;                .clip(RoundedCornerShape(12.dp))
-&nbsp;                .background(AppTheme.materialColors.secondaryContainer),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = spec.icon,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.onSecondaryContainer,
-&nbsp;                modifier = Modifier.size(18.dp),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        Column(modifier = Modifier.weight(1f)) {
-&nbsp;            Text(
-&nbsp;                text = spec.label,
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;            )
-&nbsp;            Text(
-&nbsp;                text = spec.value,
-&nbsp;                style = AppTheme.typography.bodyLarge,
-&nbsp;                color = AppTheme.materialColors.onSurface,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
+&nbsp;internal sealed interface CategorySlot {
+&nbsp;    data object Single : CategorySlot
+&nbsp;    data class SplitLine(val key: Int) : CategorySlot
 &nbsp;}
 </code>
 </pre>
@@ -328,7 +188,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

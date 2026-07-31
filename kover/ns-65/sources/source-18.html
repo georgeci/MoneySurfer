@@ -1,0 +1,360 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WorkspaceMembersViewModelKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.members</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkspaceMembersViewModelKt (com.georgeci.moneysurfer.feature.workspace.members)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkspaceMembersViewModelKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/115)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.members
+&nbsp;
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMember
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.CancelInviteUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetWorkspacesForUserUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.InviteError
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.LeaveWorkspaceUseCase
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.KoinViewModel
+&nbsp;
+&nbsp;@KoinViewModel
+&nbsp;class WorkspaceMembersViewModel(
+&nbsp;    workspaceId: WorkspaceId,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val getWorkspacesForUserUseCase: GetWorkspacesForUserUseCase,
+&nbsp;    private val memberRepository: WorkspaceMemberRepository,
+&nbsp;    private val inviteRepository: WorkspaceInviteRepository,
+&nbsp;    private val leaveWorkspace: LeaveWorkspaceUseCase,
+&nbsp;    private val cancelInvite: CancelInviteUseCase,
+&nbsp;    private val clock: ClockUseCase,
+&nbsp;) : MviViewModel&lt;WorkspaceMembersState, WorkspaceMembersEvent, WorkspaceMembersEffect&gt;(
+&nbsp;    initialState = WorkspaceMembersState.Loading(workspaceId),
+&nbsp;) {
+&nbsp;
+&nbsp;    init { observeWorkspace() }
+&nbsp;
+&nbsp;    override fun onEvent(event: WorkspaceMembersEvent) {
+&nbsp;        when (event) {
+&nbsp;            WorkspaceMembersEvent.OnDismiss -&gt; postSideEffect(WorkspaceMembersEffect.Dismiss)
+&nbsp;            WorkspaceMembersEvent.OnInviteClick -&gt; postSideEffect(WorkspaceMembersEffect.OpenInvite)
+&nbsp;            is WorkspaceMembersEvent.OnTabSelected -&gt; selectTab(event.tab)
+&nbsp;            is WorkspaceMembersEvent.OnMemberClick -&gt; openMemberActions(event.userId)
+&nbsp;            WorkspaceMembersEvent.OnLeaveClick -&gt; updateContent { copy(showLeaveDialog = true) }
+&nbsp;            WorkspaceMembersEvent.OnLeaveCancel -&gt; updateContent { copy(showLeaveDialog = false) }
+&nbsp;            WorkspaceMembersEvent.OnLeaveConfirm -&gt; performLeave()
+&nbsp;            is WorkspaceMembersEvent.OnInviteCancel -&gt; performCancelInvite(event.id)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun openMemberActions(userId: UserId) {
+&nbsp;        val state = WorkspaceMembersState.content.getOrNull(currentState) ?: return
+&nbsp;        val target = state.members.firstOrNull { it.userId == userId } ?: return
+&nbsp;
+&nbsp;        if (state.canManage &amp;&amp; !target.isYou &amp;&amp; target.role != WorkspaceRole.OWNER) {
+&nbsp;            postSideEffect(
+&nbsp;                WorkspaceMembersEffect.OpenMemberActions(state.workspaceId, userId),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun performLeave() {
+&nbsp;        val state = currentState as? WorkspaceMembersState.Content ?: return
+&nbsp;        if (state.busy) return
+&nbsp;        updateContent { copy(busy = true) }
+&nbsp;        launch(onError = { reportFailure(InviteError.LocalWriteFailed(it)) }) {
+&nbsp;            leaveWorkspace(state.workspaceId).fold(
+&nbsp;                ifLeft = { reportFailure(it) },
+&nbsp;                ifRight = {
+&nbsp;                    updateContent { copy(busy = false, showLeaveDialog = false) }
+&nbsp;                    postSideEffect(WorkspaceMembersEffect.LeftWorkspace)
+&nbsp;                },
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun performCancelInvite(id: WorkspaceInviteId) {
+&nbsp;        val state = currentState as? WorkspaceMembersState.Content ?: return
+&nbsp;        if (state.busy) return
+&nbsp;        updateContent { copy(busy = true) }
+&nbsp;        launch(onError = { reportFailure(InviteError.LocalWriteFailed(it)) }) {
+&nbsp;            cancelInvite(id).fold(
+&nbsp;                ifLeft = { reportFailure(it) },
+&nbsp;                ifRight = { updateContent { copy(busy = false) } },
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun reportFailure(error: InviteError) {
+&nbsp;        updateContent { copy(busy = false, showLeaveDialog = false) }
+&nbsp;        postSideEffect(WorkspaceMembersEffect.ShowError(error))
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun selectTab(tab: MembersTab) {
+&nbsp;        updateContent { if (this.tab == tab) this else copy(tab = tab) }
+&nbsp;    }
+&nbsp;
+&nbsp;    private inline fun updateContent(
+&nbsp;        crossinline block: WorkspaceMembersState.Content.() -&gt; WorkspaceMembersState.Content,
+&nbsp;    ) {
+&nbsp;        updateState { if (this is WorkspaceMembersState.Content) block() else this }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun observeWorkspace() {
+&nbsp;        launch {
+&nbsp;            val workspaceId = currentState.workspaceId
+&nbsp;            val userId = session.currentUserId.first()
+&nbsp;            val workspace = userId
+&nbsp;                ?.let { getWorkspacesForUserUseCase(it).first().firstOrNull { ws -&gt; ws.id == workspaceId } }
+&nbsp;
+&nbsp;            val membersFlow = memberRepository.getByWorkspaceId(workspaceId)
+&nbsp;            val invitesFlow = inviteRepository.getByWorkspaceId(workspaceId)
+&nbsp;
+&nbsp;            combine(membersFlow, invitesFlow) { members, invites -&gt; members to invites }
+&nbsp;                .collect { (members, invites) -&gt;
+&nbsp;                    val activeMembers = members.filter { it.status == WorkspaceMemberStatus.ACTIVE }
+&nbsp;                    val pendingInvites = invites
+&nbsp;                        .filter { it.status == InviteStatus.PENDING }
+&nbsp;                        .sortedByDescending { it.createdAt }
+&nbsp;                    val now = clock.now()
+&nbsp;                    val viewerRole = activeMembers.firstOrNull { it.userId == userId }?.role
+&nbsp;
+&nbsp;                    updateState {
+&nbsp;                        val previous = this as? WorkspaceMembersState.Content
+&nbsp;                        WorkspaceMembersState.Content(
+&nbsp;                            workspaceId = workspaceId,
+&nbsp;                            workspaceName = workspace?.name.orEmpty(),
+&nbsp;                            currentUserId = userId,
+&nbsp;                            viewerRole = viewerRole,
+&nbsp;                            members = activeMembers.map { it.toUi(userId) },
+&nbsp;                            pendingInvites = pendingInvites.map { it.toUi(now) },
+&nbsp;                            tab = previous?.tab ?: MembersTab.Active,
+&nbsp;                            busy = previous?.busy ?: false,
+&nbsp;                            showLeaveDialog = previous?.showLeaveDialog ?: false,
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+<b class="nc">&nbsp;private fun WorkspaceMember.toUi(currentUserId: UserId?): MemberUi = MemberUi(</b>
+<b class="nc">&nbsp;    userId = userId,</b>
+<b class="nc">&nbsp;    name = displayName.ifBlank { email.orEmpty() }.ifBlank { &quot;Member&quot; },</b>
+<b class="nc">&nbsp;    email = email.orEmpty(),</b>
+<b class="nc">&nbsp;    role = role,</b>
+<b class="nc">&nbsp;    initial = (displayName.firstOrNull() ?: email?.firstOrNull() ?: &#39;?&#39;).uppercaseChar().toString(),</b>
+<b class="nc">&nbsp;    isYou = userId == currentUserId,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;private fun WorkspaceInvite.toUi(now: kotlin.time.Instant): InviteUi = InviteUi(</b>
+<b class="nc">&nbsp;    id = id,</b>
+<b class="nc">&nbsp;    email = email,</b>
+<b class="nc">&nbsp;    role = role,</b>
+<b class="nc">&nbsp;    isExpired = expiresAt &lt;= now,</b>
+<b class="nc">&nbsp;    expiresAt = expiresAt,</b>
+&nbsp;)
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface WorkspaceMembersState {
+&nbsp;    val workspaceId: WorkspaceId
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Loading(override val workspaceId: WorkspaceId) : WorkspaceMembersState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Content(
+&nbsp;        override val workspaceId: WorkspaceId,
+&nbsp;        val workspaceName: String,
+&nbsp;        val currentUserId: UserId?,
+&nbsp;        val viewerRole: WorkspaceRole?,
+&nbsp;        val members: List&lt;MemberUi&gt;,
+&nbsp;        val pendingInvites: List&lt;InviteUi&gt;,
+&nbsp;        val tab: MembersTab,
+&nbsp;        val busy: Boolean,
+&nbsp;        val showLeaveDialog: Boolean,
+&nbsp;    ) : WorkspaceMembersState {
+&nbsp;        val canManage: Boolean get() = viewerRole == WorkspaceRole.OWNER
+&nbsp;        val canLeave: Boolean get() = viewerRole != null &amp;&amp; viewerRole != WorkspaceRole.OWNER
+&nbsp;        val activeCount: Int get() = members.size
+&nbsp;        val invitedCount: Int get() = pendingInvites.count { !it.isExpired }
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
+&nbsp;}
+&nbsp;
+&nbsp;data class MemberUi(
+&nbsp;    val userId: UserId,
+&nbsp;    val name: String,
+&nbsp;    val email: String,
+&nbsp;    val role: WorkspaceRole,
+&nbsp;    val initial: String,
+&nbsp;    val isYou: Boolean,
+&nbsp;)
+&nbsp;
+&nbsp;data class InviteUi(
+&nbsp;    val id: WorkspaceInviteId,
+&nbsp;    val email: String,
+&nbsp;    val role: WorkspaceRole,
+&nbsp;    val isExpired: Boolean,
+&nbsp;    val expiresAt: kotlin.time.Instant,
+&nbsp;)
+&nbsp;
+&nbsp;enum class MembersTab { Active, Invited }
+&nbsp;
+&nbsp;sealed interface WorkspaceMembersEvent {
+&nbsp;    data object OnDismiss : WorkspaceMembersEvent
+&nbsp;    data object OnInviteClick : WorkspaceMembersEvent
+&nbsp;    data class OnTabSelected(val tab: MembersTab) : WorkspaceMembersEvent
+&nbsp;    data class OnMemberClick(val userId: UserId) : WorkspaceMembersEvent
+&nbsp;    data object OnLeaveClick : WorkspaceMembersEvent
+&nbsp;    data object OnLeaveCancel : WorkspaceMembersEvent
+&nbsp;    data object OnLeaveConfirm : WorkspaceMembersEvent
+&nbsp;    data class OnInviteCancel(val id: WorkspaceInviteId) : WorkspaceMembersEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface WorkspaceMembersEffect {
+&nbsp;    data object Dismiss : WorkspaceMembersEffect
+&nbsp;    data object OpenInvite : WorkspaceMembersEffect
+&nbsp;    data class OpenMemberActions(
+&nbsp;        val workspaceId: WorkspaceId,
+&nbsp;        val targetUserId: UserId,
+&nbsp;    ) : WorkspaceMembersEffect
+&nbsp;    data object LeftWorkspace : WorkspaceMembersEffect
+&nbsp;    data class ShowError(val error: InviteError) : WorkspaceMembersEffect
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

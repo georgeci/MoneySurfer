@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DashboardCategoriesDonutWidgetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
+</div>
+
+<h1>Coverage Summary for Class: DashboardCategoriesDonutWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">DashboardCategoriesDonutWidgetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (10/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.4%
+  </span>
+  <span class="absValue">
+    (225/231)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_center_label
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_empty_center
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_empty_legend
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * The selected period&#39;s spend as a donut: one arc per category, largest first, with the legend
+&nbsp; * beside it and the period&#39;s total in the middle.
+&nbsp; *
+&nbsp; * Reads the same [DashboardState.Content.spentByCategory] rows the spent-by-category card does, so
+&nbsp; * the two can never disagree about what the period holds — including the uncategorized bucket,
+&nbsp; * which arrives as a real slice and is drawn as one rather than being folded away.
+&nbsp; *
+&nbsp; * How many legend rows fit is the widget&#39;s own call (Hero 5 / Compact 3, from the size the layout
+&nbsp; * provides), so every segment is still handed over: trimming the list here would shrink the *chart*
+&nbsp; * to what the legend could name, and the arcs would stop adding up to the centre figure.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;internal fun CategoriesDonutWidget(state: DashboardState.Content) {</b>
+<b class="fc">&nbsp;    val segments = state.spentByCategory.toDonutSegments()</b>
+<b class="fc">&nbsp;    SurferCategoriesDonutWidget(</b>
+<b class="fc">&nbsp;        segments = segments,</b>
+<b class="fc">&nbsp;        centerLabel = stringResource(Res.string.dashboard_categories_donut_center_label),</b>
+<b class="fc">&nbsp;        centerValue = state.spentByCategoryTotal,</b>
+<b class="fc">&nbsp;        emptyCenterText = stringResource(Res.string.dashboard_categories_donut_empty_center),</b>
+<b class="fc">&nbsp;        emptyLegendText = stringResource(Res.string.dashboard_categories_donut_empty_legend),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.CategoriesDonut),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The rows as arcs. Colour comes from the stored hue through the one resolver every category bubble
+&nbsp; * goes through, so a category keeps the same colour here, in the spend rows, and on the screens
+&nbsp; * that own it.
+&nbsp; *
+&nbsp; * The uncategorized bucket has no stored appearance, so — exactly as the spend rows do — its tint is
+&nbsp; * hashed from the fixed [DONUT_UNCATEGORIZED_ID] rather than from the label beside it: the label is
+&nbsp; * translated, and a wedge that changed colour with the app language would read as another category.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun List&lt;CategorySpendUi&gt;.toDonutSegments(): List&lt;SurferDonutSegment&gt; {</b>
+<b class="fc">&nbsp;    val fallbackName = stringResource(Res.string.dashboard_spent_by_category_uncategorized)</b>
+<b class="fc">&nbsp;    return map { row -&gt;</b>
+<b class="fc">&nbsp;        val id = row.categoryId ?: DONUT_UNCATEGORIZED_ID</b>
+<b class="fc">&nbsp;        SurferDonutSegment(</b>
+<b class="fc">&nbsp;            label = row.name ?: fallbackName,</b>
+<b class="fc">&nbsp;            percent = row.share,</b>
+<b class="fc">&nbsp;            color = SurferCategoryPalette.tintForHue(row.hue ?: DONUT_NO_STORED_HUE)</b>
+<b class="fc">&nbsp;                ?: SurferCategoryPalette.tintFor(id),</b>
+<b class="fc">&nbsp;        )</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;}
+&nbsp;
+&nbsp;/** Tint seed for the uncategorized bucket, which has no category id to be hashed from. */
+&nbsp;private const val DONUT_UNCATEGORIZED_ID = &quot;uncategorized&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The &quot;never stored&quot; hue sentinel — `SurferCategoryPalette.tintForHue` reads anything off the
+&nbsp; * colour wheel as absent and falls back to hashing the id.
+&nbsp; */
+&nbsp;private const val DONUT_NO_STORED_HUE = -1
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

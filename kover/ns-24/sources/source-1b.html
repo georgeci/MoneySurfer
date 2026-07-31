@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > CategoryCapCoverageKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+</div>
+
+<h1>Coverage Summary for Class: CategoryCapCoverageKt (com.georgeci.moneysurfer.domain.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">CategoryCapCoverageKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.6%
+  </span>
+  <span class="absValue">
+    (80/82)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;
+&nbsp;/**
+&nbsp; * What the category form&#39;s monthly-cap shortcut is allowed to do for one category.
+&nbsp; *
+&nbsp; * Budgets owns limits — `Category` carries no `cap` field (md/categories.md, decision 1). A
+&nbsp; * per-category cap *is* a budget naming exactly that one category, so the shortcut may only ever
+&nbsp; * touch such a budget. It must never add a second limit on top of one the user already built on
+&nbsp; * the Budgets screen, which would leave two caps on one category and no defined winner.
+&nbsp; */
+&nbsp;sealed interface CategoryCapCoverage {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The control is an editable amount field. [budget] is the single-category budget backing the
+&nbsp;     * cap today, or null when there is none and saving an amount should create one.
+&nbsp;     */
+&nbsp;    data class Editable(val budget: Budget?) : CategoryCapCoverage
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A limit the shortcut must not compete with already covers this category. The control goes
+&nbsp;     * read-only and names [budget]; the user changes the limit on the Budgets screen instead.
+&nbsp;     */
+&nbsp;    data class Managed(val budget: Budget) : CategoryCapCoverage
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Resolves which budget, if any, the monthly-cap control on the category form speaks for.
+&nbsp; *
+&nbsp; * Two kinds of budget are deliberately not treated as coverage:
+&nbsp; * - **archived** ones (`isActive = false`) limit nothing, so a cap set here is a fresh budget
+&nbsp; *   rather than the resurrection of an old one;
+&nbsp; * - the **all-categories** budget (empty `categoryIds`) is the global spending envelope, which by
+&nbsp; *   design sits above per-category budgets rather than competing with them — treating it as
+&nbsp; *   coverage would leave the shortcut permanently dead for anyone who keeps a general budget.
+&nbsp; *
+&nbsp; * Everything else that names this category counts. A budget naming it *alongside other
+&nbsp; * categories*, or several budgets naming it at once, both resolve to [CategoryCapCoverage.Managed].
+&nbsp; */
+&nbsp;fun resolveCategoryCapCoverage(
+&nbsp;    categoryId: CategoryId?,
+&nbsp;    budgets: List&lt;Budget&gt;,
+&nbsp;): CategoryCapCoverage {
+&nbsp;    // A category that does not exist yet cannot be covered by anything.
+<b class="fc">&nbsp;    if (categoryId == null) return CategoryCapCoverage.Editable(budget = null)</b>
+&nbsp;
+<b class="fc">&nbsp;    val covering = budgets</b>
+<b class="pc">&nbsp;        .filter { it.isActive &amp;&amp; categoryId in it.categoryIds }</b>
+&nbsp;        // Stable order so the read-only notice always names the same budget across recompositions.
+<b class="fc">&nbsp;        .sortedWith(compareBy({ it.createdAt }, { it.id.value }))</b>
+&nbsp;
+<b class="fc">&nbsp;    val only = covering.singleOrNull()</b>
+<b class="fc">&nbsp;    return when {</b>
+<b class="fc">&nbsp;        covering.isEmpty() -&gt; CategoryCapCoverage.Editable(budget = null)</b>
+<b class="fc">&nbsp;        only != null &amp;&amp; only.categoryIds.size == 1 -&gt; CategoryCapCoverage.Editable(budget = only)</b>
+<b class="fc">&nbsp;        else -&gt; CategoryCapCoverage.Managed(budget = covering.first())</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

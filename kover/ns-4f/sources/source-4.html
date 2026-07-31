@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteUserAccountScreenKt</title>
+  <title>MoneySurfer Coverage Report > ExportedLicense</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.about.licenses</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteUserAccountScreenKt (com.georgeci.moneysurfer.feature.settings.account)</h1>
+<h1>Coverage Summary for Class: ExportedLicense (com.georgeci.moneysurfer.feature.settings.about.licenses)</h1>
 
 <table class="coverageStats">
 
@@ -46,111 +46,100 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DeleteUserAccountScreenKt</td>
+  <td class="name">ExportedLicense</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/13)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    20%
   </span>
   <span class="absValue">
-    (0/53)
+    (2/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/111)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    67.6%
   </span>
   <span class="absValue">
-    (0/1534)
+    (46/68)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">DeleteUserAccountScreenKt$DeleteUserAccountScreen$1$1</td>
+    <td class="name">ExportedLicense$Companion</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/33)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">DeleteUserAccountScreenKt$WhenMappings</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/14)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    20%
   </span>
   <span class="absValue">
-    (0/55)
+    (2/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/114)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    69.4%
   </span>
   <span class="absValue">
-    (0/1567)
+    (50/72)
   </span>
 </td>
 </tr>
@@ -161,284 +150,198 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.about.licenses
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
-&nbsp;import androidx.compose.material3.AlertDialog
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.ButtonDefaults
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedTextField
-&nbsp;import androidx.compose.material3.SnackbarDuration
-&nbsp;import androidx.compose.material3.SnackbarHostState
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.LaunchedEffect
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.setValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlinx.serialization.json.Json
 &nbsp;import moneysurfer.feature.settings.generated.resources.Res
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_button
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_cancel
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_confirm
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_message
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_memberships
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_section
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_sync
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_workspaces
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_intro
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_local
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_section
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_shared
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_auth_failed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_cleanup_failed
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_generic
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_recent_login
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_wrong_password
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_label
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_missing
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_title
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.jetbrains.compose.resources.ExperimentalResourceApi
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;/** Stable selectors — see docs/testing/testing-strategy.md. */
-&nbsp;object DeleteUserAccountTestTags {
-&nbsp;    const val PasswordField = &quot;deleteAccount:passwordField&quot;
-&nbsp;    const val DeleteButton = &quot;deleteAccount:deleteButton&quot;
-&nbsp;}
+&nbsp;/**
+&nbsp; * Lists the third-party libraries bundled with the app together with their
+&nbsp; * licenses. The data comes from `files/aboutlibraries.json`, generated by the
+&nbsp; * AboutLibraries Gradle plugin (`./gradlew :shared:exportLibraryDefinitions`).
+&nbsp; */
+&nbsp;@KoinViewModel
+&nbsp;class LicensesViewModel : MviViewModel&lt;LicensesState, LicensesEvent, LicensesEffect&gt;(
+&nbsp;    initialState = LicensesState(),
+&nbsp;) {
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;fun DeleteUserAccountScreen(</b>
-&nbsp;    onNavigateBack: () -&gt; Unit,
-<b class="nc">&nbsp;    viewModel: DeleteUserAccountViewModel = koinViewModel(),</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
-<b class="nc">&nbsp;    val snackbarHostState = remember { SnackbarHostState() }</b>
-<b class="nc">&nbsp;    var pendingNotice by remember { mutableStateOf&lt;DeleteUserAccountNotice?&gt;(null) }</b>
-&nbsp;
-<b class="nc">&nbsp;    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }</b>
-<b class="nc">&nbsp;    LaunchedEffect(pendingNoticeText) {</b>
-<b class="nc">&nbsp;        val text = pendingNoticeText ?: return@LaunchedEffect</b>
-<b class="nc">&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)</b>
-<b class="nc">&nbsp;        pendingNotice = null</b>
+&nbsp;    init {
+&nbsp;        loadLicenses()
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
-&nbsp;        when (effect) {
-&nbsp;            DeleteUserAccountEffect.NavigateBack -&gt; onNavigateBack()
-&nbsp;            is DeleteUserAccountEffect.Notify -&gt; pendingNotice = effect.notice
+&nbsp;    override fun onEvent(event: LicensesEvent) {
+&nbsp;        when (event) {
+&nbsp;            LicensesEvent.OnBackClick -&gt; postSideEffect(LicensesEffect.NavigateBack)
+&nbsp;            is LicensesEvent.OnLibraryClick -&gt; updateState {
+&nbsp;                copy(expandedLibraryId = if (expandedLibraryId == event.libraryId) null else event.libraryId)
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    DeleteUserAccountContent(</b>
-<b class="nc">&nbsp;        state = state,</b>
-<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
-<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
-&nbsp;    )
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun noticeText(notice: DeleteUserAccountNotice): String = when (notice) {</b>
-&nbsp;    DeleteUserAccountNotice.WrongPassword -&gt;
-<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_wrong_password)</b>
-&nbsp;    DeleteUserAccountNotice.RequiresRecentLogin -&gt;
-<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_recent_login)</b>
-&nbsp;    DeleteUserAccountNotice.CleanupFailed -&gt;
-<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_cleanup_failed)</b>
-&nbsp;    DeleteUserAccountNotice.AuthDeletionFailed -&gt;
-<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_auth_failed)</b>
-&nbsp;    DeleteUserAccountNotice.Generic -&gt;
-<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_generic)</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun DeleteUserAccountContent(
-&nbsp;    state: DeleteUserAccountState,
-&nbsp;    snackbarHostState: SnackbarHostState,
-&nbsp;    onEvent: (DeleteUserAccountEvent) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    if (state.showConfirmDialog) {</b>
-<b class="nc">&nbsp;        ConfirmDeleteUserAccountDialog(</b>
-<b class="nc">&nbsp;            onConfirm = { onEvent(DeleteUserAccountEvent.OnConfirmAccepted) },</b>
-<b class="nc">&nbsp;            onDismiss = { onEvent(DeleteUserAccountEvent.OnConfirmDismissed) },</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="nc">&nbsp;    SettingsSubScreenScaffold(</b>
-<b class="nc">&nbsp;        title = stringResource(Res.string.settings_delete_account_title),</b>
-<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
-<b class="nc">&nbsp;        onBack = { onEvent(DeleteUserAccountEvent.OnBackClick) },</b>
-<b class="nc">&nbsp;        showProgressOverlay = state.isDeleting,</b>
-<b class="nc">&nbsp;    ) { padding -&gt;</b>
-<b class="nc">&nbsp;        Column(</b>
-<b class="nc">&nbsp;            modifier = Modifier.padding(horizontal = 16.dp),</b>
-<b class="nc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
-&nbsp;        ) {
-<b class="nc">&nbsp;            Spacer(Modifier.height(4.dp))</b>
-<b class="nc">&nbsp;            Text(</b>
-<b class="nc">&nbsp;                text = stringResource(Res.string.settings_delete_account_intro),</b>
-<b class="nc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
-<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;            )
-&nbsp;
-<b class="nc">&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_deleted_section))</b>
-<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_workspaces))</b>
-<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_memberships))</b>
-<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_sync))</b>
-&nbsp;
-<b class="nc">&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_kept_section))</b>
-<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_shared))</b>
-<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_local))</b>
-&nbsp;
-<b class="nc">&nbsp;            if (state.showPasswordField) {</b>
-<b class="nc">&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))</b>
-<b class="nc">&nbsp;                OutlinedTextField(</b>
-<b class="nc">&nbsp;                    value = state.password,</b>
-<b class="nc">&nbsp;                    onValueChange = { onEvent(DeleteUserAccountEvent.OnPasswordChange(it)) },</b>
-&nbsp;                    label = { Text(stringResource(Res.string.settings_delete_account_password_label)) },
-<b class="nc">&nbsp;                    singleLine = true,</b>
-<b class="nc">&nbsp;                    visualTransformation = PasswordVisualTransformation(),</b>
-<b class="nc">&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),</b>
-<b class="nc">&nbsp;                    isError = state.passwordMissing,</b>
-<b class="nc">&nbsp;                    supportingText = {</b>
-<b class="nc">&nbsp;                        if (state.passwordMissing) {</b>
-<b class="nc">&nbsp;                            Text(stringResource(Res.string.settings_delete_account_password_missing))</b>
-<b class="nc">&nbsp;                        }</b>
-&nbsp;                    },
-<b class="nc">&nbsp;                    enabled = !state.isDeleting,</b>
-<b class="nc">&nbsp;                    modifier = Modifier</b>
-<b class="nc">&nbsp;                        .fillMaxWidth()</b>
-<b class="nc">&nbsp;                        .testTag(DeleteUserAccountTestTags.PasswordField),</b>
-&nbsp;                )
-<b class="nc">&nbsp;            }</b>
-&nbsp;
-<b class="nc">&nbsp;            Spacer(Modifier.height(AppTheme.spacing.small))</b>
-<b class="nc">&nbsp;            Button(</b>
-<b class="nc">&nbsp;                onClick = { onEvent(DeleteUserAccountEvent.OnDeleteClick) },</b>
-<b class="nc">&nbsp;                enabled = !state.isDeleting,</b>
-<b class="nc">&nbsp;                colors = ButtonDefaults.buttonColors(</b>
-<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.error,</b>
-<b class="nc">&nbsp;                    contentColor = AppTheme.materialColors.onError,</b>
-&nbsp;                ),
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth()</b>
-<b class="nc">&nbsp;                    .testTag(DeleteUserAccountTestTags.DeleteButton),</b>
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.settings_delete_account_button))
-&nbsp;            }
-<b class="nc">&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))</b>
-<b class="nc">&nbsp;        }</b>
+&nbsp;    @OptIn(ExperimentalResourceApi::class)
+&nbsp;    private fun loadLicenses() {
+&nbsp;        launch(onError = { updateState { copy(isLoading = false, isError = true) } }) {
+&nbsp;            val libraries = parseOssLibraries(Res.readBytes(LICENSES_RESOURCE).decodeToString())
+&nbsp;            updateState { copy(isLoading = false, libraries = libraries) }
+&nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SectionTitle(text: String) {</b>
-<b class="nc">&nbsp;    Text(</b>
-<b class="nc">&nbsp;        text = text,</b>
-<b class="nc">&nbsp;        style = AppTheme.typography.titleSmall,</b>
-<b class="nc">&nbsp;        color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;        modifier = Modifier.padding(top = AppTheme.spacing.small),</b>
-&nbsp;    )
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun BulletLine(text: String) {</b>
-<b class="nc">&nbsp;    Row {</b>
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = &quot;•&quot;,</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Spacer(Modifier.width(8.dp))</b>
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = text,</b>
-<b class="nc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Final confirmation — mirrors the M3 dialog shape used by the financial-account delete. */
-&nbsp;@Composable
-&nbsp;private fun ConfirmDeleteUserAccountDialog(
-&nbsp;    onConfirm: () -&gt; Unit,
-&nbsp;    onDismiss: () -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    AlertDialog(</b>
-<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
-&nbsp;        icon = {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Delete,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.error,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        title = {
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_title),
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        text = {
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_message),
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        },
-<b class="nc">&nbsp;        confirmButton = {</b>
-<b class="nc">&nbsp;            Button(</b>
-<b class="nc">&nbsp;                onClick = onConfirm,</b>
-<b class="nc">&nbsp;                colors = ButtonDefaults.buttonColors(</b>
-<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.error,</b>
-<b class="nc">&nbsp;                    contentColor = AppTheme.materialColors.onError,</b>
-&nbsp;                ),
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_confirm))
-&nbsp;            }
-&nbsp;        },
-<b class="nc">&nbsp;        dismissButton = {</b>
-<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
-&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_cancel))
-&nbsp;            }
-&nbsp;        },
-&nbsp;    )
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun DeleteUserAccountScreenPreview() {
-&nbsp;    AppTheme {
-&nbsp;        DeleteUserAccountContent(
-&nbsp;            state = DeleteUserAccountState(userEmail = &quot;kasia@georgeci.com&quot;),
-&nbsp;            snackbarHostState = SnackbarHostState(),
-&nbsp;            onEvent = {},
-&nbsp;        )
+&nbsp;    private companion object {
+&nbsp;        const val LICENSES_RESOURCE = &quot;files/aboutlibraries.json&quot;
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;data class LicensesState(
+&nbsp;    val isLoading: Boolean = true,
+&nbsp;    val isError: Boolean = false,
+&nbsp;    val libraries: List&lt;OssLibrary&gt; = emptyList(),
+&nbsp;    val expandedLibraryId: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One row of the screen: a library family (all artifacts published under the
+&nbsp; * same project), not a single Maven coordinate — the raw export lists ~180
+&nbsp; * artifacts, most of them per-platform slices of a handful of projects.
+&nbsp; */
+&nbsp;data class OssLibrary(
+&nbsp;    val id: String,
+&nbsp;    val name: String,
+&nbsp;    /** Shared version of every artifact in the family, or `null` when they differ. */
+&nbsp;    val version: String?,
+&nbsp;    val author: String?,
+&nbsp;    /** `group:artifact version` for each bundled artifact, shown when the row is expanded. */
+&nbsp;    val artifacts: List&lt;String&gt;,
+&nbsp;    val licenses: List&lt;OssLicense&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;data class OssLicense(
+&nbsp;    val name: String,
+&nbsp;    val content: String?,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface LicensesEvent {
+&nbsp;    data object OnBackClick : LicensesEvent
+&nbsp;    data class OnLibraryClick(val libraryId: String) : LicensesEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface LicensesEffect {
+&nbsp;    data object NavigateBack : LicensesEffect
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Maps the AboutLibraries export JSON to the screen model, collapsing the flat
+&nbsp; * artifact list into library families: `androidx.compose.ui:ui-android`,
+&nbsp; * `androidx.compose.runtime:runtime-android` and their ~20 siblings are one
+&nbsp; * &quot;Jetpack Compose&quot; row rather than 20 near-identical ones. BOM artifacts are
+&nbsp; * dropped — they ship no code, only version constraints.
+&nbsp; */
+&nbsp;internal fun parseOssLibraries(jsonText: String): List&lt;OssLibrary&gt; {
+&nbsp;    val export = exportJson.decodeFromString&lt;AboutLibrariesExport&gt;(jsonText)
+&nbsp;    return export.libraries
+&nbsp;        .filterNot { it.artifactId.endsWith(BOM_ARTIFACT_SUFFIX) }
+&nbsp;        .groupBy { familyId(it.groupId) }
+&nbsp;        .map { (familyId, artifacts) -&gt; artifacts.toOssLibrary(familyId, export.licenses) }
+&nbsp;        .sortedBy { it.name.lowercase() }
+&nbsp;}
+&nbsp;
+&nbsp;private fun List&lt;ExportedLibrary&gt;.toOssLibrary(
+&nbsp;    familyId: String,
+&nbsp;    licenses: Map&lt;String, ExportedLicense&gt;,
+&nbsp;): OssLibrary = OssLibrary(
+&nbsp;    id = familyId,
+&nbsp;    name = FAMILY_NAMES[familyId] ?: mapNotNull { it.name }.distinct().joinToString().ifEmpty { familyId },
+&nbsp;    version = mapNotNull { it.artifactVersion }.distinct().singleOrNull(),
+&nbsp;    author = flatMap { it.authors }.distinct().joinToString().ifEmpty { null },
+&nbsp;    artifacts = map { library -&gt;
+&nbsp;        listOfNotNull(library.uniqueId, library.artifactVersion).joinToString(&quot; &quot;)
+&nbsp;    }.sorted(),
+&nbsp;    licenses = flatMap { it.licenses }
+&nbsp;        .distinct()
+&nbsp;        .mapNotNull { licenseId -&gt;
+&nbsp;            licenses[licenseId]?.let { license -&gt;
+&nbsp;                OssLicense(name = license.name, content = license.content)
+&nbsp;            }
+&nbsp;        }
+&nbsp;        .sortedBy { it.name },
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Display names for the library families, keyed by the Maven group prefix they
+&nbsp; * cover. Longer prefixes win, so `androidx.compose.*` is Compose and every other
+&nbsp; * `androidx.*` artifact falls into the shared Jetpack row. Groups missing here
+&nbsp; * fall back to the names the export itself carries.
+&nbsp; */
+&nbsp;private val FAMILY_NAMES = mapOf(
+&nbsp;    &quot;androidx.compose&quot; to &quot;Jetpack Compose&quot;,
+&nbsp;    &quot;androidx&quot; to &quot;AndroidX (Android Jetpack)&quot;,
+&nbsp;    &quot;co.touchlab&quot; to &quot;Kermit &amp; Stately&quot;,
+&nbsp;    &quot;com.github.ajalt.colormath&quot; to &quot;Colormath&quot;,
+&nbsp;    &quot;com.google.guava&quot; to &quot;Guava ListenableFuture&quot;,
+&nbsp;    &quot;com.materialkolor&quot; to &quot;MaterialKolor&quot;,
+&nbsp;    &quot;com.squareup.okio&quot; to &quot;Okio&quot;,
+&nbsp;    &quot;dev.drewhamilton.poko&quot; to &quot;Poko&quot;,
+&nbsp;    &quot;io.arrow-kt&quot; to &quot;Arrow&quot;,
+&nbsp;    &quot;io.github.irgaly.navigation3.resultstate&quot; to &quot;Navigation3 ResultState&quot;,
+&nbsp;    &quot;io.github.koalaplot&quot; to &quot;KoalaPlot&quot;,
+&nbsp;    &quot;io.insert-koin&quot; to &quot;Koin&quot;,
+&nbsp;    &quot;org.jetbrains&quot; to &quot;JetBrains Java Annotations&quot;,
+&nbsp;    &quot;org.jetbrains.androidx&quot; to &quot;AndroidX for Compose Multiplatform&quot;,
+&nbsp;    &quot;org.jetbrains.compose&quot; to &quot;Compose Multiplatform&quot;,
+&nbsp;    &quot;org.jetbrains.kotlin&quot; to &quot;Kotlin&quot;,
+&nbsp;    &quot;org.jetbrains.kotlinx&quot; to &quot;kotlinx libraries&quot;,
+&nbsp;    &quot;org.jetbrains.runtime&quot; to &quot;JetBrains Runtime API&quot;,
+&nbsp;    &quot;org.jetbrains.skiko&quot; to &quot;Skiko&quot;,
+&nbsp;    &quot;org.jspecify&quot; to &quot;JSpecify&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;private val FAMILY_PREFIXES = FAMILY_NAMES.keys.sortedByDescending { it.length }
+&nbsp;
+&nbsp;private const val BOM_ARTIFACT_SUFFIX = &quot;-bom&quot;
+&nbsp;
+&nbsp;private fun familyId(groupId: String): String =
+&nbsp;    FAMILY_PREFIXES.firstOrNull { groupId == it || groupId.startsWith(&quot;$it.&quot;) } ?: groupId
+&nbsp;
+&nbsp;private val exportJson = Json { ignoreUnknownKeys = true }
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class AboutLibrariesExport(
+&nbsp;    val libraries: List&lt;ExportedLibrary&gt; = emptyList(),
+&nbsp;    val licenses: Map&lt;String, ExportedLicense&gt; = emptyMap(),
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedLibrary(
+&nbsp;    val uniqueId: String,
+&nbsp;    val artifactVersion: String? = null,
+&nbsp;    val name: String? = null,
+&nbsp;    val developers: List&lt;ExportedDeveloper&gt; = emptyList(),
+&nbsp;    val organization: ExportedOrganization? = null,
+&nbsp;    val licenses: List&lt;String&gt; = emptyList(),
+&nbsp;)
+&nbsp;
+&nbsp;private val ExportedLibrary.groupId: String get() = uniqueId.substringBefore(&#39;:&#39;)
+&nbsp;
+&nbsp;private val ExportedLibrary.artifactId: String get() = uniqueId.substringAfter(&#39;:&#39;, missingDelimiterValue = &quot;&quot;)
+&nbsp;
+&nbsp;/** Organization first — for AndroidX artifacts it is the only field that is filled in consistently. */
+&nbsp;private val ExportedLibrary.authors: List&lt;String&gt;
+&nbsp;    get() = listOfNotNull(organization?.name).ifEmpty { developers.mapNotNull { it.name } }
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedDeveloper(val name: String? = null)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedOrganization(val name: String? = null)
+&nbsp;
+<b class="pc">&nbsp;@Serializable</b>
+&nbsp;private data class ExportedLicense(
+<b class="fc">&nbsp;    val name: String,</b>
+<b class="fc">&nbsp;    val content: String? = null,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -462,7 +365,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

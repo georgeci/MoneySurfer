@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncConstraints</title>
+  <title>MoneySurfer Coverage Report > MutationOperation</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.scheduler</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncConstraints (com.georgeci.moneysurfer.sync.scheduler)</h1>
+<h1>Coverage Summary for Class: MutationOperation (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncConstraints</td>
+  <td class="name">MutationOperation</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (21/21)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -92,60 +92,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.scheduler
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
-&nbsp;import kotlin.time.Duration
-&nbsp;
-&nbsp;/**
-&nbsp; * Platform-agnostic API for scheduling sync runs outside the UI lifecycle.
-&nbsp; *
-&nbsp; * Implementations live in `:data` per platform:
-&nbsp; * - Android — `WorkManager` (`PeriodicWorkRequest` / `OneTimeWorkRequest`).
-&nbsp; * - iOS — `BGTaskScheduler` (`BGAppRefreshTask` / `BGProcessingTask`).
-&nbsp; * - Desktop — coroutine `delay`-loop on `ApplicationScope`.
-&nbsp; *
-&nbsp; * The scheduler is the **executor**, not the policy: it does not decide
-&nbsp; * *when* to schedule, callers do (login, app start, manual force).
-&nbsp; *
-&nbsp; * See sync.md §4.5.
-&nbsp; */
-&nbsp;interface BackgroundSyncScheduler {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Schedule a recurring background sync. Replacing an existing periodic
-&nbsp;     * schedule is implementation-defined: Android `KEEP` policy ignores the
-&nbsp;     * second call, desktop / iOS implementations cancel the previous loop.
-&nbsp;     */
-&nbsp;    suspend fun schedulePeriodic(
-&nbsp;        interval: Duration,
-&nbsp;        constraints: SyncConstraints = SyncConstraints(),
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Schedule a single sync run after [delay]. Useful for retrying a
-&nbsp;     * sync that failed with [com.georgeci.moneysurfer.sync.api.SyncError]
-&nbsp;     * where `isRetryable = true`.
-&nbsp;     */
-&nbsp;    suspend fun scheduleOneShot(
-&nbsp;        delay: Duration,
-&nbsp;        constraints: SyncConstraints = SyncConstraints(),
-&nbsp;    )
-&nbsp;
-&nbsp;    /** Cancel both periodic and one-shot schedules — used at logout. */
-&nbsp;    suspend fun cancelAll()
+&nbsp;enum class MutationOperation {
+<b class="fc">&nbsp;    INSERT,</b>
+<b class="fc">&nbsp;    UPDATE,</b>
+<b class="fc">&nbsp;    DELETE,</b>
 &nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Platform constraints that the scheduler honours where supported.
-&nbsp; *
-&nbsp; * Desktop ignores them (no native battery / network APIs). iOS supports
-&nbsp; * `requireUnmeteredNetwork` / `requireCharging` only via `BGProcessingTask`.
-&nbsp; */
-&nbsp;data class SyncConstraints(
-<b class="fc">&nbsp;    val requireUnmeteredNetwork: Boolean = false,</b>
-<b class="fc">&nbsp;    val requireCharging: Boolean = false,</b>
-<b class="fc">&nbsp;    val requireBatteryNotLow: Boolean = true,</b>
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -169,7 +122,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 13:37</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

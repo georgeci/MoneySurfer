@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardPeriod</title>
+  <title>MoneySurfer Coverage Report > CsvRowError</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardPeriod (com.georgeci.moneysurfer.domain.dashboard)</h1>
+<h1>Coverage Summary for Class: CsvRowError (com.georgeci.moneysurfer.domain.csv)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,42 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardPeriod</td>
+  <td class="name">CsvRowError</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (57/57)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">DashboardPeriod$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -104,49 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">DashboardPeriod$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (58/58)
+    (12/12)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -154,58 +92,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
-&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
-&nbsp;import com.georgeci.moneysurfer.domain.util.periodWindow
-&nbsp;import kotlinx.datetime.LocalDate
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
 &nbsp;
 &nbsp;/**
-&nbsp; * The span every spend-oriented dashboard widget is read at, chosen once for the whole screen.
-&nbsp; *
-&nbsp; * A closed set of what the dashboard *offers*, not a second period type: [window] delegates to
-&nbsp; * `periodWindow`, so a widget scoped by this and a transactions list scoped by
-&nbsp; * [TransactionPeriodMode] cut the calendar at exactly the same dates. `AllTime` is deliberately
-&nbsp; * unreachable from here — a spend figure with no window has no pace, no days left and nothing to
-&nbsp; * compare against, which is most of what these widgets say.
-&nbsp; *
-&nbsp; * Device-local UI state rather than a stored preference (`md/insights.md` decision 6): it resets
-&nbsp; * to [DEFAULT] on relaunch, the way a filter chip does.
+&nbsp; * Outcome of a CSV import. Rows that failed stay in [errors] with their
+&nbsp; * 1-based CSV row number (header is row 1, first data row is row 2) so the
+&nbsp; * user can locate them in a spreadsheet editor.
 &nbsp; */
-&nbsp;enum class DashboardPeriod {
-<b class="fc">&nbsp;    Week,</b>
-<b class="fc">&nbsp;    Month,</b>
-&nbsp;    ;
+&nbsp;data class CsvImportReport(
+&nbsp;    val imported: Int,
+&nbsp;    val skippedDuplicates: Int,
+&nbsp;    val errors: List&lt;CsvRowError&gt;,
+&nbsp;)
 &nbsp;
-&nbsp;    /** How the same span is spelled for the transactions list and for `periodWindow`. */
-&nbsp;    val mode: TransactionPeriodMode
-<b class="fc">&nbsp;        get() = when (this) {</b>
-<b class="fc">&nbsp;            Week -&gt; TransactionPeriodMode.Week</b>
-<b class="fc">&nbsp;            Month -&gt; TransactionPeriodMode.Month</b>
-&nbsp;        }
+<b class="fc">&nbsp;data class CsvRowError(val rowNumber: Int, val issue: CsvRowIssue)</b>
+&nbsp;
+&nbsp;/** Why a single CSV row could not be imported. Localised in the UI layer. */
+&nbsp;sealed interface CsvRowIssue {
+&nbsp;    data class ColumnCountMismatch(val expected: Int, val actual: Int) : CsvRowIssue
+&nbsp;    data class InvalidValue(val column: String) : CsvRowIssue
+&nbsp;    data class UnknownWorkspace(val workspaceId: String) : CsvRowIssue
+&nbsp;    data class UnknownAccount(val accountId: String) : CsvRowIssue
+&nbsp;    data class UnknownCategory(val categoryId: String) : CsvRowIssue
+&nbsp;    data class AccountWorkspaceMismatch(val accountId: String, val workspaceId: String) : CsvRowIssue
+&nbsp;    data class CategoryWorkspaceMismatch(val categoryId: String, val workspaceId: String) : CsvRowIssue
+&nbsp;    data class CurrencyMismatch(val currency: String, val accountCurrency: String) : CsvRowIssue
+&nbsp;    data class UnpairedTransfer(val transferId: String) : CsvRowIssue
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * File-level errors from [ExportTransactionsUseCase] / [ImportTransactionsUseCase].
+&nbsp; * Raw throwables (I/O and anything else that escapes the use cases) are
+&nbsp; * wrapped at this boundary per AGENTS.md so callers never see platform
+&nbsp; * exception types.
+&nbsp; */
+&nbsp;sealed class TransactionCsvError(message: String, cause: Throwable? = null) :
+&nbsp;    RuntimeException(message, cause) {
+&nbsp;    data class Unexpected(val unexpectedCause: Throwable) : TransactionCsvError(
+&nbsp;        &quot;CSV processing failed: &quot; +
+&nbsp;            (unexpectedCause.message ?: unexpectedCause::class.simpleName ?: &quot;unknown cause&quot;),
+&nbsp;        unexpectedCause,
+&nbsp;    )
+&nbsp;    data object EmptyFile : TransactionCsvError(&quot;CSV file has no header row&quot;)
+&nbsp;    data object HeaderMismatch :
+&nbsp;        TransactionCsvError(&quot;CSV header does not match the MoneySurfer transactions format&quot;)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * The budget cadence this period reads as. A budget owns its own window, so the selection
-&nbsp;     * cannot reshape one — it says which budget a widget should let speak when several are active.
+&nbsp;     * The picked file is larger than [ImportTransactionsUseCase] will read into
+&nbsp;     * memory. Guards against an accidental or hostile multi-GB &quot;backup&quot; that
+&nbsp;     * would otherwise OOM the app during import.
 &nbsp;     */
-&nbsp;    val budgetPeriod: BudgetPeriod
-<b class="fc">&nbsp;        get() = when (this) {</b>
-<b class="fc">&nbsp;            Week -&gt; BudgetPeriod.WEEKLY</b>
-<b class="fc">&nbsp;            Month -&gt; BudgetPeriod.MONTHLY</b>
-&nbsp;        }
-&nbsp;
-&nbsp;    /** The window of this period containing [today]. Always bounded — neither entry is all-time. */
-<b class="fc">&nbsp;    fun window(today: LocalDate): TransactionPeriodWindow = periodWindow(mode, today)</b>
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /**
-&nbsp;         * Month, matching the cadence budgets default to and the one the widgets were specified
-&nbsp;         * against — a dashboard that opens on Week would understate every figure on it.
-&nbsp;         */
-<b class="fc">&nbsp;        val DEFAULT = Month</b>
-&nbsp;    }
+&nbsp;    data class FileTooLarge(val limitBytes: Long) :
+&nbsp;        TransactionCsvError(&quot;CSV file exceeds the $limitBytes-byte import limit&quot;)
 &nbsp;}
 </code>
 </pre>
@@ -230,7 +168,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

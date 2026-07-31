@@ -1,0 +1,278 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DashboardSpentMonthWidgetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
+</div>
+
+<h1>Coverage Summary for Class: DashboardSpentMonthWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">DashboardSpentMonthWidgetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.4%
+  </span>
+  <span class="absValue">
+    (27/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (34/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.8%
+  </span>
+  <span class="absValue">
+    (477/493)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DashboardSpentMonthWidgetKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.4%
+  </span>
+  <span class="absValue">
+    (27/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (34/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.8%
+  </span>
+  <span class="absValue">
+    (477/493)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.insight.SpendTrend
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentMonthWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_down
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_flat
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_up
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_no_budget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_of_budget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * What this month has cost, how far that is through the budget, and how it compares to last month.
+&nbsp; *
+&nbsp; * Like the burn rate and safe-to-spend cards this one keeps drawing with no budget behind it — the
+&nbsp; * amount is arithmetic over transactions, and &quot;no budget set&quot; is a state the card is partly *for*.
+&nbsp; * Only the bar needs a cap, and it is simply left empty without one rather than filled against a
+&nbsp; * limit nobody set.
+&nbsp; *
+&nbsp; * A dash stands in for the amount only while [DashboardState.Content.spentMonth] itself is null,
+&nbsp; * which is the frame before a workspace and its base currency resolve — never a month that merely
+&nbsp; * booked nothing, which is a real zero and prints as one.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;internal fun SpentMonthWidget(state: DashboardState.Content) {</b>
+<b class="fc">&nbsp;    val spentMonth = state.spentMonth</b>
+<b class="fc">&nbsp;    SurferSpentMonthWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_spent_month_title),</b>
+<b class="pc">&nbsp;        spent = spentMonth?.spentFormatted ?: NO_AMOUNT,</b>
+<b class="fc">&nbsp;        progress = spentMonth?.progress ?: 0f,</b>
+<b class="fc">&nbsp;        caption = spentMonth.caption(),</b>
+<b class="fc">&nbsp;        trailingLabel = spentMonth?.delta?.label(),</b>
+<b class="fc">&nbsp;        trailingLabelColor = spentMonth?.delta?.color(),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .height(spentMonthCardHeight())</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.SpentMonth),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The line under the amount: the cap it is measured against, or the fact that nothing caps it.
+&nbsp; *
+&nbsp; * Null while the figure itself is unresolved, which is *not* the same as no budget — a workspace the
+&nbsp; * device has not pulled yet may well have one, and saying otherwise states something about the
+&nbsp; * user&#39;s money the app has not read. The card loses nothing by staying quiet: its height is pinned
+&nbsp; * below, and `SurferSpentMonthWidget` drops the caption row entirely when it has nothing for it.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun SpentMonthUi?.caption(): String? {</b>
+<b class="fc">&nbsp;    val resolved = this ?: return null</b>
+<b class="fc">&nbsp;    val cap = resolved.capFormatted ?: return stringResource(Res.string.dashboard_spent_month_no_budget)</b>
+<b class="fc">&nbsp;    return stringResource(Res.string.dashboard_spent_month_of_budget, cap)</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The delta as a sentence. The direction picks the wording rather than a sign being formatted into
+&nbsp; * the percentage, so a translation can put the arrow wherever its language wants it — and a flat
+&nbsp; * month gets a sentence of its own rather than &quot;+0%&quot;.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SpentMonthDeltaUi.label(): String = when (trend) {</b>
+<b class="fc">&nbsp;    SpendTrend.Up -&gt; stringResource(Res.string.dashboard_spent_month_delta_up, percent)</b>
+<b class="fc">&nbsp;    SpendTrend.Down -&gt; stringResource(Res.string.dashboard_spent_month_delta_down, percent)</b>
+<b class="fc">&nbsp;    SpendTrend.Flat -&gt; stringResource(Res.string.dashboard_spent_month_delta_flat)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * `uikit` does not depend on `domain`, so the direction is resolved to a colour here.
+&nbsp; *
+&nbsp; * Spending more is the error colour and spending less is the income green — the same reading
+&nbsp; * [SpendTrend.tone] makes in the insights engine, and the pair the rest of the app already uses for
+&nbsp; * money going the wrong and the right way. A flat month takes the widget&#39;s default, because there is
+&nbsp; * no direction to colour.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SpentMonthDeltaUi.color(): Color? = when (trend) {</b>
+<b class="fc">&nbsp;    SpendTrend.Up -&gt; AppTheme.materialColors.error</b>
+<b class="fc">&nbsp;    SpendTrend.Down -&gt; AppTheme.semanticColors.income</b>
+<b class="fc">&nbsp;    SpendTrend.Flat -&gt; null</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The height this card is drawn at, for the density in scope.
+&nbsp; *
+&nbsp; * Fixed, unlike the list-shaped cards&#39; floor: it draws the same four rows whatever the month holds,
+&nbsp; * so it needs a height rather than a minimum — `SurferSpentMonthWidget` fills what it is given. One
+&nbsp; * value per density, so the size the user picked changes the card&#39;s footprint and not only its
+&nbsp; * typography.
+&nbsp; *
+&nbsp; * Internal and shared with the customize picker&#39;s tile rather than restated there: the picker exists
+&nbsp; * to show what the two sizes look like, so a tile drawn at a height the dashboard does not use is a
+&nbsp; * thumbnail that misrepresents the choice it is offering.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun spentMonthCardHeight(): Dp =
+<b class="fc">&nbsp;    if (LocalSurferWidgetSize.current == SurferWidgetSize.Compact) {</b>
+<b class="fc">&nbsp;        SPENT_MONTH_COMPACT_HEIGHT</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;        SPENT_MONTH_HEIGHT</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;private val SPENT_MONTH_HEIGHT = 160.dp</b>
+<b class="fc">&nbsp;private val SPENT_MONTH_COMPACT_HEIGHT = 132.dp</b>
+&nbsp;
+&nbsp;/** Stands in for the amount until a workspace and a base currency resolve — see [SpentMonthWidget]. */
+&nbsp;private const val NO_AMOUNT = &quot;—&quot;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

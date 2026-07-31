@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserConfigRemoteSource</title>
+  <title>MoneySurfer Coverage Report > SpendAnalyticsRepositoryImplKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,77 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: UserConfigRemoteSource (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: SpendAnalyticsRepositoryImplKt (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">UserConfigRemoteSource</td>
-    <td class="coverageStat"/>
+  <td class="name">SpendAnalyticsRepositoryImplKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.2%
+  </span>
+  <span class="absValue">
+    (13/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.1%
+  </span>
+  <span class="absValue">
+    (215/226)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,41 +99,157 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.remote.UserConfigDoc
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorySpendSliceEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CurrencySpendEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.DailySpendEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.MerchantSpendEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.MonthlyTypeTotalEntity
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
+&nbsp;import com.georgeci.moneysurfer.domain.model.CurrencyTotal
+&nbsp;import com.georgeci.moneysurfer.domain.model.DailySpendPoint
+&nbsp;import com.georgeci.moneysurfer.domain.model.MerchantSpend
+&nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNet
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendScope
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.conflate
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;import kotlinx.datetime.plus
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * The one write of the per-user settings sync: `users/{uid}/config/{key}`.
+&nbsp; * [SpendAnalyticsRepository] over the aggregate queries in [TransactionDao].
 &nbsp; *
-&nbsp; * A seam rather than a direct `firestore` call inside the plugin, for the reason
-&nbsp; * [AccountDeletionRemoteSource][com.georgeci.moneysurfer.data.remote.AccountDeletionRemoteSource]
-&nbsp; * exists: the decision logic around the write — what to push, when a row is stale, when a push may
-&nbsp; * be recorded — is the part worth testing, and gitlive&#39;s JVM artefact cannot be instantiated off
-&nbsp; * Android.
+&nbsp; * Injects the DAO directly, as `CategorySpendRepositoryImpl` does — there is no transaction-shaped
+&nbsp; * intermediate to reuse here, and routing a `GROUP BY` through a repository that returns whole
+&nbsp; * rows is what this class exists to avoid.
+&nbsp; *
+&nbsp; * Every flow is [conflate]d: Room&#39;s invalidation tracker fires per write, and
+&nbsp; * `TransactionSyncPlugin.applyDoc` writes a pulled batch row by row, so an un-conflated aggregate
+&nbsp; * would recompute once per row for a screen that can only draw the last result anyway.
 &nbsp; */
-&nbsp;fun interface UserConfigRemoteSource {
+&nbsp;@Single(binds = [SpendAnalyticsRepository::class])
+&nbsp;class SpendAnalyticsRepositoryImpl(
+&nbsp;    private val dao: TransactionDao,
+&nbsp;) : SpendAnalyticsRepository {
 &nbsp;
-&nbsp;    suspend fun write(uid: String, key: String, doc: UserConfigDoc)
+&nbsp;    override fun byCategory(scope: SpendScope): Flow&lt;List&lt;CategorySpendSlice&gt;&gt; =
+&nbsp;        dao.getSpendByCategory(
+&nbsp;            workspaceId = scope.workspaceId.value,
+&nbsp;            baseCurrency = scope.baseCurrency.value,
+&nbsp;            fromDate = scope.fromDate(),
+&nbsp;            toDateExclusive = scope.toDateExclusive(),
+&nbsp;        ).map { rows -&gt; rows.map(CategorySpendSliceEntity::toDomain) }.conflate()
+&nbsp;
+&nbsp;    override fun netByMonth(scope: SpendScope): Flow&lt;List&lt;MonthlyNet&gt;&gt; =
+&nbsp;        dao.getNetTotalsByMonth(
+&nbsp;            workspaceId = scope.workspaceId.value,
+&nbsp;            baseCurrency = scope.baseCurrency.value,
+&nbsp;            fromDate = scope.fromDate(),
+&nbsp;            toDateExclusive = scope.toDateExclusive(),
+&nbsp;        ).map { rows -&gt; rows.toMonthlyNets() }.conflate()
+&nbsp;
+&nbsp;    override fun daily(scope: SpendScope): Flow&lt;List&lt;DailySpendPoint&gt;&gt; =
+&nbsp;        dao.getDailySpend(
+&nbsp;            workspaceId = scope.workspaceId.value,
+&nbsp;            baseCurrency = scope.baseCurrency.value,
+&nbsp;            fromDate = scope.fromDate(),
+&nbsp;            toDateExclusive = scope.toDateExclusive(),
+&nbsp;        ).map { rows -&gt; rows.mapNotNull(DailySpendEntity::toDomain) }.conflate()
+&nbsp;
+&nbsp;    override fun topMerchants(scope: SpendScope, limit: Int): Flow&lt;List&lt;MerchantSpend&gt;&gt; =
+&nbsp;        dao.getTopMerchants(
+&nbsp;            workspaceId = scope.workspaceId.value,
+&nbsp;            baseCurrency = scope.baseCurrency.value,
+&nbsp;            fromDate = scope.fromDate(),
+&nbsp;            toDateExclusive = scope.toDateExclusive(),
+&nbsp;            limit = limit,
+&nbsp;        ).map { rows -&gt; rows.map(MerchantSpendEntity::toDomain) }.conflate()
+&nbsp;
+&nbsp;    override fun excludedByCurrency(scope: SpendScope): Flow&lt;List&lt;CurrencyTotal&gt;&gt; =
+&nbsp;        dao.getSpendByExcludedCurrency(
+&nbsp;            workspaceId = scope.workspaceId.value,
+&nbsp;            baseCurrency = scope.baseCurrency.value,
+&nbsp;            fromDate = scope.fromDate(),
+&nbsp;            toDateExclusive = scope.toDateExclusive(),
+&nbsp;        ).map { rows -&gt; rows.map(CurrencySpendEntity::toDomain) }.conflate()
 &nbsp;}
 &nbsp;
-&nbsp;@Single(binds = [UserConfigRemoteSource::class])
-&nbsp;class FirebaseUserConfigRemoteSource(
-&nbsp;    private val firestore: FirebaseFirestore,
-&nbsp;) : UserConfigRemoteSource {
+<b class="fc">&nbsp;private fun SpendScope.fromDate(): String? = window.from?.toString()</b>
 &nbsp;
-&nbsp;    override suspend fun write(uid: String, key: String, doc: UserConfigDoc) {
-&nbsp;        firestore
-&nbsp;            .collection(SyncCollection.USERS)
-&nbsp;            .document(uid)
-&nbsp;            .collection(SyncCollection.USER_CONFIG)
-&nbsp;            .document(key)
-&nbsp;            .set(doc)
+&nbsp;/**
+&nbsp; * The window is closed at the top ([com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow]
+&nbsp; * models what the transactions list needs), the predicate is half-open. Converting here rather
+&nbsp; * than comparing with `&lt;=` keeps the SQL identical to the one budgets and the aligned category
+&nbsp; * trend use, so the three can only agree.
+&nbsp; */
+&nbsp;private fun SpendScope.toDateExclusive(): String? =
+<b class="pc">&nbsp;    window.to?.plus(1, DateTimeUnit.DAY)?.toString()</b>
+&nbsp;
+<b class="fc">&nbsp;private fun CategorySpendSliceEntity.toDomain(): CategorySpendSlice = CategorySpendSlice(</b>
+<b class="fc">&nbsp;    categoryId = categoryId?.let(::CategoryId),</b>
+<b class="fc">&nbsp;    total = Money.fromMinor(totalMinor),</b>
+<b class="fc">&nbsp;    transactionCount = transactionCount,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;private fun MerchantSpendEntity.toDomain(): MerchantSpend = MerchantSpend(</b>
+<b class="fc">&nbsp;    merchant = merchant,</b>
+<b class="fc">&nbsp;    total = Money.fromMinor(totalMinor),</b>
+<b class="fc">&nbsp;    transactionCount = transactionCount,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;private fun CurrencySpendEntity.toDomain(): CurrencyTotal = CurrencyTotal(</b>
+<b class="fc">&nbsp;    currencyCode = CurrencyCode(currencyCode),</b>
+<b class="fc">&nbsp;    amount = Money.fromMinor(totalMinor),</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Null for a row whose date will not parse — dropping one unreadable day beats failing the whole
+&nbsp; * screen, the same defence [CategorySpendRepositoryImpl] applies to its months.
+&nbsp; *
+&nbsp; * Kept as a second line rather than a live path: the query&#39;s `operationDate = date(operationDate)`
+&nbsp; * term already admits nothing but a canonical `YYYY-MM-DD`, which [LocalDate.parse] always accepts,
+&nbsp; * so nothing reaching here can fail. That is why coverage reports the null branch as never taken —
+&nbsp; * it is unreachable by construction, and only stays because `operationDate` is a plain text column
+&nbsp; * one predicate change away from letting something else through.
+&nbsp; */
+&nbsp;private fun DailySpendEntity.toDomain(): DailySpendPoint? {
+<b class="pc">&nbsp;    val parsed = runCatching { LocalDate.parse(operationDate) }.getOrNull() ?: return null</b>
+<b class="fc">&nbsp;    return DailySpendPoint(date = parsed, total = Money.fromMinor(totalMinor))</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Folds the `(month, type)` cells into one row per month, oldest first.
+&nbsp; *
+&nbsp; * A month arrives as one row per type it booked, so the side it did not book folds to zero rather
+&nbsp; * than dropping the column from the chart. Months keep the order SQLite returned them in, which
+&nbsp; * `ORDER BY month ASC` already makes ascending.
+&nbsp; *
+&nbsp; * The unparseable-month branch is the same unreachable-by-construction guard [DailySpendEntity]
+&nbsp; * carries: `substr` over a canonical date cannot produce anything [YearMonth.parse] refuses.
+&nbsp; */
+&nbsp;private fun List&lt;MonthlyTypeTotalEntity&gt;.toMonthlyNets(): List&lt;MonthlyNet&gt; =
+<b class="fc">&nbsp;    groupBy { it.month }.mapNotNull { (month, rows) -&gt;</b>
+<b class="pc">&nbsp;        val parsed = runCatching { YearMonth.parse(month) }.getOrNull() ?: return@mapNotNull null</b>
+<b class="fc">&nbsp;        MonthlyNet(</b>
+<b class="fc">&nbsp;            month = parsed,</b>
+<b class="fc">&nbsp;            income = rows.totalOf(TransactionType.INCOME),</b>
+<b class="fc">&nbsp;            expense = rows.totalOf(TransactionType.EXPENSE),</b>
+<b class="fc">&nbsp;        )</b>
 &nbsp;    }
-&nbsp;}
+&nbsp;
+&nbsp;private fun List&lt;MonthlyTypeTotalEntity&gt;.totalOf(type: TransactionType): Money =
+<b class="fc">&nbsp;    Money.fromMinor(filter { it.type == type.name }.sumOf { it.totalMinor })</b>
 </code>
 </pre>
 </div>
@@ -102,7 +273,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

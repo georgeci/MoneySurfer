@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceModule</title>
+  <title>MoneySurfer Coverage Report > EmptyStateSpec</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceModule (com.georgeci.moneysurfer.feature.workspace.di)</h1>
+<h1>Coverage Summary for Class: EmptyStateSpec (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceModule</td>
+  <td class="name">EmptyStateSpec</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (32/32)
   </span>
 </td>
 </tr>
@@ -92,14 +92,229 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.di
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import org.koin.core.annotation.ComponentScan
-&nbsp;import org.koin.core.annotation.Module
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_cta
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered_cta
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search_cta
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_split_categories
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-<b class="fc">&nbsp;@Module</b>
-&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.feature.workspace&quot;)
-&nbsp;class WorkspaceModule
+&nbsp;/** Alpha of the transfer tile&#39;s tint wash — the same weight the category bubbles use. */
+&nbsp;private const val TRANSFER_TILE_ALPHA = 0.18f
+&nbsp;
+&nbsp;/** Alpha of the income amount pill behind the row&#39;s amount. */
+&nbsp;private const val INCOME_PILL_ALPHA = 0.14f
+&nbsp;
+&nbsp;private const val META_SEPARATOR = &quot; · &quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * One transaction line, with the three variants the list can render, swipeable to delete.
+&nbsp; *
+&nbsp; * A transfer leg is deliberately neither of the other two: it carries the swap glyph on a neutral
+&nbsp; * transfer tint and no amount pill, because the money did not leave or arrive — it moved sideways,
+&nbsp; * and drawing it as a plain expense is exactly what made the two legs unreadable.
+&nbsp; *
+&nbsp; * The row&#39;s gap to the next one is on the swipe wrapper while its inset stays on the line: the
+&nbsp; * Delete button is measured against the wrapper, so a bottom padding inside it would push the
+&nbsp; * button off the line&#39;s centre, and a horizontal one would leave a dead 16dp strip at the edge
+&nbsp; * where the swipe starts.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun TransactionRow(
+&nbsp;    row: TransactionRowUi,
+&nbsp;    showAccount: Boolean,
+&nbsp;    untitled: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    onDelete: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val title = row.title.ifBlank { untitled }
+&nbsp;    // Resolved here rather than in the mapping: only a composable can reach the string table, and
+&nbsp;    // a collapsed receipt&#39;s meta is a count, not the name of any one of its categories.
+&nbsp;    val subtitle = if (row.splitCategoryCount &gt; 0) {
+&nbsp;        stringResource(Res.string.transactions_list_split_categories, row.splitCategoryCount)
+&nbsp;    } else {
+&nbsp;        row.subtitle
+&nbsp;    }
+&nbsp;    SurferSwipeToDeleteTransaction(
+&nbsp;        transactionTitle = title,
+&nbsp;        onDelete = onDelete,
+&nbsp;        modifier = Modifier.padding(bottom = 12.dp),
+&nbsp;        isTransfer = row.isTransfer,
+&nbsp;        // Any leg of a receipt, not just a collapsed row: the swipe takes the whole group either
+&nbsp;        // way, and a page holding part of a group renders its legs individually.
+&nbsp;        isSplit = row.isSplitLeg,
+&nbsp;    ) {
+&nbsp;        TransactionLine(
+&nbsp;            row = row,
+&nbsp;            showAccount = showAccount,
+&nbsp;            title = title,
+&nbsp;            subtitle = subtitle,
+&nbsp;            onClick = onClick,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TransactionLine(
+&nbsp;    row: TransactionRowUi,
+&nbsp;    showAccount: Boolean,
+&nbsp;    title: String,
+&nbsp;    subtitle: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;) {
+&nbsp;    val transferTint = AppTheme.semanticColors.transfer
+&nbsp;    SurferTransactionLine(
+&nbsp;        modifier = Modifier.padding(horizontal = 16.dp),
+&nbsp;        icon = when {
+&nbsp;            row.isTransfer -&gt; SurferCategoryPalette.TransferIcon
+&nbsp;            // A collapsed split is several categories at once, so the category glyph says more
+&nbsp;            // about it than the generic receipt every expense row carries.
+&nbsp;            row.splitCategoryCount &gt; 0 -&gt; SurferIcons.Category
+&nbsp;            row.isExpense -&gt; SurferIcons.Receipt
+&nbsp;            else -&gt; SurferIcons.Wallet
+&nbsp;        },
+&nbsp;        title = title,
+&nbsp;        formattedAmount = row.formattedAmount,
+&nbsp;        categoryHueSeed = row.categoryHueSeed,
+&nbsp;        meta = row.metaLine(subtitle, showAccount),
+&nbsp;        iconTint = if (row.isTransfer) transferTint else AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        iconBackground = if (row.isTransfer) {
+&nbsp;            transferTint.copy(alpha = TRANSFER_TILE_ALPHA)
+&nbsp;        } else {
+&nbsp;            AppTheme.materialColors.surfaceContainerHighest
+&nbsp;        },
+&nbsp;        amountColor = when {
+&nbsp;            row.isTransfer -&gt; AppTheme.materialColors.onSurfaceVariant
+&nbsp;            row.isExpense -&gt; AppTheme.materialColors.onSurface
+&nbsp;            else -&gt; AppTheme.semanticColors.income
+&nbsp;        },
+&nbsp;        amountPillBackground = if (row.isExpense || row.isTransfer) {
+&nbsp;            null
+&nbsp;        } else {
+&nbsp;            AppTheme.semanticColors.income.copy(alpha = INCOME_PILL_ALPHA)
+&nbsp;        },
+&nbsp;        onClick = onClick,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * `Groceries · Everyday` — the row&#39;s category, then the account that owns it once the list is not
+&nbsp; * scoped to one. Either half may be missing (an uncategorised row, a single-account list), so the
+&nbsp; * separator is joined in rather than baked into a string.
+&nbsp; */
+&nbsp;private fun TransactionRowUi.metaLine(subtitle: String, showAccount: Boolean): String? = listOf(
+&nbsp;    subtitle,
+&nbsp;    accountName.takeIf { showAccount }.orEmpty(),
+&nbsp;).filter { it.isNotBlank() }
+&nbsp;    .joinToString(META_SEPARATOR)
+&nbsp;    .takeIf { it.isNotBlank() }
+&nbsp;
+&nbsp;/**
+&nbsp; * Why the list is empty, which is what every word and the CTA on the empty state follow from.
+&nbsp; *
+&nbsp; * Resolved from [TransactionsByAccountState.Content.activeFilterCount] rather than from
+&nbsp; * `isFiltered`: the latter already counts a non-blank query, so it cannot tell [Search] from
+&nbsp; * [Filtered] — and only a real filter may be offered for clearing.
+&nbsp; */
+&nbsp;private enum class EmptyReason { FirstRun, Search, Filtered }
+&nbsp;
+&nbsp;/**
+&nbsp; * Whether the empty state on screen already offers &quot;add a transaction&quot;. The FAB is the same
+&nbsp; * action, and two add buttons a thumb apart is one too many — the screen hides the FAB while this
+&nbsp; * is true. Filtered and search empties do not count: their CTA clears the filter, not adds a row.
+&nbsp; */
+&nbsp;internal val TransactionsByAccountState.Content.showsAddCta: Boolean
+&nbsp;    get() = isEmpty &amp;&amp; emptyReason() == EmptyReason.FirstRun
+&nbsp;
+&nbsp;private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {
+&nbsp;    activeFilterCount &gt; 0 -&gt; EmptyReason.Filtered
+&nbsp;    query.isNotBlank() -&gt; EmptyReason.Search
+&nbsp;    else -&gt; EmptyReason.FirstRun
+&nbsp;}
+&nbsp;
+&nbsp;/** Everything the empty state renders, so each reason names its copy in one place. */
+<b class="fc">&nbsp;private data class EmptyStateSpec(</b>
+<b class="fc">&nbsp;    val title: StringResource,</b>
+<b class="fc">&nbsp;    val guidance: StringResource,</b>
+<b class="fc">&nbsp;    val actionLabel: StringResource,</b>
+<b class="fc">&nbsp;    val icon: ImageVector,</b>
+<b class="fc">&nbsp;    val actionIcon: ImageVector,</b>
+<b class="fc">&nbsp;    val action: TransactionsByAccountEvent,</b>
+&nbsp;)
+&nbsp;
+&nbsp;private fun EmptyReason.spec(): EmptyStateSpec = when (this) {
+&nbsp;    // Nothing to show *yet*: the next step is the first transaction.
+&nbsp;    EmptyReason.FirstRun -&gt; EmptyStateSpec(
+&nbsp;        title = Res.string.transactions_list_empty_title,
+&nbsp;        guidance = Res.string.transactions_list_empty,
+&nbsp;        actionLabel = Res.string.transactions_list_empty_cta,
+&nbsp;        icon = SurferIcons.Receipt,
+&nbsp;        actionIcon = SurferIcons.Add,
+&nbsp;        action = TransactionsByAccountEvent.OnAddTransactionClick,
+&nbsp;    )
+&nbsp;    // Rows exist and are hidden, so the CTA is the way back rather than a way forward. &quot;Clear
+&nbsp;    // filters&quot; would name a control the search-only user never touched, hence the two variants.
+&nbsp;    EmptyReason.Search -&gt; EmptyStateSpec(
+&nbsp;        title = Res.string.transactions_list_empty_filtered_title,
+&nbsp;        guidance = Res.string.transactions_list_empty_search,
+&nbsp;        actionLabel = Res.string.transactions_list_empty_search_cta,
+&nbsp;        icon = SurferIcons.Search,
+&nbsp;        actionIcon = SurferIcons.Close,
+&nbsp;        action = TransactionsByAccountEvent.OnClearFiltersClick,
+&nbsp;    )
+&nbsp;    EmptyReason.Filtered -&gt; EmptyStateSpec(
+&nbsp;        title = Res.string.transactions_list_empty_filtered_title,
+&nbsp;        guidance = Res.string.transactions_list_empty_filtered,
+&nbsp;        actionLabel = Res.string.transactions_list_empty_filtered_cta,
+&nbsp;        icon = SurferIcons.Search,
+&nbsp;        actionIcon = SurferIcons.Close,
+&nbsp;        action = TransactionsByAccountEvent.OnClearFiltersClick,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Title, one line of guidance and a single CTA, per the design system&#39;s empty-state rule. */
+&nbsp;@Composable
+&nbsp;internal fun EmptyState(
+&nbsp;    state: TransactionsByAccountState.Content,
+&nbsp;    onEvent: (TransactionsByAccountEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val spec = state.emptyReason().spec()
+&nbsp;    Box(
+&nbsp;        modifier = Modifier.fillMaxSize(),
+&nbsp;        contentAlignment = Alignment.Center,
+&nbsp;    ) {
+&nbsp;        SurferEmptyState(
+&nbsp;            title = stringResource(spec.title),
+&nbsp;            subtitle = stringResource(spec.guidance),
+&nbsp;            icon = spec.icon,
+&nbsp;            actionLabel = stringResource(spec.actionLabel),
+&nbsp;            actionIcon = spec.actionIcon,
+&nbsp;            onActionClick = { onEvent(spec.action) },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -123,7 +338,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-30 23:40</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardWidgetSpanKt</title>
+  <title>MoneySurfer Coverage Report > TransactionCsvCodec</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,165 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardWidgetSpanKt (com.georgeci.moneysurfer.domain.dashboard)</h1>
+<h1>Coverage Summary for Class: TransactionCsvCodec (com.georgeci.moneysurfer.domain.csv)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardWidgetSpanKt</td>
-    <td class="coverageStat"/>
+  <td class="name">TransactionCsvCodec</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (193/193)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">TransactionCsvCodec$FieldReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (42/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (342/342)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCsvCodec$FieldRejectedException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (44/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (72/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (542/542)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,34 +185,219 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
 &nbsp;
-&nbsp;/** Columns in the dashboard grid — the lowest common multiple of the halves and thirds below. */
-&nbsp;private const val GRID_COLUMNS = 6
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTags
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * How much of a dashboard *row* a widget claims once there is a grid to place it in. Only read at
-&nbsp; * expanded width and above; below that the dashboard is one widget per row and every span renders
-&nbsp; * the same.
-&nbsp; *
-&nbsp; * Widths are expressed as columns of a [COLUMNS]-column grid rather than as free fractions, so the
-&nbsp; * useful ones all tile a row exactly — `2+2+2`, `3+3`, `4+2`, `6`. A layout therefore cannot leave a
-&nbsp; * half-column sliver, and rows can be packed greedily without a solver.
-&nbsp; *
-&nbsp; * Declared widest-first: that is the order the picker offers, and [Full] is the default — the width
-&nbsp; * every widget already has in the single-column dashboard.
+&nbsp; * Every column the transactions CSV has ever had. Declaration order is the
+&nbsp; * order [TransactionCsvFormat.Latest] writes them in, so ordinal == field index
+&nbsp; * in a record this build *writes*. A record being *read* may come from an older
+&nbsp; * layout that holds fewer columns — index those through
+&nbsp; * [TransactionCsvFormat.indexOf] instead.
 &nbsp; */
-&nbsp;enum class DashboardWidgetSpan(val columns: Int) {
-&nbsp;    Full(GRID_COLUMNS),
-&nbsp;    TwoThirds(4),
-&nbsp;    Half(3),
-&nbsp;    Third(2),
-&nbsp;    ;
+&nbsp;enum class TransactionCsvColumn(val header: String) {
+&nbsp;    Id(&quot;id&quot;),
+&nbsp;    WorkspaceId(&quot;workspace_id&quot;),
+&nbsp;    AccountId(&quot;account_id&quot;),
+&nbsp;    Type(&quot;type&quot;),
+&nbsp;    Status(&quot;status&quot;),
+&nbsp;    AmountMinor(&quot;amount_minor&quot;),
+&nbsp;    Currency(&quot;currency&quot;),
+&nbsp;    CategoryId(&quot;category_id&quot;),
+&nbsp;    Note(&quot;note&quot;),
+&nbsp;    OperationAt(&quot;operation_at&quot;),
+&nbsp;    OperationDate(&quot;operation_date&quot;),
+&nbsp;    CreatedAt(&quot;created_at&quot;),
+&nbsp;    UpdatedAt(&quot;updated_at&quot;),
+&nbsp;    TransferId(&quot;transfer_id&quot;),
+&nbsp;    Merchant(&quot;merchant&quot;),
+&nbsp;    Tags(&quot;tags&quot;),
+&nbsp;    RecurringRuleId(&quot;recurring_rule_id&quot;),
+&nbsp;    SplitId(&quot;split_id&quot;),
+&nbsp;}
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Columns a dashboard grid row is divided into. */
-&nbsp;        const val COLUMNS = GRID_COLUMNS
+&nbsp;sealed interface TransactionCsvDecodeResult {
+&nbsp;    data class Decoded(val transaction: Transaction) : TransactionCsvDecodeResult
+&nbsp;    data class Rejected(val issue: CsvRowIssue) : TransactionCsvDecodeResult
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Maps a [Transaction] to/from one CSV record. Amounts are minor units,
+&nbsp; * instants are ISO-8601 strings, `operation_date` is an ISO local date, and
+&nbsp; * nullable ids serialise as empty fields. Purely structural — reference
+&nbsp; * validation (does the account exist?) happens in the import use case.
+&nbsp; *
+&nbsp; * Writing is always [TransactionCsvFormat.Latest]; reading accepts any layout
+&nbsp; * this codec has published, which the caller resolves from the file&#39;s header
+&nbsp; * row via [TransactionCsvFormat.forHeader] and passes to [decode].
+&nbsp; */
+&nbsp;object TransactionCsvCodec {
+&nbsp;
+&nbsp;    /** Header row of an export — the layout marker readers match on. */
+<b class="fc">&nbsp;    val header: List&lt;String&gt; = TransactionCsvFormat.Latest.header</b>
+&nbsp;
+<b class="fc">&nbsp;    fun encode(transaction: Transaction): List&lt;String&gt; = with(transaction) {</b>
+<b class="fc">&nbsp;        listOf(</b>
+<b class="fc">&nbsp;            id.value,</b>
+<b class="fc">&nbsp;            workspaceId.value,</b>
+<b class="fc">&nbsp;            accountId.value,</b>
+<b class="fc">&nbsp;            type.name,</b>
+<b class="fc">&nbsp;            status.name,</b>
+<b class="fc">&nbsp;            money.minor.toString(),</b>
+<b class="fc">&nbsp;            currencyCode.value,</b>
+<b class="fc">&nbsp;            categoryId?.value.orEmpty(),</b>
+&nbsp;            // Free text: neutralise CSV formula injection before it reaches a
+&nbsp;            // spreadsheet. Reversed by unguardFormula on decode.
+<b class="fc">&nbsp;            Csv.guardFormula(note),</b>
+<b class="fc">&nbsp;            operationAt.toString(),</b>
+<b class="fc">&nbsp;            operationDate.toString(),</b>
+<b class="fc">&nbsp;            createdAt.toString(),</b>
+<b class="fc">&nbsp;            updatedAt.toString(),</b>
+<b class="fc">&nbsp;            transferId?.value.orEmpty(),</b>
+&nbsp;            // Free text like the note, and guarded the same way.
+<b class="fc">&nbsp;            Csv.guardFormula(merchant),</b>
+&nbsp;            // Each tag is guarded on its own: any of them can be the one the
+&nbsp;            // spreadsheet would evaluate once a user re-orders the cell by hand.
+<b class="fc">&nbsp;            Csv.encodeCellList(tags.map(Csv::guardFormula)),</b>
+<b class="fc">&nbsp;            recurringRuleId?.value.orEmpty(),</b>
+<b class="fc">&nbsp;            splitId?.value.orEmpty(),</b>
+<b class="fc">&nbsp;        )</b>
 &nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decodes one record read from a [format] file. Rejects anything whose field
+&nbsp;     * count is not exactly that format&#39;s — the decoder&#39;s only integrity check,
+&nbsp;     * and it holds per format, so a row missing its tail is still rejected
+&nbsp;     * rather than back-filled with defaults.
+&nbsp;     */
+&nbsp;    fun decode(
+&nbsp;        fields: List&lt;String&gt;,
+<b class="fc">&nbsp;        format: TransactionCsvFormat = TransactionCsvFormat.Latest,</b>
+&nbsp;    ): TransactionCsvDecodeResult {
+<b class="fc">&nbsp;        if (fields.size != format.columns.size) {</b>
+<b class="fc">&nbsp;            return TransactionCsvDecodeResult.Rejected(</b>
+<b class="fc">&nbsp;                CsvRowIssue.ColumnCountMismatch(</b>
+<b class="fc">&nbsp;                    expected = format.columns.size,</b>
+<b class="fc">&nbsp;                    actual = fields.size,</b>
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        }
+<b class="fc">&nbsp;        return FieldReader(fields, format).decodeTransaction()</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private class FieldReader(</b>
+<b class="fc">&nbsp;        private val fields: List&lt;String&gt;,</b>
+<b class="fc">&nbsp;        private val format: TransactionCsvFormat,</b>
+&nbsp;    ) {
+&nbsp;
+&nbsp;        fun decodeTransaction(): TransactionCsvDecodeResult = try {
+<b class="fc">&nbsp;            TransactionCsvDecodeResult.Decoded(</b>
+<b class="fc">&nbsp;                Transaction(</b>
+<b class="fc">&nbsp;                    id = TransactionId(required(TransactionCsvColumn.Id)),</b>
+<b class="fc">&nbsp;                    workspaceId = WorkspaceId(required(TransactionCsvColumn.WorkspaceId)),</b>
+<b class="fc">&nbsp;                    accountId = AccountId(required(TransactionCsvColumn.AccountId)),</b>
+<b class="fc">&nbsp;                    money = Money(amountMinor(TransactionCsvColumn.AmountMinor)),</b>
+<b class="fc">&nbsp;                    currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),</b>
+<b class="fc">&nbsp;                    categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),</b>
+<b class="fc">&nbsp;                    note = Csv.unguardFormula(raw(TransactionCsvColumn.Note)),</b>
+<b class="fc">&nbsp;                    merchant = Csv.unguardFormula(raw(TransactionCsvColumn.Merchant)),</b>
+<b class="fc">&nbsp;                    tags = tags(TransactionCsvColumn.Tags),</b>
+<b class="fc">&nbsp;                    operationAt = instant(TransactionCsvColumn.OperationAt),</b>
+<b class="fc">&nbsp;                    operationDate = localDate(TransactionCsvColumn.OperationDate),</b>
+<b class="fc">&nbsp;                    type = enum&lt;TransactionType&gt;(TransactionCsvColumn.Type),</b>
+<b class="fc">&nbsp;                    status = enum&lt;TransactionStatus&gt;(TransactionCsvColumn.Status),</b>
+<b class="fc">&nbsp;                    createdAt = instant(TransactionCsvColumn.CreatedAt),</b>
+<b class="fc">&nbsp;                    updatedAt = instant(TransactionCsvColumn.UpdatedAt),</b>
+<b class="fc">&nbsp;                    transferId = optional(TransactionCsvColumn.TransferId)?.let(::TransferId),</b>
+<b class="fc">&nbsp;                    recurringRuleId = optional(TransactionCsvColumn.RecurringRuleId)</b>
+<b class="fc">&nbsp;                        ?.let(::RecurringRuleId),</b>
+<b class="fc">&nbsp;                    splitId = optional(TransactionCsvColumn.SplitId)?.let(::SplitId),</b>
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        } catch (rejected: FieldRejectedException) {
+<b class="fc">&nbsp;            TransactionCsvDecodeResult.Rejected(CsvRowIssue.InvalidValue(rejected.column.header))</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The record&#39;s value for [column], or `&quot;&quot;` when [format] predates the
+&nbsp;         * column. Empty is already the &quot;not recorded&quot; encoding of every column
+&nbsp;         * added after [TransactionCsvFormat.V1] (blank merchant, no tags, null
+&nbsp;         * id), and [required] still rejects a blank field, so an older layout
+&nbsp;         * can never quietly satisfy a mandatory column.
+&nbsp;         */
+&nbsp;        private fun raw(column: TransactionCsvColumn): String {
+<b class="fc">&nbsp;            val index = format.indexOf(column) ?: return &quot;&quot;</b>
+<b class="fc">&nbsp;            return fields[index]</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private fun required(column: TransactionCsvColumn): String =
+<b class="fc">&nbsp;            raw(column).ifBlank { throw FieldRejectedException(column) }</b>
+&nbsp;
+&nbsp;        private fun optional(column: TransactionCsvColumn): String? =
+<b class="fc">&nbsp;            raw(column).ifBlank { null }</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Unpacks the tag cell and re-normalises it. The cell can come from a
+&nbsp;         * hand-edited or hostile file, and [TransactionTags.normalize] is what
+&nbsp;         * stops a comma — the separator of the Room column these land in — or a
+&nbsp;         * 500-tag list from reaching storage. Tags this codec wrote are already
+&nbsp;         * normalised and normalisation is idempotent, so the round-trip is
+&nbsp;         * unaffected.
+&nbsp;         */
+&nbsp;        private fun tags(column: TransactionCsvColumn): List&lt;String&gt; =
+<b class="fc">&nbsp;            TransactionTags.normalize(</b>
+<b class="fc">&nbsp;                Csv.decodeCellList(raw(column)).map(Csv::unguardFormula),</b>
+&nbsp;            )
+&nbsp;
+&nbsp;        private fun long(column: TransactionCsvColumn): Long =
+<b class="fc">&nbsp;            raw(column).toLongOrNull() ?: throw FieldRejectedException(column)</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * A monetary minor amount bounded to the domain cap. Rejects crafted
+&nbsp;         * out-of-range values (e.g. [Long.MIN_VALUE], whose abs() would wrap)
+&nbsp;         * before they enter a [Money] and corrupt a cached balance. See #159.
+&nbsp;         */
+&nbsp;        private fun amountMinor(column: TransactionCsvColumn): Long {
+<b class="fc">&nbsp;            val value = long(column)</b>
+<b class="fc">&nbsp;            if (value &lt; -Money.MAX_MINOR || value &gt; Money.MAX_MINOR) {</b>
+<b class="fc">&nbsp;                throw FieldRejectedException(column)</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return value</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private fun instant(column: TransactionCsvColumn): Instant = try {
+<b class="fc">&nbsp;            Instant.parse(required(column))</b>
+&nbsp;        } catch (_: IllegalArgumentException) {
+<b class="fc">&nbsp;            throw FieldRejectedException(column)</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private fun localDate(column: TransactionCsvColumn): LocalDate = try {
+<b class="fc">&nbsp;            LocalDate.parse(required(column))</b>
+&nbsp;        } catch (_: IllegalArgumentException) {
+<b class="fc">&nbsp;            throw FieldRejectedException(column)</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(column: TransactionCsvColumn): E =
+<b class="fc">&nbsp;            enumValues&lt;E&gt;().find { it.name == raw(column) }</b>
+<b class="fc">&nbsp;                ?: throw FieldRejectedException(column)</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private class FieldRejectedException(val column: TransactionCsvColumn) : RuntimeException()</b>
 &nbsp;}
 </code>
 </pre>
@@ -96,7 +422,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

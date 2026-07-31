@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpUserRemoteRepository</title>
+  <title>MoneySurfer Coverage Report > CategoryCapUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpUserRemoteRepository (com.georgeci.moneysurfer.offline.noop)</h1>
+<h1>Coverage Summary for Class: CategoryCapUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpUserRemoteRepository</td>
+  <td class="name">CategoryCapUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (295/295)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CategoryCapUseCase$coverageOf-84wupCo$$inlined$map$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryCapUseCase$coverageOf-84wupCo$$inlined$map$1$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryCapUseCase$coverageOf-84wupCo$$inlined$map$1$2</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -58,33 +106,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/9)
-  </span>
-</td>
     <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryCapUseCase$coverageOf-84wupCo$$inlined$map$1$2$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CategoryCapUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    57.1%
   </span>
   <span class="absValue">
-    (0/9)
+    (4/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/10)
+    (18/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (295/295)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,34 +158,104 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.User
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryCapCoverage
+&nbsp;import com.georgeci.moneysurfer.domain.model.resolveCategoryCapCoverage
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Offline build has no Firestore — every remote-user operation is silently
-&nbsp; * dropped. Reads return null so callers fall back to local-only state.
+&nbsp; * Both directions of the category form&#39;s monthly-cap shortcut: what the control may show, and what
+&nbsp; * saving it does to the budget behind it.
+&nbsp; *
+&nbsp; * There is no `cap` field on `Category` to write to — the cap *is* a budget naming exactly one
+&nbsp; * category (md/categories.md, decision 2). Read and write share [resolveCategoryCapCoverage] so
+&nbsp; * the screen and the write path can never disagree about which budget the control speaks for.
 &nbsp; */
-<b class="nc">&nbsp;class NoOpUserRemoteRepository : UserRemoteRepository {</b>
-<b class="nc">&nbsp;    override suspend fun fetch(uid: String): User? = null</b>
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class CategoryCapUseCase(
+<b class="fc">&nbsp;    private val budgetRepository: BudgetRepository,</b>
+<b class="fc">&nbsp;    private val getBudgets: GetBudgetsUseCase,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
+&nbsp;) {
 &nbsp;
-&nbsp;    override suspend fun create(
-&nbsp;        uid: String,
-&nbsp;        displayName: String?,
-&nbsp;        email: String?,
-&nbsp;        isAnon: Boolean,
-&nbsp;        createdAt: Long,
-<b class="nc">&nbsp;    ) = Unit</b>
+&nbsp;    /**
+&nbsp;     * Which budget the control speaks for, tracked live. Re-resolving on every emission means a
+&nbsp;     * budget created or archived elsewhere while the form is open is reflected here rather than
+&nbsp;     * silently overwritten on save.
+&nbsp;     */
+&nbsp;    fun coverageOf(categoryId: CategoryId?): Flow&lt;CategoryCapCoverage&gt; =
+<b class="fc">&nbsp;        getBudgets().map { budgets -&gt; resolveCategoryCapCoverage(categoryId, budgets) }</b>
 &nbsp;
-<b class="nc">&nbsp;    override suspend fun addWorkspaceRef(uid: String, workspaceId: WorkspaceId) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun setDefaultWorkspace(uid: String, workspaceId: WorkspaceId) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun findByEmail(email: String): UserId? = null</b>
-<b class="nc">&nbsp;    override suspend fun upsertEmailMapping(email: String, uid: String) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = Unit</b>
+&nbsp;    /**
+&nbsp;     * Applies the control to the backing budget: creates a single-category budget, updates its
+&nbsp;     * amount, or deletes it when the field was cleared.
+&nbsp;     *
+&nbsp;     * Coverage is re-resolved here rather than trusted from the caller, so a screen holding a
+&nbsp;     * stale state cannot write over a budget that appeared in the meantime.
+&nbsp;     *
+&nbsp;     * @param category the category as it was just saved — its id, name, type and workspace.
+&nbsp;     * @param previousName the category&#39;s name before this save, or null when it was just created.
+&nbsp;     *   Used to keep an untouched backing budget&#39;s name in step with a category rename.
+&nbsp;     * @param cap the amount typed into the control, or null when it is empty (no cap).
+&nbsp;     */
+&nbsp;    suspend operator fun invoke(
+&nbsp;        category: Category,
+&nbsp;        previousName: String?,
+&nbsp;        cap: Money?,
+<b class="fc">&nbsp;        timeZone: TimeZone = TimeZone.currentSystemDefault(),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        val budgets = budgetRepository.getByWorkspaceId(category.workspaceId).first()</b>
+<b class="fc">&nbsp;        val backing = when (val coverage = resolveCategoryCapCoverage(category.id, budgets)) {</b>
+<b class="fc">&nbsp;            is CategoryCapCoverage.Editable -&gt; coverage.budget</b>
+&nbsp;            // A shared limit already owns this category. The form shows the control read-only, and
+&nbsp;            // the shortcut stays out of it rather than creating a second overlapping limit.
+<b class="fc">&nbsp;            is CategoryCapCoverage.Managed -&gt; return</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Budgets cap spending, so an income category can never move one — it carries no cap, and
+&nbsp;        // converting an expense category to income takes its backing budget with it.
+<b class="fc">&nbsp;        val target = cap?.takeIf { category.type == CategoryType.EXPENSE }</b>
+<b class="fc">&nbsp;        val now = clock.now()</b>
+&nbsp;
+<b class="fc">&nbsp;        when {</b>
+<b class="fc">&nbsp;            target == null -&gt; backing?.let { budgetRepository.delete(it.id) }</b>
+&nbsp;
+<b class="fc">&nbsp;            backing == null -&gt; budgetRepository.insert(</b>
+<b class="fc">&nbsp;                Budget(</b>
+<b class="fc">&nbsp;                    workspaceId = category.workspaceId,</b>
+<b class="fc">&nbsp;                    name = category.name,</b>
+<b class="fc">&nbsp;                    categoryIds = listOf(category.id),</b>
+<b class="fc">&nbsp;                    amount = target,</b>
+<b class="fc">&nbsp;                    period = BudgetPeriod.MONTHLY,</b>
+<b class="fc">&nbsp;                    startDate = now.toLocalDateTime(timeZone).date,</b>
+<b class="fc">&nbsp;                    createdAt = now,</b>
+&nbsp;                ),
+&nbsp;            )
+&nbsp;
+<b class="fc">&nbsp;            else -&gt; budgetRepository.update(</b>
+<b class="fc">&nbsp;                backing.copy(</b>
+<b class="fc">&nbsp;                    amount = target,</b>
+&nbsp;                    // Follow a category rename only while the budget still carries the old name.
+&nbsp;                    // A name the user changed on the Budgets screen is theirs to keep.
+<b class="fc">&nbsp;                    name = if (backing.name == previousName) category.name else backing.name,</b>
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -144,7 +280,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

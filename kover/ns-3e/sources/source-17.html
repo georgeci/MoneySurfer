@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DashboardRecurringWidgetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
+</div>
+
+<h1>Coverage Summary for Class: DashboardRecurringWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">DashboardRecurringWidgetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (4/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (24/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.5%
+  </span>
+  <span class="absValue">
+    (269/276)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.defaultMinSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecurringItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecurringWidget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_due_today
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_due_tomorrow
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_empty_subtitle
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_empty_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * The scheduled payments about to land: the soonest few recurring rules, each with the day it falls
+&nbsp; * due and what it will cost.
+&nbsp; *
+&nbsp; * The rows are handed over exactly as [DashboardState.Content.upcoming] holds them — already sorted
+&nbsp; * and already capped — and how many of them fit is the widget&#39;s own call (Hero 3 / Compact 2). The
+&nbsp; * action opens the transactions list rather than a rules screen, which the app does not have yet.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun RecurringWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferRecurringWidget(</b>
+<b class="fc">&nbsp;        items = state.upcoming.map { it.toWidgetItem() },</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_recurring_title),</b>
+<b class="fc">&nbsp;        actionLabel = stringResource(Res.string.dashboard_recurring_see_all),</b>
+<b class="fc">&nbsp;        onActionClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },</b>
+<b class="fc">&nbsp;        emptyTitle = stringResource(Res.string.dashboard_recurring_empty_title),</b>
+<b class="fc">&nbsp;        emptySubtitle = stringResource(Res.string.dashboard_recurring_empty_subtitle),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.Recurring),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The due label: &quot;Today&quot; and &quot;Tomorrow&quot; for the two days a user plans around by name, and the ISO
+&nbsp; * date for everything further out — the app ships no date locale rules, and a date is unambiguous
+&nbsp; * without them. Same call as the balance card&#39;s &quot;as of&quot; line.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun UpcomingRecurringUi.toWidgetItem(): SurferRecurringItem = SurferRecurringItem(</b>
+<b class="fc">&nbsp;    id = id.value,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    dueLabel = when (daysUntil) {</b>
+<b class="fc">&nbsp;        0 -&gt; stringResource(Res.string.dashboard_recurring_due_today)</b>
+<b class="fc">&nbsp;        1 -&gt; stringResource(Res.string.dashboard_recurring_due_tomorrow)</b>
+<b class="fc">&nbsp;        else -&gt; dueDateIso</b>
+&nbsp;    },
+<b class="fc">&nbsp;    amountFormatted = amountFormatted,</b>
+<b class="fc">&nbsp;    isImminent = isImminent,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
+</div>
+</body>
+</html>

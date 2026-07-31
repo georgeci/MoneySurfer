@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDiOnlineFirstRunModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > TombstonePatch</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,30 +19,214 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDiOnlineFirstRunModuleModuleKt (com.georgeci.moneysurfer.di)</h1>
+<h1>Coverage Summary for Class: TombstonePatch (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDiOnlineFirstRunModuleModuleKt</td>
-    <td class="coverageStat"/>
+  <td class="name">TombstonePatch</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (40/56)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">TombstonePatch$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.3%
+  </span>
+  <span class="absValue">
+    (44/60)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocRef
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
+&nbsp;import com.georgeci.moneysurfer.sync.repository.MutationOperation
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlinx.serialization.SerializationStrategy
+&nbsp;
+&nbsp;/**
+&nbsp; * Wire-format patch pushed for [com.georgeci.moneysurfer.sync.repository.MutationOperation.DELETE].
+&nbsp; *
+&nbsp; * Firestore rules deny hard deletes on every entity collection
+&nbsp; * (`allow delete: if false`, firestore.rules v2.0.0), so a local delete
+&nbsp; * replicates as a soft-delete `update`. Field names must match the entity DTOs
+&nbsp; * in RemoteDtos.kt: peers decode `deletedAt != null` and hard-delete the local
+&nbsp; * row, and their `updatedAt &gt; cursor` pull picks the tombstone up
+&nbsp; * (see sync-pull-lww.md → Tombstones).
+&nbsp; */
+<b class="pc">&nbsp;@Serializable</b>
+&nbsp;data class TombstonePatch(
+<b class="fc">&nbsp;    val deletedAt: Long,</b>
+<b class="fc">&nbsp;    val updatedAt: Long,</b>
+<b class="fc">&nbsp;    val clientVersionCode: Int,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * [TombstonePatch.deletedAt] and [TombstonePatch.updatedAt] both take the
+&nbsp; * mutation&#39;s enqueue time, so a retried push writes an identical patch —
+&nbsp; * matching the idempotent re-push contract the rest of the outbox relies on.
+&nbsp; */
+&nbsp;internal fun tombstonePatchFor(
+&nbsp;    mutation: PendingMutation,
+&nbsp;    clientVersionCode: Int,
+&nbsp;): TombstonePatch {
+&nbsp;    val deletedAtMillis = mutation.createdAt.toEpochMilliseconds()
+&nbsp;    return TombstonePatch(
+&nbsp;        deletedAt = deletedAtMillis,
+&nbsp;        updatedAt = deletedAtMillis,
+&nbsp;        clientVersionCode = clientVersionCode,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The push half every workspace sub-collection plugin shares: an upsert writes whatever [doc]
+&nbsp; * resolves to now, and a delete writes a tombstone patch instead — Firestore rules deny hard
+&nbsp; * deletes.
+&nbsp; *
+&nbsp; * [doc] returning null means the row is no longer there to push. That is the same &quot;created and
+&nbsp; * deleted between two drains&quot; case the tombstone skip covers from the other side, and it must
+&nbsp; * return normally: `UploadPendingChangesUseCaseImpl` treats a push that throws as undelivered and
+&nbsp; * requeues it, which for a row that will never come back is a queue entry that never drains.
+&nbsp; */
+&nbsp;internal suspend fun &lt;T : Any&gt; WorkspaceDocumentWriter.pushToCollection(
+&nbsp;    mutation: PendingMutation,
+&nbsp;    collectionName: String,
+&nbsp;    clientVersionCode: Int,
+&nbsp;    strategy: SerializationStrategy&lt;T&gt;,
+&nbsp;    doc: suspend (WorkspaceDocRef) -&gt; T?,
+&nbsp;) {
+&nbsp;    val ref = WorkspaceDocRef.inCollection(
+&nbsp;        workspaceId = requireNotNull(mutation.scopeKey) {
+&nbsp;            &quot;$collectionName mutation ${mutation.entityId} has no workspace scope&quot;
+&nbsp;        },
+&nbsp;        collectionName = collectionName,
+&nbsp;        documentId = mutation.entityId,
+&nbsp;    )
+&nbsp;    when (mutation.operation) {
+&nbsp;        MutationOperation.INSERT,
+&nbsp;        MutationOperation.UPDATE,
+&nbsp;        -&gt; doc(ref)?.let { set(ref, strategy, it) }
+&nbsp;        MutationOperation.DELETE -&gt;
+&nbsp;            tombstone(ref, tombstonePatchFor(mutation, clientVersionCode))
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +248,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

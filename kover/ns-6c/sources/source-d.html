@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncState</title>
+  <title>MoneySurfer Coverage Report > NoOpWorkspaceSyncer</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncState (com.georgeci.moneysurfer.sync.api)</h1>
+<h1>Coverage Summary for Class: NoOpWorkspaceSyncer (com.georgeci.moneysurfer.offline.noop)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,118 +48,43 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">SyncState$Idle</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">SyncState$Queued</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">SyncState$Running</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">NoOpWorkspaceSyncer</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (3/3)
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (7/7)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (31/31)
+    (0/6)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -164,22 +92,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 &nbsp;
 &nbsp;/**
-&nbsp; * Global coordinator state — only live activity.
-&nbsp; * Terminal outcomes (success / fail / cancel) live in [LastSyncOutcome].
-&nbsp; * See SyncCoordinatorFAQ.md №10.
+&nbsp; * Offline build has no remote sync. Every push/pull request is a silent
+&nbsp; * success — the on-disk Room database is the source of truth.
 &nbsp; */
-&nbsp;sealed interface SyncState {
-<b class="fc">&nbsp;    data object Idle : SyncState</b>
-<b class="fc">&nbsp;    data class Queued(val count: Int) : SyncState</b>
-<b class="fc">&nbsp;    data class Running(</b>
-<b class="fc">&nbsp;        val requestId: SyncRequestId,</b>
-<b class="fc">&nbsp;        val reasons: Set&lt;SyncReason&gt;,</b>
-<b class="fc">&nbsp;        val scope: SyncScope,</b>
-<b class="fc">&nbsp;        val currentStep: SyncStep,</b>
-&nbsp;    ) : SyncState
+<b class="nc">&nbsp;class NoOpWorkspaceSyncer : WorkspaceSyncer {</b>
+&nbsp;    /** Nothing is ever pushed in the offline build, and callers must be able to tell. */
+<b class="nc">&nbsp;    override suspend fun pushAll(): Boolean = false</b>
+<b class="nc">&nbsp;    override suspend fun syncAll() = Unit</b>
+<b class="nc">&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit</b>
 &nbsp;}
 </code>
 </pre>
@@ -204,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

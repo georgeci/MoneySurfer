@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DebugPrefillReport</title>
+  <title>MoneySurfer Coverage Report > DashboardWidgetSize</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.debug</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: DebugPrefillReport (com.georgeci.moneysurfer.domain.debug)</h1>
+<h1>Coverage Summary for Class: DashboardWidgetSize (com.georgeci.moneysurfer.domain.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DebugPrefillReport</td>
+  <td class="name">DashboardWidgetSize</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (6/6)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (27/27)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -92,49 +92,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.debug
-&nbsp;
-&nbsp;import arrow.core.Either
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
 &nbsp;
 &nbsp;/**
-&nbsp; * Fills the pinned workspace with a realistic dataset, so a freshly installed debug build has
-&nbsp; * something to render. Driven by one row in the QA configuration panel, which is itself only
-&nbsp; * reachable while a real Debug configuration layer is bound — i.e. never in a release build.
-&nbsp; *
-&nbsp; * Session-agnostic on purpose. Everything is written through the ordinary repositories, so the
-&nbsp; * rows enqueue on the outbox exactly like user-entered ones:
-&nbsp; *  - guest (&quot;demo&quot;) session — no Firebase uid, so the outbox drains nowhere and the data stays
-&nbsp; *    local, matching the demo-isolation rule in `docs/architecture/sync.md` §2.11;
-&nbsp; *  - signed-in session — the same rows reach Firestore on the next drain, which [prefill] asks
-&nbsp; *    for itself.
-&nbsp; *
-&nbsp; * Re-running adds another batch of transactions. Accounts, budgets and goals are matched by
-&nbsp; * name first, so only the transaction count grows.
+&nbsp; * How much room a widget takes in the column. Maps 1:1 onto `uikit.widgets.SurferWidgetSize`;
+&nbsp; * declared in the domain so a layout can be persisted without leaking UI types into `data`.
 &nbsp; */
-&nbsp;fun interface DebugDataPrefiller {
-&nbsp;
-&nbsp;    suspend fun prefill(): Either&lt;DebugPrefillError, DebugPrefillReport&gt;
+&nbsp;enum class DashboardWidgetSize {
+<b class="fc">&nbsp;    Expanded,</b>
+<b class="fc">&nbsp;    Compact,</b>
 &nbsp;}
 &nbsp;
-&nbsp;/** What one [DebugDataPrefiller.prefill] run actually wrote. Every count is rows *created*. */
-<b class="fc">&nbsp;data class DebugPrefillReport(</b>
-<b class="fc">&nbsp;    val accounts: Int,</b>
-<b class="fc">&nbsp;    val categories: Int,</b>
-<b class="fc">&nbsp;    val transactions: Int,</b>
-<b class="fc">&nbsp;    val budgets: Int,</b>
-<b class="fc">&nbsp;    val goals: Int,</b>
-&nbsp;)
-&nbsp;
-&nbsp;sealed interface DebugPrefillError {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * No workspace is pinned — the session has not finished bootstrapping, or the user is on the
-&nbsp;     * sign-in screen. There is nothing to attach rows to, so the run is refused rather than
-&nbsp;     * inventing a workspace behind the user&#39;s back.
-&nbsp;     */
-&nbsp;    data object NoWorkspace : DebugPrefillError
-&nbsp;
-&nbsp;    data class WriteFailed(val cause: Throwable) : DebugPrefillError
+&nbsp;/**
+&nbsp; * Visual treatment of a single dashboard widget: its [size] plus an optional widget-specific
+&nbsp; * [variant] key (e.g. a chart flavour) that only the widget that defines it understands. The
+&nbsp; * variant is free-form on purpose — each widget task can introduce its own values without
+&nbsp; * touching this type or the persistence format.
+&nbsp; */
+&nbsp;data class DashboardCardStyle(
+&nbsp;    val size: DashboardWidgetSize = DashboardWidgetSize.Expanded,
+&nbsp;    val variant: String? = null,
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        val EXPANDED = DashboardCardStyle(DashboardWidgetSize.Expanded)
+&nbsp;        val COMPACT = DashboardCardStyle(DashboardWidgetSize.Compact)
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -159,7 +141,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 11:06</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

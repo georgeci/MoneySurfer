@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMeta</title>
+  <title>MoneySurfer Coverage Report > DashboardWidgetPreviewKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard.customize</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMeta (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: DashboardWidgetPreviewKt (com.georgeci.moneysurfer.feature.dashboard.customize)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMeta</td>
+  <td class="name">DashboardWidgetPreviewKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (17/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    61%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
+    (47/77)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    99.7%
   </span>
   <span class="absValue">
-    (27/27)
+    (313/314)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.3%
+  </span>
+  <span class="absValue">
+    (2643/2690)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">DashboardWidgetPreviewKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61%
+  </span>
+  <span class="absValue">
+    (47/77)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.7%
+  </span>
+  <span class="absValue">
+    (313/314)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.3%
+  </span>
+  <span class="absValue">
+    (2643/2690)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,40 +126,663 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard.customize
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlin.time.Instant
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.CompositionLocalProvider
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;import com.georgeci.moneysurfer.feature.dashboard.spentMonthCardHeight
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceTrend
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategoriesDonutWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferDonutSegment
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightTone
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecurringItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecurringWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentMonthWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_left
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_over
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_spent_of
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_ok
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_over
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_warn
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_average
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_projection
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_categories_donut_center_label
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_goal_laptop
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_goal_trip
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_down_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_down_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_subs_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_subs_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_up_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_up_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_coffee
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_groceries
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_rent
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_transport
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_due_tomorrow
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recurring_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_of_cap
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_delta_down
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_of_budget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_month_title
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/**
-&nbsp; * Per-(scopeKey, collection) sync metadata.
-&nbsp; *
-&nbsp; * - [cursor] — `lastPulledAt` value used as `WHERE updatedAt &gt; cursor` filter
-&nbsp; *   in the next pull. Updated only when remote rows are successfully written
-&nbsp; *   to local Room within the same transaction.
-&nbsp; * - [lastSyncSuccessAt] / [lastSyncAttemptAt] — timestamps for the UI badge.
-&nbsp; *
-&nbsp; * [scopeKey] is typically a workspace id string. [collection] is an opaque
-&nbsp; * Firestore collection name string (e.g. &quot;accounts&quot;, &quot;transactions&quot;).
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №14, sync.md §4.3.
-&nbsp; */
-&nbsp;interface SyncMetaRepository {
-&nbsp;    suspend fun cursor(scopeKey: String, collection: String): Instant?
-&nbsp;    suspend fun setCursor(scopeKey: String, collection: String, cursor: Instant)
-&nbsp;    suspend fun markAttempt(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun markSuccess(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun clearScope(scopeKey: String)
-&nbsp;    fun observe(scopeKey: String): Flow&lt;List&lt;SyncMeta&gt;&gt;
+&nbsp;/** The picker&#39;s half of the size mapping — lifted out so the tile table stays a table. */
+<b class="fc">&nbsp;private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {</b>
+<b class="fc">&nbsp;    DashboardWidgetSize.Expanded -&gt; SurferWidgetSize.Expanded</b>
+<b class="fc">&nbsp;    DashboardWidgetSize.Compact -&gt; SurferWidgetSize.Compact</b>
 &nbsp;}
 &nbsp;
-<b class="fc">&nbsp;data class SyncMeta(</b>
-<b class="fc">&nbsp;    val scopeKey: String,</b>
-<b class="fc">&nbsp;    val collection: String,</b>
-<b class="fc">&nbsp;    val lastPulledAt: Instant?,</b>
-<b class="fc">&nbsp;    val lastSyncSuccessAt: Instant?,</b>
-<b class="fc">&nbsp;    val lastSyncAttemptAt: Instant?,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * Width the sample widget is laid out at before it is scaled into a picker tile: the dashboard&#39;s
+&nbsp; * own content width on a phone (a 392dp artboard minus its 16dp side padding). Measuring at the
+&nbsp; * real width is what makes the thumbnails comparable — see
+&nbsp; * [com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth].
+&nbsp; */
+<b class="fc">&nbsp;private val PREVIEW_CONTENT_WIDTH = 360.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * A widget drawn from sample data, the way [cardStyle] would draw it on the dashboard. The picker
+&nbsp; * shows these side by side, so they render the real widgets rather than a schematic: the whole
+&nbsp; * point of the choice is what the typography and the row density actually look like.
+&nbsp; *
+&nbsp; * The sample list is longer than a compact card shows on purpose — a size the user picks has to be
+&nbsp; * visibly different in the preview, and several widgets differ only in how many rows they keep.
+&nbsp; */
+&nbsp;// The &quot;complexity&quot; is the number of widgets the dashboard offers, not tangled logic — every branch
+&nbsp;// is one tile. Same call as `DashboardWidget`, the render half of the same registry.
+&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
+&nbsp;@Composable
+&nbsp;internal fun DashboardWidgetPreview(
+&nbsp;    type: DashboardWidgetType,
+&nbsp;    cardStyle: DashboardCardStyle,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    CompositionLocalProvider(LocalSurferWidgetSize provides cardStyle.size.toWidgetSize()) {</b>
+<b class="fc">&nbsp;        val content = Modifier</b>
+<b class="fc">&nbsp;            .surferScaleToWidth(PREVIEW_CONTENT_WIDTH)</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="pc">&nbsp;        when (type) {</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Balance -&gt; BalancePreview(cardStyle.variant, modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.QuickActions -&gt; QuickActionsPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.SpentMonth -&gt; SpentMonthPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.SafeToSpend -&gt; SafeToSpendPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.BurnRate -&gt; BurnRatePreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Budgets -&gt; BudgetsPreview(modifier.then(content))</b>
+&nbsp;            DashboardWidgetType.SpentByCategory -&gt;
+<b class="fc">&nbsp;                SpentByCategoryPreview(cardStyle.variant, modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.CategoriesDonut -&gt; CategoriesDonutPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Accounts -&gt; AccountsPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Insights -&gt; InsightsPreview(cardStyle.variant, modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Recurring -&gt; RecurringPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Goals -&gt; GoalsPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.RecentTransactions -&gt; RecentTransactionsPreview(modifier.then(content))</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample curve as well as sample figures: half of what tells the six treatments apart is how much
+&nbsp; * room each gives the trend, and a tile drawn from a workspace with no history would show none of
+&nbsp; * that.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BalancePreview(variant: String?, modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferBalanceWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_balance_title),</b>
+<b class="fc">&nbsp;        balance = SAMPLE_TOTAL,</b>
+<b class="fc">&nbsp;        variant = SurferBalanceVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        trend = SurferBalanceTrend(text = SAMPLE_TREND, series = SAMPLE_BALANCE_SERIES),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The buttons are inert here — the tile is a thumbnail, not a second place to log a transaction.
+&nbsp; *
+&nbsp; * The two tiles come out nearly the same height, because all this widget&#39;s size setting changes is
+&nbsp; * the button height (52dp against 48dp). That is the honest thumbnail: padding it out to make the
+&nbsp; * choice look bigger than it is would promise a row the dashboard then does not draw.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun QuickActionsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferQuickActionsWidget(</b>
+<b class="fc">&nbsp;        primaryLabel = stringResource(Res.string.dashboard_add_transaction),</b>
+<b class="fc">&nbsp;        primaryIcon = SurferIcons.Add,</b>
+<b class="fc">&nbsp;        onPrimaryClick = {},</b>
+<b class="fc">&nbsp;        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),</b>
+<b class="fc">&nbsp;        secondaryIcon = SurferIcons.SwapHoriz,</b>
+<b class="fc">&nbsp;        onSecondaryClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample numbers rather than the user&#39;s own: the tile is drawn for every widget in the picker,
+&nbsp; * including the ones switched off, so it must not depend on there being a budget to read.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SafeToSpendPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferSafeToSpendWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_safe_to_spend_title),</b>
+<b class="fc">&nbsp;        data = SurferSafeToSpendData(</b>
+<b class="fc">&nbsp;            amount = SAMPLE_SAFE_TO_SPEND,</b>
+<b class="fc">&nbsp;            caption = stringResource(</b>
+<b class="fc">&nbsp;                Res.string.dashboard_safe_to_spend_caption,</b>
+<b class="fc">&nbsp;                SAMPLE_BUDGET_LIMIT,</b>
+<b class="fc">&nbsp;                stringResource(Res.string.dashboard_customize_preview_account_everyday),</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            perDay = stringResource(Res.string.dashboard_safe_to_spend_per_day, SAMPLE_SAFE_PER_DAY),</b>
+<b class="fc">&nbsp;            daysLeft = pluralStringResource(</b>
+<b class="fc">&nbsp;                Res.plurals.dashboard_days_left,</b>
+<b class="fc">&nbsp;                SAMPLE_DAYS_LEFT,</b>
+<b class="fc">&nbsp;                SAMPLE_DAYS_LEFT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            progress = SAMPLE_SAFE_PROGRESS,</b>
+<b class="fc">&nbsp;            paceFraction = SAMPLE_SAFE_PACE,</b>
+<b class="fc">&nbsp;            status = SurferBudgetStatus.Ok,</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample numbers again, for the same reason [SafeToSpendPreview] uses them: the tile is drawn for
+&nbsp; * every widget in the picker, including the ones switched off, so it must not depend on the month
+&nbsp; * holding any spend — or on a budget existing to measure it against.
+&nbsp; *
+&nbsp; * The card fills the height it is given, so the tile takes the dashboard&#39;s own height for the size
+&nbsp; * being previewed — the picker&#39;s whole job is showing what that size looks like, and the two
+&nbsp; * densities really are different heights.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SpentMonthPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferSpentMonthWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_spent_month_title),</b>
+<b class="fc">&nbsp;        spent = SAMPLE_SPENT_MONTH,</b>
+<b class="fc">&nbsp;        progress = SAMPLE_SPENT_MONTH_PROGRESS,</b>
+<b class="fc">&nbsp;        caption = stringResource(Res.string.dashboard_spent_month_of_budget, SAMPLE_BUDGET_LIMIT),</b>
+<b class="fc">&nbsp;        trailingLabel = stringResource(Res.string.dashboard_spent_month_delta_down, SAMPLE_SPENT_MONTH_DELTA),</b>
+<b class="fc">&nbsp;        trailingLabelColor = AppTheme.semanticColors.income,</b>
+<b class="fc">&nbsp;        modifier = modifier.height(spentMonthCardHeight()),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample rows, like [SafeToSpendPreview] — the tile is drawn for every widget in the picker,
+&nbsp; * including the ones switched off, so it must not depend on the month holding any spend.
+&nbsp; *
+&nbsp; * One of the three carries a cap, because the near-limit treatment is half of what distinguishes
+&nbsp; * the five variants from each other.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SpentByCategoryPreview(variant: String?, modifier: Modifier) {</b>
+<b class="fc">&nbsp;    val tints = SurferCategoryPalette.tints</b>
+<b class="fc">&nbsp;    SurferSpentByCategoryWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_spent_by_category_title),</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-rent&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;                amount = SAMPLE_EXPENSE_THREE_MAGNITUDE,</b>
+<b class="fc">&nbsp;                share = SAMPLE_SHARE_RENT,</b>
+<b class="fc">&nbsp;                caption = stringResource(Res.string.dashboard_spent_by_category_share, SAMPLE_PERCENT_RENT),</b>
+<b class="fc">&nbsp;                tint = tints[0],</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-groceries&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),</b>
+<b class="fc">&nbsp;                amount = SAMPLE_CATEGORY_GROCERIES,</b>
+<b class="fc">&nbsp;                share = SAMPLE_SHARE_GROCERIES,</b>
+<b class="fc">&nbsp;                caption = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_spent_by_category_of_cap,</b>
+<b class="fc">&nbsp;                    SAMPLE_CATEGORY_GROCERIES,</b>
+<b class="fc">&nbsp;                    SAMPLE_CATEGORY_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                tint = tints[1],</b>
+<b class="fc">&nbsp;                cap = SurferCategorySpendCap(</b>
+<b class="fc">&nbsp;                    progress = SAMPLE_CAP_PROGRESS,</b>
+<b class="fc">&nbsp;                    status = SurferBudgetStatus.Warn,</b>
+<b class="fc">&nbsp;                    statusLabel = stringResource(Res.string.dashboard_spent_by_category_status_warn),</b>
+&nbsp;                ),
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-coffee&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;                amount = SAMPLE_CATEGORY_COFFEE,</b>
+<b class="fc">&nbsp;                share = SAMPLE_SHARE_COFFEE,</b>
+<b class="fc">&nbsp;                caption = stringResource(Res.string.dashboard_spent_by_category_share, SAMPLE_PERCENT_COFFEE),</b>
+<b class="fc">&nbsp;                tint = tints[2],</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        variant = SurferSpentByCategoryVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample segments, for the same reason [SpentByCategoryPreview] uses sample rows. Five of them,
+&nbsp; * because the legend keeps five at Hero and three at Compact — a tile with three would look
+&nbsp; * identical at both sizes, and the size is exactly what this picker is asking about.
+&nbsp; *
+&nbsp; * The last one is the uncategorized bucket, drawn under its real label: it is a segment the live
+&nbsp; * widget shows whenever the period holds spend nobody filed, so the preview should not pretend
+&nbsp; * every wedge has a category behind it.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun CategoriesDonutPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    val tints = SurferCategoryPalette.tints</b>
+<b class="fc">&nbsp;    val labels = listOf(</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_groceries),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_transport),</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_spent_by_category_uncategorized),</b>
+&nbsp;    )
+<b class="fc">&nbsp;    SurferCategoriesDonutWidget(</b>
+&nbsp;        // Zipped rather than indexed: the shares are a separate list, and a label added to one
+&nbsp;        // without the other should shorten the sample, not crash the picker.
+<b class="fc">&nbsp;        segments = labels.zip(SAMPLE_DONUT_SHARES).mapIndexed { index, (label, share) -&gt;</b>
+<b class="fc">&nbsp;            SurferDonutSegment(</b>
+<b class="fc">&nbsp;                label = label,</b>
+<b class="fc">&nbsp;                percent = share,</b>
+<b class="fc">&nbsp;                color = tints[index % tints.size],</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        },
+<b class="fc">&nbsp;        centerLabel = stringResource(Res.string.dashboard_categories_donut_center_label),</b>
+<b class="fc">&nbsp;        centerValue = SAMPLE_DONUT_TOTAL,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample payments, for the same reason [SafeToSpendPreview] uses sample numbers: the tile is drawn
+&nbsp; * for every widget in the picker, including the ones switched off, so it must not depend on the
+&nbsp; * workspace keeping any recurring rules.
+&nbsp; *
+&nbsp; * Three rows, because the card keeps three at Hero and two at Compact — and the first is tinted,
+&nbsp; * since the imminent treatment is half of what the two sizes are being compared on.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun RecurringPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferRecurringWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferRecurringItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-recurring-1&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;                dueLabel = stringResource(Res.string.dashboard_recurring_due_tomorrow),</b>
+<b class="fc">&nbsp;                amountFormatted = SAMPLE_RECURRING_RENT,</b>
+<b class="fc">&nbsp;                isImminent = true,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferRecurringItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-recurring-2&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_transport),</b>
+<b class="fc">&nbsp;                dueLabel = SAMPLE_RECURRING_SECOND_DUE,</b>
+<b class="fc">&nbsp;                amountFormatted = SAMPLE_RECURRING_TRANSPORT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferRecurringItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-recurring-3&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;                dueLabel = SAMPLE_RECURRING_THIRD_DUE,</b>
+<b class="fc">&nbsp;                amountFormatted = SAMPLE_RECURRING_COFFEE,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_recurring_title),</b>
+<b class="fc">&nbsp;        actionLabel = stringResource(Res.string.dashboard_recurring_see_all),</b>
+<b class="fc">&nbsp;        onActionClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample numbers again, for the same reason [SafeToSpendPreview] uses them: the tile is drawn for
+&nbsp; * every widget in the picker, including the ones switched off, so it must not depend on there being
+&nbsp; * a week of spend to read.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BurnRatePreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferBurnRateWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_burn_rate_title),</b>
+<b class="fc">&nbsp;        data = SurferBurnRateData(</b>
+<b class="fc">&nbsp;            average = stringResource(Res.string.dashboard_burn_rate_average, SAMPLE_BURN_AVERAGE),</b>
+<b class="fc">&nbsp;            caption = stringResource(Res.string.dashboard_burn_rate_caption),</b>
+<b class="fc">&nbsp;            bars = SAMPLE_BURN_FRACTIONS.mapIndexed { index, fraction -&gt;</b>
+<b class="fc">&nbsp;                SurferBurnRateBar(</b>
+<b class="fc">&nbsp;                    label = (SAMPLE_BURN_FIRST_DAY + index).toString(),</b>
+<b class="fc">&nbsp;                    fraction = fraction,</b>
+<b class="fc">&nbsp;                    isToday = index == SAMPLE_BURN_FRACTIONS.lastIndex,</b>
+<b class="fc">&nbsp;                )</b>
+&nbsp;            },
+<b class="fc">&nbsp;            projection = stringResource(Res.string.dashboard_burn_rate_projection, SAMPLE_BURN_PROJECTION),</b>
+<b class="fc">&nbsp;            pace = SurferBurnRatePace(</b>
+<b class="fc">&nbsp;                label = stringResource(Res.string.dashboard_burn_rate_on_track),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Ok,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample budgets rather than the user&#39;s own, for the same reason the safe-to-spend tile uses them:
+&nbsp; * the picker draws every widget, including the ones switched off, so it must not depend on there
+&nbsp; * being a budget to read. The ids are named rather than numbered — nothing reads them back, and
+&nbsp; * repeating &quot;preview-1&quot; across widgets is a duplicated literal for no gain.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BudgetsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferBudgetsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferBudgetItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-budget-groceries&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),</b>
+<b class="fc">&nbsp;                statusLabel = stringResource(Res.string.dashboard_budgets_status_warn),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Warn,</b>
+<b class="fc">&nbsp;                spentOfLimit = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_budgets_spent_of,</b>
+<b class="fc">&nbsp;                    SAMPLE_BUDGET_SPENT,</b>
+<b class="fc">&nbsp;                    SAMPLE_BUDGET_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                remaining = stringResource(Res.string.dashboard_budgets_left, SAMPLE_BUDGET_LEFT),</b>
+<b class="fc">&nbsp;                progress = SAMPLE_BUDGET_PROGRESS,</b>
+<b class="fc">&nbsp;                alertFraction = SAMPLE_BUDGET_ALERT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferBudgetItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-budget-rent&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;                statusLabel = stringResource(Res.string.dashboard_budgets_status_ok),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Ok,</b>
+<b class="fc">&nbsp;                spentOfLimit = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_budgets_spent_of,</b>
+<b class="fc">&nbsp;                    SAMPLE_RENT_SPENT,</b>
+<b class="fc">&nbsp;                    SAMPLE_RENT_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                remaining = stringResource(Res.string.dashboard_budgets_left, SAMPLE_RENT_LEFT),</b>
+<b class="fc">&nbsp;                progress = SAMPLE_RENT_PROGRESS,</b>
+<b class="fc">&nbsp;                alertFraction = SAMPLE_BUDGET_ALERT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferBudgetItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-budget-coffee&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;                statusLabel = stringResource(Res.string.dashboard_budgets_status_over),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Over,</b>
+<b class="fc">&nbsp;                spentOfLimit = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_budgets_spent_of,</b>
+<b class="fc">&nbsp;                    SAMPLE_COFFEE_SPENT,</b>
+<b class="fc">&nbsp;                    SAMPLE_COFFEE_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                remaining = stringResource(Res.string.dashboard_budgets_over, SAMPLE_COFFEE_OVER),</b>
+<b class="fc">&nbsp;                progress = SAMPLE_COFFEE_PROGRESS,</b>
+<b class="fc">&nbsp;                alertFraction = SAMPLE_BUDGET_ALERT,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_budgets_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_budgets_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun AccountsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferAccountsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferAccountItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-1&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_account_everyday),</b>
+<b class="fc">&nbsp;                subtitle = SAMPLE_CURRENCY,</b>
+<b class="fc">&nbsp;                balance = SAMPLE_ACCOUNT_ONE,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferAccountItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-2&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_account_savings),</b>
+<b class="fc">&nbsp;                subtitle = SAMPLE_CURRENCY,</b>
+<b class="fc">&nbsp;                balance = SAMPLE_ACCOUNT_TWO,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferAccountItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-3&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_account_cash),</b>
+<b class="fc">&nbsp;                subtitle = SAMPLE_CURRENCY,</b>
+<b class="fc">&nbsp;                balance = SAMPLE_ACCOUNT_THREE,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        addCta = SurferAddAccountCta(</b>
+<b class="fc">&nbsp;            label = stringResource(Res.string.dashboard_add_account),</b>
+<b class="fc">&nbsp;            onClick = {},</b>
+<b class="fc">&nbsp;            trailingLabel = stringResource(Res.string.dashboard_accounts_manage),</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample sentences rather than the user&#39;s own, like every other tile here: the picker is opened
+&nbsp; * to compare two layouts, and a workspace with one insight (or none) would show two blank tiles.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun InsightsPreview(variant: String?, modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferInsightsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferInsightItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-insight-1&quot;,</b>
+<b class="fc">&nbsp;                tone = SurferInsightTone.Warn,</b>
+<b class="fc">&nbsp;                icon = SurferIcons.ArrowUp,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.dashboard_customize_preview_insight_up_title),</b>
+<b class="fc">&nbsp;                body = stringResource(Res.string.dashboard_customize_preview_insight_up_body),</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferInsightItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-insight-2&quot;,</b>
+<b class="fc">&nbsp;                tone = SurferInsightTone.Good,</b>
+<b class="fc">&nbsp;                icon = SurferIcons.ArrowDown,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.dashboard_customize_preview_insight_down_title),</b>
+<b class="fc">&nbsp;                body = stringResource(Res.string.dashboard_customize_preview_insight_down_body),</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferInsightItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-insight-3&quot;,</b>
+<b class="fc">&nbsp;                tone = SurferInsightTone.Neutral,</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Sync,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.dashboard_customize_preview_insight_subs_title),</b>
+<b class="fc">&nbsp;                body = stringResource(Res.string.dashboard_customize_preview_insight_subs_body),</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_insights_title),</b>
+<b class="fc">&nbsp;        variant = SurferInsightsVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun GoalsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferGoalsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferGoalItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-1&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_goal_laptop),</b>
+<b class="fc">&nbsp;                savedFormatted = SAMPLE_GOAL_SAVED,</b>
+<b class="fc">&nbsp;                targetFormatted = SAMPLE_GOAL_TARGET,</b>
+<b class="fc">&nbsp;                progress = SAMPLE_GOAL_PROGRESS,</b>
+<b class="fc">&nbsp;                captionLine = &quot;&quot;,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferGoalItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-2&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_goal_trip),</b>
+<b class="fc">&nbsp;                savedFormatted = SAMPLE_TRIP_SAVED,</b>
+<b class="fc">&nbsp;                targetFormatted = SAMPLE_TRIP_TARGET,</b>
+<b class="fc">&nbsp;                progress = SAMPLE_TRIP_PROGRESS,</b>
+<b class="fc">&nbsp;                captionLine = &quot;&quot;,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_goals_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_goals_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun RecentTransactionsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    val bubbleBg = AppTheme.materialColors.primaryContainer</b>
+<b class="fc">&nbsp;    val bubbleFg = AppTheme.materialColors.onPrimaryContainer</b>
+<b class="fc">&nbsp;    val samples = listOf(</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_groceries) to SAMPLE_EXPENSE_ONE,</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_salary) to SAMPLE_INCOME,</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_coffee) to SAMPLE_EXPENSE_TWO,</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_rent) to SAMPLE_EXPENSE_THREE,</b>
+&nbsp;    )
+<b class="fc">&nbsp;    SurferRecentTransactionsWidget(</b>
+<b class="fc">&nbsp;        items = samples.mapIndexed { index, (title, amount) -&gt;</b>
+<b class="fc">&nbsp;            SurferRecentTransactionItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-$index&quot;,</b>
+<b class="fc">&nbsp;                title = title,</b>
+<b class="fc">&nbsp;                subtitle = &quot;&quot;,</b>
+<b class="fc">&nbsp;                amount = amount,</b>
+<b class="fc">&nbsp;                isExpense = amount != SAMPLE_INCOME,</b>
+<b class="fc">&nbsp;                iconBgColor = bubbleBg,</b>
+<b class="fc">&nbsp;                iconFgColor = bubbleFg,</b>
+<b class="fc">&nbsp;                iconInitial = title.take(1),</b>
+<b class="fc">&nbsp;                categoryHueSeed = &quot;preview-$index&quot;,</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        },
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_recent_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val SAMPLE_CURRENCY = &quot;EUR&quot;
+&nbsp;private const val SAMPLE_TOTAL = &quot;€11,575.32&quot;
+&nbsp;private const val SAMPLE_TREND = &quot;+€412&quot;
+<b class="fc">&nbsp;private val SAMPLE_BALANCE_SERIES = listOf(9_800f, 10_240f, 9_950f, 10_610f, 11_160f, 11_575f)</b>
+&nbsp;private const val SAMPLE_ACCOUNT_ONE = &quot;€2,480.32&quot;
+&nbsp;private const val SAMPLE_ACCOUNT_TWO = &quot;€8,915.00&quot;
+&nbsp;private const val SAMPLE_ACCOUNT_THREE = &quot;€180.00&quot;
+&nbsp;private const val SAMPLE_GOAL_SAVED = &quot;€820&quot;
+&nbsp;private const val SAMPLE_GOAL_TARGET = &quot;€1,600&quot;
+&nbsp;private const val SAMPLE_GOAL_PROGRESS = 0.51f
+&nbsp;private const val SAMPLE_TRIP_SAVED = &quot;€1,240&quot;
+&nbsp;private const val SAMPLE_TRIP_TARGET = &quot;€3,000&quot;
+&nbsp;private const val SAMPLE_TRIP_PROGRESS = 0.41f
+&nbsp;private const val SAMPLE_EXPENSE_ONE = &quot;−€48.20&quot;
+&nbsp;private const val SAMPLE_INCOME = &quot;+€3,200.00&quot;
+&nbsp;private const val SAMPLE_EXPENSE_TWO = &quot;−€9.99&quot;
+&nbsp;private const val SAMPLE_EXPENSE_THREE = &quot;−€760.00&quot;
+&nbsp;private const val SAMPLE_SAFE_TO_SPEND = &quot;€642.30&quot;
+&nbsp;private const val SAMPLE_BUDGET_LIMIT = &quot;€1,800&quot;
+&nbsp;private const val SAMPLE_SAFE_PER_DAY = &quot;€53.52&quot;
+&nbsp;private const val SAMPLE_DAYS_LEFT = 12
+&nbsp;private const val SAMPLE_SAFE_PROGRESS = 0.64f
+&nbsp;private const val SAMPLE_SAFE_PACE = 0.6f
+&nbsp;private const val SAMPLE_SPENT_MONTH = &quot;€1,173.69&quot;
+&nbsp;private const val SAMPLE_SPENT_MONTH_PROGRESS = 0.65f
+&nbsp;private const val SAMPLE_SPENT_MONTH_DELTA = 18
+&nbsp;private const val SAMPLE_BURN_AVERAGE = &quot;€42.10&quot;
+&nbsp;private const val SAMPLE_BURN_PROJECTION = &quot;€1,263&quot;
+&nbsp;private const val SAMPLE_BURN_FIRST_DAY = 22
+<b class="fc">&nbsp;private val SAMPLE_BURN_FRACTIONS = listOf(0.42f, 0.18f, 1f, 0f, 0.63f, 0.31f, 0.24f)</b>
+&nbsp;private const val SAMPLE_BUDGET_SPENT = &quot;€312.40&quot;
+&nbsp;private const val SAMPLE_BUDGET_CAP = &quot;€400.00&quot;
+&nbsp;private const val SAMPLE_BUDGET_LEFT = &quot;€87.60&quot;
+&nbsp;private const val SAMPLE_BUDGET_PROGRESS = 0.78f
+&nbsp;private const val SAMPLE_BUDGET_ALERT = 0.8f
+&nbsp;private const val SAMPLE_RENT_SPENT = &quot;€760.00&quot;
+&nbsp;private const val SAMPLE_RENT_CAP = &quot;€1,200.00&quot;
+&nbsp;private const val SAMPLE_RENT_LEFT = &quot;€440.00&quot;
+&nbsp;private const val SAMPLE_RENT_PROGRESS = 0.63f
+&nbsp;private const val SAMPLE_COFFEE_SPENT = &quot;€68.40&quot;
+&nbsp;private const val SAMPLE_COFFEE_CAP = &quot;€60.00&quot;
+&nbsp;private const val SAMPLE_COFFEE_OVER = &quot;€8.40&quot;
+&nbsp;private const val SAMPLE_COFFEE_PROGRESS = 1.14f
+&nbsp;private const val SAMPLE_EXPENSE_THREE_MAGNITUDE = &quot;€760.00&quot;
+&nbsp;private const val SAMPLE_CATEGORY_GROCERIES = &quot;€142.10&quot;
+&nbsp;private const val SAMPLE_CATEGORY_COFFEE = &quot;€38.20&quot;
+&nbsp;private const val SAMPLE_CATEGORY_CAP = &quot;€150&quot;
+&nbsp;private const val SAMPLE_SHARE_RENT = 0.62f
+&nbsp;private const val SAMPLE_SHARE_GROCERIES = 0.25f
+&nbsp;private const val SAMPLE_SHARE_COFFEE = 0.13f
+&nbsp;private const val SAMPLE_PERCENT_RENT = 62
+&nbsp;private const val SAMPLE_PERCENT_COFFEE = 13
+&nbsp;private const val SAMPLE_CAP_PROGRESS = 0.95f
+&nbsp;
+&nbsp;/** Adds up to 1 exactly, so the sample donut closes rather than leaving a wedge of track showing. */
+<b class="fc">&nbsp;private val SAMPLE_DONUT_SHARES = listOf(0.42f, 0.22f, 0.14f, 0.12f, 0.1f)</b>
+&nbsp;private const val SAMPLE_DONUT_TOTAL = &quot;€1,214.60&quot;
+&nbsp;private const val SAMPLE_RECURRING_RENT = &quot;€980.00&quot;
+&nbsp;private const val SAMPLE_RECURRING_TRANSPORT = &quot;€59.00&quot;
+&nbsp;private const val SAMPLE_RECURRING_COFFEE = &quot;€9.99&quot;
+&nbsp;
+&nbsp;/** Sample due dates, ISO like the live card&#39;s — see `RecurringWidget.toWidgetItem`. */
+&nbsp;private const val SAMPLE_RECURRING_SECOND_DUE = &quot;2026-04-30&quot;
+&nbsp;private const val SAMPLE_RECURRING_THIRD_DUE = &quot;2026-05-02&quot;
 </code>
 </pre>
 </div>
@@ -149,7 +806,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>

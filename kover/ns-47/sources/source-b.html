@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoryVisual</title>
+  <title>MoneySurfer Coverage Report > InsightsState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.insights</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoryVisual (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: InsightsState (com.georgeci.moneysurfer.feature.insights)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,43 +45,98 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SurferCategoryVisual</td>
+  <tr>
+    <td class="name">InsightsState$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsState$Content</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (62/62)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InsightsState$Content$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">InsightsState$Loading</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (64/64)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,239 +144,111 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.insights
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
+&nbsp;import kotlin.math.roundToInt
 &nbsp;
-&nbsp;/**
-&nbsp; * Circular bubble used to represent a category across the app (dashboard rows, transaction
-&nbsp; * details, pickers, creation preview). Foreground keeps the full category tint; background
-&nbsp; * is a low-alpha wash of the same tint, so light/dark themes both read correctly.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun SurferCategoryBubble(
-&nbsp;    icon: ImageVector,
-&nbsp;    tint: Color,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    size: Dp = 44.dp,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .size(size)
-&nbsp;            .clip(CircleShape)
-&nbsp;            .background(tint.copy(alpha = 0.18f)),
-&nbsp;        contentAlignment = Alignment.Center,
-&nbsp;    ) {
-&nbsp;        Icon(
-&nbsp;            imageVector = icon,
-&nbsp;            // decorative — category colour/icon indicator; the surrounding text provides the accessible label
-&nbsp;            contentDescription = null,
-&nbsp;            tint = tint,
-&nbsp;            modifier = Modifier.size(size * 0.5f),
-&nbsp;        )
+&nbsp;/** [share] is a fraction; this is it as whole percent. */
+&nbsp;private const val PERCENT = 100
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface InsightsState {
+<b class="fc">&nbsp;    data object Loading : InsightsState</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Everything the screen draws for the period the pager is on, already formatted against the
+&nbsp;     * workspace base currency — `domain` owns no copy and `MoneyFormatter` needs a currency the
+&nbsp;     * composable has no business resolving.
+&nbsp;     *
+&nbsp;     * [inFlight] covers the one thing the user can wait for here: paging or re-cadencing the period
+&nbsp;     * re-runs four `GROUP BY` rollups, and on a large workspace the answer does not arrive in the
+&nbsp;     * same frame as the new label. One flag rather than one per control, per AGENTS.md — the pager
+&nbsp;     * only ever has one change in the air.
+&nbsp;     */
+<b class="fc">&nbsp;    @optics</b>
+&nbsp;    data class Content(
+<b class="fc">&nbsp;        val mode: DashboardPeriod,</b>
+<b class="fc">&nbsp;        val period: InsightsPeriodUi,</b>
+&nbsp;        /** False once the period contains today; there is nothing to page forward into. */
+<b class="fc">&nbsp;        val canGoToNextPeriod: Boolean,</b>
+<b class="fc">&nbsp;        val baseCurrency: String,</b>
+<b class="fc">&nbsp;        val totalFormatted: String,</b>
+<b class="fc">&nbsp;        val categories: List&lt;InsightsCategoryUi&gt;,</b>
+<b class="fc">&nbsp;        val months: List&lt;InsightsMonthUi&gt;,</b>
+<b class="fc">&nbsp;        val merchants: List&lt;InsightsMerchantUi&gt;,</b>
+&nbsp;        /** Currency codes the base-currency filter left out of every figure above, largest first. */
+<b class="fc">&nbsp;        val hiddenCurrencies: List&lt;String&gt;,</b>
+&nbsp;        /** Whether [hiddenCurrencies] is *why* the period looks empty — see `SpendInsights`. */
+<b class="fc">&nbsp;        val hiddenByBaseCurrency: Boolean,</b>
+<b class="fc">&nbsp;        val inFlight: Boolean = false,</b>
+&nbsp;    ) : InsightsState {
+&nbsp;
+<b class="fc">&nbsp;        val isEmpty: Boolean get() = categories.isEmpty()</b>
+&nbsp;
+&nbsp;        companion object
 &nbsp;    }
+&nbsp;
+&nbsp;    companion object
 &nbsp;}
 &nbsp;
-&nbsp;/** A category&#39;s resolved appearance: what [SurferCategoryBubble] needs and nothing else. */
-<b class="nc">&nbsp;data class SurferCategoryVisual(</b>
-<b class="nc">&nbsp;    val icon: ImageVector,</b>
-<b class="nc">&nbsp;    val tint: Color,</b>
+&nbsp;/**
+&nbsp; * The pager&#39;s label reduced to the numbers its copy needs, so the composable resolves month names
+&nbsp; * and week wording from its own resources and the view model stays free of `@Composable`.
+&nbsp; */
+&nbsp;sealed interface InsightsPeriodUi {
+&nbsp;    /** [monthNumber] is 1-based, matching `Month.number`. */
+&nbsp;    data class Month(val monthNumber: Int, val year: Int) : InsightsPeriodUi
+&nbsp;
+&nbsp;    /** ISO week; [weekYear] can differ from the calendar year around New Year. */
+&nbsp;    data class Week(val weekNumber: Int, val weekYear: Int) : InsightsPeriodUi
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One row of the category breakdown, and one slice of the donut above it.
+&nbsp; *
+&nbsp; * [name] and [hue] are null for the uncategorized bucket, which has no stored appearance and no
+&nbsp; * name of its own — the screen supplies both, so the bucket keeps its colour when the user switches
+&nbsp; * language.
+&nbsp; */
+&nbsp;data class InsightsCategoryUi(
+&nbsp;    val id: String,
+&nbsp;    val name: String?,
+&nbsp;    val hue: Int?,
+&nbsp;    val spentFormatted: String,
+&nbsp;    val share: Float,
+&nbsp;) {
+&nbsp;    val sharePercent: Int get() = (share * PERCENT).roundToInt()
+&nbsp;}
+&nbsp;
+&nbsp;/** One column of the income-vs-expense chart. The two magnitudes drive the bars, the strings the a11y copy. */
+&nbsp;data class InsightsMonthUi(
+&nbsp;    /** 1-based, matching `Month.number`. */
+&nbsp;    val monthNumber: Int,
+&nbsp;    val year: Int,
+&nbsp;    val income: Long,
+&nbsp;    val expense: Long,
+&nbsp;    val incomeFormatted: String,
+&nbsp;    val expenseFormatted: String,
 &nbsp;)
 &nbsp;
-&nbsp;/**
-&nbsp; * Catalogue of category tints + icons, and the single resolver every category bubble goes
-&nbsp; * through. [visualFor] maps a category&#39;s *stored* `iconKey` + `hue` onto this palette; the
-&nbsp; * `…For(id)` helpers behind it stay as the fallback for rows that carry no stored appearance
-&nbsp; * and for call sites that only have a name to hash (transaction rows, previews).
-&nbsp; *
-&nbsp; * [iconKeys] and [hues] are positionally paired with [icons] and [tints] and must stay in
-&nbsp; * lockstep with `CategoryAppearance` in the domain module — uikit deliberately does not depend
-&nbsp; * on domain, so `CategoryPaletteParityTest` in feature/category asserts the two agree.
-&nbsp; */
-&nbsp;object SurferCategoryPalette {
-&nbsp;    val tints: List&lt;Color&gt; = listOf(
-&nbsp;        Color(0xFF2F8E6E), // mint   — hue 162
-&nbsp;        Color(0xFFB5533B), // amber  — hue  35
-&nbsp;        Color(0xFF2E5AA8), // indigo — hue 258
-&nbsp;        Color(0xFFA06A1E), // citrus — hue  68
-&nbsp;        Color(0xFF6B4E99), // plum   — hue 303
-&nbsp;        Color(0xFFB54A6B), // rose   — hue 340
-&nbsp;        Color(0xFFB54744), // clay   — hue   8
-&nbsp;        Color(0xFF6B7D3D), // moss   — hue  90
-&nbsp;    )
+&nbsp;/** One row of the top-merchants list. [merchant] is never blank — the aggregate excludes those rows. */
+&nbsp;data class InsightsMerchantUi(
+&nbsp;    val merchant: String,
+&nbsp;    val spentFormatted: String,
+&nbsp;    val transactionCount: Int,
+&nbsp;)
 &nbsp;
-&nbsp;    val icons: List&lt;ImageVector&gt; = listOf(
-&nbsp;        SurferIcons.Category,
-&nbsp;        SurferIcons.CreditCard,
-&nbsp;        SurferIcons.Savings,
-&nbsp;        SurferIcons.Cash,
-&nbsp;        SurferIcons.Wallet,
-&nbsp;        SurferIcons.Receipt,
-&nbsp;        SurferIcons.Event,
-&nbsp;        SurferIcons.Tag,
-&nbsp;    )
-&nbsp;
-&nbsp;    /** Hues in degrees behind [tints], in the same order. */
-&nbsp;    val hues: List&lt;Int&gt; = listOf(162, 35, 258, 68, 303, 340, 8, 90)
-&nbsp;
-&nbsp;    /** Semantic keys behind [icons], in the same order. Stored on the category, unlike an index. */
-&nbsp;    val iconKeys: List&lt;String&gt; = listOf(
-&nbsp;        &quot;category&quot;,
-&nbsp;        &quot;card&quot;,
-&nbsp;        &quot;savings&quot;,
-&nbsp;        &quot;cash&quot;,
-&nbsp;        &quot;wallet&quot;,
-&nbsp;        &quot;receipt&quot;,
-&nbsp;        &quot;event&quot;,
-&nbsp;        &quot;tag&quot;,
-&nbsp;    )
-&nbsp;
-&nbsp;    /** Marker for the seeded system Transfer category — matches `CategorySystemKind.TRANSFER.name`. */
-&nbsp;    const val SYSTEM_KIND_TRANSFER: String = &quot;TRANSFER&quot;
-&nbsp;
-&nbsp;    /** Icon key of the system Transfer category — matches `CategoryAppearance.TRANSFER_ICON_KEY`. */
-&nbsp;    const val TRANSFER_ICON_KEY: String = &quot;transfer&quot;
-&nbsp;
-&nbsp;    /** Tint for the system Transfer category. Kept fixed (not hashed) so it&#39;s always recognisable. */
-&nbsp;    val TransferTint: Color = Color(0xFF2E5AA8)
-&nbsp;    val TransferIcon: ImageVector = SurferIcons.SwapHoriz
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The one resolver every [SurferCategoryBubble] call site goes through.
-&nbsp;     *
-&nbsp;     * [iconKey] and [hue] are the category&#39;s stored choice; [id] is only the fallback seed for
-&nbsp;     * a category that has none (an older client&#39;s row), so a bubble is never blank or uniformly
-&nbsp;     * grey. A stored value that names nothing in this palette — a key from a newer build, a hue
-&nbsp;     * off the wheel — degrades to that same fallback rather than throwing.
-&nbsp;     */
-&nbsp;    fun visualFor(
-&nbsp;        id: String,
-&nbsp;        iconKey: String,
-&nbsp;        hue: Int,
-&nbsp;        systemKind: String? = null,
-&nbsp;    ): SurferCategoryVisual = SurferCategoryVisual(
-&nbsp;        icon = iconForKey(iconKey, systemKind) ?: iconFor(id, systemKind),
-&nbsp;        tint = tintForHue(hue, systemKind) ?: tintFor(id, systemKind),
-&nbsp;    )
-&nbsp;
-&nbsp;    /** Icon for a stored key, or null when the key is blank or unknown to this build. */
-&nbsp;    fun iconForKey(iconKey: String, systemKind: String? = null): ImageVector? {
-&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER || iconKey == TRANSFER_ICON_KEY) return TransferIcon
-&nbsp;        return icons.getOrNull(iconKeys.indexOf(iconKey))
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Tint for a stored hue, snapped to the nearest palette hue around the colour wheel, or null
-&nbsp;     * when the hue is off the wheel entirely (the &quot;never stored&quot; sentinel).
-&nbsp;     */
-&nbsp;    fun tintForHue(hue: Int, systemKind: String? = null): Color? {
-&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint
-&nbsp;        if (hue &lt; 0 || hue &gt;= HUE_DEGREES) return null
-&nbsp;        val nearest = hues.indices.minBy { circularHueDistance(hues[it], hue) }
-&nbsp;        return tints[nearest]
-&nbsp;    }
-&nbsp;
-&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {
-&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint
-&nbsp;        return tints[nonNegativeMod(stringHash(id), tints.size)]
-&nbsp;    }
-&nbsp;
-&nbsp;    fun iconFor(id: String, systemKind: String? = null): ImageVector {
-&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferIcon
-&nbsp;        return icons[nonNegativeMod(stringHash(id), icons.size)]
-&nbsp;    }
-&nbsp;
-&nbsp;    fun tintForName(name: String): Color =
-&nbsp;        if (name.isEmpty()) {
-&nbsp;            tints[0]
-&nbsp;        } else {
-&nbsp;            tints[
-&nbsp;                nonNegativeMod(
-&nbsp;                    name.fold(0L) { acc, c -&gt; acc * 31 + c.code },
-&nbsp;                    tints.size,
-&nbsp;                ),
-&nbsp;            ]
-&nbsp;        }
-&nbsp;
-&nbsp;    private fun circularHueDistance(a: Int, b: Int): Int {
-&nbsp;        val diff = kotlin.math.abs(a - b)
-&nbsp;        return minOf(diff, HUE_DEGREES - diff)
-&nbsp;    }
-&nbsp;
-&nbsp;    private const val HUE_DEGREES = 360
-&nbsp;
-&nbsp;    private fun nonNegativeMod(value: Long, size: Int): Int {
-&nbsp;        val s = size.toLong()
-&nbsp;        val r = value % s
-&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun stringHash(value: String): Long =
-&nbsp;        value.fold(0L) { acc, c -&gt; acc * 31 + c.code }
+&nbsp;sealed interface InsightsEvent {
+&nbsp;    data object OnBackClick : InsightsEvent
+&nbsp;    data object OnPreviousPeriodClick : InsightsEvent
+&nbsp;    data object OnNextPeriodClick : InsightsEvent
+&nbsp;    data class OnPeriodModeChanged(val mode: DashboardPeriod) : InsightsEvent
 &nbsp;}
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferCategoryBubblePreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;        ) {
-&nbsp;            Row(
-&nbsp;                horizontalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;                verticalAlignment = Alignment.CenterVertically,
-&nbsp;            ) {
-&nbsp;                SurferCategoryPalette.tints.zip(SurferCategoryPalette.icons).forEach { (tint, icon) -&gt;
-&nbsp;                    SurferCategoryBubble(icon = icon, tint = tint)
-&nbsp;                }
-&nbsp;            }
-&nbsp;            Row(
-&nbsp;                horizontalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;                verticalAlignment = Alignment.CenterVertically,
-&nbsp;            ) {
-&nbsp;                SurferCategoryBubble(
-&nbsp;                    icon = SurferIcons.Category,
-&nbsp;                    tint = SurferCategoryPalette.tints[0],
-&nbsp;                    size = 32.dp,
-&nbsp;                )
-&nbsp;                SurferCategoryBubble(
-&nbsp;                    icon = SurferIcons.Category,
-&nbsp;                    tint = SurferCategoryPalette.tints[0],
-&nbsp;                    size = 44.dp,
-&nbsp;                )
-&nbsp;                SurferCategoryBubble(
-&nbsp;                    icon = SurferIcons.Category,
-&nbsp;                    tint = SurferCategoryPalette.tints[0],
-&nbsp;                    size = 56.dp,
-&nbsp;                )
-&nbsp;                SurferCategoryBubble(
-&nbsp;                    icon = SurferIcons.Category,
-&nbsp;                    tint = SurferCategoryPalette.tints[0],
-&nbsp;                    size = 72.dp,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
+&nbsp;sealed interface InsightsEffect {
+&nbsp;    data object NavigateBack : InsightsEffect
 &nbsp;}
 </code>
 </pre>
@@ -349,7 +273,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-31 11:36</div>
 </div>
 </body>
 </html>
