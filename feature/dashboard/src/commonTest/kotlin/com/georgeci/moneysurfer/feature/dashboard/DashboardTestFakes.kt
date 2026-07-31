@@ -49,6 +49,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCurrentWorkspaceUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetDailySpendSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
@@ -114,6 +115,19 @@ internal fun newViewModel(
     transactions: FakeTransactionRepository,
     uiPreferences: UiPreferences = FakeUiPreferences(),
     baseCurrency: CurrencyCode = USD,
+    workspaceName: String = "Personal",
+    /**
+     * The workspace rows the device holds. Seeded with the one the session points at; pass an empty
+     * repository to model a device that has not pulled the row yet, which is the state the toolbar
+     * falls back to the app's own name for.
+     *
+     * Passing one **supersedes** [baseCurrency] and [workspaceName] — they are only read to build
+     * this default. Seed the row yourself if you need either, or a spec asking for `EUR` gets a
+     * workspace in `aWorkspace`'s default USD and fails inside the formatter rather than here.
+     */
+    workspaces: FakeGoalWorkspaceRepository = FakeGoalWorkspaceRepository(
+        listOf(aWorkspace(id = ws, baseCurrency = baseCurrency, name = workspaceName)),
+    ),
     rates: FakeExchangeRateRepository = FakeExchangeRateRepository(),
     goals: FakeSavingsGoalRepository = FakeSavingsGoalRepository(),
     hostCapabilities: FakeHostCapabilities = FakeHostCapabilities(isOffline = false),
@@ -124,7 +138,6 @@ internal fun newViewModel(
     recurringRules: FakeRecurringRuleRepository = FakeRecurringRuleRepository(),
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
-    val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
     // One instance for both readers: the headline is a projection of the rows' own progress list.
     val activeBudgetProgress = GetActiveBudgetProgressUseCase(
         getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
@@ -177,6 +190,8 @@ internal fun newViewModel(
             clock = clock,
         ),
         getMonthlyNetHistory = GetMonthlyNetHistoryUseCase(spendAnalytics, workspaces, session, clock),
+        clock = clock,
+        getCurrentWorkspace = GetCurrentWorkspaceUseCase(workspaces, session),
         uiPreferences = uiPreferences,
         hostCapabilities = hostCapabilities,
     )
