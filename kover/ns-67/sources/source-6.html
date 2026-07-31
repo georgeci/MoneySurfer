@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     5.3%
   </span>
   <span class="absValue">
-    (4/75)
+    (4/76)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     1.6%
   </span>
   <span class="absValue">
-    (16/995)
+    (16/996)
   </span>
 </td>
 </tr>
@@ -107,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     5.3%
   </span>
   <span class="absValue">
-    (4/75)
+    (4/76)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     1.6%
   </span>
   <span class="absValue">
-    (16/995)
+    (16/996)
   </span>
 </td>
 </tr>
@@ -146,6 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.runtime.getValue
 &nbsp;import androidx.compose.runtime.remember
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clipToBounds
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerItem
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerSection
@@ -256,6 +257,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            modifier = Modifier</b>
 <b class="nc">&nbsp;                .weight(1f)</b>
 <b class="nc">&nbsp;                .fillMaxHeight()</b>
+&nbsp;                // `NavDisplay` slides a leaving screen out by its own full width, and drawing is
+&nbsp;                // not bounded by layout: without this the outgoing screen paints across the
+&nbsp;                // drawer for the length of the transition, so switching destinations appears to
+&nbsp;                // repaint the destination list itself. The drawer is chrome and stays put.
+<b class="nc">&nbsp;                .clipToBounds()</b>
 <b class="nc">&nbsp;                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),</b>
 &nbsp;        ) {
 <b class="nc">&nbsp;            content()</b>
@@ -350,7 +356,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:52</div>
+    <div style="float:right;">generated on 2026-07-31 23:24</div>
 </div>
 </body>
 </html>

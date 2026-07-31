@@ -112,6 +112,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.runtime.getValue
 &nbsp;import androidx.compose.runtime.remember
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clipToBounds
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerItem
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerSection
@@ -222,6 +223,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            modifier = Modifier
 &nbsp;                .weight(1f)
 &nbsp;                .fillMaxHeight()
+&nbsp;                // `NavDisplay` slides a leaving screen out by its own full width, and drawing is
+&nbsp;                // not bounded by layout: without this the outgoing screen paints across the
+&nbsp;                // drawer for the length of the transition, so switching destinations appears to
+&nbsp;                // repaint the destination list itself. The drawer is chrome and stays put.
+&nbsp;                .clipToBounds()
 &nbsp;                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),
 &nbsp;        ) {
 &nbsp;            content()
@@ -316,7 +322,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:52</div>
+    <div style="float:right;">generated on 2026-07-31 23:24</div>
 </div>
 </body>
 </html>

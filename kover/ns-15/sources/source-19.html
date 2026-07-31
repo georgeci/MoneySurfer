@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserConfigRemoteSource</title>
+  <title>MoneySurfer Coverage Report > UserCollectionReader</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: UserConfigRemoteSource (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: UserCollectionReader (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserConfigRemoteSource</td>
+  <td class="name">UserCollectionReader</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,38 +46,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.remote.UserConfigDoc
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 &nbsp;
 &nbsp;/**
-&nbsp; * The one write of the per-user settings sync: `users/{uid}/config/{key}`.
+&nbsp; * Reads a collection under `users/{uid}` — the user-scoped counterpart of
+&nbsp; * [WorkspaceCollectionReader].
 &nbsp; *
-&nbsp; * A seam rather than a direct `firestore` call inside the plugin, for the reason
-&nbsp; * [AccountDeletionRemoteSource][com.georgeci.moneysurfer.data.remote.AccountDeletionRemoteSource]
-&nbsp; * exists: the decision logic around the write — what to push, when a row is stale, when a push may
-&nbsp; * be recorded — is the part worth testing, and gitlive&#39;s JVM artefact cannot be instantiated off
-&nbsp; * Android.
+&nbsp; * Deliberately whole-collection and cursorless, unlike every workspace read. The one collection
+&nbsp; * behind it (`config`) is about ten tiny documents and is not expected to grow much, so incremental
+&nbsp; * reads would buy nothing but cursor bookkeeping in a brand-new scope — and the Firestore rule then
+&nbsp; * only has to permit a bare `list` rather than prove a filtered, ordered query.
+&nbsp; *
+&nbsp; * &quot;Not expected to grow much&quot; is an expectation, not a guarantee, which is why [limit] is not
+&nbsp; * optional. Nothing prunes these documents: the config plugin stores keys it does not recognise so
+&nbsp; * a mixed-version pair of devices cannot lose each other&#39;s settings, and no code path deletes one
+&nbsp; * outside the account-deletion purge — so every renamed or retired `SettingKey` leaves an orphan
+&nbsp; * behind for good. Uncapped, a collection that grew through that drift (or a client bug, or a
+&nbsp; * compromised device) would be materialised whole into memory and re-applied to Room on every
+&nbsp; * foreground sync, on every one of the user&#39;s devices.
 &nbsp; */
-&nbsp;fun interface UserConfigRemoteSource {
+&nbsp;fun interface UserCollectionReader {
 &nbsp;
-&nbsp;    suspend fun write(uid: String, key: String, doc: UserConfigDoc)
-&nbsp;}
-&nbsp;
-&nbsp;@Single(binds = [UserConfigRemoteSource::class])
-&nbsp;class FirebaseUserConfigRemoteSource(
-&nbsp;    private val firestore: FirebaseFirestore,
-&nbsp;) : UserConfigRemoteSource {
-&nbsp;
-&nbsp;    override suspend fun write(uid: String, key: String, doc: UserConfigDoc) {
-&nbsp;        firestore
-&nbsp;            .collection(SyncCollection.USERS)
-&nbsp;            .document(uid)
-&nbsp;            .collection(SyncCollection.USER_CONFIG)
-&nbsp;            .document(key)
-&nbsp;            .set(doc)
-&nbsp;    }
+&nbsp;    /** At most [limit] documents. The caller decides what to do when the cap is reached. */
+&nbsp;    suspend fun fetchAll(uid: String, collectionName: String, limit: Int): List&lt;RemoteDocument&gt;
 &nbsp;}
 </code>
 </pre>
@@ -102,7 +93,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 21:52</div>
+    <div style="float:right;">generated on 2026-07-31 23:24</div>
 </div>
 </body>
 </html>
