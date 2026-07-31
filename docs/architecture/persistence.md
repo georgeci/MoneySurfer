@@ -17,9 +17,10 @@
 - For per-entity field shape see [data-models.md](data-models.md). For time
   type policy see [data-models.md#time-policy](data-models.md#time-policy)
   and [../../md/time.md](../../md/time.md).
-- Room schema version is frozen at 36 for the first release; every step above it needs
-  a hand-written migration and no release build may fall back to a destructive one —
-  see [Room schema versioning](#room-schema-versioning).
+- Room release baseline is 36 — provisional until the first release ships, frozen the
+  day it does. Every step above it needs a hand-written migration and no release build
+  may fall back to a destructive one — see
+  [Room schema versioning](#room-schema-versioning).
 
 READ WHEN:
 - changing Room schema
@@ -60,11 +61,23 @@ transient, but `pending_mutations` holds local writes that have not reached Fire
 yet, so a release-build schema bump there drops them silently. Bringing it under this
 policy needs its own migrations and is tracked separately.
 
-**Frozen release baseline: schema version 36.** That is the version of
-`MoneySurferDatabase` shipping with the first MVP release, recorded in code as
-`MONEY_SURFER_DB_RELEASE_BASELINE_VERSION`. It is a historical marker, not a moving
-floor — never raise it. The live version stays in `MONEY_SURFER_DB_VERSION`, which is
-the single source of truth the `@Database` annotation reads.
+**Release baseline: schema version 36**, recorded in code as
+`MONEY_SURFER_DB_RELEASE_BASELINE_VERSION` — the oldest version a released build must be
+able to upgrade *from*. The live version stays in `MONEY_SURFER_DB_VERSION`, which is the
+single source of truth the `@Database` annotation reads.
+
+> **Still provisional: the first release has not shipped.** Until it does, no database
+> exists outside a developer machine, so the baseline may legitimately move up with
+> `MONEY_SURFER_DB_VERSION` — a pre-release schema change can raise the baseline
+> *instead of* adding a migration, and `verifyRoomMigrations` is satisfied either way.
+> Prefer writing the migration anyway when it is cheap: it is the path that gets
+> exercised, and rehearsing it now is how the release-day chain is known to work.
+>
+> **At the first release this freezes.** Whoever cuts it pins the baseline to whatever
+> `MONEY_SURFER_DB_VERSION` ships, and from then on the number is a historical marker
+> that must never be raised: raising it later would excuse exactly the migrations that
+> real installs depend on. Every step from the frozen number upward needs a hand-written
+> migration, forever.
 
 Policy:
 
@@ -79,8 +92,8 @@ Policy:
   iOS via `Platform.isDebugBinary`, and the JVM desktop host unconditionally while it
   remains developer-only. A release build that hits an unmigrated step throws rather
   than silently dropping the user's ledger.
-- **Versions below the baseline are unreachable in the field.** Nothing under 36 ever
-  shipped, so the pre-baseline gaps (`< 25`, plus `26 → 27` and `28 → 29`) have no
+- **Versions below the baseline are unreachable in the field.** No build has shipped at
+  all yet, so the pre-baseline gaps (`< 25`, plus `26 → 27` and `28 → 29`) have no
   migration and never will. They are only reachable on a developer machine, where the
   destructive fallback handles them.
 - **Exported schemas are committed.** `data-local/build.gradle.kts` points Room's
@@ -98,6 +111,11 @@ Adding a schema change:
 1. Edit the entities and bump `MONEY_SURFER_DB_VERSION`.
 2. Build the module so Room exports `schemas/**/<version>.json`; commit it.
 3. Add `MIGRATION_<n>_<n+1>` in `data/db/migration/` and register it in
-   `DatabaseBuilder.kt`.
+   `DatabaseBuilder.kt`. Pre-release only: raising
+   `MONEY_SURFER_DB_RELEASE_BASELINE_VERSION` to the new version is the alternative,
+   valid while nothing has shipped — say which you chose in the PR.
 4. Run `./gradlew :data-local:verifyRoomMigrations` — it must be green before the PR.
+
+At release: pin `MONEY_SURFER_DB_RELEASE_BASELINE_VERSION` to the shipping
+`MONEY_SURFER_DB_VERSION`, and treat it as immutable from that point on.
 <!-- AI:END -->

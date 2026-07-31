@@ -156,6 +156,13 @@ val verifyRoomMigrations = tasks.register("verifyRoomMigrations") {
             .toSortedSet()
 
         val problems = mutableListOf<String>()
+        // The baseline is still mutable pre-release, so guard the direction: above the live
+        // version it would make the loop below iterate zero times and wave everything through.
+        if (baseline > declaredVersion) {
+            problems += "MONEY_SURFER_DB_RELEASE_BASELINE_VERSION ($baseline) is above " +
+                "MONEY_SURFER_DB_VERSION ($declaredVersion). The baseline is a floor, not a " +
+                "ceiling — above the live version it disables this check entirely."
+        }
         if (exported.isEmpty()) {
             problems += "No exported schemas found under ${schemasDir.asFile}."
         } else if (exported.max() != declaredVersion) {

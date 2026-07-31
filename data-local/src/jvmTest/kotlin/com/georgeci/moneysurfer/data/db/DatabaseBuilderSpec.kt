@@ -51,12 +51,13 @@ class DatabaseBuilderSpec : StringSpec({
         }
     }
 
-    "the frozen release baseline is the version the first release shipped" {
-        // Guards the constant the verifyRoomMigrations Gradle task reads: lowering it would
-        // silently excuse a missing migration, raising it would excuse every one below the
-        // new floor.
-        MONEY_SURFER_DB_RELEASE_BASELINE_VERSION shouldBe 36
-        (MONEY_SURFER_DB_VERSION >= MONEY_SURFER_DB_RELEASE_BASELINE_VERSION) shouldBe true
+    "the release baseline never runs ahead of the schema it is a floor for" {
+        // Deliberately not pinned to a literal: the first release has not shipped, so the
+        // baseline may still move up with MONEY_SURFER_DB_VERSION (see the constant's KDoc).
+        // What must hold either way is that it is a floor and not a ceiling — a baseline above
+        // the live version would make verifyRoomMigrations check an empty range and wave
+        // through a schema bump with no migration at all.
+        (MONEY_SURFER_DB_RELEASE_BASELINE_VERSION <= MONEY_SURFER_DB_VERSION) shouldBe true
     }
 })
 
