@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.feature.transaction.creation.TransactionTypeUi
 import com.georgeci.moneysurfer.screenshot.ScreenshotQualifiers
 import com.georgeci.moneysurfer.screenshot.ScreenshotSdk
 import com.georgeci.moneysurfer.screenshot.captureFullScreen
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,15 +43,26 @@ import kotlin.time.Instant
 @Config(sdk = [ScreenshotSdk], qualifiers = ScreenshotQualifiers)
 class TransactionCreationScreenshotTest {
 
+    private lateinit var hostTimeZone: TimeZone
+
     /**
      * The date row formats [OperationTimestamp] in the *host's* zone, so a machine east of UTC+12
      * would render the following day and fail against a reference recorded on CI. Pinning the
-     * default zone makes the frame the same everywhere; the JVM is the test's own, so nothing
-     * outside this suite sees it.
+     * default zone makes the frame the same everywhere.
+     *
+     * Restored in [restoreTimeZone] rather than left pinned: the default is JVM-global and the
+     * whole source set shares one test JVM, so a later date-sensitive test would otherwise inherit
+     * UTC and pass for a reason that has nothing to do with it.
      */
     @Before
     fun pinTimeZone() {
+        hostTimeZone = TimeZone.getDefault()
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    }
+
+    @After
+    fun restoreTimeZone() {
+        TimeZone.setDefault(hostTimeZone)
     }
 
     @Test
@@ -67,7 +79,6 @@ class TransactionCreationScreenshotTest {
                 note = "",
                 selectedAccount = null,
                 selectedCategory = null,
-                timestamp = OperationTimestamp,
             ),
             onEvent = {},
         )

@@ -54,7 +54,7 @@ class AccountDetailsScreenshotTest {
                 formattedIncome = "€0.00",
                 formattedExpenses = "€0.00",
                 chart = AccountBalanceChartUi(
-                    points = List(ChartPointCount) { it.toFloat() to 0f },
+                    points = List(ChartBalances.size) { it.toFloat() to 0f },
                     formattedDelta = "€0.00",
                     isDeltaNegative = false,
                 ),
@@ -118,7 +118,5 @@ class AccountDetailsScreenshotTest {
             2231f, 2288f, 2262f, 2240f, 2310f, 2295f, 2352f, 2330f, 2308f, 2374f,
             2360f, 2412f, 2390f, 2368f, 2430f, 2415f, 2462f, 2441f, 2470f, 2480f,
         )
-
-        val ChartPointCount = ChartBalances.size
     }
 }

@@ -55,7 +55,13 @@ class CategoryDetailsScreenshotTest {
         )
     }
 
-    /** Income reads the same numbers the other way round — worth a frame for the tint alone. */
+    /**
+     * Income reads the same numbers the other way round — worth a frame for the tint alone.
+     *
+     * Its own months rather than the expense ones: the hero is the latest month's total and the
+     * stats are derived from the same series, so borrowing Dining's trend would record a frame
+     * whose hero, average and bars contradict each other.
+     */
     @Test
     fun categoryDetailsIncome() = captureFullScreen("category_details_income") {
         CategoryDetailsContent(
@@ -68,13 +74,21 @@ class CategoryDetailsScreenshotTest {
                 isLeaf = true,
                 subcategories = emptyList(),
                 formattedTotal = "€3,200.00",
-                formattedAverage = "€3,200.00",
+                formattedAverage = "€3,120.00",
                 formattedPerTransaction = "€3,200.00",
                 transactionCount = 1,
+                months = listOf(
+                    CategoryTrendMonthUi(YearMonth(2025, 11), 300_000, "€3,000.00"),
+                    CategoryTrendMonthUi(YearMonth(2025, 12), 320_000, "€3,200.00"),
+                    CategoryTrendMonthUi(YearMonth(2026, 1), 300_000, "€3,000.00"),
+                    CategoryTrendMonthUi(YearMonth(2026, 2), 300_000, "€3,000.00"),
+                    CategoryTrendMonthUi(YearMonth(2026, 3), 302_000, "€3,020.00"),
+                    CategoryTrendMonthUi(YearMonth(2026, 4), 320_000, "€3,200.00"),
+                ),
                 transactions = listOf(
                     CategoryTransactionUi(
                         id = TransactionId("screenshot-tx-2"),
-                        title = "March payroll",
+                        title = "April payroll",
                         formattedAmount = "€3,200.00",
                         isExpense = false,
                         categoryHueSeed = "screenshot-cat-salary",

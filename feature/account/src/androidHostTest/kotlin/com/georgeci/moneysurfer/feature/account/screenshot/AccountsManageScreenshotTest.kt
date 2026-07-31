@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.account.screenshot
 
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
+import com.georgeci.moneysurfer.feature.account.manage.AccountManageUi
 import com.georgeci.moneysurfer.feature.account.manage.AccountsManageContent
 import com.georgeci.moneysurfer.feature.account.manage.AccountsManagePendingDelete
 import com.georgeci.moneysurfer.feature.account.manage.AccountsManageState
@@ -59,13 +61,34 @@ class AccountsManageScreenshotTest {
         )
     }
 
-    /** Accounts in more than one currency: the minor totals sit beside the headline, unconverted. */
+    /**
+     * Accounts in more than one currency: the minor totals sit beside the headline, unconverted.
+     *
+     * The two extra accounts are what those totals are *of* — the screen derives the row from the
+     * accounts it lists, so a frame with a dollar total and no dollar account would record a state
+     * the screen cannot reach.
+     */
     @Test
     fun accountsManageMultiCurrency() = captureFullScreen("accounts_manage_multi_currency") {
         AccountsManageContent(
             state = AccountsManageState.Content(
                 isEditing = false,
-                activeAccounts = PreviewActiveAccountsFull,
+                activeAccounts = PreviewActiveAccountsFull + listOf(
+                    AccountManageUi(
+                        id = AccountId("screenshot-acc-usd"),
+                        name = "Travel USD",
+                        type = AccountType.CARD,
+                        formattedBalance = "$1,240.00",
+                        currency = "USD",
+                    ),
+                    AccountManageUi(
+                        id = AccountId("screenshot-acc-gbp"),
+                        name = "London rent",
+                        type = AccountType.BANK,
+                        formattedBalance = "£310.50",
+                        currency = "GBP",
+                    ),
+                ),
                 archivedAccounts = emptyList(),
                 formattedTotal = "€11,575.32",
                 otherCurrencyTotals = listOf("$1,240.00", "£310.50"),
