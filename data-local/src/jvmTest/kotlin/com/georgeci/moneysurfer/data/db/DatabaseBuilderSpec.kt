@@ -51,6 +51,53 @@ class DatabaseBuilderSpec : StringSpec({
         }
     }
 
+    "a release build opens a database already at the current schema and keeps its rows" {
+        // The negative case above only proves it refuses. This is the everyday path: no version
+        // change, so the release default must open normally rather than treat "no migration
+        // needed" as "no migration found".
+        withDbDir { dir ->
+            val path = dir / "moneysurfer.db"
+            seedConfigEntry(path)
+
+            val database = getRoomDatabase(Room.databaseBuilder<MoneySurferDatabase>(path.toString()))
+            try {
+                runTest { database.configEntryDao().getByKey(SEEDED_KEY)?.value shouldBe SEEDED_VALUE }
+            } finally {
+                database.close()
+            }
+        }
+    }
+
+    "the debug fallback only fires on a mismatch — a matching schema keeps its rows" {
+        // The risk of leaving the fallback on for debuggable hosts would be it wiping on every
+        // launch. It must be inert whenever the schema already agrees.
+        withDbDir { dir ->
+            val path = dir / "moneysurfer.db"
+            seedConfigEntry(path)
+
+            val database = getRoomDatabase(
+                builder = Room.databaseBuilder<MoneySurferDatabase>(path.toString()),
+                allowDestructiveMigration = true,
+            )
+            try {
+                runTest { database.configEntryDao().getByKey(SEEDED_KEY)?.value shouldBe SEEDED_VALUE }
+            } finally {
+                database.close()
+            }
+        }
+    }
+
+    "a fresh database is stamped with the declared schema version" {
+        // Ties the constant to what Room actually writes, so a hand-edited @Database version or a
+        // stale exported schema shows up here as well as in verifyRoomMigrations.
+        withDbDir { dir ->
+            val path = dir / "moneysurfer.db"
+            seedConfigEntry(path)
+
+            userVersionOf(path) shouldBe MONEY_SURFER_DB_VERSION
+        }
+    }
+
     "the release baseline never runs ahead of the schema it is a floor for" {
         // Deliberately not pinned to a literal: the first release has not shipped, so the
         // baseline may still move up with MONEY_SURFER_DB_VERSION (see the constant's KDoc).
@@ -62,6 +109,39 @@ class DatabaseBuilderSpec : StringSpec({
 })
 
 private const val PRE_BASELINE_USER_VERSION = 20
+private const val SEEDED_KEY = "ui.theme_mode"
+private const val SEEDED_VALUE = "dark"
+
+private fun withDbDir(block: (Path) -> Unit) {
+    val dir = newTempDir("db-policy")
+    try {
+        block(dir)
+    } finally {
+        deleteRecursively(dir)
+    }
+}
+
+/** Creates the database at the current schema and leaves one row in it. */
+private fun seedConfigEntry(path: Path) {
+    val database = getRoomDatabase(Room.databaseBuilder<MoneySurferDatabase>(path.toString()))
+    try {
+        runTest { database.configEntryDao().write(SEEDED_KEY, SEEDED_VALUE, updatedAt = 1L) }
+    } finally {
+        database.close()
+    }
+}
+
+private fun userVersionOf(path: Path): Int {
+    val connection = BundledSQLiteDriver().open(path.toString())
+    return try {
+        connection.prepare("PRAGMA user_version").use { statement ->
+            statement.step()
+            statement.getLong(0).toInt()
+        }
+    } finally {
+        connection.close()
+    }
+}
 
 /** Room wraps the migration failure, so the reason can sit on a cause rather than the top frame. */
 private fun Throwable.messageChain(): String =
