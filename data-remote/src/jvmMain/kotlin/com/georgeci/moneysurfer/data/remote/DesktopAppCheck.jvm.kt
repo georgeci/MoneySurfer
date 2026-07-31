@@ -2,9 +2,7 @@ package com.georgeci.moneysurfer.data.remote
 
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.AppCheckProvider
-import com.google.firebase.appcheck.AppCheckProviderFactory
 import com.google.firebase.appcheck.AppCheckToken
 import com.google.firebase.appcheck.FirebaseAppCheck
 import dev.gitlive.firebase.FirebaseOptions
@@ -13,6 +11,7 @@ import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
+import java.net.URISyntaxException
 
 /**
  * App Check for the desktop host.
@@ -37,14 +36,11 @@ internal fun installDesktopAppCheck(
     exchange: DebugTokenExchange = DebugTokenExchange(::postJson),
 ) {
     val debugToken = env(ENV_APPCHECK_DEBUG_TOKEN)?.takeIf { it.isNotBlank() } ?: return
-    FirebaseAppCheck.getInstance()
-        .installAppCheckProviderFactory(
-            DesktopAppCheckProviderFactory(
-                options = options,
-                debugToken = debugToken,
-                exchange = exchange,
-            ),
-        )
+    // `AppCheckProviderFactory` has a single method, so a lambda is the whole factory — the
+    // FirebaseApp it is handed carries nothing this provider needs.
+    FirebaseAppCheck.getInstance().installAppCheckProviderFactory {
+        DesktopAppCheckProvider(options, debugToken, exchange)
+    }
 }
 
 /**
@@ -55,22 +51,17 @@ internal fun interface DebugTokenExchange {
     fun post(url: String, body: String): String
 }
 
-internal class DesktopAppCheckProviderFactory(
-    private val options: FirebaseOptions,
-    private val debugToken: String,
-    private val exchange: DebugTokenExchange,
-) : AppCheckProviderFactory {
-
-    override fun create(firebaseApp: FirebaseApp): AppCheckProvider =
-        DesktopAppCheckProvider(options, debugToken, exchange)
-}
-
 internal class DesktopAppCheckProvider(
     private val options: FirebaseOptions,
     private val debugToken: String,
     private val exchange: DebugTokenExchange,
 ) : AppCheckProvider {
 
+    /**
+     * `Tasks.call` dispatches through `Dispatchers.Main`, which on this host comes from
+     * `kotlinx-coroutines-swing` in `composeApp`. A JVM host without a main dispatcher would
+     * fail here rather than in the exchange itself.
+     */
     override fun getToken(): Task<AppCheckToken> = Tasks.call { exchangeDebugToken() }
 
     internal fun exchangeDebugToken(): AppCheckToken {
@@ -120,7 +111,9 @@ private fun openJsonPost(url: String): HttpURLConnection {
         URI(url).toURL().openConnection() as HttpURLConnection
     } catch (error: IOException) {
         throw HttpRequestException("Cannot open $url", error)
-    } catch (error: IllegalArgumentException) {
+    } catch (error: URISyntaxException) {
+        // `URI(String)` throws this, not IllegalArgumentException — only `URI.create` maps it to
+        // the unchecked one. Catching the wrong type let a malformed URL escape untyped.
         throw HttpRequestException("Malformed URL: $url", error)
     }
     connection.requestMethod = "POST"
@@ -132,7 +125,7 @@ private fun openJsonPost(url: String): HttpURLConnection {
     return connection
 }
 
-private fun postJson(url: String, body: String): String {
+internal fun postJson(url: String, body: String): String {
     val connection = openJsonPost(url)
     return try {
         connection.outputStream.use { it.write(body.toByteArray()) }
