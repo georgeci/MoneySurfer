@@ -60,18 +60,36 @@ private const val FrontEndY: Float = 0.82f
 private const val FrontGradientStartY: Float = 0.74f
 private const val FrontGradientAlpha: Float = 0.55f
 
+/** Which way the brand gradient runs behind a pre-auth screen. */
+enum class SurferAuthGradient {
+    /** Top to bottom — the stacked phone / tablet-portrait layout the ramp was drawn for. */
+    Vertical,
+
+    /**
+     * Top-left to bottom-right. On a short, wide window a vertical ramp is compressed into almost
+     * no travel and reads as a flat fill; running it along the diagonal restores the tonal shift.
+     */
+    Diagonal,
+}
+
 /**
  * The green gradient + wave band behind every pre-auth screen (onboarding + sign-in). Draw it edge
  * to edge (outside of [com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets]) so it tints the
  * status bar and the navigation bar / gesture ribbon as well.
  */
 @Composable
-fun SurferAuthBackground(modifier: Modifier = Modifier) {
+fun SurferAuthBackground(
+    modifier: Modifier = Modifier,
+    gradient: SurferAuthGradient = SurferAuthGradient.Vertical,
+) {
+    val colors = listOf(AuthColors.GreenTop, AuthColors.GreenBottom)
     Box(
         modifier = modifier.background(
-            Brush.verticalGradient(
-                colors = listOf(AuthColors.GreenTop, AuthColors.GreenBottom),
-            ),
+            when (gradient) {
+                SurferAuthGradient.Vertical -> Brush.verticalGradient(colors)
+                // Defaults run corner to corner, which is the diagonal we want.
+                SurferAuthGradient.Diagonal -> Brush.linearGradient(colors)
+            },
         ),
     ) {
         WaveDecoration(

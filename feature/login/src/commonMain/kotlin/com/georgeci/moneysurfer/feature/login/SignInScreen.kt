@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,21 +49,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
 import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
+import com.georgeci.moneysurfer.uikit.components.SurferAuthGradient
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.components.SurferPasswordField
 import com.georgeci.moneysurfer.uikit.components.SurferTextField
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
 import com.georgeci.moneysurfer.uikit.tokens.AuthColors
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.login.generated.resources.Res
 import moneysurfer.feature.login.generated.resources.sign_in_anonymous
@@ -132,6 +137,17 @@ private val OrLabelSize = 11.sp
 private val PrimaryLabelSize = 15.sp
 private val ContentMaxWidth: Dp = 480.dp
 
+// ── Split (wide + landscape) layout ──────────────────────────────────────────────────────────────
+private val SplitMaxWidth: Dp = 1120.dp
+private val SplitColumnGap: Dp = 40.dp
+private val SplitSheetMaxWidth: Dp = 432.dp
+private val SplitBrandIconSize: Dp = 44.dp
+private val SplitHeroTitleSize = 52.sp
+private val SplitHeroTitleLineHeight = 54.sp
+private val SplitHeroSubtitleMaxWidth: Dp = 380.dp
+private const val SplitBrandWeight = 0.54f
+private const val SplitFormWeight = 0.46f
+
 @Composable
 private fun SignInError.localized(): String = stringResource(
     when (this) {
@@ -182,49 +198,31 @@ fun SignInContent(
     // only the content is inset — that is what tints the system bars green. The gradient is light
     // at the top and the wave band is dark at the bottom, so the two bars get opposite icon tints.
     ConfigureSystemBars(darkStatusBarBackground = false, darkNavigationBarBackground = true)
-    Box(
+    // Measured on the window rather than inside the insets below, so opening the keyboard — which
+    // eats into the bottom inset — cannot flip the screen between layouts mid-typing.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .surferTestTagAsId()
             .testTag(SignInTestTags.Root),
     ) {
-        SurferAuthBackground(modifier = Modifier.fillMaxSize())
+        val split = isSplitLayout(width = maxWidth, height = maxHeight)
 
-        // The bottom safe-drawing inset carries the IME, so the insets below already lift the
-        // content clear of the keyboard. What was still missing is somewhere to lift it TO: with
-        // a fixed-height column the sheet was squeezed off-screen and the "Create account" button
-        // became unreachable. Measuring inside the inset padding yields a viewport height that
-        // already accounts for the keyboard, and the scroll container covers the rest.
-        BoxWithConstraints(
+        SurferAuthBackground(
+            modifier = Modifier.fillMaxSize(),
+            gradient = if (split) SurferAuthGradient.Diagonal else SurferAuthGradient.Vertical,
+        )
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .surferSafeInsets()
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
         ) {
-            val viewportHeight = maxHeight
-            Column(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth()
-                    .widthIn(max = ContentMaxWidth)
-                    .verticalScroll(rememberScrollState())
-                    .heightIn(min = viewportHeight)
-                    .padding(
-                        start = AppTheme.spacing.default,
-                        end = AppTheme.spacing.default,
-                        top = AppTheme.spacing.xLarge,
-                        bottom = AppTheme.spacing.large,
-                    ),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                // Exactly two children so SpaceBetween reproduces the pinned-to-bottom sheet of
-                // the original weight(1f) layout, which a scrollable column cannot use.
-                Column(modifier = Modifier.padding(bottom = AppTheme.spacing.large)) {
-                    SignInBrandHeader()
-                    Spacer(Modifier.height(AppTheme.spacing.xLarge))
-                    SignInHero()
-                }
-                SignInActionSheet(state = state, onEvent = onEvent)
+            if (split) {
+                SignInSplitLayout(state = state, onEvent = onEvent)
+            } else {
+                SignInStackedLayout(state = state, onEvent = onEvent)
             }
         }
 
@@ -241,6 +239,113 @@ fun SignInContent(
                 error = error,
                 onDismiss = { onEvent(SignInEvent.OnErrorDismiss) },
             )
+        }
+    }
+}
+
+/**
+ * Whether the brand block and the sheet sit side by side instead of stacked.
+ *
+ * Two conditions, both needed. [SurferWindowSize.Expanded] is the width at which two columns each
+ * keep a readable measure — below it (a tablet in portrait, the 834 dp artboard) the design still
+ * stacks. And the window has to be wider than it is tall: a 1024 dp tablet held in *portrait* is
+ * Expanded too, and splitting it would leave two tall, half-empty columns.
+ */
+private fun isSplitLayout(width: Dp, height: Dp): Boolean =
+    SurferWindowSize.ofWidth(width) >= SurferWindowSize.Expanded && width > height
+
+/**
+ * Phone and tablet-portrait: brand on top, sheet pinned to the bottom.
+ *
+ * The bottom safe-drawing inset carries the IME, so the insets applied by the caller already lift
+ * the content clear of the keyboard. What was still missing is somewhere to lift it TO: with a
+ * fixed-height column the sheet was squeezed off-screen and the "Create account" button became
+ * unreachable. Measuring inside the inset padding yields a viewport height that already accounts
+ * for the keyboard, and the scroll container covers the rest.
+ */
+@Composable
+private fun SignInStackedLayout(
+    state: SignInState,
+    onEvent: (SignInEvent) -> Unit,
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val viewportHeight = maxHeight
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .widthIn(max = ContentMaxWidth)
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = viewportHeight)
+                .padding(
+                    start = AppTheme.spacing.default,
+                    end = AppTheme.spacing.default,
+                    top = AppTheme.spacing.xLarge,
+                    bottom = AppTheme.spacing.large,
+                ),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            // Exactly two children so SpaceBetween reproduces the pinned-to-bottom sheet of the
+            // original weight(1f) layout, which a scrollable column cannot use.
+            Column(modifier = Modifier.padding(bottom = AppTheme.spacing.large)) {
+                SignInBrandHeader()
+                Spacer(Modifier.height(AppTheme.spacing.xLarge))
+                SignInHero()
+            }
+            SignInActionSheet(state = state, onEvent = onEvent)
+        }
+    }
+}
+
+/**
+ * Desktop and tablet-landscape: brand on the left, the sheet as a card on the right, both centred
+ * on the vertical axis. Stacking these would put the sheet below the fold on every landscape
+ * window, and the wave band — drawn along the bottom of the backdrop — would end up behind the
+ * card rather than beside it.
+ */
+@Composable
+private fun SignInSplitLayout(
+    state: SignInState,
+    onEvent: (SignInEvent) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxHeight()
+            .surferContentContainer(maxWidth = SplitMaxWidth)
+            .padding(
+                horizontal = AppTheme.spacing.xLarge,
+                vertical = AppTheme.spacing.large,
+            ),
+        horizontalArrangement = Arrangement.spacedBy(SplitColumnGap),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(SplitBrandWeight)) {
+            SignInBrandHeader(iconSize = SplitBrandIconSize)
+            Spacer(Modifier.height(AppTheme.spacing.xxLarge))
+            SignInHero(
+                titleSize = SplitHeroTitleSize,
+                titleLineHeight = SplitHeroTitleLineHeight,
+                subtitleMaxWidth = SplitHeroSubtitleMaxWidth,
+            )
+        }
+        // The sheet scrolls on its own: the brand block always fits, but the form is taller than a
+        // short landscape window (a phone on its side is ~410 dp tall) and has to stay reachable.
+        BoxWithConstraints(
+            modifier = Modifier
+                .weight(SplitFormWeight)
+                .fillMaxHeight(),
+        ) {
+            val viewportHeight = maxHeight
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = viewportHeight)
+                    .widthIn(max = SplitSheetMaxWidth),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                SignInActionSheet(state = state, onEvent = onEvent)
+            }
         }
     }
 }
@@ -268,13 +373,16 @@ private fun SignInErrorDialog(
 }
 
 @Composable
-private fun SignInBrandHeader(modifier: Modifier = Modifier) {
+private fun SignInBrandHeader(
+    modifier: Modifier = Modifier,
+    iconSize: Dp = BrandIconSize,
+) {
     Row(
         modifier = modifier.testTag(SignInTestTags.BrandHeader),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
     ) {
-        SurferAppIcon(size = BrandIconSize)
+        SurferAppIcon(size = iconSize)
         Text(
             text = stringResource(Res.string.sign_in_brand),
             style = AppTheme.typography.titleLarge,
@@ -285,13 +393,18 @@ private fun SignInBrandHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SignInHero(modifier: Modifier = Modifier) {
+private fun SignInHero(
+    modifier: Modifier = Modifier,
+    titleSize: TextUnit = HeroTitleSize,
+    titleLineHeight: TextUnit = HeroTitleLineHeight,
+    subtitleMaxWidth: Dp = HeroSubtitleMaxWidth,
+) {
     Column(modifier = modifier) {
         Text(
             text = stringResource(Res.string.sign_in_hero_title),
             color = AuthColors.OnBrand,
-            fontSize = HeroTitleSize,
-            lineHeight = HeroTitleLineHeight,
+            fontSize = titleSize,
+            lineHeight = titleLineHeight,
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier.testTag(SignInTestTags.HeroTitle),
         )
@@ -301,7 +414,7 @@ private fun SignInHero(modifier: Modifier = Modifier) {
             color = AuthColors.OnBrandMuted,
             style = AppTheme.typography.bodyLarge,
             modifier = Modifier
-                .widthIn(max = HeroSubtitleMaxWidth)
+                .widthIn(max = subtitleMaxWidth)
                 .testTag(SignInTestTags.HeroSubtitle),
         )
     }

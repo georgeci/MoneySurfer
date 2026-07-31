@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.ui
 
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SkikoComposeUiTest
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -9,7 +11,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.test.v2.runSkikoComposeUiTest
 import com.georgeci.moneysurfer.feature.login.AuthMode
 import com.georgeci.moneysurfer.feature.login.SignInContent
 import com.georgeci.moneysurfer.feature.login.SignInError
@@ -27,12 +29,18 @@ import java.awt.GraphicsEnvironment
  *
  * Answers step 1's two questions: `runComposeUiTest` runs inside a kotest [StringSpec] block, and
  * it renders headless (offscreen Skiko) with no display attached.
+ *
+ * Every case is pinned to a phone window by [runSignInTest]. `runComposeUiTest`'s default is
+ * 1024 × 768 — expanded *and* landscape — which sign-in now lays out as two columns, so leaving
+ * these on the default would quietly move the whole file onto the split layout and leave the
+ * stacked one, the layout nearly every user sees, with no state coverage at all. Geometry of the
+ * wide layouts is `SignInResponsiveLayoutTest`'s job.
  */
 @OptIn(ExperimentalTestApi::class)
 class SignInScreenStateTest : StringSpec({
 
     "submit button stays enabled on empty input so submitting can explain what is missing" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(state = SignInState(), onEvent = {})
             }
@@ -43,7 +51,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "submit button is enabled once the state can be submitted" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(
                     state = SignInState(email = "surfer@example.com", password = "secret1"),
@@ -56,7 +64,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "loading state shows the full screen loader and blocks the mode toggle" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(
                     state = SignInState(
@@ -75,7 +83,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "inline form-level error renders the shared error text" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(
                     state = SignInState(error = SignInError.InvalidCredentials),
@@ -88,7 +96,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "auth error renders a dialog instead of field or form text" {
-        runComposeUiTest {
+        runSignInTest {
             val events = mutableListOf<SignInEvent>()
             setContent {
                 SignInContent(
@@ -108,7 +116,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "email error renders under the email field, not as the shared error text" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(
                     state = SignInState(error = SignInError.EmailInvalid),
@@ -122,7 +130,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "password error renders under the password field" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(
                     state = SignInState(mode = AuthMode.SignUp, error = SignInError.PasswordTooShort),
@@ -136,7 +144,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "password is masked until the reveal toggle is tapped" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(state = SignInState(password = "secret1"), onEvent = {})
             }
@@ -148,7 +156,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "no error state renders no error text" {
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(state = SignInState(), onEvent = {})
             }
@@ -171,7 +179,7 @@ class SignInScreenStateTest : StringSpec({
     }
 
     "clicking submit and toggle emits the matching events" {
-        runComposeUiTest {
+        runSignInTest {
             val events = mutableListOf<SignInEvent>()
             setContent {
                 SignInContent(
@@ -195,7 +203,7 @@ class SignInScreenStateTest : StringSpec({
     "composition renders with no display attached" {
         GraphicsEnvironment.isHeadless() shouldBe true
 
-        runComposeUiTest {
+        runSignInTest {
             setContent {
                 SignInContent(state = SignInState(), onEvent = {})
             }
@@ -205,11 +213,19 @@ class SignInScreenStateTest : StringSpec({
     }
 })
 
+/** A 411 × 891 phone — Compact, so these cases exercise the stacked layout. */
+private const val PHONE_WIDTH_PX = 411f
+private const val PHONE_HEIGHT_PX = 891f
+
+@OptIn(ExperimentalTestApi::class)
+private fun runSignInTest(block: suspend SkikoComposeUiTest.() -> Unit) =
+    runSkikoComposeUiTest(size = Size(PHONE_WIDTH_PX, PHONE_HEIGHT_PX), block = block)
+
 /** Where the submit button sits, so two states can be compared for layout shift. */
 @OptIn(ExperimentalTestApi::class)
 private fun submitButtonTop(state: SignInState): Float {
     var top = Float.NaN
-    runComposeUiTest {
+    runSignInTest {
         setContent { SignInContent(state = state, onEvent = {}) }
         top = onNodeWithTag(SignInTestTags.SubmitButton).fetchSemanticsNode().positionInRoot.y
     }
