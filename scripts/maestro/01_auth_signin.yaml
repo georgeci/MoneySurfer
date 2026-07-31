@@ -11,6 +11,25 @@ name: Auth — Sign in with test user
 - launchApp:
     clearState: true
 
+# Wiping app data also clears `onboardingCompleted`, and onboarding gates the
+# route decision ahead of any session check (`AppLaunchViewModel`, issue #173).
+# So a cleared launch lands here, not on sign-in — asserting `signIn:root`
+# straight after `clearState` is what made this flow fail every night (#297).
+# The online build's onboarding is one step, so a single Continue commits the
+# flag and routes onward. 60s: this is the coldest launch in the suite (first
+# start after a clean install — Compose + Koin graph warm-up), the same budget
+# `ios/app-open.yaml` uses for the same reason.
+- extendedWaitUntil:
+    visible:
+      id: "onboarding:root"
+    timeout: 60000
+- tapOn:
+    id: "onboarding:continue"
+
+- extendedWaitUntil:
+    visible:
+      id: "signIn:root"
+    timeout: 20000
 - assertVisible:
     id: "signIn:root"
 - assertVisible:

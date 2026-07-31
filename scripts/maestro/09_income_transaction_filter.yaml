@@ -3,6 +3,14 @@ name: Transaction — Add income and filter list
 ---
 - runFlow: 03_dashboard_add_account.yaml
 
+# Recent lives below the Accounts widget 03 left us on, and a `notVisible` guard
+# only tests what is on screen — unscrolled, it would add another "Salary" every
+# run (#297).
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recent"
+    direction: DOWN
+    timeout: 20000
 - runFlow:
     when:
       notVisible: "Salary"
@@ -24,6 +32,16 @@ name: Transaction — Add income and filter list
       - tapOn:
           id: "transactionCreation:save"
 
+# Save navigates ahead of the write, and the dashboard reopens at the top.
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: "Salary"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:recent"
 - assertVisible:

@@ -6,6 +6,13 @@ name: Account — Details and transaction filters
 # (08, 17) own theirs — see README.md → Rules for writing a flow.
 - runFlow: 04_add_transaction.yaml
 
+# 04 leaves the dashboard scrolled down to its transaction in Recent; the account
+# card is in the Accounts widget above it, so scroll back up to reach it (#297).
+- scrollUntilVisible:
+    element:
+      text: "Main Bank"
+    direction: UP
+    timeout: 20000
 - tapOn:
     text: "Main Bank"
 

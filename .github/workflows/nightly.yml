@@ -241,26 +241,30 @@ jobs:
   maestro-android:
     name: Maestro Android (E2E)
     needs: decide
-    # Diagnostic while issue #297 remains open: the suite is flaky, so this job
-    # runs for trend/history signal but remains non-blocking via
-    # `continue-on-error`. Keeping it scheduled prevents E2E regressions from
-    # disappearing completely while isolation and navigation waits are fixed.
     if: needs.decide.outputs.run == 'true'
-    # QUARANTINED (issue #220): still partially red. Progress so far:
-    #   - qaAndroidDevice (instrumented sync tests): GREEN. The off-by-one
-    #     sync-count expectations were stale (they never accounted for the
-    #     workspace root doc, which every pull re-applies) and the harness threw
-    #     in @Before when it initialised the *default* FirebaseApp (Crashlytics
-    #     build-id missing in the instrumentation build). Both fixed in #220.
-    #   - qaMaestroOfflineAndroid (offline golden flow): GREEN.
-    #   - qaMaestroAndroid (online E2E): STILL RED. 15/18 flows fail right after
-    #     sign-in — the app never reaches the "Choose a workspace" screen. The
-    #     Firebase Auth emulator + seeded creds are valid (a direct
-    #     signInWithPassword succeeds), so this is an app-side E2E sign-in issue,
-    #     the same never-validated class as the iOS suite (#219), not a device or
-    #     seed problem. Needs dedicated E2E-wiring work before the job is green.
-    # Keep it running for signal, but don't let it gate the nightly. Remove this
-    # once the online Maestro suite is green too (see #219).
+    # Non-blocking while issue #297 lands. The state of each workload:
+    #   - qaAndroidDevice (instrumented sync tests): GREEN since #220 (stale
+    #     off-by-one sync counts that never accounted for the workspace root doc,
+    #     plus a @Before that initialised the *default* FirebaseApp without a
+    #     Crashlytics build id).
+    #   - qaMaestroOfflineAndroid (offline golden flow): was green, then started
+    #     failing at a different step each night — bare `assertVisible` calls
+    #     firing inside the window a write needs to land, and a Recent list the
+    #     configurable-dashboard widgets (#282–296) pushed below the fold. Fixed
+    #     in #297 with `extendedWaitUntil` / `scrollUntilVisible`.
+    #   - qaMaestroAndroid (online E2E): was 19/19 red, every night, with the
+    #     same two messages — not flake. Onboarding gates the startup route
+    #     ahead of any session check (`AppLaunchViewModel`, #173) and no online
+    #     flow walked it, so `01`/`16` asserted `signIn:root` on the welcome
+    #     screen and everything chaining `00_login` lost `dashboard:settings`.
+    #     The earlier note here blamed an app-side sign-in bug; the Auth
+    #     emulator and the seeded credentials were never the problem.
+    # The AVD is still reused between nights (booting one costs 5–8 min), but the
+    # app is now uninstalled before it is installed, so the device no longer
+    # carries state into a run that the Firebase emulator — always freshly empty
+    # — knows nothing about.
+    #
+    # Drop `continue-on-error` after 2–3 consecutive green nights (#297).
     continue-on-error: true
     runs-on: ubuntu-latest
     # 120 (was 90): one AVD boot now hosts three workloads — online E2E (with a

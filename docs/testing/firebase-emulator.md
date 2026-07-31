@@ -315,7 +315,8 @@ In `gradle/qa.gradle.kts`:
 | Task                              | Purpose                                                                                                    |
 |-----------------------------------|------------------------------------------------------------------------------------------------------------|
 | `maestroAssembleDebug`            | Builds the Android APK with `BuildConfig.USE_EMULATOR=true`.                                               |
-| `maestroInstallDebug`             | Builds the Android emulator APK + `adb install -r`.                                                        |
+| `maestroUninstallDebug`           | Removes a previously installed build so the suite starts on an empty `/data` (see below).                  |
+| `maestroInstallDebug`             | Builds the Android emulator APK, uninstalls the old one, then `adb install`.                               |
 | `qaMaestroAndroid` / `qaMaestro`   | Full Android pipeline: install APK → `firebase emulators:exec` → seed → `maestro test` → tear down.         |
 | `maestroBuildIosSimulator`        | Builds iOS Debug simulator app with `MS_USE_EMULATOR=YES`; default simulator name is `iPhone 17`.          |
 | `maestroInstallIosSimulator`      | Builds and installs the iOS simulator app on the booted simulator.                                         |
@@ -325,6 +326,20 @@ In `gradle/qa.gradle.kts`:
 ./gradlew qaMaestroAndroid
 ./gradlew qaMaestroIos -PiosSimulatorName="iPhone 17" -PiosSimulatorUdid=<udid>
 ```
+
+### Why the app is uninstalled first
+
+The emulator has no continuity: each `emulators:exec` starts an empty Auth + Firestore and
+`seed.sh` puts the users back. The *device* used to have plenty — the nightly reuses its AVD
+(`force-avd-creation: false`, since booting one costs 5–8 minutes), so the app's Room DB,
+DataStore preferences and persisted Firebase session survived from night to night, and
+`adb install -r` preserved them across the install.
+
+The two halves therefore disagreed: a create-if-missing guard would read `Main Bank` off the
+local DB and skip a create that the backend needed, and every assertion depending on server
+state diverged from there — differently on each attempt, which is what made the retry fail
+*more* flows than the first try (#297). Uninstalling first is the cheap half of the fix; the
+other half is that flows walk the onboarding gate (`scripts/maestro/README.md`, rule 6).
 
 ### Seed fixtures
 
