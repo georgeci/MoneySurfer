@@ -287,7 +287,7 @@
 ## qa-runbook
 - Title: Setup
 - File: docs/testing/qa-runbook.md
-- Lines: 49-376
+- Lines: 50-396
 - Tasks: testing, qa, reports, tooling
 
 ## room-schema-versioning

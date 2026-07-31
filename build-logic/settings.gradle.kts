@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 
 include("kmp")
+include("qa-tools")

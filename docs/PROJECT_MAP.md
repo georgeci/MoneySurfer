@@ -44,7 +44,7 @@ utils/                  small shared utilities (MviViewModel, AsyncState)
 *-test-fixtures/        shared test fixtures (domain, data, sync)
 integration-test/       Firebase/Room integration tests
 firestore-tests/        Firestore rules tests
-build-logic/            Gradle convention plugins
+build-logic/            Gradle convention plugins (qa-tools/: helpers for gradle/qa.gradle.kts)
 iosApp/                 native iOS Xcode entry point (online)
 iosAppOffline/          native iOS Xcode entry point (offline)
 ```
