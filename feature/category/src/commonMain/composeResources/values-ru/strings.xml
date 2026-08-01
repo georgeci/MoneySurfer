@@ -56,9 +56,11 @@
     <string name="category_details_hero_label_expense">Расходы за %1$s</string>
     <string name="category_details_hero_label_income">Доходы · %1$s</string>
     <string name="category_details_hero_label_transfer">Перевод · %1$s</string>
-    <string name="category_details_stat_average">В среднем / мес.</string>
+    <!-- Три плитки статистики в одном ряду: на экране 411dp под текст остаётся меньше 70dp.
+         Держите строки короткими — плитка обрезает подпись до одной строки. -->
+    <string name="category_details_stat_average">Ср. / мес.</string>
     <string name="category_details_stat_transactions">Операций</string>
-    <string name="category_details_stat_per_transaction">За операцию</string>
+    <string name="category_details_stat_per_transaction">За опер.</string>
     <string name="category_details_trend_title">Последние 6 месяцев</string>
     <string name="category_details_subcategories">Подкатегории</string>
     <string name="category_details_subcategories_empty">Подкатегорий нет. Всё учитывается прямо в этой категории.</string>
