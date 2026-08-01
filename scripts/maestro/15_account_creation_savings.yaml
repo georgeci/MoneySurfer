@@ -11,6 +11,14 @@ name: Account — Create savings account with opening balance
 # run for as long as it has existed (#351 review).
 - runFlow: 03_dashboard_add_account.yaml
 
+# Bring the whole Accounts widget on screen before the guard reads it — anchored
+# on the container, not on the Manage button, which is the section header and
+# leaves the rows below the fold; see the note in 10 (#297).
+- scrollUntilVisible:
+    element:
+      id: "dashboard:accounts"
+    direction: DOWN
+    timeout: 20000
 - runFlow:
     when:
       notVisible: "Rainy Day"
@@ -47,6 +55,22 @@ name: Account — Create savings account with opening balance
       - tapOn:
           id: "toolbar:back"
 
+# Reset to the top before walking down: popping back restores the offset this
+# flow left at the Manage button — see the note in 10 (#297).
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: "dashboard:balance"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Rainy Day"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:accounts"
 - assertVisible:

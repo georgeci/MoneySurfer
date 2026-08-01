@@ -17,35 +17,35 @@ name: Workspace — Create and select test workspace
 # has been selected on a prior run, since the app persists the active workspace
 # across launches — straight on the dashboard.
 #
-# Case 1: already on a dashboard. The toolbar renders the active workspace name,
-# so a missing "Test Workspace" means a different workspace is selected; walk
-# back to the picker and let case 2 below fix it.
+# Case 1: not on the picker (a restored session lands straight on a dashboard).
+# Walk back to the picker unconditionally and let case 2 below select the right
+# workspace.
+#
+# Unconditionally, rather than short-circuiting when the toolbar already names
+# `Test Workspace`. That branch existed here before and was dead weight: until
+# #442 `DashboardViewModel` passed `workspaceName = null`, so the toolbar always
+# read the default title and the guard was always false — the flow detoured
+# through Settings every single run anyway, after first burning a 15s wait on a
+# name that could not arrive (#297). #442 wires the name, so the short-circuit
+# could work now; it stays out because paying a couple of taps every time beats
+# paying a multi-second wait every time, and because a branch that only triggers
+# when a *different* workspace is selected is the branch least likely to be
+# exercised and most likely to rot.
 - runFlow:
     when:
       notVisible:
         id: "workspaceSelector:root"
     commands:
-      # Let the toolbar's workspace name arrive before judging it. The dashboard
-      # renders `state.workspaceName ?: defaultTitle`, so a read taken before the
-      # workspace streams in sees the fallback title, concludes "wrong
-      # workspace", and sends every chained flow on a needless settings-to-picker
-      # detour (#351 review).
+      - tapOn:
+          id: "dashboard:settings"
+      - assertVisible:
+          id: "settings:root"
+      - tapOn:
+          id: "settings:workspaceRow"
       - extendedWaitUntil:
-          visible: "Test Workspace"
-          timeout: 15000
-          optional: true
-      - runFlow:
-          when:
-            notVisible: "Test Workspace"
-          commands:
-            - tapOn:
-                id: "dashboard:settings"
-            - assertVisible:
-                id: "settings:root"
-            - tapOn:
-                id: "settings:workspaceRow"
-            - assertVisible:
-                id: "workspaceSelector:root"
+          visible:
+            id: "workspaceSelector:root"
+          timeout: 20000
 
 # Case 2: the picker is up — create the workspace when it's missing, then select
 # and confirm it.
@@ -80,18 +80,28 @@ name: Workspace — Create and select test workspace
                 id: "workspaceCreation:save"
 
       # Select the row, then confirm — the picker only enables the confirm
-      # button for the highlighted workspace.
+      # button for the highlighted workspace, and labels it after that
+      # workspace ("Use Test Workspace"). Tapping the row is therefore both the
+      # selection and the only place the choice is visible at all.
       - tapOn:
           text: "Test Workspace"
       - tapOn:
           id: "workspaceSelector:confirm"
 
-# Assert we landed on Dashboard content, in the workspace this flow promises.
-# The name is waited on rather than asserted outright: it arrives with the rest
-# of the dashboard state, so a bare assertVisible races the fallback title on a
-# loaded emulator — the same read 03 already guards with an explicit wait.
-- assertVisible:
-    id: "dashboard:root"
+# Landed on the Dashboard, in the workspace this flow promises. Both are waited
+# on rather than asserted: confirming writes the active workspace before it
+# navigates, and the toolbar name arrives with the rest of the dashboard state.
+#
+# The name is worth asserting again now that #442 wires `workspaceName` through
+# `DashboardViewModel` — before that it was hardcoded to null and this assertion
+# could only ever fail (#297). It is the one check that this flow delivered the
+# workspace it claims to, rather than leaving whichever one happened to be
+# selected; without it a wrong choice would surface much later, as a missing
+# fixture in some unrelated flow.
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
 - extendedWaitUntil:
     visible: "Test Workspace"
     timeout: 20000

@@ -7,6 +7,16 @@ name: Transaction — Add expense transaction
 - runFlow: 03_dashboard_add_account.yaml
 
 # Create the baseline expense once and reuse it across transaction flows.
+#
+# Scroll Recent into view before the guard reads it: `notVisible` tests what is
+# on screen, and 03 leaves the dashboard parked on the Accounts widget, with
+# Recent further down still (#297). Without this the guard sees no
+# "Test expense" on every run and adds another one.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recent"
+    direction: DOWN
+    timeout: 20000
 - runFlow:
     when:
       notVisible: "Test expense"
@@ -32,7 +42,17 @@ name: Transaction — Add expense transaction
       - tapOn:
           id: "transactionCreation:save"
 
-# Assert back on Dashboard and transaction appears in Recent
+# Back on the Dashboard — Save navigates ahead of the write landing, and the
+# screen reopens at the top, so wait for the root and scroll down to Recent.
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: "Test expense"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:recent"
 - assertVisible:
