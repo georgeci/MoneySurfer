@@ -61,9 +61,15 @@ val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
  * `ANDROID_SERIAL` — it has been seen selecting an attached handset while adb
  * correctly used the emulator — so the value is threaded into `--device` as well
  * as `adb -s`. `iosMaestroDeviceId` above has always done the same for iOS.
+ *
+ * Blank is treated as unset on each source in turn, not just absent: a wrapper
+ * expanding an empty variable into `-PandroidDeviceId=` leaves the property
+ * *present*, so a plain `?:` would keep `""` and hand adb a `-s ""` it rejects
+ * with a bare non-zero exit — while masking an `ANDROID_SERIAL` that was set.
  */
-val androidMaestroDeviceId: String? = providers.gradleProperty("androidDeviceId").orNull
-    ?: System.getenv("ANDROID_SERIAL")
+val androidMaestroDeviceId: String? =
+    providers.gradleProperty("androidDeviceId").orNull?.trim()?.ifEmpty { null }
+        ?: System.getenv("ANDROID_SERIAL")?.trim()?.ifEmpty { null }
 
 /**
  * `adb -s <serial>` prefix, or empty when nothing is pinned. A plain `List<String>`

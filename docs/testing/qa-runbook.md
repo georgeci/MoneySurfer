@@ -217,9 +217,9 @@ property (or env var) feeds both sides — `adb -s <serial>` and `maestro test
 --device <serial>` — across every Android Maestro task. It is the Android mirror
 of `-PiosSimulatorUdid`.
 
-Pass a real serial or omit the flag entirely; `-PandroidDeviceId=` with an empty
-value expands to `adb -s "" …` and fails the install with a bare non-zero adb
-exit rather than falling back to `ANDROID_SERIAL`.
+Blank counts as unset on each source in turn, so a wrapper that expands an empty
+variable into `-PandroidDeviceId=` falls through to `ANDROID_SERIAL` instead of
+handing adb a `-s ""` it rejects.
 
 Pick an **AVD** serial for the online lanes. `defaultEmulatorHost()` is hardcoded
 to `10.0.2.2` — the AVD-only alias for the host machine — so an app pointed at a
