@@ -191,6 +191,12 @@ private fun SurferPaneHeaderAction(action: SurferPaneAction) {
  * top app bar, drawn by the list pane. This is part of the detail pane's content, so it also skips
  * the sync badge [SurferToolbar] adds.
  *
+ * And deliberately not *lettered* like one either. Carrying the bar's `titleLarge` made this read
+ * as a second top app bar sitting next to the first, so the section looked split across two
+ * toolbars even though only one of them was one. `titleMedium` puts the title a step below the bar
+ * beside it, where the first line of a pane's content belongs. The row keeps the bar's height —
+ * see [PaneHeaderMinHeight] — because that is what keeps the two panes' content aligned.
+ *
  * It still takes [TopAppBarColors] and honours the container, title, navigation-icon and
  * action-icon roles, so a screen that colours its chrome gets the same treatment whichever pane it
  * lands in — the scroll-dependent roles are the only ones with nothing to map onto. The defaults
@@ -225,7 +231,7 @@ fun SurferPaneHeader(
         }
         Text(
             text = title,
-            style = AppTheme.typography.titleLarge,
+            style = AppTheme.typography.titleMedium,
             color = colors.titleContentColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -237,7 +243,11 @@ fun SurferPaneHeader(
     }
 }
 
-/** Matches the `TopAppBar` height the list pane draws, so the two panes line up. */
+/**
+ * Matches the `TopAppBar` height the list pane draws, so the two panes line up. What separates the
+ * header from the bar is its type, not its height — a shorter row would start the detail pane's
+ * content above the list pane's first row for no reason.
+ */
 private val PaneHeaderMinHeight = 64.dp
 private val TitleInset = 16.dp
 private val IconInset = 4.dp

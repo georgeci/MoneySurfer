@@ -15,6 +15,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarTestTags
+import com.georgeci.moneysurfer.uikit.navigation.LocalSurferCanNavigateBack
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.window.LocalSurferPane
 import com.georgeci.moneysurfer.uikit.window.SurferPane
@@ -76,12 +77,36 @@ class SurferPaneScaffoldTest : StringSpec({
             onAllNodesWithContentDescription(ADD_LABEL).fetchSemanticsNodes().size shouldBe 0
         }
     }
+
+    "a screen at the bottom of the back stack draws no back arrow" {
+        runComposeUiTest {
+            setContent { PaneScaffold(SurferPane(), canNavigateBack = false) }
+
+            onAllNodesWithTag(SurferToolbarTestTags.Back).fetchSemanticsNodes().size shouldBe 0
+            // Only the navigation affordance goes; the section's own FAB is unaffected.
+            onAllNodesWithContentDescription(ADD_LABEL).fetchSemanticsNodes().size shouldBe 1
+        }
+    }
+
+    "a list pane the drawer reset to draws no back arrow either" {
+        runComposeUiTest {
+            setContent {
+                PaneScaffold(SurferPane(role = SurferPaneRole.List), canNavigateBack = false)
+            }
+
+            onAllNodesWithTag(SurferToolbarTestTags.Back).fetchSemanticsNodes().size shouldBe 0
+            onAllNodesWithContentDescription(ADD_LABEL).fetchSemanticsNodes().size shouldBe 1
+        }
+    }
 })
 
 @Composable
-private fun PaneScaffold(pane: SurferPane) {
+private fun PaneScaffold(pane: SurferPane, canNavigateBack: Boolean = true) {
     AppTheme {
-        CompositionLocalProvider(LocalSurferPane provides pane) {
+        CompositionLocalProvider(
+            LocalSurferPane provides pane,
+            LocalSurferCanNavigateBack provides canNavigateBack,
+        ) {
             SurferPaneScaffold(
                 title = TITLE,
                 onBack = {},
