@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.domain.model.BurnRate
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.model.CategorySpend
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
+import com.georgeci.moneysurfer.domain.model.DayPart
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.MonthlyNetHistory
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
@@ -28,6 +29,7 @@ import com.georgeci.moneysurfer.domain.model.safeToSpend
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.Money
@@ -40,6 +42,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCurrentWorkspaceUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetMonthlyNetHistoryUseCase
@@ -50,6 +53,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetUpcomingRecurringUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.TimeZone
@@ -80,6 +84,8 @@ class DashboardViewModel(
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     private val getMonthlyNetHistory: GetMonthlyNetHistoryUseCase,
     private val getUpcomingRecurring: GetUpcomingRecurringUseCase,
+    private val clock: ClockUseCase,
+    getCurrentWorkspace: GetCurrentWorkspaceUseCase,
     uiPreferences: UiPreferences,
     hostCapabilities: HostCapabilities,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
@@ -105,6 +111,27 @@ class DashboardViewModel(
      */
     private val period = MutableStateFlow(DashboardPeriod.DEFAULT)
 
+    /**
+     * What the toolbar calls the active workspace, or null while nothing names one.
+     *
+     * Narrowed to the name here rather than carried as the whole [Workspace]: the row is rewritten
+     * with a fresh `updatedAt` on every sync pull, and a `distinctUntilChanged` over the whole
+     * object would let each of those — plus every description or base-currency edit — rebuild the
+     * entire dashboard state to produce a value equal to the one already on screen. Trimming before
+     * the guard folds `" Home "` into `"Home"` for the same reason.
+     *
+     * Null rather than blank: null is the screen's "fall back to the app name" signal, and a
+     * workspace named nothing but whitespace would otherwise draw an empty toolbar title instead of
+     * taking that fallback.
+     *
+     * `onStart` for the reason [layout] has one: the pointer is DataStore-backed and the row behind
+     * it a query, and the balance should not wait on either to draw.
+     */
+    private val workspaceName = getCurrentWorkspace()
+        .map { it?.name?.trim()?.ifBlank { null } }
+        .distinctUntilChanged()
+        .onStart { emit(null) }
+
     init {
         observeDashboard()
     }
@@ -126,11 +153,11 @@ class DashboardViewModel(
         // change — the new period beside the previous budget's figures — which resolves on the next
         // frame and only differs at all when the workspace runs budgets on both cadences.
         //
-        // The sixth source arrived with the budgets card, so the two the screen draws *around* the
-        // widgets — which layout, which span — ride together in [DashboardChrome] and free a slot.
-        // They are the pair to fold: both are local UI state that is always present, so neither can
-        // be the one a widget is waiting on.
-        val chrome = combine(layout, period, ::DashboardChrome)
+        // The sixth source arrived with the budgets card, so what the screen draws *around* the
+        // widgets — which layout, which span, whose workspace — rides together in [DashboardChrome]
+        // and frees a slot. They are the ones to fold: each carries an opening value of its own, so
+        // none of them can be what a widget is waiting on.
+        val chrome = combine(layout, period, workspaceName, ::DashboardChrome)
         val widgetSources = combine(
             chrome,
             getSafeToSpend(period.map { it.budgetPeriod }).onStart { emit(null) },
@@ -174,9 +201,12 @@ class DashboardViewModel(
                     formattedTotalBalance = balance?.headline,
                     otherCurrencyTotals = balance?.notConverted.orEmpty(),
                     ratesAsOf = balance?.asOf,
-                    workspaceName = null,
-                    workspaceInitial = null,
-                    greeting = null,
+                    workspaceName = widgets.chrome.workspaceName,
+                    workspaceInitial = widgets.chrome.workspaceInitial,
+                    // Read per emission rather than once at subscription, so a dashboard left open
+                    // across a boundary is corrected by the next transaction change instead of
+                    // greeting the user with the wrong half of the day until they navigate away.
+                    greeting = DayPart.at(clock.now(), TimeZone.currentSystemDefault()),
                     formattedTrendDelta = balance?.trend?.text,
                     isTrendDeltaNegative = balance?.trend?.isNegative == true,
                     balanceSeries = balance?.trend?.series.orEmpty(),
@@ -462,9 +492,24 @@ sealed interface DashboardState {
          * Renders as the staleness signal so a total computed offline says how old it is.
          */
         val ratesAsOf: String? = null,
+        /**
+         * The active workspace's name, or null while nothing names one — nobody signed in, no
+         * workspace selected, or a row the device has not pulled yet. The screen draws the app's
+         * own name in that case; it never draws a guess at which workspace this is.
+         */
         val workspaceName: String?,
+        /**
+         * The letter for the toolbar's avatar bubble, derived from [workspaceName]. Carried rather
+         * than re-derived on the screen so a leading space or a lowercase name cannot produce a
+         * different bubble than the title it is drawn beside.
+         */
         val workspaceInitial: String?,
-        val greeting: String?,
+        /**
+         * Which greeting the toolbar opens with, off the device clock. The part of day, not the
+         * sentence — that needs a locale this class does not have. Null only in a state built by
+         * hand; the view model always resolves one.
+         */
+        val greeting: DayPart?,
         /**
          * What the balance moved by this month, signed and formatted, or null when no window of
          * base-currency history backs a figure — see `toTrendUi`.
@@ -616,13 +661,35 @@ private fun CategorySpend.toUi(currency: CurrencyCode) = CategorySpendUi(
 )
 
 /**
- * What the screen draws around the widgets: which cards, in what order, and the span they are all
- * read at. Folded into one flow so the five `combine` takes can cover six sources.
+ * What the screen draws around the widgets: which cards, in what order, the span they are all read
+ * at, and what the toolbar calls the active workspace. Folded into one flow so the five `combine`
+ * takes can cover seven sources.
  */
 private data class DashboardChrome(
     val layout: DashboardLayoutConfig,
     val period: DashboardPeriod,
-)
+    /** Trimmed, or null while nothing names one — see `DashboardViewModel.workspaceName`. */
+    val workspaceName: String?,
+) {
+
+    /**
+     * The letter in the toolbar bubble. Taken off the trimmed name, so a workspace called
+     * " family " gets an F — the screen's own fallback reads the raw first character and would
+     * draw a space.
+     */
+    val workspaceInitial: String? get() = workspaceName?.initial()
+}
+
+/**
+ * The first *character* of a name as a display string — which is not always the first `Char`.
+ *
+ * A workspace called "🏠 Home" starts with a surrogate pair, and handing half of one to the avatar
+ * bubble draws a replacement box where the letter should be. Uppercased through [String.uppercase],
+ * which is locale-invariant: the toolbar bubble must not turn a Turkish user's "istanbul" into a
+ * dotted İ the title beside it does not have.
+ */
+private fun String.initial(): String =
+    take(if (first().isHighSurrogate() && length > 1) 2 else 1).uppercase()
 
 /** Everything the balance widget draws, already formatted. */
 private data class BalanceUi(

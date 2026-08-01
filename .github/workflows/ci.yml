@@ -625,6 +625,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonar --stacktrace
 
+      # The analysis above is green whether or not the coverage survived the import, so
+      # ask SonarCloud what it actually stored. This is the check that was missing while
+      # `:navigation`, `:utils` and most of `:feature:*` sat at no coverage at all — see
+      # the script header and `sonar.coverage.exclusions` in build.gradle.kts.
+      #
+      # Pull requests are skipped by the script's own contract: a PR analysis holds
+      # components for the changed files alone, so "no coverage for module X" cannot be
+      # told apart there from "nobody touched module X".
+      - name: Verify SonarCloud imported the coverage
+        if: github.event_name != 'pull_request'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew -q printSonarCoveredModules | bash scripts/ci/verify-sonar-coverage.sh
+
   detekt:
     name: detekt (blocking)
     runs-on: ubuntu-latest

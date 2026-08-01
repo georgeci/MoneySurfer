@@ -161,13 +161,13 @@
 ## emulator-jvm-bootstrap
 - Title: JVM Firebase bootstrap
 - File: docs/testing/firebase-emulator.md
-- Lines: 347-374
+- Lines: 362-389
 - Tasks: testing, emulator, jvm, gitlive
 
 ## emulator-maestro
 - Title: Maestro against the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 267-345
+- Lines: 267-360
 - Tasks: testing, emulator, maestro, android, ios
 
 ## emulator-run
@@ -185,7 +185,7 @@
 ## emulator-troubleshooting
 - Title: Troubleshooting
 - File: docs/testing/firebase-emulator.md
-- Lines: 376-449
+- Lines: 391-464
 - Tasks: testing, emulator, troubleshooting
 
 ## invites-discovery
@@ -287,7 +287,7 @@
 ## qa-runbook
 - Title: Setup
 - File: docs/testing/qa-runbook.md
-- Lines: 49-376
+- Lines: 50-396
 - Tasks: testing, qa, reports, tooling
 
 ## room-schema-versioning

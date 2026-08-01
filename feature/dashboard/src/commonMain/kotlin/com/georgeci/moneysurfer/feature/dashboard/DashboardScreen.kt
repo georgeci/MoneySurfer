@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.domain.model.DayPart
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -56,6 +57,10 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_s
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_afternoon
+import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_evening
+import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_morning
+import moneysurfer.feature.dashboard.generated.resources.dashboard_greeting_night
 import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
@@ -65,6 +70,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
 import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_title
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -206,7 +212,7 @@ fun DashboardContent(
                 letter = state.workspaceInitial
                     ?: workspaceName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),
                 primaryText = workspaceName,
-                secondaryText = state.greeting ?: stringResource(Res.string.dashboard_toolbar_greeting),
+                secondaryText = stringResource(state.greeting.labelRes()),
                 actions = {
                     SurferToolbarAction(
                         icon = SurferIcons.Edit,
@@ -243,6 +249,22 @@ fun DashboardContent(
             onEvent = onEvent,
         )
     }
+}
+
+/**
+ * The greeting's copy. Picked here rather than in the view model for the reason every other
+ * sentence on this screen is: the string resources — and the locale behind them — live here, and
+ * the view model carries only the decision.
+ *
+ * Null keeps the neutral screen name the toolbar showed before a greeting was ever resolved, which
+ * is what a hand-built state (a preview, a screenshot frame) renders.
+ */
+private fun DayPart?.labelRes(): StringResource = when (this) {
+    DayPart.Morning -> Res.string.dashboard_greeting_morning
+    DayPart.Afternoon -> Res.string.dashboard_greeting_afternoon
+    DayPart.Evening -> Res.string.dashboard_greeting_evening
+    DayPart.Night -> Res.string.dashboard_greeting_night
+    null -> Res.string.dashboard_toolbar_greeting
 }
 
 /**

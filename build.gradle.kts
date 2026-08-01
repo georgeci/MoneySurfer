@@ -162,6 +162,14 @@ allprojects {
     }
 }
 
+// The two `sonar.coverage.exclusions` values that carry meaning on their own: keep
+// every file of a module out of the coverage numbers, or keep nothing out. The
+// "nothing" pattern is not a no-op — `sonar.exclusions` already drops build output
+// from the analysis entirely, so it can never match an analysed file, and its whole
+// job is to occupy the key so SonarCloud's server-side `**/*` is not inherited.
+val excludeEverything = "**/*"
+val excludeNothing = "**/build/**"
+
 // Modules with no test sources of their own, plus test scaffolding. They are
 // deliberately absent from the `kover(...)` aggregation below, so Sonar receives
 // no coverage data for them; without an explicit exclusion that reads as a real
@@ -312,14 +320,24 @@ subprojects {
             // per-target layouts already listed in `mainCandidates`
             // (`iosArm64Main`, `iosX64Main`, `iosSimulatorArm64Main`) are covered
             // the day a module starts using one.
+            //
+            // Sent for *every* module, including the ones with nothing to exclude.
+            // A key the scanner omits is resolved server-side instead, and the value
+            // SonarCloud serves this project is `**/*` — so a silent module had every
+            // line of its coverage dropped on import while the analysis stayed green.
+            // That is what kept `:navigation`, `:utils`, `:sync-surfer`, `:app-config:*`
+            // and most of `:feature:*` at no coverage at all long after issue #272: the
+            // modules that looked fixed were the ones that happened to own an
+            // `src/iosMain` and therefore had a value of their own to send.
             val coverageExclusions = when {
-                path in coverageExcludedProjects -> listOf("**/*")
+                path in coverageExcludedProjects -> listOf(excludeEverything)
                 else -> mainDirs.filter { it.startsWith("src/ios") }.map { "$it/**/*" } +
                     entryPointSources.getOrElse(path) { emptyList() }
             }
-            if (coverageExclusions.isNotEmpty()) {
-                property("sonar.coverage.exclusions", coverageExclusions.joinToString(","))
-            }
+            property(
+                "sonar.coverage.exclusions",
+                coverageExclusions.ifEmpty { listOf(excludeNothing) }.joinToString(","),
+            )
         }
     }
 }
@@ -362,6 +380,43 @@ dependencies {
     // integration tests exercise the modules above, so its coverage data must be
     // merged in or that exercise is invisible to the report.
     kover(projects.integrationTest)
+}
+
+// Read back from the aggregation above rather than written out a second time, so the
+// list CI verifies against cannot drift from the list that produces the report.
+private val koverAggregatedPaths: Set<String> = configurations.getByName("kover")
+    .dependencies
+    .filterIsInstance<ProjectDependency>()
+    .map { it.path }
+    .toSet()
+
+// Aggregated for the coverage its tests give *other* modules; it owns no production
+// code, so it is never expected to carry coverage of its own.
+val coverageDonorOnly = ":integration-test"
+
+// Aggregating a module and then excluding it from coverage cancels out in silence: the
+// merged report carries its lines, Sonar drops them on import, and the analysis stays
+// green reporting nothing at all for that module.
+private val cancelledOutModules = (koverAggregatedPaths - coverageDonorOnly) intersect coverageExcludedProjects
+
+require(cancelledOutModules.isEmpty()) {
+    "Aggregated into Kover but excluded from Sonar coverage, so their lines are dropped on " +
+        "import: ${cancelledOutModules.sorted()}. Either drop the `kover(...)` entry or take " +
+        "the module out of `coverageExcludedProjects`."
+}
+
+// The modules SonarCloud must end up holding coverage for, as repository-relative
+// directories. Consumed by `scripts/ci/verify-sonar-coverage.sh`, which asserts each one
+// actually arrived — the analysis itself passes just as happily when coverage silently
+// never lands (issue #272 and its sequel: a module that sends no
+// `sonar.coverage.exclusions` inherits the server-side "exclude everything" default).
+tasks.register("printSonarCoveredModules") {
+    group = "verification"
+    description = "Prints the modules whose coverage SonarCloud is expected to import."
+    val modules = (koverAggregatedPaths - coverageDonorOnly)
+        .map { it.removePrefix(":").replace(':', '/') }
+        .sorted()
+    doLast { modules.forEach { println(it) } }
 }
 
 // Report filters for the merged report — they live on the root project because that

@@ -30,6 +30,17 @@ creates it:
 
 Anything a flow does not chain, it must not depend on.
 
+## Every run starts on a clean install
+
+`maestroInstallDebug` (and its offline sibling) uninstall before they install. The nightly AVD is
+deliberately reused between nights — booting one costs 5–8 minutes — so without that the app's
+Room DB, DataStore preferences and persisted Firebase session survive from one night to the next,
+while the Firebase emulator starts empty on every run. That mismatch is what let a create-if-missing
+guard read `Main Bank` off the local DB and skip a create the backend needed (#297).
+
+So: the device and the backend start empty together, and everything a flow sees inside a run was
+put there by the suite itself. `clearState` still governs isolation *within* a run.
+
 ## Rules for writing a flow
 
 **1. Prepare your own entry state; never clean up for whoever runs next.**
@@ -69,6 +80,21 @@ guard will re-create a fixture that is merely below the fold.
 Prefer the recorded contribution (`.*250.*`) over a derived ring percentage; prefer
 `assertNotVisible` on your own fixture over "the list is empty", which any neighbouring flow can
 falsify (see the Income filter in `07_account_details_and_filters.yaml`).
+
+**6. `clearState: true` puts you on onboarding, not on sign-in.**
+`AppLaunchViewModel` reads `onboardingCompleted` *before* it looks at the session (#173), so a
+wiped install lands on the welcome screen whatever the auth state is. Clear the gate — one
+`onboarding:continue` online, two offline — before asserting anything else. This is what made the
+whole online suite red every night: `01` and `16` asserted `signIn:root` straight after
+`clearState`, and because they wiped the shared install, every flow chaining `00_login` hit the
+same screen and lost `dashboard:settings` (#297). `00_login` now clears the gate when it finds it.
+
+**7. Wait after a write; assert only what is on screen.**
+`Save` navigates as soon as the write is issued, so the destination arrives ahead of its content —
+use `extendedWaitUntil` for the landing, not `assertVisible`. And the Dashboard is taller than one
+viewport now that its widgets are configurable (#282–296): the Recent list sits below the fold, so
+reach it with `scrollUntilVisible` rather than asserting where it used to be. Both mistakes report
+identically to "the app never saved it" (#297).
 
 ## Selectors
 

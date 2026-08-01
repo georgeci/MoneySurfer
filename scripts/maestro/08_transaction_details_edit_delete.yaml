@@ -89,5 +89,24 @@ name: Transaction — Details, edit and delete
 - tapOn:
     id: "transactionDetails:confirmDelete"
 
+# Back on the Dashboard. Popping back *restores* the scroll offset rather than
+# reopening at the top, and this flow left it parked down at Recent — so the
+# Accounts widget is now above us, and scrolling down could never reach it.
+# Reset to the balance card at the top first, then walk down to Accounts; that
+# pair works from wherever the pop happened to land (#297).
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: "dashboard:balance"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      id: "dashboard:accounts"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:accounts"

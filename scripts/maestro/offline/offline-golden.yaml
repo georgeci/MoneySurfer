@@ -20,14 +20,26 @@ tags:
 
 # 1. First launch lands on onboarding (#279 put it ahead of everything else;
 #    the standalone first-run currency picker this flow used to drive is gone).
-- assertVisible:
-    id: "onboarding:root"
+#    Waited, not asserted: `maestroInstallOfflineDebug` now uninstalls before it
+#    installs (#297), so this is a genuine first start — Compose and the Koin
+#    graph warm up behind the splash. Same 60s budget as `ios/app-open.yaml`.
+- extendedWaitUntil:
+    visible:
+      id: "onboarding:root"
+    timeout: 60000
 
 # 2. Value pitch → the offline-only "where do we start?" step → first account.
-#    The same CTA id carries both steps; Cash is preselected, and confirming it
-#    runs `FirstRunSeeder` before routing to the account form.
+#    The same CTA id carries both steps, which is exactly why the second tap
+#    needs a landmark of its own: fired back-to-back, both taps can land on the
+#    value step, and the flow then sits on the picker while asserting the
+#    account form. Wait for the account-kind list — it exists only on step 2.
 - tapOn:
     id: "onboarding:continue"
+- extendedWaitUntil:
+    visible:
+      id: "onboarding:kind:Cash"
+    timeout: 20000
+#    Cash is preselected, and confirming it runs `FirstRunSeeder` before routing.
 - tapOn:
     id: "onboarding:continue"
 
@@ -35,8 +47,16 @@ tags:
 #    the top bar where the keyboard can never cover it. The first-run variant of
 #    this screen carries a different title ("Your first account") but the same
 #    root, so the id holds for both entry points.
-- assertVisible:
-    id: "accountCreation:root"
+#
+#    Waited rather than asserted: the Continue above is not a plain navigation —
+#    `OnboardingViewModel.finish()` awaits `FirstRunSeeder.seedIfNeeded()` (which
+#    writes the workspace this screen needs) and persists `onboardingCompleted`
+#    before it posts the effect. A bare assert here fires inside that window and
+#    is one of the two steps this flow failed on in the nightly (#297).
+- extendedWaitUntil:
+    visible:
+      id: "accountCreation:root"
+    timeout: 30000
 - tapOn:
     id: "accountCreation:name"
 - inputText: "Cash"
@@ -45,8 +65,14 @@ tags:
 
 # 4. Seed verified — Dashboard renders with the balance widget and the
 #    add-transaction FAB (only shown once the "Cash" account exists).
-- assertVisible:
-    id: "dashboard:root"
+#    Every landing after a write is waited on, not asserted: Save persists the
+#    row and *then* navigates, so the assertion has to outlast a DB round trip
+#    (#297 root cause 2). Once the root is up the rest of the screen is a plain
+#    assert — it composes in the same frame.
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
 - assertVisible:
     id: "dashboard:balance"
 - assertVisible:
@@ -60,8 +86,10 @@ tags:
 #    keyboard keys instead (this exact flow once saved "252" and no note).
 - tapOn:
     id: "dashboard:addTransaction"
-- assertVisible:
-    id: "transactionCreation:root"
+- extendedWaitUntil:
+    visible:
+      id: "transactionCreation:root"
+    timeout: 20000
 - tapOn:
     id: "transactionCreation:note"
 - inputText: "Maestro golden expense"
@@ -72,8 +100,24 @@ tags:
     id: "transactionCreation:save"
 
 # 6. Balance updates — back on the Dashboard, the new transaction is listed.
-- assertVisible:
-    id: "dashboard:root"
+#    The root is waited on rather than asserted: Save navigates as soon as the
+#    write is issued, so the screen lands a frame or two ahead of its content.
+#
+#    The Recent list is then *scrolled to*, not asserted where it stands. It
+#    used to sit within the first viewport; the widgets added since (Safe to
+#    spend, Burn rate — the configurable dashboard, #282–296) pushed it below
+#    the fold, and a bare assert on an off-screen row is a failure Maestro
+#    reports identically to "the transaction was never saved" (#297). The
+#    balance above already proves the write landed; this proves it is listed.
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: "Maestro golden expense"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     text: "Maestro golden expense"
 
@@ -86,10 +130,19 @@ tags:
 #    Preferences has nothing online-only in it, and the Backup screen hides its
 #    cloud schedule/"Back up now"/"Delete cloud backup" surfaces offline,
 #    leaving the local archive + restore pair.
+#    Step 6 left the Dashboard scrolled down to the Recent list, so bring the
+#    top bar that carries the gear back into view before reaching for it.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:settings"
+    direction: UP
+    timeout: 20000
 - tapOn:
     id: "dashboard:settings"
-- assertVisible:
-    id: "settings:root"
+- extendedWaitUntil:
+    visible:
+      id: "settings:root"
+    timeout: 20000
 - assertVisible:
     id: "settings:categoriesRow"
 - assertVisible:

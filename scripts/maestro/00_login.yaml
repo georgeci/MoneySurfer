@@ -6,6 +6,53 @@ tags:
 - launchApp:
     clearState: false
 
+# Onboarding gates every other route (issue #173): `AppLaunchViewModel` reads
+# `onboardingCompleted` before it inspects the session at all, and lands on the
+# welcome screen whenever the flag is unset — the state a fresh install leaves,
+# and the one every `clearState: true` flow (01, 16) restores mid-suite. Nothing
+# here walked that gate, so the whole online suite ran into it: 01/16 asserted
+# `signIn:root` on the welcome screen, and every flow that chained this one lost
+# `dashboard:settings` for the same reason (#297).
+#
+# The online build's onboarding is a single value step — `OnboardingState`
+# reports `totalSteps = 1` when `isOffline` is false — so one Continue commits
+# the flag and routes to sign-in. (The offline build's second step is walked by
+# `offline/offline-golden.yaml`.)
+#
+# Optional wait, because the common case is a launch that already has the flag
+# set: the check costs its full budget only on the first flow of a run and right
+# after 01/16.
+#
+# 20s rather than the 10s the preference read itself needs. The first flow of
+# every run now cold-starts a *freshly installed* app — `maestroInstallDebug`
+# uninstalls first (#297) — so process start plus the Compose and Koin graph
+# warm-up land in front of this wait, on a CI runner rather than a workstation.
+# `01_auth_signin.yaml` and `ios/app-open.yaml` budget 60s for the same launch;
+# this one is optional, so the budget is paid on every flow that has no
+# onboarding to find, and 20s trades that cost against the margin.
+- extendedWaitUntil:
+    visible:
+      id: "onboarding:root"
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        id: "onboarding:root"
+    commands:
+      - tapOn:
+          id: "onboarding:continue"
+      # Wait for the gate to *clear*, not for a particular destination. Continue
+      # routes to sign-in, but `AppLaunchViewModel` restores a persisted Firebase
+      # session in parallel and bounces straight on to the workspace picker — so
+      # waiting on `signIn:root` fails whenever there is still a session on the
+      # device, which is most of the suite (#297). Its absence is the one thing
+      # true either way; the branches below then sort out where we landed.
+      - extendedWaitUntil:
+          notVisible:
+            id: "onboarding:root"
+          timeout: 20000
+
 # Firebase restores a persisted Auth session asynchronously on cold start, so
 # the sign-in screen flashes for ~1–2s before the app auto-navigates to the
 # workspace picker. Wait out that restore window before deciding whether a
@@ -13,11 +60,20 @@ tags:
 # below catches the flash, starts typing, and races the auto-navigation —
 # tapping a screen that's already vanishing (issue #219). `optional: true` lets
 # a genuinely logged-out launch fall straight through to the sign-in branch.
-- extendedWaitUntil:
-    visible:
-      id: "workspaceSelector:root"
-    timeout: 12000
-    optional: true
+#
+# Skipped when the sign-in form is already up: either onboarding just routed us
+# here or there was no session to restore. Waiting out a restore window that
+# cannot produce anything would cost every post-onboarding launch 12s.
+- runFlow:
+    when:
+      notVisible:
+        id: "signIn:root"
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: "workspaceSelector:root"
+          timeout: 12000
+          optional: true
 
 # TEST_EMAIL and TEST_PASSWORD are passed by the Maestro test suite from
 # scripts/e2e-test-user.properties. The same file is used by Firebase seed.
@@ -49,5 +105,26 @@ tags:
       - tapOn:
           id: "signIn:submit"
 
-      - assertVisible:
-          id: "workspaceSelector:root"
+      # Waited, not asserted: submit is a round trip to the Auth emulator, and
+      # `SignInViewModel` only posts `NavigateToWorkspaceSelector` once it comes
+      # back. A bare assert here fires inside that window — and because every
+      # flow enters through this one, it took the whole suite down with it
+      # (#297 root cause 2). A rejected sign-in still fails, just on the timeout
+      # rather than on the first frame.
+      - extendedWaitUntil:
+          visible:
+            id: "workspaceSelector:root"
+          timeout: 30000
+
+# Every branch above is conditional, so state what this flow actually promises:
+# the app is past its launch screens, with a session behind it. Without this a
+# launch that matched *no* branch — onboarding that outlasted the wait above, or
+# any screen nobody anticipated — reports success having done nothing, and the
+# damage lands on whichever flow chained it: `02` failing with
+# `Element not found: dashboard:settings` names neither the screen the app is on
+# nor the missing sign-in (#297). Asserting the two screens we must have left is
+# cheaper than an OR over the several we could legitimately be on.
+- assertNotVisible:
+    id: "onboarding:root"
+- assertNotVisible:
+    id: "signIn:root"

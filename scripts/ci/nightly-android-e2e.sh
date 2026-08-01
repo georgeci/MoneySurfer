@@ -19,6 +19,15 @@ overall=0
 # 1) Online E2E suite — the dominant flake source (AVD + Firebase emulator +
 #    full flow set). Auto-retry once before giving up so a single flaky flow
 #    doesn't cost a whole night of signal.
+#
+#    The retry is a clean slate on both sides, which is what makes it worth
+#    running at all (issue #297: the retry used to fail *more* flows than the
+#    first attempt, and a different set). `qaMaestroAndroid` opens its own
+#    `firebase emulators:exec`, so Auth and Firestore start empty and are
+#    re-seeded; and it depends on `maestroInstallDebug`, which now uninstalls
+#    before installing, so the device's Room DB, preferences and persisted
+#    session go with them. Neither task can go UP-TO-DATE — both are `Exec`
+#    tasks with no declared outputs — so the second attempt really does redo it.
 run_online() { ./gradlew qaMaestroAndroid --stacktrace; }
 if ! run_online; then
   echo "::warning title=E2E flake guard::qaMaestroAndroid failed — retrying once."

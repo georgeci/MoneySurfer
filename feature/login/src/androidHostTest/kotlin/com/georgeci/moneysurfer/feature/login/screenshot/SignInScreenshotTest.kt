@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.feature.login.SignInState
 import com.georgeci.moneysurfer.screenshot.ScreenshotQualifiers
 import com.georgeci.moneysurfer.screenshot.ScreenshotSdk
 import com.georgeci.moneysurfer.screenshot.captureFullScreen
+import com.georgeci.moneysurfer.screenshot.captureFullScreenAtWidths
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -26,8 +27,13 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [ScreenshotSdk], qualifiers = ScreenshotQualifiers)
 class SignInScreenshotTest {
 
+    /**
+     * The one state captured at every width, because sign-in has two layouts: stacked at Compact,
+     * and brand-beside-sheet once the window is expanded *and* landscape. The other cases below
+     * stay phone-only — they vary the sheet's contents, which the split does not change.
+     */
     @Test
-    fun signIn() = captureFullScreen("sign_in") {
+    fun signIn() = captureFullScreenAtWidths("sign_in") {
         SignInContent(state = SignInState(), onEvent = {})
     }
 

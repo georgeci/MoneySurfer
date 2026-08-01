@@ -9,6 +9,7 @@
 - [Firebase bootstrap (emulator)](#firebase-bootstrap-emulator)
 - [Filling a debug build with data](#filling-a-debug-build-with-data)
 - [QA tasks](#qa-tasks)
+  - [Configuration cache](#configuration-cache)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
   - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
 - [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
@@ -153,6 +154,25 @@ The common and Android-host aggregates discover test owners from
 maintained module list. Adding one of those source sets is therefore enough to
 join the corresponding aggregate.
 
+### Configuration cache
+
+Every QA task is configuration-cache compatible — no
+`notCompatibleWithConfigurationCache(...)` opt-outs, no discarded entries. Two
+rules keep it that way when you add or edit a task in
+[`gradle/qa.gradle.kts`](../../gradle/qa.gradle.kts):
+
+- **Helpers go in `build-logic/qa-tools`** (`MaestroTools`, `AllureTools`), not
+  in the script. A `doFirst` / `doLast` that calls a script-level function
+  captures the compiled script instance, which cannot be serialized.
+- **Actions capture values, not the build model.** Copy script-level `val`s into
+  locals inside the task's configuration block and use those; never touch
+  `project`, `rootProject` or `rootDir` from inside an action (use the captured
+  `repoRoot`, and `File.deleteRecursively()` instead of `project.delete(...)`).
+
+Spawning subprocesses (`adb`, `maestro`, `xcodebuild`, `firebase emulators:exec`,
+a nested `./gradlew`) from a task action is fine — only *configuration-time*
+work has to be cacheable.
+
 ## Plain test/Maestro tasks (no Allure)
 
 > **Note**: Android Maestro APK builds use `BuildConfig.USE_EMULATOR=true`; iOS Maestro simulator builds set `MS_USE_EMULATOR=YES`. Flows always talk to the local Firebase Emulator, never to the production project. `qaMaestroAndroid` / `qaMaestroIos` boot and tear down the emulator automatically. Standalone `maestroRunAll*` tasks require the emulator to already be running (`scripts/firebase/start.sh`).
@@ -182,20 +202,23 @@ simulators are visible to Maestro.
 
 With exactly one AVD or phone attached, nothing needs saying — `adb` and
 `maestro test` each pick the only target. With **both** attached, the install
-step dies on `adb: more than one device/emulator` and Maestro may drive the
-wrong one. Pass the serial from `adb devices`:
+step dies on `adb: more than one device/emulator`, `maestroUninstallDebug` can
+strip the dev build off your phone, and Maestro may drive the wrong one. Pass
+the serial from `adb devices`:
 
 ```bash
-./gradlew qaMaestroOfflineAndroid -PandroidDeviceSerial=emulator-5554
+./gradlew qaMaestroOfflineAndroid -PandroidDeviceId=emulator-5554
 ```
 
 `ANDROID_SERIAL` is honoured as a fallback, but it is **not** sufficient on its
-own: it steers `adb`, and Maestro does not read it. The Gradle property (or env
-var) feeds both sides — `adb -s <serial> install` and `maestro test --device
-<serial>` — and applies to every Android Maestro task (`maestroInstallDebug`,
-`maestroInstallOfflineDebug`, `maestroRunAll*`, `maestroRunOne*`,
-`qaMaestroAndroid`, `qaMaestroOfflineAndroid`). It is the Android mirror of
-`-PiosSimulatorUdid`.
+own: it steers `adb`, and Maestro picks its device independently. The Gradle
+property (or env var) feeds both sides — `adb -s <serial>` and `maestro test
+--device <serial>` — across every Android Maestro task. It is the Android mirror
+of `-PiosSimulatorUdid`.
+
+Pass a real serial or omit the flag entirely; `-PandroidDeviceId=` with an empty
+value expands to `adb -s "" …` and fails the install with a bare non-zero adb
+exit rather than falling back to `ANDROID_SERIAL`.
 
 Pick an **AVD** serial for the online lanes. `defaultEmulatorHost()` is hardcoded
 to `10.0.2.2` — the AVD-only alias for the host machine — so an app pointed at a

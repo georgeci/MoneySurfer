@@ -4,16 +4,21 @@ import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
+import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.aGoal
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
+import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.goalId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
+import com.georgeci.moneysurfer.domain.model.DayPart
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -25,6 +30,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 
 /**
  * The dashboard state the screen assembles regardless of which widget reads it: the layout, the
@@ -296,6 +304,133 @@ class DashboardViewModelTest : StringSpec({
 
         val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
         content.goals.map { it.name } shouldContainExactly listOf("Goal 1", "Goal 2")
+    }
+
+    "the toolbar names the workspace the session points at" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaceName = "Household budget",
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceName shouldBe "Household budget"
+        content.workspaceInitial shouldBe "H"
+    }
+
+    "the avatar letter is taken off the trimmed name, not the raw one" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaceName = "  family jar ",
+        )
+
+        // The screen's own fallback reads the first character of whatever it is handed, so an
+        // untrimmed name would draw a blank bubble beside a title with a visible leading gap.
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceName shouldBe "family jar"
+        content.workspaceInitial shouldBe "F"
+    }
+
+    "an emoji-led name keeps its whole glyph in the avatar bubble" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaceName = "🏠 Home",
+        )
+
+        // The house is a surrogate pair, so taking the first `Char` hands the bubble half of one
+        // and the toolbar draws a replacement box where the avatar should be.
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceInitial shouldBe "🏠"
+    }
+
+    "a workspace named nothing but whitespace falls back rather than drawing an empty title" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaceName = "   ",
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceName shouldBe null
+        content.workspaceInitial shouldBe null
+    }
+
+    "a workspace row the device has not pulled yet leaves the toolbar to its fallback" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaces = FakeGoalWorkspaceRepository(emptyList()),
+        )
+
+        // Null rather than a guess: the screen draws the app's own name, which is honest about
+        // knowing nothing, where a placeholder would name a workspace that may not be this one.
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceName shouldBe null
+        content.workspaceInitial shouldBe null
+    }
+
+    "a rename reaches the toolbar without the screen re-subscribing" {
+        val ws = workspaceId("ws-1")
+        val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, name = "Household")))
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaces = workspaces,
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().workspaceName shouldBe "Household"
+
+        workspaces.update(aWorkspace(id = ws, name = "Household budget"))
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceName shouldBe "Household budget"
+        content.workspaceInitial shouldBe "H"
+    }
+
+    "the greeting follows the device clock" {
+        val ws = workspaceId("ws-1")
+        // Built from a local wall-clock time rather than a fixed instant, so the spec asserts the
+        // same greeting on every machine the suite runs on.
+        val nineInTheMorning = LocalDateTime(2026, 7, 15, 9, 0).toInstant(TimeZone.currentSystemDefault())
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            clock = ClockUseCase(FixedClock(nineInTheMorning)),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().greeting shouldBe DayPart.Morning
+    }
+
+    "the greeting is resolved even when no workspace names the toolbar" {
+        val ws = workspaceId("ws-1")
+        val elevenAtNight = LocalDateTime(2026, 7, 15, 23, 0).toInstant(TimeZone.currentSystemDefault())
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            workspaces = FakeGoalWorkspaceRepository(emptyList()),
+            clock = ClockUseCase(FixedClock(elevenAtNight)),
+        )
+
+        // It takes no workspace to know the time of day, so the greeting line stays true even on
+        // the frame where the title has fallen back to the app's own name.
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.workspaceName shouldBe null
+        content.greeting shouldBe DayPart.Night
     }
 
     "the offline build carries its flag onto the dashboard" {
