@@ -11,6 +11,7 @@
 - [QA tasks](#qa-tasks)
   - [Configuration cache](#configuration-cache)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
+  - [Picking an Android device](#picking-an-android-device)
   - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
 - [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
 - [Integration tests (:integration-test)](#integration-tests-integration-test)
