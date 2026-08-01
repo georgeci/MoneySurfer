@@ -103,8 +103,14 @@ fun CategoryCreationScreen(
     )
 }
 
+/**
+ * The editor, drawn from a state it is handed rather than one it resolves.
+ *
+ * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+ * own — see docs/testing/screenshot-tests.md.
+ */
 @Composable
-private fun CategoryCreationContent(
+internal fun CategoryCreationContent(
     state: CategoryCreationState,
     isEditing: Boolean,
     onEvent: (CategoryCreationEvent) -> Unit,
