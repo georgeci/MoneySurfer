@@ -401,13 +401,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        confirmButton = {
 &nbsp;            TextButton(
 &nbsp;                onClick = onDismiss,
-&nbsp;                modifier = Modifier.testTag(SignInTestTags.ErrorDialogConfirm),
+&nbsp;                // The dialog is its own window, so the hosting screen&#39;s
+&nbsp;                // `surferTestTagAsId()` does not reach in here — it has to be applied
+&nbsp;                // again alongside the tag, the way `SurferDeleteTransactionDialog`
+&nbsp;                // does. Without it the tag never becomes a resource-id and Maestro
+&nbsp;                // cannot see either node, even though the dialog is plainly on screen
+&nbsp;                // (#297).
+&nbsp;                modifier = Modifier
+&nbsp;                    .surferTestTagAsId()
+&nbsp;                    .testTag(SignInTestTags.ErrorDialogConfirm),
 &nbsp;            ) {
 &nbsp;                Text(stringResource(Res.string.sign_in_error_dialog_ok))
 &nbsp;            }
 &nbsp;        },
 &nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        modifier = Modifier.testTag(SignInTestTags.ErrorDialog),
+&nbsp;        modifier = Modifier
+&nbsp;            .surferTestTagAsId()
+&nbsp;            .testTag(SignInTestTags.ErrorDialog),
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -798,7 +808,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 23:24</div>
+    <div style="float:right;">generated on 2026-08-01 10:52</div>
 </div>
 </body>
 </html>

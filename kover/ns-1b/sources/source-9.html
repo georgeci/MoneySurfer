@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConfigHydration</title>
+  <title>MoneySurfer Coverage Report > HostCapabilities</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: ConfigHydration (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: HostCapabilities (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConfigHydration</td>
+  <td class="name">HostCapabilities</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,18 +47,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
 &nbsp;/**
-&nbsp; * Warms the configuration engine&#39;s in-memory mirrors.
+&nbsp; * What this build of the app can do — the facts the host decides at compile time.
 &nbsp; *
-&nbsp; * Every backing store is suspend-only, so the synchronous reads on [HostCapabilities] need each
-&nbsp; * layer loaded once first. `AppLaunchViewModel` awaits this alongside the startup work it already
-&nbsp; * performs, before it resolves the start route — so nothing renders against a half-loaded chain.
+&nbsp; * Replaces `OfflineBuildFlags`, `SignInFeatureConfig` and `TransactionCreationFeatureConfig`: one
+&nbsp; * facade over the configuration engine&#39;s Build layer instead of three data classes with a Koin
+&nbsp; * binding each in every host.
 &nbsp; *
-&nbsp; * Exists as a domain facade because `navigation` (like feature modules) must not depend on
-&nbsp; * `app-config`. Idempotent; mirroring remote layers is what makes them survive a cold start
-&nbsp; * offline, not what makes reads synchronous.
+&nbsp; * Reads are synchronous because the Build layer is an in-memory map, but they still go through
+&nbsp; * `Config`, so a QA override can shadow one locally. That makes them valid only **after**
+&nbsp; * [ConfigHydration.hydrate] has completed — which `AppLaunchViewModel` awaits before it resolves
+&nbsp; * the start route, i.e. before any screen that injects this facade can exist.
 &nbsp; */
-&nbsp;fun interface ConfigHydration {
-&nbsp;    suspend fun hydrate()
+&nbsp;interface HostCapabilities {
+&nbsp;
+&nbsp;    /** Firebase-free build: no profile, sync, members, invites, logout or account deletion. */
+&nbsp;    val isOffline: Boolean
+&nbsp;
+&nbsp;    val signInEmailPassword: Boolean
+&nbsp;    val signInAnonymous: Boolean
+&nbsp;    val signInDemo: Boolean
+&nbsp;
+&nbsp;    /** Multi-account transfers in transaction creation. */
+&nbsp;    val transferEnabled: Boolean
+&nbsp;
+&nbsp;    /** The per-widget card-style picker on the dashboard customize screen. */
+&nbsp;    val dashboardWidgetStyle: Boolean
 &nbsp;}
 </code>
 </pre>
@@ -83,7 +96,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 23:24</div>
+    <div style="float:right;">generated on 2026-08-01 10:52</div>
 </div>
 </body>
 </html>

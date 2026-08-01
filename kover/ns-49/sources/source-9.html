@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     94.4%
   </span>
   <span class="absValue">
-    (352/373)
+    (356/377)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     90.8%
   </span>
   <span class="absValue">
-    (3317/3654)
+    (3319/3656)
   </span>
 </td>
 </tr>
@@ -107,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     94.4%
   </span>
   <span class="absValue">
-    (352/373)
+    (356/377)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     90.8%
   </span>
   <span class="absValue">
-    (3317/3654)
+    (3319/3656)
   </span>
 </td>
 </tr>
@@ -483,13 +483,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        confirmButton = {</b>
 <b class="fc">&nbsp;            TextButton(</b>
 <b class="fc">&nbsp;                onClick = onDismiss,</b>
-<b class="fc">&nbsp;                modifier = Modifier.testTag(SignInTestTags.ErrorDialogConfirm),</b>
+&nbsp;                // The dialog is its own window, so the hosting screen&#39;s
+&nbsp;                // `surferTestTagAsId()` does not reach in here — it has to be applied
+&nbsp;                // again alongside the tag, the way `SurferDeleteTransactionDialog`
+&nbsp;                // does. Without it the tag never becomes a resource-id and Maestro
+&nbsp;                // cannot see either node, even though the dialog is plainly on screen
+&nbsp;                // (#297).
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .surferTestTagAsId()</b>
+<b class="fc">&nbsp;                    .testTag(SignInTestTags.ErrorDialogConfirm),</b>
 &nbsp;            ) {
 &nbsp;                Text(stringResource(Res.string.sign_in_error_dialog_ok))
 &nbsp;            }
 &nbsp;        },
 <b class="fc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
-<b class="fc">&nbsp;        modifier = Modifier.testTag(SignInTestTags.ErrorDialog),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .surferTestTagAsId()</b>
+<b class="fc">&nbsp;            .testTag(SignInTestTags.ErrorDialog),</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
 &nbsp;
@@ -880,7 +890,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 23:24</div>
+    <div style="float:right;">generated on 2026-08-01 10:52</div>
 </div>
 </body>
 </html>

@@ -427,6 +427,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferDetailPlaceholder
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferStatValueFormat
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
@@ -623,6 +624,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                        icon = SurferIcons.Receipt,
 &nbsp;                        iconTint = visual.tint,
 &nbsp;                        modifier = Modifier.weight(1f),
+&nbsp;                        // A count, not money — the default split treatment would pad &quot;14&quot; to &quot;14.00&quot;.
+&nbsp;                        valueFormat = SurferStatValueFormat.Plain,
 &nbsp;                    )
 &nbsp;                    SurferAccountStatCard(
 &nbsp;                        label = stringResource(Res.string.category_details_stat_per_transaction),
@@ -844,7 +847,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 23:24</div>
+    <div style="float:right;">generated on 2026-08-01 10:52</div>
 </div>
 </body>
 </html>

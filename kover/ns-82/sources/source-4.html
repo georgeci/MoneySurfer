@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    40%
   </span>
   <span class="absValue">
-    (2/4)
+    (2/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    45%
   </span>
   <span class="absValue">
-    (6/12)
+    (9/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.7%
+    92.9%
   </span>
   <span class="absValue">
-    (26/30)
+    (39/42)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.7%
+    87.6%
   </span>
   <span class="absValue">
-    (300/350)
+    (416/475)
   </span>
 </td>
 </tr>
@@ -113,8 +113,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.compose.ui.unit.em
 &nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
@@ -123,13 +126,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+&nbsp;/** How [SurferAccountStatCard] renders its value. */
+&nbsp;enum class SurferStatValueFormat {
+&nbsp;    /** Split-amount treatment: superscript currency sign, large integer, small fraction. */
+&nbsp;    Amount,
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verbatim, at the same size and weight as [Amount]&#39;s integer part. For values that are not
+&nbsp;     * money — counts, percentages, streaks — which the split treatment would pad into a fake
+&nbsp;     * amount (&quot;14&quot; → &quot;14.00&quot;).
+&nbsp;     */
+&nbsp;    Plain,
+&nbsp;}
+&nbsp;
 &nbsp;/**
 &nbsp; * Compact &quot;in / out / balance · period&quot; stat tile used on Account Details (and other surfaces
 &nbsp; * that need a small KPI). Built on [SurferCard] so it inherits the active container style; the
 &nbsp; * caller picks the leading icon and its tint to denote direction (income, expense, neutral).
 &nbsp; *
-&nbsp; * Pass [value] as a pre-formatted amount string. When unknown, pass `null` to render an em-dash
-&nbsp; * placeholder; an empty string is treated the same way.
+&nbsp; * Pass [value] as a pre-formatted amount string, or set [valueFormat] to
+&nbsp; * [SurferStatValueFormat.Plain] to render it as typed. When unknown, pass `null` to render an
+&nbsp; * em-dash placeholder; an empty string is treated the same way.
+&nbsp; *
+&nbsp; * [label] is kept to one line: tiles are narrow — three across a 411 dp phone leave under 70 dp
+&nbsp; * for text — and a word longer than the tile breaks mid-word rather than wrapping. Keep labels
+&nbsp; * short enough that the ellipsis never shows.
 &nbsp; */
 &nbsp;@Composable
 &nbsp;fun SurferAccountStatCard(
@@ -138,6 +159,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    icon: ImageVector,
 &nbsp;    iconTint: Color,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    valueFormat: SurferStatValueFormat = SurferStatValueFormat.Amount,</b>
 <b class="pc">&nbsp;) {</b>
 <b class="pc">&nbsp;    val displayValue = value?.takeIf { it.isNotBlank() }</b>
 <b class="fc">&nbsp;    SurferCard(modifier = modifier) {</b>
@@ -156,16 +178,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                    text = label,</b>
 <b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
 <b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                    maxLines = 1,</b>
+<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
 &nbsp;                )
 <b class="fc">&nbsp;            }</b>
-<b class="pc">&nbsp;            if (displayValue == null) {</b>
-<b class="nc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;            when {</b>
+<b class="pc">&nbsp;                displayValue == null -&gt; Text(</b>
 <b class="nc">&nbsp;                    text = &quot;—&quot;,</b>
 <b class="nc">&nbsp;                    style = AppTheme.typography.titleLarge,</b>
 <b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
 &nbsp;                )
-<b class="fc">&nbsp;            } else {</b>
-<b class="fc">&nbsp;                SurferSplitAmount(</b>
+&nbsp;
+<b class="fc">&nbsp;                valueFormat == SurferStatValueFormat.Plain -&gt; Text(</b>
+<b class="fc">&nbsp;                    text = displayValue,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.displayLarge.copy(</b>
+<b class="fc">&nbsp;                        fontSize = SurferSplitAmountTier.Stat.integerSize,</b>
+<b class="fc">&nbsp;                        fontWeight = FontWeight.SemiBold,</b>
+<b class="fc">&nbsp;                        letterSpacing = SurferSplitAmountTier.Stat.letterSpacing,</b>
+<b class="fc">&nbsp;                        lineHeight = 1.em,</b>
+&nbsp;                    ),
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                    maxLines = 1,</b>
+<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                )
+&nbsp;
+<b class="fc">&nbsp;                else -&gt; SurferSplitAmount(</b>
 <b class="fc">&nbsp;                    formattedAmount = displayValue,</b>
 <b class="fc">&nbsp;                    tier = SurferSplitAmountTier.Stat,</b>
 <b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
@@ -195,6 +232,40 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                value = &quot;€1,148.49&quot;,
 &nbsp;                icon = SurferIcons.ArrowUp,
 &nbsp;                iconTint = AppTheme.materialColors.error,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferAccountStatCardPlainPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.fillMaxWidth(),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;        ) {
+&nbsp;            SurferAccountStatCard(
+&nbsp;                label = &quot;Avg / mo&quot;,
+&nbsp;                value = &quot;€196.83&quot;,
+&nbsp;                icon = SurferIcons.Calendar,
+&nbsp;                iconTint = AppTheme.materialColors.primary,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
+&nbsp;            SurferAccountStatCard(
+&nbsp;                label = &quot;Txns&quot;,
+&nbsp;                value = &quot;14&quot;,
+&nbsp;                icon = SurferIcons.Receipt,
+&nbsp;                iconTint = AppTheme.materialColors.primary,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;                valueFormat = SurferStatValueFormat.Plain,
+&nbsp;            )
+&nbsp;            SurferAccountStatCard(
+&nbsp;                label = &quot;Per txn&quot;,
+&nbsp;                value = &quot;€12.04&quot;,
+&nbsp;                icon = SurferIcons.Tag,
+&nbsp;                iconTint = AppTheme.materialColors.primary,
 &nbsp;                modifier = Modifier.weight(1f),
 &nbsp;            )
 &nbsp;        }
@@ -249,7 +320,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-31 23:24</div>
+    <div style="float:right;">generated on 2026-08-01 10:52</div>
 </div>
 </body>
 </html>
