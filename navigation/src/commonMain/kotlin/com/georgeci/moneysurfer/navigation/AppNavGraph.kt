@@ -32,6 +32,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.georgeci.moneysurfer.navigation.util.rememberBackNavigationNavEntryDecorator
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.components.SurferSplash
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -175,6 +176,7 @@ fun AppNavGraph(
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator(),
+                rememberBackNavigationNavEntryDecorator(backStack, entryProvider),
                 rememberNavigationResultNavEntryDecorator(
                     backStack = backStack,
                     entryProvider = entryProvider,

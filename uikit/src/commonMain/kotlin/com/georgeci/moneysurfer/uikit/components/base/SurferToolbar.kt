@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.navigation.LocalSurferCanNavigateBack
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -35,6 +36,13 @@ import moneysurfer.uikit.generated.resources.Res
 import moneysurfer.uikit.generated.resources.uikit_back
 import org.jetbrains.compose.resources.stringResource
 
+/**
+ * The app's top app bar.
+ *
+ * @param onBack drawn as the navigation icon, but only while [LocalSurferCanNavigateBack] says the
+ *   affordance leads somewhere. A screen states what back *means* for it; whether there is anything
+ *   to go back to is the navigation host's to know, and a section the drawer reset to has nothing.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurferToolbar(
@@ -45,11 +53,12 @@ fun SurferToolbar(
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     actions: @Composable RowScope.() -> Unit = {},
 ) {
+    val canNavigateBack = LocalSurferCanNavigateBack.current
     SurferToolbar(
         modifier = modifier,
         navigationIcon = {
             when {
-                onBack != null -> IconButton(
+                onBack != null && canNavigateBack -> IconButton(
                     onClick = onBack,
                     modifier = Modifier.testTag(SurferToolbarTestTags.Back),
                 ) {
