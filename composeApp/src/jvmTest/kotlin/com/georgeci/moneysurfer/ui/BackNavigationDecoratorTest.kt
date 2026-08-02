@@ -27,13 +27,14 @@ class BackNavigationDecoratorTest : StringSpec({
 
     "the decorator gives each entry the affordance its place on the stack allows" {
         val seen = mutableMapOf<String, Boolean>()
+        // A section the drawer reset to, with one detail opened on top of it.
+        val backStack = listOf("accounts", "account-1")
 
         runComposeUiTest {
             setContent {
-                val entries = remember { listOf(probe("accounts", seen), probe("account-1", seen)) }
-                // What `backNavigationContentKeys` produces for the stack [accounts, account-1]:
-                // the list is the bottom entry, the detail above it is not.
-                val decorator = rememberBackNavigationNavEntryDecorator<String>(setOf("account-1"))
+                val provider = remember { { key: String -> probe(key, seen) } }
+                val decorator = rememberBackNavigationNavEntryDecorator(backStack, provider)
+                val entries = remember { backStack.map(provider) }
 
                 rememberDecoratedNavEntries(entries, listOf(decorator)).forEach { it.Content() }
             }

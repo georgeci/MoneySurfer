@@ -16,17 +16,28 @@ import com.georgeci.moneysurfer.uikit.navigation.LocalSurferCanNavigateBack
  * composed — selecting the section a screen is already in resets the stack to just that screen, and
  * its arrow has to go with the entries that were below it.
  *
- * @param poppableContentKeys from [backNavigationContentKeys].
+ * Takes the [backStack] rather than the keys [backNavigationContentKeys] derives from it, so the
+ * navigation host is left with one call and nothing to hold: which entries can go back is this
+ * file's business, and the host has no test harness to cover it in.
+ *
+ * The keys are derived on every composition rather than through a `derivedStateOf`. Memoizing them
+ * would have to key on [entryProvider], which the host rebuilds each composition, so the cache
+ * would miss every time anyway — and a back stack is a handful of entries. Only the *decorator* is
+ * memoized, on the keys themselves, so an unchanged stack does not hand `NavDisplay` a new one.
  */
 @Composable
 fun <T : Any> rememberBackNavigationNavEntryDecorator(
-    poppableContentKeys: Set<Any>,
-): NavEntryDecorator<T> = remember(poppableContentKeys) {
-    NavEntryDecorator { entry ->
-        CompositionLocalProvider(
-            LocalSurferCanNavigateBack provides (entry.contentKey in poppableContentKeys),
-        ) {
-            entry.Content()
+    backStack: List<T>,
+    entryProvider: (T) -> NavEntry<T>,
+): NavEntryDecorator<T> {
+    val poppableContentKeys = backNavigationContentKeys(backStack, entryProvider)
+    return remember(poppableContentKeys) {
+        NavEntryDecorator { entry ->
+            CompositionLocalProvider(
+                LocalSurferCanNavigateBack provides (entry.contentKey in poppableContentKeys),
+            ) {
+                entry.Content()
+            }
         }
     }
 }

@@ -32,7 +32,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.georgeci.moneysurfer.navigation.util.backNavigationContentKeys
 import com.georgeci.moneysurfer.navigation.util.rememberBackNavigationNavEntryDecorator
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.components.SurferSplash
@@ -151,13 +150,6 @@ fun AppNavGraph(
         derivedStateOf { backStack.lastOrNull { it is Route.TopLevel } as? Route.TopLevel }
     }
 
-    // Which screens may draw a back affordance at all. Recomputed from the stack rather than
-    // decided per screen: a section reset to by the drawer has nothing below it, the same section
-    // pushed from the dashboard on a phone does.
-    val poppableContentKeys by remember(backStack) {
-        derivedStateOf { backNavigationContentKeys(backStack, entryProvider) }
-    }
-
     val navDisplay: @Composable () -> Unit = {
         NavDisplay(
             modifier = Modifier.background(AppTheme.materialColors.background),
@@ -184,7 +176,7 @@ fun AppNavGraph(
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator(),
-                rememberBackNavigationNavEntryDecorator(poppableContentKeys),
+                rememberBackNavigationNavEntryDecorator(backStack, entryProvider),
                 rememberNavigationResultNavEntryDecorator(
                     backStack = backStack,
                     entryProvider = entryProvider,
