@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
+import com.georgeci.moneysurfer.uikit.components.account.SurferStatValueFormat
 import com.georgeci.moneysurfer.uikit.components.account.SurferTotalBalanceCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -101,6 +102,41 @@ class SurferAccountScreenshotTest {
                 title = "Balance trend",
                 delta = "+€412 this month",
                 modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    /**
+     * The three-up row Category Details uses — the tightest layout the tile ships in, and the one
+     * that surfaced both a count rendered as money ("14" → "14.00") and a label breaking mid-word.
+     */
+    @Test
+    fun surferAccountStatsThreeUp() = captureLightAndDark("surfer_account_stats_three_up") {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            SurferAccountStatCard(
+                label = "Avg / mo",
+                value = "€196.83",
+                icon = SurferIcons.Calendar,
+                iconTint = AppTheme.materialColors.primary,
+                modifier = Modifier.weight(1f),
+            )
+            SurferAccountStatCard(
+                label = "Txns",
+                value = "14",
+                icon = SurferIcons.Receipt,
+                iconTint = AppTheme.materialColors.primary,
+                modifier = Modifier.weight(1f),
+                valueFormat = SurferStatValueFormat.Plain,
+            )
+            SurferAccountStatCard(
+                label = "Per txn",
+                value = "€12.04",
+                icon = SurferIcons.Tag,
+                iconTint = AppTheme.materialColors.primary,
+                modifier = Modifier.weight(1f),
             )
         }
     }

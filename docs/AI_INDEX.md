@@ -161,13 +161,13 @@
 ## emulator-jvm-bootstrap
 - Title: JVM Firebase bootstrap
 - File: docs/testing/firebase-emulator.md
-- Lines: 347-374
+- Lines: 362-389
 - Tasks: testing, emulator, jvm, gitlive
 
 ## emulator-maestro
 - Title: Maestro against the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 267-345
+- Lines: 267-360
 - Tasks: testing, emulator, maestro, android, ios
 
 ## emulator-run
@@ -185,7 +185,7 @@
 ## emulator-troubleshooting
 - Title: Troubleshooting
 - File: docs/testing/firebase-emulator.md
-- Lines: 376-449
+- Lines: 391-464
 - Tasks: testing, emulator, troubleshooting
 
 ## invites-discovery
@@ -359,7 +359,7 @@
 ## screenshot-tests
 - Title: Two kinds of capture
 - File: docs/testing/screenshot-tests.md
-- Lines: 36-267
+- Lines: 39-299
 - Tasks: testing, uikit, screenshot, roborazzi
 
 ## security-audit-2026-07

@@ -24,6 +24,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferDetailPlaceholder
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
+import com.georgeci.moneysurfer.uikit.components.account.SurferStatValueFormat
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
@@ -145,8 +146,14 @@ private fun CategoryDetailsPlaceholder(
 
 private const val SKELETON_ROWS = 5
 
+/**
+ * The category, drawn from a state it is handed rather than one it resolves.
+ *
+ * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+ * own — see docs/testing/screenshot-tests.md.
+ */
 @Composable
-private fun CategoryDetailsContent(
+internal fun CategoryDetailsContent(
     state: CategoryDetailsState.Content,
     onEvent: (CategoryDetailsEvent) -> Unit,
 ) {
@@ -220,6 +227,8 @@ private fun CategoryDetailsContent(
                         icon = SurferIcons.Receipt,
                         iconTint = visual.tint,
                         modifier = Modifier.weight(1f),
+                        // A count, not money — the default split treatment would pad "14" to "14.00".
+                        valueFormat = SurferStatValueFormat.Plain,
                     )
                     SurferAccountStatCard(
                         label = stringResource(Res.string.category_details_stat_per_transaction),

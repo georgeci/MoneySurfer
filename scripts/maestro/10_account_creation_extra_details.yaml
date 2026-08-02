@@ -9,6 +9,20 @@ name: Account — Create card account with extra details
 # dependency instead of leaving it to luck (#351 review).
 - runFlow: 03_dashboard_add_account.yaml
 
+# Bring the whole Accounts widget on screen before the guard reads it.
+# `notVisible` only tests what is rendered, so an unscrolled dashboard reports
+# every account as missing (#297) — and re-creating one trips duplicate-name
+# validation, which pins the creation form open.
+#
+# Anchored on `dashboard:accounts`, not on the Manage button: that button is the
+# section *header* action (`AccountsWidget` in DashboardScreen.kt puts it above
+# `SurferAccountsWidget`), so stopping there can leave the account rows below the
+# fold. The container tag wraps header and rows together.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:accounts"
+    direction: DOWN
+    timeout: 20000
 - runFlow:
     when:
       notVisible: "Travel Card"
@@ -24,22 +38,40 @@ name: Account — Create card account with extra details
 
       - tapOn:
           id: "accountCreation:type:card"
+
+      # Extra details first, opening balance last. The balance field raises a
+      # decimal keypad, and the "Extra details" chips sit at the bottom of the
+      # form — underneath it. Filling the balance first therefore sent the chip
+      # tap into the keypad's "1" key: the balance silently became "123.451",
+      # no IBAN field was ever added, and the flow failed on a selector for a
+      # field that does not exist (#297). Same rule as 04_add_transaction.yaml —
+      # fill what the keyboard will cover *before* raising it. Nothing here needs
+      # `hideKeyboard`, which is unreliable on iOS and maps to BACK on Android.
+      #
+      # Extra details are opt-in: the "IBAN" chip *adds* the field, it isn't the
+      # field. Both carry the same label, so the old `tapOn: text: "IBAN"` hit
+      # the chip and the IBAN string that followed went to whatever was still
+      # focused — the opening-balance input. Tap the chip, then the field it
+      # created, and only then type (#352).
+      - scrollUntilVisible:
+          element:
+            id: "accountCreation:addExtra:iban"
+          direction: DOWN
+          timeout: 20000
+      - tapOn:
+          id: "accountCreation:addExtra:iban"
+      - tapOn:
+          id: "accountCreation:iban"
+      - inputText: "ES9121000418450200051332"
+
+      # Both remaining fields sit above the keypad the last of them raises, and
+      # Save lives in the top bar where no keyboard reaches it.
       - tapOn:
           id: "accountCreation:name"
       - inputText: "Travel Card"
       - tapOn:
           id: "accountCreation:openingBalance"
       - inputText: "123.45"
-      # Extra details are opt-in: the "IBAN" chip *adds* the field, it isn't the
-      # field. Both carry the same label, so the old `tapOn: text: "IBAN"` hit
-      # the chip and the IBAN string that followed went to whatever was still
-      # focused — the opening-balance input. Tap the chip, then the field it
-      # created, and only then type (#352).
-      - tapOn:
-          id: "accountCreation:addExtra:iban"
-      - tapOn:
-          id: "accountCreation:iban"
-      - inputText: "ES9121000418450200051332"
       - tapOn:
           id: "accountCreation:save"
 
@@ -53,6 +85,23 @@ name: Account — Create card account with extra details
       - tapOn:
           id: "toolbar:back"
 
+# Popping back restores the scroll offset this flow left at the Manage button
+# rather than reopening at the top, so reset upwards first and then walk down —
+# the pair lands correctly from either position (#297).
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: "dashboard:balance"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Travel Card"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:accounts"
 - assertVisible:

@@ -125,8 +125,14 @@ private fun AccountDetailsLoading(onEvent: (AccountDetailsEvent) -> Unit) {
 
 private const val SKELETON_ROWS = 5
 
+/**
+ * The account, drawn from a state it is handed rather than one it resolves.
+ *
+ * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+ * own — see docs/testing/screenshot-tests.md.
+ */
 @Composable
-private fun AccountDetailsContent(
+internal fun AccountDetailsContent(
     state: AccountDetailsState.Content,
     onEvent: (AccountDetailsEvent) -> Unit,
 ) {

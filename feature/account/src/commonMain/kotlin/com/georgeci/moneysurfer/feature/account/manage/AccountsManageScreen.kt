@@ -138,8 +138,14 @@ private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -> Unit) {
 
 private const val ACCOUNTS_SKELETON_ROWS = 5
 
+/**
+ * The list, drawn from a state it is handed rather than one it resolves.
+ *
+ * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+ * own — see docs/testing/screenshot-tests.md.
+ */
 @Composable
-private fun AccountsManageContent(
+internal fun AccountsManageContent(
     state: AccountsManageState.Content,
     onEvent: (AccountsManageEvent) -> Unit,
 ) {

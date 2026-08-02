@@ -157,8 +157,14 @@ private fun AccountCreationLoading(
     }
 }
 
+/**
+ * The form, drawn from a state it is handed rather than one it resolves.
+ *
+ * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+ * own — see docs/testing/screenshot-tests.md.
+ */
 @Composable
-private fun AccountCreationContent(
+internal fun AccountCreationContent(
     state: AccountCreationState.Content,
     firstRun: Boolean,
     onEvent: (AccountCreationEvent) -> Unit,

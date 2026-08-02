@@ -6,16 +6,26 @@ name: Dashboard — Add bank account
 
 - runFlow: 02_workspace_create.yaml
 
-# Assert dashboard content is visible
+# Scroll the Accounts widget into view. It is nowhere near the first screenful:
+# the configurable dashboard (#282–296) stacks Balance, Spent this month, Safe to
+# spend, Burn rate, Budgets and the category cards above it. Asserting it where
+# it used to be is how this flow — and everything chaining it — failed (#297).
+- scrollUntilVisible:
+    element:
+      id: "dashboard:accounts"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:accounts"
 
 # Create the baseline account once and reuse it across the remaining flows.
 #
-# Wait for the account list to arrive before deciding. "Accounts" above is just
-# the section header — it renders before Firestore has streamed the rows, so on
-# a slow read the guard below would fire against an already-populated workspace,
-# and the duplicate-name validation then leaves the create form stuck (#219).
+# Wait for the account list to arrive before deciding. The widget above is just
+# the section container — it renders before Firestore has streamed the rows, so
+# on a slow read the guard below would fire against an already-populated
+# workspace, and the duplicate-name validation then leaves the create form stuck
+# (#219). The scroll above is what makes this wait meaningful: a `notVisible`
+# guard tests what is *on screen*, so off-screen rows read as absent.
 #
 # 20s, not 10s: this is a cold-launch read (00_login relaunches the app), and
 # late in a full suite run the emulator has been slow enough to blow a 10s
@@ -41,7 +51,17 @@ name: Dashboard — Add bank account
       - tapOn:
           id: "accountCreation:save"
 
-# Assert back on Dashboard and account card is visible
+# Back on the Dashboard — which reopens at the top, so scroll down to the
+# Accounts widget again before reading the card out of it.
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: "Main Bank"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:accounts"
 - assertVisible:

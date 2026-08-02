@@ -42,9 +42,16 @@ name: Dashboard — empty-state CTA before first transaction
     id: "workspaceSelector:confirm"
 
 # Same precondition as before — one account, zero transactions. The dashboard
-# only offers the "add transaction" affordance once an account exists. Let the
-# list stream in first, so a slow read can't trigger a duplicate create (see
-# 03_dashboard_add_account.yaml).
+# only offers the "add transaction" affordance once an account exists. Scroll the
+# Accounts widget in first — it sits well below the first screenful on the
+# configurable dashboard (#282–296), and a `notVisible` guard reading an
+# off-screen list creates a duplicate every run (#297). Then let the list stream
+# in, so a slow read can't do the same (see 03_dashboard_add_account.yaml).
+- scrollUntilVisible:
+    element:
+      id: "dashboard:accounts"
+    direction: DOWN
+    timeout: 20000
 - extendedWaitUntil:
     visible: "Empty Bank"
     timeout: 20000
@@ -65,19 +72,37 @@ name: Dashboard — empty-state CTA before first transaction
       - tapOn:
           id: "accountCreation:save"
 
-# Golden first-run state: the Recent section shows the empty state, not a blank box.
+# Golden first-run state: the Recent section shows the empty state, not a blank
+# box. Recent sits below Accounts, so keep scrolling down to it.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recentEmpty"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:recentEmpty"
 
 # The empty-state CTA is the next step — it opens transaction creation.
 - tapOn:
     id: "dashboard:addTransaction"
-- assertVisible:
-    id: "transactionCreation:root"
+- extendedWaitUntil:
+    visible:
+      id: "transactionCreation:root"
+    timeout: 20000
 
 # Leave without saving; the empty state must survive an abandoned creation.
+# Closing returns to the dashboard at the top, so scroll back down to check.
 - tapOn:
     id: "transactionCreation:close"
+- extendedWaitUntil:
+    visible:
+      id: "dashboard:root"
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recentEmpty"
+    direction: DOWN
+    timeout: 20000
 - assertVisible:
     id: "dashboard:recentEmpty"
 

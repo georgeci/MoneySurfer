@@ -69,8 +69,13 @@ kotlin {
         }
 
         getByName("androidHostTest") {
+            // Shared Roborazzi capture harness — see gradle/screenshot-tests.gradle.kts.
+            kotlin.srcDir(rootProject.file("gradle/screenshot-harness/kotlin"))
             dependencies {
                 implementation(libs.kotest.runner.junit5)
+                implementation(libs.kotlinx.datetime)
+                implementation(projects.domain)
+                implementation(projects.uikit)
             }
         }
 
@@ -128,3 +133,7 @@ tasks.named<Test>("jvmTest") {
 dependencies {
     "androidRuntimeClasspath"(libs.compose.uiToolingPreview)
 }
+
+// Full-screen Roborazzi captures of the category tree, editor and details screens.
+// See docs/testing/screenshot-tests.md.
+apply(from = rootProject.file("gradle/screenshot-tests.gradle.kts"))

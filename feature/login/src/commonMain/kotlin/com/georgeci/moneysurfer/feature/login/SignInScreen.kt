@@ -355,13 +355,23 @@ private fun SignInErrorDialog(
         confirmButton = {
             TextButton(
                 onClick = onDismiss,
-                modifier = Modifier.testTag(SignInTestTags.ErrorDialogConfirm),
+                // The dialog is its own window, so the hosting screen's
+                // `surferTestTagAsId()` does not reach in here — it has to be applied
+                // again alongside the tag, the way `SurferDeleteTransactionDialog`
+                // does. Without it the tag never becomes a resource-id and Maestro
+                // cannot see either node, even though the dialog is plainly on screen
+                // (#297).
+                modifier = Modifier
+                    .surferTestTagAsId()
+                    .testTag(SignInTestTags.ErrorDialogConfirm),
             ) {
                 Text(stringResource(Res.string.sign_in_error_dialog_ok))
             }
         },
         containerColor = AppTheme.materialColors.surface,
-        modifier = Modifier.testTag(SignInTestTags.ErrorDialog),
+        modifier = Modifier
+            .surferTestTagAsId()
+            .testTag(SignInTestTags.ErrorDialog),
     )
 }
 
