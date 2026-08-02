@@ -68,10 +68,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.3%
+    85.7%
   </span>
   <span class="absValue">
-    (18/28)
+    (24/28)
   </span>
 </td>
 <td class="coverageStat">
@@ -84,10 +84,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.2%
+    96.5%
   </span>
   <span class="absValue">
-    (489/567)
+    (547/567)
   </span>
 </td>
 </tr>
@@ -238,9 +238,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        iconKey: String,
 &nbsp;        hue: Int,
 <b class="fc">&nbsp;        systemKind: String? = null,</b>
-<b class="pc">&nbsp;    ): SurferCategoryVisual = SurferCategoryVisual(</b>
+<b class="fc">&nbsp;    ): SurferCategoryVisual = SurferCategoryVisual(</b>
 <b class="fc">&nbsp;        icon = iconForKey(iconKey, systemKind) ?: iconFor(id, systemKind),</b>
-<b class="pc">&nbsp;        tint = tintForHue(hue, systemKind) ?: tintFor(id, systemKind),</b>
+<b class="fc">&nbsp;        tint = tintForHue(hue, systemKind) ?: tintFor(id, systemKind),</b>
 &nbsp;    )
 &nbsp;
 &nbsp;    /** Icon for a stored key, or null when the key is blank or unknown to this build. */
@@ -256,13 +256,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    @Composable
 &nbsp;    @ReadOnlyComposable
 <b class="fc">&nbsp;    fun tintForHue(hue: Int, systemKind: String? = null): Color? {</b>
-<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
+<b class="fc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
 <b class="fc">&nbsp;        return tintIndexForHue(hue)?.let { tints[it] }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Composable
 &nbsp;    @ReadOnlyComposable
-<b class="pc">&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {</b>
+<b class="fc">&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {</b>
 <b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
 <b class="fc">&nbsp;        return tints[tintIndexFor(id)]</b>
 &nbsp;    }
@@ -295,7 +295,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private fun nonNegativeMod(value: Long, size: Int): Int {
 <b class="fc">&nbsp;        val s = size.toLong()</b>
 <b class="fc">&nbsp;        val r = value % s</b>
-<b class="pc">&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()</b>
+<b class="fc">&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun stringHash(value: String): Long =
@@ -369,7 +369,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

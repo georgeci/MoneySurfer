@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteConfigMirrorImplKt</title>
+  <title>MoneySurfer Coverage Report > DebugConfigSourceImplKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteConfigMirrorImplKt (com.georgeci.moneysurfer.data.config)</h1>
+<h1>Coverage Summary for Class: DebugConfigSourceImplKt (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteConfigMirrorImplKt</td>
+  <td class="name">DebugConfigSourceImplKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -49,37 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.datastore.core.DataStore
 &nbsp;import androidx.datastore.preferences.core.Preferences
 &nbsp;import androidx.datastore.preferences.core.stringPreferencesKey
-&nbsp;import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKey
+&nbsp;import com.georgeci.moneysurfer.appconfig.DebugConfigSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.LayerValue
+&nbsp;import com.georgeci.moneysurfer.appconfig.layerValueOf
 &nbsp;import kotlinx.coroutines.CoroutineScope
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/** File name of the server-flag mirror. Deliberately not the app&#39;s settings file. */
-&nbsp;internal const val REMOTE_FLAGS_FILE_NAME = &quot;moneysurfer_remote_flags.preferences_pb&quot;
+&nbsp;/** File name of the debug-overrides store. Deliberately not the app&#39;s settings file. */
+&nbsp;internal const val DEBUG_OVERRIDES_FILE_NAME = &quot;moneysurfer_debug_overrides.preferences_pb&quot;
 &nbsp;
 &nbsp;/**
-&nbsp; * [RemoteConfigMirror] on its own DataStore file, alongside the other DataStore-backed layers.
-&nbsp; *
-&nbsp; * Its own file for two reasons. The contents are server-owned and disposable, so they must not ride
-&nbsp; * along in the user&#39;s settings file through backup and export; and being disposable is what lets the
-&nbsp; * store replace itself on corruption, which the settings file deliberately does not do because it
-&nbsp; * also holds the session pointers.
+&nbsp; * QA overrides on their own DataStore file, so resetting them never touches user settings and they
+&nbsp; * stay out of backup/export.
 &nbsp; *
 &nbsp; * The store is **not** a Koin binding: a second unqualified `DataStore&lt;Preferences&gt;` would collide
-&nbsp; * with the app&#39;s own one in `sharedPlatformModule` and both would end up reading the same file. Each
-&nbsp; * platform&#39;s `createRemoteConfigMirror(...)` builds it and hands it straight to this constructor —
-&nbsp; * the same shape `DebugConfigSourceImpl` already uses.
+&nbsp; * with the app&#39;s own one in `sharedPlatformModule` and both layers would end up reading the same
+&nbsp; * file. Each platform&#39;s `createDebugConfigSource(...)` builds it and hands it straight to this
+&nbsp; * constructor.
 &nbsp; *
-&nbsp; * Values are stored under the bare key name; the file is dedicated, so there is nothing to namespace
-&nbsp; * against.
+&nbsp; * Values are stored under the bare key name — the file is dedicated, so there is nothing to
+&nbsp; * namespace against.
 &nbsp; */
-&nbsp;class RemoteConfigMirrorImpl(
+&nbsp;class DebugConfigSourceImpl(
 &nbsp;    dataStore: DataStore&lt;Preferences&gt;,
 &nbsp;    scope: CoroutineScope,
-&nbsp;) : RemoteConfigMirror {
+&nbsp;) : DebugConfigSource {
 &nbsp;
 &nbsp;    private val mirror = PreferencesMirror(dataStore, scope)
 &nbsp;
-&nbsp;    override fun raw(name: String): String? = mirror.raw(name)
+&nbsp;    override val isActive: Boolean = true
+&nbsp;
+&nbsp;    override fun &lt;T : Any&gt; peek(key: ConfigKey&lt;T&gt;): LayerValue&lt;T&gt; = key.layerValueOf(mirror.raw(key.name))
 &nbsp;
 &nbsp;    override val changes: Flow&lt;Unit&gt; = mirror.changes
 &nbsp;
@@ -87,13 +88,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override val isDegraded: Boolean get() = mirror.isDegraded
 &nbsp;
-&nbsp;    override suspend fun replaceAll(values: Map&lt;String, String&gt;) {
-&nbsp;        mirror.edit { preferences -&gt;
-&nbsp;            // Clear first: this is a replace, not a merge, so a flag the owner removed from the
-&nbsp;            // document stops being served instead of being pinned at its last value forever.
-&nbsp;            preferences.clear()
-&nbsp;            values.forEach { (name, raw) -&gt; preferences[stringPreferencesKey(name)] = raw }
-&nbsp;        }
+&nbsp;    override suspend fun override(key: ConfigKey&lt;*&gt;, raw: String) {
+&nbsp;        mirror.edit { preferences -&gt; preferences[stringPreferencesKey(key.name)] = raw }
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun clear(key: ConfigKey&lt;*&gt;) {
+&nbsp;        mirror.edit { preferences -&gt; preferences.remove(stringPreferencesKey(key.name)) }
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun clearAll() {
+&nbsp;        mirror.edit { preferences -&gt; preferences.clear() }
 &nbsp;    }
 &nbsp;}
 </code>
@@ -119,7 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

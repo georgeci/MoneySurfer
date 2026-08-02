@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ViewModelStoreNavEntryDecorator</title>
+  <title>MoneySurfer Coverage Report > NavigationResultsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.navigation.util</a>
 </div>
 
-<h1>Coverage Summary for Class: ViewModelStoreNavEntryDecorator (com.georgeci.moneysurfer.navigation.util)</h1>
+<h1>Coverage Summary for Class: NavigationResultsKt (com.georgeci.moneysurfer.navigation.util)</h1>
 
 <table class="coverageStats">
 
@@ -46,35 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ViewModelStoreNavEntryDecorator</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/104)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">ViewModelStoreNavEntryDecorator$_init_$lambda$0$1$0$$inlined$onDispose$1</td>
+  <td class="name">NavigationResultsKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -83,10 +55,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/2)
   </span>
 </td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -95,13 +63,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/6)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/9)
+    (0/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -109,7 +76,77 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/104)
+    (0/124)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NavigationResultsKt$rememberNavigationResult$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
   </span>
 </td>
 </tr>
@@ -123,61 +160,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation.util
 &nbsp;
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.runtime.DisposableEffect
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
 &nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.lifecycle.ViewModelStore
-&nbsp;import androidx.lifecycle.ViewModelStoreOwner
-&nbsp;import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-&nbsp;import androidx.navigation3.runtime.NavEntryDecorator
+&nbsp;import io.github.irgaly.navigation3.resultstate.LocalNavigationResultConsumer
+&nbsp;import io.github.irgaly.navigation3.resultstate.SerializableNavigationResultKey
+&nbsp;import io.github.irgaly.navigation3.resultstate.clearResult
+&nbsp;import io.github.irgaly.navigation3.resultstate.getResultState
 &nbsp;
-&nbsp;class NavEntryViewModelStoreHolder {
-&nbsp;
-&nbsp;    private val stores = mutableMapOf&lt;Any, ViewModelStore&gt;()
-&nbsp;
-&nbsp;    fun getOrCreate(key: Any): ViewModelStoreOwner {
-&nbsp;        val store = stores.getOrPut(key) { ViewModelStore() }
-&nbsp;        return object : ViewModelStoreOwner {
-&nbsp;            override val viewModelStore: ViewModelStore = store
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clear(key: Any) {
-&nbsp;        stores.remove(key)?.clear()
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clearAll() {
-&nbsp;        stores.values.forEach { it.clear() }
-&nbsp;        stores.clear()
-&nbsp;    }
-&nbsp;}
-&nbsp;
+&nbsp;/**
+&nbsp; * Reads the current navigation result for [key] and clears it after observation. Returns the
+&nbsp; * deserialized value (or `null` when no result is pending). Each consumer entry only sees the
+&nbsp; * result on the composition where it was written; the next composition observes `null`.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;fun &lt;T : Any&gt; rememberViewModelStoreNavEntryDecorator(
-&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder = remember { NavEntryViewModelStoreHolder() },
-&nbsp;): NavEntryDecorator&lt;T&gt; {
-&nbsp;    return remember(vmStoreHolder) {
-&nbsp;        ViewModelStoreNavEntryDecorator(vmStoreHolder)
+<b class="nc">&nbsp;fun &lt;T&gt; rememberNavigationResult(key: SerializableNavigationResultKey&lt;T&gt;): T? {</b>
+<b class="nc">&nbsp;    val consumer = LocalNavigationResultConsumer.current</b>
+<b class="nc">&nbsp;    val raw by remember(consumer) { consumer.getResultState(key) }</b>
+<b class="nc">&nbsp;    val value = raw?.getResult()</b>
+<b class="nc">&nbsp;    LaunchedEffect(value) {</b>
+<b class="nc">&nbsp;        value ?: return@LaunchedEffect</b>
+<b class="nc">&nbsp;        consumer.clearResult(key)</b>
 &nbsp;    }
+&nbsp;    return value
 &nbsp;}
-&nbsp;
-<b class="nc">&nbsp;class ViewModelStoreNavEntryDecorator&lt;T : Any&gt;(</b>
-&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder,
-&nbsp;) : NavEntryDecorator&lt;T&gt;(
-<b class="nc">&nbsp;    decorate = { entry -&gt;</b>
-<b class="nc">&nbsp;        val owner = remember(entry.contentKey) { vmStoreHolder.getOrCreate(entry.contentKey) }</b>
-&nbsp;
-<b class="nc">&nbsp;        DisposableEffect(entry.contentKey) {</b>
-<b class="nc">&nbsp;            onDispose { vmStoreHolder.clear(entry.contentKey) }</b>
-&nbsp;        }
-&nbsp;
-<b class="nc">&nbsp;        CompositionLocalProvider(</b>
-<b class="nc">&nbsp;            LocalViewModelStoreOwner provides owner,</b>
-<b class="nc">&nbsp;        ) {</b>
-<b class="nc">&nbsp;            entry.Content()</b>
-&nbsp;        }
-&nbsp;    },
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -201,7 +207,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

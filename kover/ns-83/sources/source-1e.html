@@ -68,10 +68,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    42.3%
+    43.8%
   </span>
   <span class="absValue">
-    (33/78)
+    (35/80)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     95.7%
   </span>
   <span class="absValue">
-    (89/93)
+    (90/94)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89.4%
+    89.5%
   </span>
   <span class="absValue">
-    (1355/1516)
+    (1371/1532)
   </span>
 </td>
 </tr>
@@ -129,6 +129,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.navigation.LocalSurferCanNavigateBack
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -136,6 +137,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.uikit.generated.resources.uikit_back
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
+&nbsp;/**
+&nbsp; * The app&#39;s top app bar.
+&nbsp; *
+&nbsp; * @param onBack drawn as the navigation icon, but only while [LocalSurferCanNavigateBack] says the
+&nbsp; *   affordance leads somewhere. A screen states what back *means* for it; whether there is anything
+&nbsp; *   to go back to is the navigation host&#39;s to know, and a section the drawer reset to has nothing.
+&nbsp; */
 &nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
 <b class="nc">&nbsp;fun SurferToolbar(</b>
@@ -146,11 +154,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
 <b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val canNavigateBack = LocalSurferCanNavigateBack.current</b>
 <b class="fc">&nbsp;    SurferToolbar(</b>
 <b class="fc">&nbsp;        modifier = modifier,</b>
 <b class="fc">&nbsp;        navigationIcon = {</b>
 <b class="fc">&nbsp;            when {</b>
-<b class="fc">&nbsp;                onBack != null -&gt; IconButton(</b>
+<b class="fc">&nbsp;                onBack != null &amp;&amp; canNavigateBack -&gt; IconButton(</b>
 <b class="fc">&nbsp;                    onClick = onBack,</b>
 <b class="fc">&nbsp;                    modifier = Modifier.testTag(SurferToolbarTestTags.Back),</b>
 &nbsp;                ) {
@@ -448,7 +457,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

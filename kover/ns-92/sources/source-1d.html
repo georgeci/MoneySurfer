@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferRecentTransactionsWidgetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferRecentTransactionsWidgetKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferRecentTransactionsWidgetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.4%
+  </span>
+  <span class="absValue">
+    (38/64)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.6%
+  </span>
+  <span class="absValue">
+    (70/71)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.3%
+  </span>
+  <span class="absValue">
+    (766/858)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+&nbsp;
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.compositeOver
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/** Opacity of the income amount pill&#39;s tint wash. */
+&nbsp;private const val INCOME_PILL_WASH_ALPHA = 0.14f
+&nbsp;
+&nbsp;/**
+&nbsp; * Rows a compact card shows. The widget is handed the same list either way — the dashboard has no
+&nbsp; * idea which size the user picked for it — so the trimming has to happen here.
+&nbsp; */
+&nbsp;private const val COMPACT_ROWS = 3
+&nbsp;
+&nbsp;data class SurferRecentTransactionItem(
+&nbsp;    val id: String,
+&nbsp;    val title: String,
+&nbsp;    val subtitle: String,
+&nbsp;    val amount: String,
+&nbsp;    val isExpense: Boolean,
+&nbsp;    val iconBgColor: Color,
+&nbsp;    val iconFgColor: Color,
+&nbsp;    val iconInitial: String,
+&nbsp;    val icon: ImageVector? = null,
+&nbsp;    val categoryHueSeed: String? = null,
+&nbsp;    val categoryDotColor: Color? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Recent-transactions widget for the dashboard column.
+&nbsp; *
+&nbsp; * [seeAllTestTag] and [emptyTestTag] tag the &quot;see all&quot; link and the empty-state block so a UI
+&nbsp; * test can drive them without matching localized copy; the host screen owns the tag values.
+&nbsp; */
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferRecentTransactionsWidget(</b>
+&nbsp;    items: List&lt;SurferRecentTransactionItem&gt;,
+&nbsp;    title: String,
+&nbsp;    seeAllLabel: String,
+&nbsp;    onSeeAllClick: () -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,</b>
+<b class="fc">&nbsp;    onItemClick: ((SurferRecentTransactionItem) -&gt; Unit)? = null,</b>
+<b class="fc">&nbsp;    emptyIcon: ImageVector = SurferIcons.Receipt,</b>
+<b class="fc">&nbsp;    emptyTitle: String? = null,</b>
+<b class="fc">&nbsp;    emptySubtitle: String? = null,</b>
+<b class="fc">&nbsp;    seeAllTestTag: String? = null,</b>
+<b class="fc">&nbsp;    emptyTestTag: String? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val hero = size == SurferWidgetSize.Expanded</b>
+<b class="fc">&nbsp;    val visibleItems = if (hero) items else items.take(COMPACT_ROWS)</b>
+<b class="fc">&nbsp;    val incomeColor = AppTheme.semanticColors.income</b>
+&nbsp;
+&nbsp;    // The income amount is `incomeColor` text on a wash of the same colour, so leaving the
+&nbsp;    // wash translucent would make its contrast depend on whatever the widget is dropped onto.
+&nbsp;    // Compositing over `surface` fixes the pair at a known ≥4.5:1 in both themes.
+<b class="fc">&nbsp;    val incomePillBackground = incomeColor</b>
+<b class="fc">&nbsp;        .copy(alpha = INCOME_PILL_WASH_ALPHA)</b>
+<b class="fc">&nbsp;        .compositeOver(AppTheme.materialColors.surface)</b>
+&nbsp;
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Row(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth()</b>
+<b class="fc">&nbsp;                .padding(top = 4.dp, bottom = 8.dp),</b>
+<b class="fc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = title,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                modifier = Modifier.weight(1f),</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = seeAllLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.primary,</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .clickable(onClick = onSeeAllClick)</b>
+<b class="pc">&nbsp;                    .then(seeAllTestTag?.let { Modifier.testTag(it) } ?: Modifier),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (items.isEmpty()) {</b>
+<b class="fc">&nbsp;            SurferWidgetEmptyState(</b>
+<b class="fc">&nbsp;                icon = emptyIcon,</b>
+<b class="fc">&nbsp;                title = emptyTitle,</b>
+<b class="fc">&nbsp;                subtitle = emptySubtitle,</b>
+<b class="pc">&nbsp;                modifier = emptyTestTag?.let { Modifier.testTag(it) } ?: Modifier,</b>
+<b class="fc">&nbsp;                contentPadding = 0.dp,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        } else {</b>
+<b class="fc">&nbsp;            Column(</b>
+<b class="fc">&nbsp;                verticalArrangement = Arrangement.spacedBy(if (hero) 12.dp else 8.dp),</b>
+&nbsp;            ) {
+<b class="fc">&nbsp;                visibleItems.forEach { transaction -&gt;</b>
+<b class="fc">&nbsp;                    SurferTransactionLine(</b>
+<b class="pc">&nbsp;                        icon = transaction.icon ?: SurferIcons.Receipt,</b>
+<b class="fc">&nbsp;                        title = transaction.title,</b>
+<b class="fc">&nbsp;                        formattedAmount = transaction.amount,</b>
+<b class="fc">&nbsp;                        categoryHueSeed = transaction.categoryHueSeed,</b>
+<b class="fc">&nbsp;                        meta = transaction.subtitle.takeIf { it.isNotEmpty() },</b>
+<b class="fc">&nbsp;                        metaDotColor = if (transaction.categoryHueSeed.isNullOrBlank()) {</b>
+<b class="fc">&nbsp;                            transaction.categoryDotColor</b>
+&nbsp;                        } else {
+<b class="fc">&nbsp;                            null</b>
+&nbsp;                        },
+<b class="fc">&nbsp;                        iconTint = transaction.iconFgColor,</b>
+<b class="fc">&nbsp;                        iconBackground = transaction.iconBgColor,</b>
+<b class="fc">&nbsp;                        amountColor = if (transaction.isExpense) {</b>
+<b class="fc">&nbsp;                            AppTheme.materialColors.onSurface</b>
+<b class="fc">&nbsp;                        } else {</b>
+<b class="fc">&nbsp;                            incomeColor</b>
+<b class="fc">&nbsp;                        },</b>
+<b class="fc">&nbsp;                        amountPillBackground = if (transaction.isExpense) {</b>
+<b class="fc">&nbsp;                            null</b>
+&nbsp;                        } else {
+<b class="fc">&nbsp;                            incomePillBackground</b>
+&nbsp;                        },
+<b class="pc">&nbsp;                        onClick = onItemClick?.let { handler -&gt; { handler(transaction) } },</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferRecentTransactionsHeroPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferRecentTransactionsWidget(
+&nbsp;                items = listOf(
+&nbsp;                    SurferRecentTransactionItem(
+&nbsp;                        id = &quot;1&quot;,
+&nbsp;                        title = &quot;Lidl — weekly shop&quot;,
+&nbsp;                        subtitle = &quot;Groceries · Everyday · Today, 18:42&quot;,
+&nbsp;                        amount = &quot;−€48.20&quot;,
+&nbsp;                        isExpense = true,
+&nbsp;                        iconBgColor = Color(0xFFE4F4EB),
+&nbsp;                        iconFgColor = Color(0xFF1F6A47),
+&nbsp;                        iconInitial = &quot;G&quot;,
+&nbsp;                        categoryDotColor = Color(0xFF2F9970),
+&nbsp;                    ),
+&nbsp;                    SurferRecentTransactionItem(
+&nbsp;                        id = &quot;3&quot;,
+&nbsp;                        title = &quot;March payroll&quot;,
+&nbsp;                        subtitle = &quot;Salary · Emergency Fund · Yesterday&quot;,
+&nbsp;                        amount = &quot;+€3,200.00&quot;,
+&nbsp;                        isExpense = false,
+&nbsp;                        iconBgColor = Color(0xFFE4F4EB),
+&nbsp;                        iconFgColor = Color(0xFF1F6A47),
+&nbsp;                        iconInitial = &quot;S&quot;,
+&nbsp;                        categoryDotColor = Color(0xFF2F9970),
+&nbsp;                    ),
+&nbsp;                ),
+&nbsp;                title = &quot;Recent&quot;,
+&nbsp;                seeAllLabel = &quot;See all&quot;,
+&nbsp;                onSeeAllClick = {},
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .height(260.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferRecentTransactionsEmptyPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferRecentTransactionsWidget(
+&nbsp;                items = emptyList(),
+&nbsp;                title = &quot;Recent&quot;,
+&nbsp;                seeAllLabel = &quot;See all&quot;,
+&nbsp;                onSeeAllClick = {},
+&nbsp;                emptyTitle = &quot;No activity yet&quot;,
+&nbsp;                emptySubtitle = &quot;Transactions you log will show up here.&quot;,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .height(220.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
+</div>
+</body>
+</html>

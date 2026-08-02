@@ -171,8 +171,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;private const val SKELETON_ROWS = 5
 &nbsp;
+&nbsp;/**
+&nbsp; * The account, drawn from a state it is handed rather than one it resolves.
+&nbsp; *
+&nbsp; * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/screenshot-tests.md.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun AccountDetailsContent(
+&nbsp;internal fun AccountDetailsContent(
 &nbsp;    state: AccountDetailsState.Content,
 &nbsp;    onEvent: (AccountDetailsEvent) -&gt; Unit,
 &nbsp;) {
@@ -498,7 +504,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

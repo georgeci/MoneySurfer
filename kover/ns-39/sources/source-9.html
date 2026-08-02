@@ -149,8 +149,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    )
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * The editor, drawn from a state it is handed rather than one it resolves.
+&nbsp; *
+&nbsp; * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/screenshot-tests.md.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun CategoryCreationContent(
+&nbsp;internal fun CategoryCreationContent(
 &nbsp;    state: CategoryCreationState,
 &nbsp;    isEditing: Boolean,
 &nbsp;    onEvent: (CategoryCreationEvent) -&gt; Unit,
@@ -459,7 +465,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

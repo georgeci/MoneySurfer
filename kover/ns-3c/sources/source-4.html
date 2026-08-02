@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">CategoriesManageScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/14)
+    (14/21)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    26.7%
   </span>
   <span class="absValue">
-    (0/81)
+    (27/101)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    76.4%
   </span>
   <span class="absValue">
-    (0/85)
+    (97/127)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    51%
   </span>
   <span class="absValue">
-    (0/1309)
+    (667/1309)
   </span>
 </td>
 </tr>
@@ -240,34 +240,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    48.3%
   </span>
   <span class="absValue">
-    (0/22)
+    (14/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    26.7%
   </span>
   <span class="absValue">
-    (0/81)
+    (27/101)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    74%
   </span>
   <span class="absValue">
-    (0/89)
+    (97/131)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    49.7%
   </span>
   <span class="absValue">
-    (0/1342)
+    (667/1342)
   </span>
 </td>
 </tr>
@@ -328,7 +328,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
 &nbsp;/** Extra leading inset per nesting level. One level is all [CategoryTree.MAX_DEPTH] allows. */
-<b class="nc">&nbsp;private val ChildIndent = 24.dp</b>
+<b class="fc">&nbsp;private val ChildIndent = 24.dp</b>
 &nbsp;
 &nbsp;/** Stable selectors for the Categories management screen — see docs/testing/testing-strategy.md. */
 &nbsp;object CategoriesManageTestTags {
@@ -394,86 +394,92 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;private const val SKELETON_ROWS = 5
 &nbsp;
+&nbsp;/**
+&nbsp; * The tree, drawn from a state it is handed rather than one it resolves.
+&nbsp; *
+&nbsp; * `internal` for the Roborazzi captures in `androidHostTest`, which mount it with a state of their
+&nbsp; * own — see docs/testing/screenshot-tests.md.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun CategoriesManageContent(
+&nbsp;internal fun CategoriesManageContent(
 &nbsp;    state: CategoriesManageState.Content,
 &nbsp;    onEvent: (CategoriesManageEvent) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    Scaffold(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .surferSafeInsets()</b>
-<b class="nc">&nbsp;            .testTag(CategoriesManageTestTags.Root)</b>
-<b class="nc">&nbsp;            .surferTestTagAsId(),</b>
-<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
-<b class="nc">&nbsp;        topBar = {</b>
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.categories_manage_title),
-&nbsp;                onBack = { onEvent(CategoriesManageEvent.OnBackClick) },
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Scaffold(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .surferSafeInsets()</b>
+<b class="fc">&nbsp;            .testTag(CategoriesManageTestTags.Root)</b>
+<b class="fc">&nbsp;            .surferTestTagAsId(),</b>
+<b class="fc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
+<b class="fc">&nbsp;        topBar = {</b>
+<b class="fc">&nbsp;            SurferToolbar(</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.categories_manage_title),</b>
+<b class="fc">&nbsp;                onBack = { onEvent(CategoriesManageEvent.OnBackClick) },</b>
 &nbsp;            )
 &nbsp;        },
-<b class="nc">&nbsp;        floatingActionButton = {</b>
-&nbsp;            SurferAddFab(
-&nbsp;                label = stringResource(Res.string.categories_manage_add),
-&nbsp;                onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },
-&nbsp;                modifier = Modifier.testTag(CategoriesManageTestTags.AddButton),
+<b class="fc">&nbsp;        floatingActionButton = {</b>
+<b class="fc">&nbsp;            SurferAddFab(</b>
+<b class="fc">&nbsp;                label = stringResource(Res.string.categories_manage_add),</b>
+<b class="fc">&nbsp;                onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },</b>
+<b class="fc">&nbsp;                modifier = Modifier.testTag(CategoriesManageTestTags.AddButton),</b>
 &nbsp;            )
 &nbsp;        },
-<b class="nc">&nbsp;    ) { padding -&gt;</b>
-&nbsp;        if (state.categories.isEmpty()) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
-&nbsp;                contentAlignment = Alignment.Center,
+<b class="fc">&nbsp;    ) { padding -&gt;</b>
+<b class="fc">&nbsp;        if (state.categories.isEmpty()) {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),</b>
+<b class="fc">&nbsp;                contentAlignment = Alignment.Center,</b>
 &nbsp;            ) {
-&nbsp;                SurferEmptyState(
-&nbsp;                    title = stringResource(Res.string.categories_manage_empty),
-&nbsp;                    icon = SurferIcons.Category,
+<b class="fc">&nbsp;                SurferEmptyState(</b>
+<b class="fc">&nbsp;                    title = stringResource(Res.string.categories_manage_empty),</b>
+<b class="fc">&nbsp;                    icon = SurferIcons.Category,</b>
 &nbsp;                )
-&nbsp;            }
+<b class="fc">&nbsp;            }</b>
 &nbsp;            return@Scaffold
-&nbsp;        }
+<b class="fc">&nbsp;        }</b>
 &nbsp;
-&nbsp;        LazyColumn(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(top = padding.calculateTopPadding()),
-&nbsp;            contentPadding = PaddingValues(
-&nbsp;                top = AppTheme.spacing.small,
-&nbsp;                bottom = padding.calculateBottomPadding() +
-&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
+<b class="fc">&nbsp;        LazyColumn(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxSize()</b>
+<b class="fc">&nbsp;                .surferContentContainer()</b>
+<b class="fc">&nbsp;                .padding(top = padding.calculateTopPadding()),</b>
+<b class="fc">&nbsp;            contentPadding = PaddingValues(</b>
+<b class="fc">&nbsp;                top = AppTheme.spacing.small,</b>
+<b class="fc">&nbsp;                bottom = padding.calculateBottomPadding() +</b>
+<b class="fc">&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,</b>
 &nbsp;            ),
-&nbsp;        ) {
-&nbsp;            items(state.categories, key = { it.id.value }) { category -&gt;
-&nbsp;                CategoryManageRow(
-&nbsp;                    category = category,
-&nbsp;                    deleteLabel = stringResource(Res.string.categories_manage_remove),
-&nbsp;                    editLabel = stringResource(Res.string.categories_manage_edit),
-<b class="nc">&nbsp;                    onClick = { onEvent(CategoriesManageEvent.OnCategoryClick(category.id)) },</b>
-<b class="nc">&nbsp;                    onEditClick = { onEvent(CategoriesManageEvent.OnEditCategoryClick(category.id)) },</b>
-<b class="nc">&nbsp;                    onRemoveClick = { onEvent(CategoriesManageEvent.OnRemoveCategoryClick(category.id)) },</b>
-&nbsp;                    modifier = Modifier
-&nbsp;                        .fillMaxWidth()
-&nbsp;                        .padding(
+<b class="fc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;            items(state.categories, key = { it.id.value }) { category -&gt;</b>
+<b class="fc">&nbsp;                CategoryManageRow(</b>
+<b class="fc">&nbsp;                    category = category,</b>
+<b class="fc">&nbsp;                    deleteLabel = stringResource(Res.string.categories_manage_remove),</b>
+<b class="fc">&nbsp;                    editLabel = stringResource(Res.string.categories_manage_edit),</b>
+<b class="pc">&nbsp;                    onClick = { onEvent(CategoriesManageEvent.OnCategoryClick(category.id)) },</b>
+<b class="pc">&nbsp;                    onEditClick = { onEvent(CategoriesManageEvent.OnEditCategoryClick(category.id)) },</b>
+<b class="pc">&nbsp;                    onRemoveClick = { onEvent(CategoriesManageEvent.OnRemoveCategoryClick(category.id)) },</b>
+<b class="fc">&nbsp;                    modifier = Modifier</b>
+<b class="fc">&nbsp;                        .fillMaxWidth()</b>
+<b class="fc">&nbsp;                        .padding(</b>
 &nbsp;                            // Children are indented under the parent they follow — the list is
 &nbsp;                            // already in tree order, so the indent is all the nesting needs.
-&nbsp;                            start = AppTheme.spacing.default + ChildIndent * category.depth,
-&nbsp;                            end = AppTheme.spacing.default,
+<b class="fc">&nbsp;                            start = AppTheme.spacing.default + ChildIndent * category.depth,</b>
+<b class="fc">&nbsp;                            end = AppTheme.spacing.default,</b>
 &nbsp;                        )
-&nbsp;                        .padding(vertical = AppTheme.spacing.xSmall),
-&nbsp;                )
-&nbsp;            }
+<b class="fc">&nbsp;                        .padding(vertical = AppTheme.spacing.xSmall),</b>
+<b class="fc">&nbsp;                )</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    state.pendingDelete?.let { pending -&gt;</b>
-<b class="nc">&nbsp;        DeleteCategoryDialog(</b>
-<b class="nc">&nbsp;            categoryName = pending.name,</b>
-<b class="nc">&nbsp;            childCount = pending.childCount,</b>
-<b class="nc">&nbsp;            onConfirm = { onEvent(CategoriesManageEvent.OnDeleteConfirm) },</b>
-<b class="nc">&nbsp;            onDismiss = { onEvent(CategoriesManageEvent.OnDeleteCancel) },</b>
+<b class="fc">&nbsp;    state.pendingDelete?.let { pending -&gt;</b>
+<b class="fc">&nbsp;        DeleteCategoryDialog(</b>
+<b class="fc">&nbsp;            categoryName = pending.name,</b>
+<b class="fc">&nbsp;            childCount = pending.childCount,</b>
+<b class="fc">&nbsp;            onConfirm = { onEvent(CategoriesManageEvent.OnDeleteConfirm) },</b>
+<b class="fc">&nbsp;            onDismiss = { onEvent(CategoriesManageEvent.OnDeleteCancel) },</b>
 &nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
 &nbsp;private fun CategoryManageRow(
@@ -483,59 +489,59 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onClick: () -&gt; Unit,
 &nbsp;    onEditClick: () -&gt; Unit,
 &nbsp;    onRemoveClick: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    SurferSwipeRevealRow(</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferSwipeRevealRow(</b>
 &nbsp;        // Two actions now that tapping the row opens the detail screen instead of the editor —
 &nbsp;        // edit has to stay reachable from the list itself. 156dp is what two 72dp actions plus
 &nbsp;        // the gaps measure, matching AccountsManage.
-<b class="nc">&nbsp;        revealWidth = 156.dp,</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;        actions = {</b>
-<b class="nc">&nbsp;            SurferSwipeAction(</b>
-<b class="nc">&nbsp;                icon = SurferIcons.Edit,</b>
-<b class="nc">&nbsp;                label = editLabel,</b>
-<b class="nc">&nbsp;                onClick = onEditClick,</b>
+<b class="fc">&nbsp;        revealWidth = 156.dp,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        actions = {</b>
+<b class="fc">&nbsp;            SurferSwipeAction(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Edit,</b>
+<b class="fc">&nbsp;                label = editLabel,</b>
+<b class="fc">&nbsp;                onClick = onEditClick,</b>
 &nbsp;            )
-<b class="nc">&nbsp;            SurferSwipeAction(</b>
-<b class="nc">&nbsp;                icon = SurferIcons.Delete,</b>
-<b class="nc">&nbsp;                label = deleteLabel,</b>
-<b class="nc">&nbsp;                onClick = onRemoveClick,</b>
-<b class="nc">&nbsp;                destructive = true,</b>
+<b class="fc">&nbsp;            SurferSwipeAction(</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Delete,</b>
+<b class="fc">&nbsp;                label = deleteLabel,</b>
+<b class="fc">&nbsp;                onClick = onRemoveClick,</b>
+<b class="fc">&nbsp;                destructive = true,</b>
 &nbsp;            )
 &nbsp;        },
-<b class="nc">&nbsp;    ) {</b>
-<b class="nc">&nbsp;        CategoryManageCard(category = category, onClick = onClick)</b>
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        CategoryManageCard(category = category, onClick = onClick)</b>
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
 &nbsp;private fun CategoryManageCard(
 &nbsp;    category: CategoryManageUi,
 &nbsp;    onClick: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val visual = SurferCategoryPalette.visualFor(</b>
-<b class="nc">&nbsp;        id = category.id.value,</b>
-<b class="nc">&nbsp;        iconKey = category.iconKey,</b>
-<b class="nc">&nbsp;        hue = category.hue,</b>
-<b class="nc">&nbsp;        systemKind = category.systemKind,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val visual = SurferCategoryPalette.visualFor(</b>
+<b class="fc">&nbsp;        id = category.id.value,</b>
+<b class="fc">&nbsp;        iconKey = category.iconKey,</b>
+<b class="fc">&nbsp;        hue = category.hue,</b>
+<b class="fc">&nbsp;        systemKind = category.systemKind,</b>
 &nbsp;    )
-<b class="nc">&nbsp;    SurferCategoryManageCard(</b>
-<b class="nc">&nbsp;        name = category.name,</b>
-<b class="nc">&nbsp;        typeLabel = categoryTypeLabel(category.type),</b>
-<b class="nc">&nbsp;        icon = visual.icon,</b>
-<b class="nc">&nbsp;        tint = visual.tint,</b>
-<b class="nc">&nbsp;        onClick = onClick,</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;    SurferCategoryManageCard(</b>
+<b class="fc">&nbsp;        name = category.name,</b>
+<b class="fc">&nbsp;        typeLabel = categoryTypeLabel(category.type),</b>
+<b class="fc">&nbsp;        icon = visual.icon,</b>
+<b class="fc">&nbsp;        tint = visual.tint,</b>
+<b class="fc">&nbsp;        onClick = onClick,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
 &nbsp;private fun categoryTypeLabel(type: CategoryType): String =
-<b class="nc">&nbsp;    when (type) {</b>
-<b class="nc">&nbsp;        CategoryType.EXPENSE -&gt; stringResource(Res.string.category_creation_type_expense)</b>
-<b class="nc">&nbsp;        CategoryType.INCOME -&gt; stringResource(Res.string.category_creation_type_income)</b>
+<b class="pc">&nbsp;    when (type) {</b>
+<b class="fc">&nbsp;        CategoryType.EXPENSE -&gt; stringResource(Res.string.category_creation_type_expense)</b>
+<b class="fc">&nbsp;        CategoryType.INCOME -&gt; stringResource(Res.string.category_creation_type_income)</b>
 <b class="nc">&nbsp;        CategoryType.TRANSFER -&gt; stringResource(Res.string.category_creation_type_transfer)</b>
 <b class="nc">&nbsp;    }</b>
 &nbsp;
@@ -584,7 +590,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

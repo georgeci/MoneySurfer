@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferErrorStateTestTags</title>
+  <title>MoneySurfer Coverage Report > SurferErrorBoundaryTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferErrorStateTestTags (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferErrorBoundaryTestTags (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferErrorStateTestTags</td>
+  <td class="name">SurferErrorBoundaryTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,115 +46,70 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.material3.Surface
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.uikit.generated.resources.Res
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_subtitle
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_title
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_retry
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
 &nbsp;/**
-&nbsp; * Centered error-state block: an error-tinted icon medallion, a title, an optional subtitle
-&nbsp; * and an optional retry action. Mirrors [SurferEmptyState] but signals a failed load rather
-&nbsp; * than absent content — use [SurferEmptyState] when the load succeeded but produced nothing.
+&nbsp; * App-level fallback for failures no screen handled itself: while [hasError] is true a
+&nbsp; * full-bleed [SurferErrorState] with a retry action covers [content] (issue #78).
 &nbsp; *
-&nbsp; * @param onRetry when non-null, renders a retry button; override [retryLabel] to relabel it.
+&nbsp; * The content stays composed underneath rather than being torn down and rebuilt, so a
+&nbsp; * transient failure does not cost the user their navigation back stack — dismissing via
+&nbsp; * [onRetry] returns them exactly where they were, and the screen&#39;s own reload runs on the
+&nbsp; * data it already observes.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferErrorState(
-&nbsp;    title: String,
+&nbsp;fun SurferErrorBoundary(
+&nbsp;    hasError: Boolean,
+&nbsp;    onRetry: () -&gt; Unit,
 &nbsp;    modifier: Modifier = Modifier,
-&nbsp;    subtitle: String? = null,
-&nbsp;    icon: ImageVector = SurferIcons.Info,
-&nbsp;    retryLabel: String = &quot;Retry&quot;,
-&nbsp;    onRetry: (() -&gt; Unit)? = null,
+&nbsp;    content: @Composable () -&gt; Unit,
 &nbsp;) {
-&nbsp;    Column(
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth()
-&nbsp;            .padding(AppTheme.spacing.large),
-&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
-&nbsp;        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(64.dp)
-&nbsp;                .clip(CircleShape)
-&nbsp;                .background(AppTheme.materialColors.errorContainer),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = icon,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.onErrorContainer,
-&nbsp;                modifier = Modifier.size(28.dp),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        Text(
-&nbsp;            text = title,
-&nbsp;            style = AppTheme.typography.titleMedium,
-&nbsp;            color = AppTheme.materialColors.onSurface,
-&nbsp;            textAlign = TextAlign.Center,
-&nbsp;        )
-&nbsp;        if (subtitle != null) {
-&nbsp;            Text(
-&nbsp;                text = subtitle,
-&nbsp;                style = AppTheme.typography.bodyMedium,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        if (onRetry != null) {
-&nbsp;            SurferButton(
-&nbsp;                text = retryLabel,
-&nbsp;                onClick = onRetry,
-&nbsp;                style = SurferButtonStyle.Tonal,
+&nbsp;    Box(modifier = modifier.fillMaxSize()) {
+&nbsp;        content()
+&nbsp;
+&nbsp;        if (hasError) {
+&nbsp;            Surface(
 &nbsp;                modifier = Modifier
-&nbsp;                    .padding(top = AppTheme.spacing.xSmall)
-&nbsp;                    .testTag(SurferErrorStateTestTags.RetryButton),
-&nbsp;            )
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .testTag(SurferErrorBoundaryTestTags.Fallback),
+&nbsp;                color = AppTheme.materialColors.surface,
+&nbsp;            ) {
+&nbsp;                Box(contentAlignment = Alignment.Center) {
+&nbsp;                    SurferErrorState(
+&nbsp;                        title = stringResource(Res.string.uikit_error_boundary_title),
+&nbsp;                        subtitle = stringResource(Res.string.uikit_error_boundary_subtitle),
+&nbsp;                        retryLabel = stringResource(Res.string.uikit_retry),
+&nbsp;                        onRetry = onRetry,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;object SurferErrorStateTestTags {
-&nbsp;    const val RetryButton = &quot;errorState:retry&quot;
+&nbsp;object SurferErrorBoundaryTestTags {
+&nbsp;    const val Fallback = &quot;errorBoundary:fallback&quot;
 &nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferErrorStatePreview() {
+&nbsp;private fun SurferErrorBoundaryPreview() {
 &nbsp;    SurferComponentPreview {
-&nbsp;        SurferErrorState(
-&nbsp;            title = &quot;Something went wrong&quot;,
-&nbsp;            subtitle = &quot;We couldn&#39;t load your accounts. Check your connection and try again.&quot;,
-&nbsp;            onRetry = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferErrorStateNoRetryPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferErrorState(title = &quot;Failed to sync&quot;)
+&nbsp;        SurferErrorBoundary(hasError = true, onRetry = {}) {}
 &nbsp;    }
 &nbsp;}
 </code>
@@ -180,7 +135,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

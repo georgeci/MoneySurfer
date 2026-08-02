@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NavEntryViewModelStoreHolder</title>
+  <title>MoneySurfer Coverage Report > BackNavigationNavEntryDecoratorKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.navigation.util</a>
 </div>
 
-<h1>Coverage Summary for Class: NavEntryViewModelStoreHolder (com.georgeci.moneysurfer.navigation.util)</h1>
+<h1>Coverage Summary for Class: BackNavigationNavEntryDecoratorKt (com.georgeci.moneysurfer.navigation.util)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,42 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NavEntryViewModelStoreHolder</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (47/47)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">NavEntryViewModelStoreHolder$getOrCreate$1</td>
+  <td class="name">BackNavigationNavEntryDecoratorKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -90,13 +58,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,45 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (9/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (54/54)
+    (106/106)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -154,60 +96,62 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.runtime.DisposableEffect
 &nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.lifecycle.ViewModelStore
-&nbsp;import androidx.lifecycle.ViewModelStoreOwner
-&nbsp;import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+&nbsp;import androidx.navigation3.runtime.NavEntry
 &nbsp;import androidx.navigation3.runtime.NavEntryDecorator
+&nbsp;import com.georgeci.moneysurfer.uikit.navigation.LocalSurferCanNavigateBack
 &nbsp;
-<b class="fc">&nbsp;class NavEntryViewModelStoreHolder {</b>
-&nbsp;
-<b class="fc">&nbsp;    private val stores = mutableMapOf&lt;Any, ViewModelStore&gt;()</b>
-&nbsp;
-&nbsp;    fun getOrCreate(key: Any): ViewModelStoreOwner {
-<b class="fc">&nbsp;        val store = stores.getOrPut(key) { ViewModelStore() }</b>
-<b class="fc">&nbsp;        return object : ViewModelStoreOwner {</b>
-<b class="fc">&nbsp;            override val viewModelStore: ViewModelStore = store</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clear(key: Any) {
-<b class="fc">&nbsp;        stores.remove(key)?.clear()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clearAll() {
-<b class="fc">&nbsp;        stores.values.forEach { it.clear() }</b>
-<b class="fc">&nbsp;        stores.clear()</b>
-&nbsp;    }
-&nbsp;}
-&nbsp;
+&nbsp;/**
+&nbsp; * Publishes [LocalSurferCanNavigateBack] to every rendered entry, so a screen&#39;s toolbar can drop a
+&nbsp; * back arrow that leads nowhere.
+&nbsp; *
+&nbsp; * A decorator rather than a wrapper around the entry provider: the flag has to follow the back
+&nbsp; * stack, and only the decoration runs again when the stack changes underneath an entry that stays
+&nbsp; * composed — selecting the section a screen is already in resets the stack to just that screen, and
+&nbsp; * its arrow has to go with the entries that were below it.
+&nbsp; *
+&nbsp; * Takes the [backStack] rather than the keys [backNavigationContentKeys] derives from it, so the
+&nbsp; * navigation host is left with one call and nothing to hold: which entries can go back is this
+&nbsp; * file&#39;s business, and the host has no test harness to cover it in.
+&nbsp; *
+&nbsp; * The keys are derived on every composition rather than through a `derivedStateOf`. Memoizing them
+&nbsp; * would have to key on [entryProvider], which the host rebuilds each composition, so the cache
+&nbsp; * would miss every time anyway — and a back stack is a handful of entries. Only the *decorator* is
+&nbsp; * memoized, on the keys themselves, so an unchanged stack does not hand `NavDisplay` a new one.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;fun &lt;T : Any&gt; rememberViewModelStoreNavEntryDecorator(
-&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder = remember { NavEntryViewModelStoreHolder() },
-&nbsp;): NavEntryDecorator&lt;T&gt; {
-&nbsp;    return remember(vmStoreHolder) {
-&nbsp;        ViewModelStoreNavEntryDecorator(vmStoreHolder)
+&nbsp;fun &lt;T : Any&gt; rememberBackNavigationNavEntryDecorator(
+&nbsp;    backStack: List&lt;T&gt;,
+&nbsp;    entryProvider: (T) -&gt; NavEntry&lt;T&gt;,
+<b class="fc">&nbsp;): NavEntryDecorator&lt;T&gt; {</b>
+<b class="fc">&nbsp;    val poppableContentKeys = backNavigationContentKeys(backStack, entryProvider)</b>
+<b class="fc">&nbsp;    return remember(poppableContentKeys) {</b>
+<b class="fc">&nbsp;        NavEntryDecorator { entry -&gt;</b>
+<b class="fc">&nbsp;            CompositionLocalProvider(</b>
+<b class="fc">&nbsp;                LocalSurferCanNavigateBack provides (entry.contentKey in poppableContentKeys),</b>
+<b class="fc">&nbsp;            ) {</b>
+<b class="fc">&nbsp;                entry.Content()</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;class ViewModelStoreNavEntryDecorator&lt;T : Any&gt;(
-&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder,
-&nbsp;) : NavEntryDecorator&lt;T&gt;(
-&nbsp;    decorate = { entry -&gt;
-&nbsp;        val owner = remember(entry.contentKey) { vmStoreHolder.getOrCreate(entry.contentKey) }
-&nbsp;
-&nbsp;        DisposableEffect(entry.contentKey) {
-&nbsp;            onDispose { vmStoreHolder.clear(entry.contentKey) }
-&nbsp;        }
-&nbsp;
-&nbsp;        CompositionLocalProvider(
-&nbsp;            LocalViewModelStoreOwner provides owner,
-&nbsp;        ) {
-&nbsp;            entry.Content()
-&nbsp;        }
-&nbsp;    },
-&nbsp;)
+&nbsp;/**
+&nbsp; * The `contentKey`s of the [backStack] entries that have another entry below them — the ones a back
+&nbsp; * affordance can actually pop.
+&nbsp; *
+&nbsp; * Keys are resolved through the same [entryProvider] the host renders with, rather than derived
+&nbsp; * from the route: what a route&#39;s content key is, is that provider&#39;s decision.
+&nbsp; *
+&nbsp; * A route that appears on the stack twice, once at the bottom, contributes one key for both
+&nbsp; * occurrences and so keeps its affordance at the bottom too. Nothing in the app pushes a route on
+&nbsp; * top of itself — the sections are reached with `AppNavigator.resetTo` — and the alternative,
+&nbsp; * dropping the affordance on the *upper* copy, strands the user on it.
+&nbsp; */
+&nbsp;internal fun &lt;T : Any&gt; backNavigationContentKeys(
+&nbsp;    backStack: List&lt;T&gt;,
+&nbsp;    entryProvider: (T) -&gt; NavEntry&lt;T&gt;,
+<b class="fc">&nbsp;): Set&lt;Any&gt; = backStack.drop(1).mapTo(mutableSetOf()) { entryProvider(it).contentKey }</b>
 </code>
 </pre>
 </div>
@@ -231,7 +175,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

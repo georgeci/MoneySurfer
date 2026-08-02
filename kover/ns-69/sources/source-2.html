@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NavEntryViewModelStoreHolderKt</title>
+  <title>MoneySurfer Coverage Report > NavEntryViewModelStoreHolder</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.navigation.util</a>
 </div>
 
-<h1>Coverage Summary for Class: NavEntryViewModelStoreHolderKt (com.georgeci.moneysurfer.navigation.util)</h1>
+<h1>Coverage Summary for Class: NavEntryViewModelStoreHolder (com.georgeci.moneysurfer.navigation.util)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,103 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NavEntryViewModelStoreHolderKt</td>
+  <td class="name">NavEntryViewModelStoreHolder</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/76)
+    (47/47)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">NavEntryViewModelStoreHolder$getOrCreate$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (54/54)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -110,33 +161,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 &nbsp;import androidx.navigation3.runtime.NavEntryDecorator
 &nbsp;
-&nbsp;class NavEntryViewModelStoreHolder {
+<b class="fc">&nbsp;class NavEntryViewModelStoreHolder {</b>
 &nbsp;
-&nbsp;    private val stores = mutableMapOf&lt;Any, ViewModelStore&gt;()
+<b class="fc">&nbsp;    private val stores = mutableMapOf&lt;Any, ViewModelStore&gt;()</b>
 &nbsp;
 &nbsp;    fun getOrCreate(key: Any): ViewModelStoreOwner {
-&nbsp;        val store = stores.getOrPut(key) { ViewModelStore() }
-&nbsp;        return object : ViewModelStoreOwner {
-&nbsp;            override val viewModelStore: ViewModelStore = store
+<b class="fc">&nbsp;        val store = stores.getOrPut(key) { ViewModelStore() }</b>
+<b class="fc">&nbsp;        return object : ViewModelStoreOwner {</b>
+<b class="fc">&nbsp;            override val viewModelStore: ViewModelStore = store</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    fun clear(key: Any) {
-&nbsp;        stores.remove(key)?.clear()
+<b class="fc">&nbsp;        stores.remove(key)?.clear()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    fun clearAll() {
-&nbsp;        stores.values.forEach { it.clear() }
-&nbsp;        stores.clear()
+<b class="fc">&nbsp;        stores.values.forEach { it.clear() }</b>
+<b class="fc">&nbsp;        stores.clear()</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
 &nbsp;fun &lt;T : Any&gt; rememberViewModelStoreNavEntryDecorator(
-<b class="nc">&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder = remember { NavEntryViewModelStoreHolder() },</b>
-<b class="nc">&nbsp;): NavEntryDecorator&lt;T&gt; {</b>
-<b class="nc">&nbsp;    return remember(vmStoreHolder) {</b>
-<b class="nc">&nbsp;        ViewModelStoreNavEntryDecorator(vmStoreHolder)</b>
+&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder = remember { NavEntryViewModelStoreHolder() },
+&nbsp;): NavEntryDecorator&lt;T&gt; {
+&nbsp;    return remember(vmStoreHolder) {
+&nbsp;        ViewModelStoreNavEntryDecorator(vmStoreHolder)
 &nbsp;    }
 &nbsp;}
 &nbsp;
@@ -180,7 +231,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

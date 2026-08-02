@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    63.9%
+    69.4%
   </span>
   <span class="absValue">
-    (23/36)
+    (25/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.8%
+    93.2%
   </span>
   <span class="absValue">
-    (67/73)
+    (68/73)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.9%
+    95.6%
   </span>
   <span class="absValue">
-    (730/769)
+    (735/769)
   </span>
 </td>
 </tr>
@@ -131,26 +131,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.4%
+    65.9%
   </span>
   <span class="absValue">
-    (27/44)
+    (29/44)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.8%
+    94%
   </span>
   <span class="absValue">
-    (77/83)
+    (78/83)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.3%
+    95.9%
   </span>
   <span class="absValue">
-    (876/919)
+    (881/919)
   </span>
 </td>
 </tr>
@@ -285,7 +285,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val tint = typeTint(type)</b>
 <b class="pc">&nbsp;    val labelRes = when (type) {</b>
 <b class="fc">&nbsp;        TransactionTypeUi.Expense -&gt; Res.string.transaction_creation_expense</b>
-<b class="nc">&nbsp;        TransactionTypeUi.Income -&gt; Res.string.transaction_creation_income</b>
+<b class="fc">&nbsp;        TransactionTypeUi.Income -&gt; Res.string.transaction_creation_income</b>
 <b class="nc">&nbsp;        TransactionTypeUi.Transfer -&gt; Res.string.transaction_creation_transfer</b>
 &nbsp;    }
 &nbsp;    // Composited over `surface` rather than left translucent: the label is `tint` on a wash
@@ -309,7 +309,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;internal fun currencySymbol(code: CurrencyCode?): String {
-<b class="pc">&nbsp;    val value = code?.value ?: return &quot;$&quot;</b>
+<b class="fc">&nbsp;    val value = code?.value ?: return &quot;$&quot;</b>
 <b class="pc">&nbsp;    return when (value) {</b>
 <b class="fc">&nbsp;        &quot;EUR&quot; -&gt; &quot;€&quot;</b>
 <b class="nc">&nbsp;        &quot;GBP&quot; -&gt; &quot;£&quot;</b>
@@ -342,7 +342,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

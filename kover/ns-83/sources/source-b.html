@@ -68,10 +68,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    51.5%
+    52.9%
   </span>
   <span class="absValue">
-    (35/68)
+    (36/68)
   </span>
 </td>
 <td class="coverageStat">
@@ -84,10 +84,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.3%
+    91.7%
   </span>
   <span class="absValue">
-    (1128/1236)
+    (1133/1236)
   </span>
 </td>
 </tr>
@@ -292,6 +292,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * top app bar, drawn by the list pane. This is part of the detail pane&#39;s content, so it also skips
 &nbsp; * the sync badge [SurferToolbar] adds.
 &nbsp; *
+&nbsp; * And deliberately not *lettered* like one either. Carrying the bar&#39;s `titleLarge` made this read
+&nbsp; * as a second top app bar sitting next to the first, so the section looked split across two
+&nbsp; * toolbars even though only one of them was one. `titleMedium` puts the title a step below the bar
+&nbsp; * beside it, where the first line of a pane&#39;s content belongs. The row keeps the bar&#39;s height —
+&nbsp; * see [PaneHeaderMinHeight] — because that is what keeps the two panes&#39; content aligned.
+&nbsp; *
 &nbsp; * It still takes [TopAppBarColors] and honours the container, title, navigation-icon and
 &nbsp; * action-icon roles, so a screen that colours its chrome gets the same treatment whichever pane it
 &nbsp; * lands in — the scroll-dependent roles are the only ones with nothing to map onto. The defaults
@@ -326,7 +332,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        }</b>
 <b class="fc">&nbsp;        Text(</b>
 <b class="fc">&nbsp;            text = title,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.titleLarge,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleMedium,</b>
 <b class="fc">&nbsp;            color = colors.titleContentColor,</b>
 <b class="fc">&nbsp;            maxLines = 1,</b>
 <b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
@@ -338,7 +344,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;/** Matches the `TopAppBar` height the list pane draws, so the two panes line up. */
+&nbsp;/**
+&nbsp; * Matches the `TopAppBar` height the list pane draws, so the two panes line up. What separates the
+&nbsp; * header from the bar is its type, not its height — a shorter row would start the detail pane&#39;s
+&nbsp; * content above the list pane&#39;s first row for no reason.
+&nbsp; */
 <b class="fc">&nbsp;private val PaneHeaderMinHeight = 64.dp</b>
 <b class="fc">&nbsp;private val TitleInset = 16.dp</b>
 <b class="fc">&nbsp;private val IconInset = 4.dp</b>
@@ -409,7 +419,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

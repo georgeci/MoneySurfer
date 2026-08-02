@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContributionDao</title>
+  <title>MoneySurfer Coverage Report > BudgetDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContributionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: BudgetDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContributionDao</td>
+  <td class="name">BudgetDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,45 +51,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface GoalContributionDao {
+&nbsp;interface BudgetDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE workspaceId = :workspaceId ORDER BY occurredOn DESC&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;GoalContributionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM budgets&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;BudgetEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE goalId = :goalId ORDER BY occurredOn DESC, createdAt DESC&quot;)
-&nbsp;    fun getByGoalId(goalId: String): Flow&lt;List&lt;GoalContributionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM budgets WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;BudgetEntity&gt;&gt;
 &nbsp;
-&nbsp;    /** Rows of a goal as a one-shot read — the outbox needs them before a cascade drops them. */
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE goalId = :goalId&quot;)
-&nbsp;    suspend fun listByGoalId(goalId: String): List&lt;GoalContributionEntity&gt;
-&nbsp;
-&nbsp;    /** A goal&#39;s saved amount. Signed sum, so withdrawals subtract; 0 when there are no rows. */
-&nbsp;    @Query(&quot;SELECT COALESCE(SUM(amount), 0) FROM goal_contributions WHERE goalId = :goalId&quot;)
-&nbsp;    fun observeTotalByGoalId(goalId: String): Flow&lt;Long&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT COALESCE(SUM(amount), 0) FROM goal_contributions WHERE goalId = :goalId&quot;)
-&nbsp;    suspend fun totalByGoalId(goalId: String): Long
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): GoalContributionEntity?
+&nbsp;    @Query(&quot;SELECT * FROM budgets WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): BudgetEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: GoalContributionEntity)
+&nbsp;    suspend fun insert(entity: BudgetEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: GoalContributionEntity)
+&nbsp;    suspend fun update(entity: BudgetEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;GoalContributionEntity&gt;)
+&nbsp;    suspend fun upsertAll(entities: List&lt;BudgetEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM goal_contributions WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM budgets WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM goal_contributions&quot;)
+&nbsp;    @Query(&quot;DELETE FROM budgets&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -115,7 +104,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

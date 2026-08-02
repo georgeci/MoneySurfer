@@ -285,6 +285,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * top app bar, drawn by the list pane. This is part of the detail pane&#39;s content, so it also skips
 &nbsp; * the sync badge [SurferToolbar] adds.
 &nbsp; *
+&nbsp; * And deliberately not *lettered* like one either. Carrying the bar&#39;s `titleLarge` made this read
+&nbsp; * as a second top app bar sitting next to the first, so the section looked split across two
+&nbsp; * toolbars even though only one of them was one. `titleMedium` puts the title a step below the bar
+&nbsp; * beside it, where the first line of a pane&#39;s content belongs. The row keeps the bar&#39;s height —
+&nbsp; * see [PaneHeaderMinHeight] — because that is what keeps the two panes&#39; content aligned.
+&nbsp; *
 &nbsp; * It still takes [TopAppBarColors] and honours the container, title, navigation-icon and
 &nbsp; * action-icon roles, so a screen that colours its chrome gets the same treatment whichever pane it
 &nbsp; * lands in — the scroll-dependent roles are the only ones with nothing to map onto. The defaults
@@ -319,7 +325,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;        Text(
 &nbsp;            text = title,
-&nbsp;            style = AppTheme.typography.titleLarge,
+&nbsp;            style = AppTheme.typography.titleMedium,
 &nbsp;            color = colors.titleContentColor,
 &nbsp;            maxLines = 1,
 &nbsp;            overflow = TextOverflow.Ellipsis,
@@ -331,7 +337,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Matches the `TopAppBar` height the list pane draws, so the two panes line up. */
+&nbsp;/**
+&nbsp; * Matches the `TopAppBar` height the list pane draws, so the two panes line up. What separates the
+&nbsp; * header from the bar is its type, not its height — a shorter row would start the detail pane&#39;s
+&nbsp; * content above the list pane&#39;s first row for no reason.
+&nbsp; */
 &nbsp;private val PaneHeaderMinHeight = 64.dp
 &nbsp;private val TitleInset = 16.dp
 &nbsp;private val IconInset = 4.dp
@@ -402,7 +412,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>

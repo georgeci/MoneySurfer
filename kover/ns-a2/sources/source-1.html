@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMetaDao</title>
+  <title>MoneySurfer Coverage Report > Koin_hints_com_georgeci_moneysurfer_appconfig_di_ConfigModuleKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db.dao</a>
+    <a href="../index.html">org.koin.plugin.hints</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMetaDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
+<h1>Coverage Summary for Class: Koin_hints_com_georgeci_moneysurfer_appconfig_di_ConfigModuleKt (org.koin.plugin.hints)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMetaDao</td>
+  <td class="name">Koin_hints_com_georgeci_moneysurfer_appconfig_di_ConfigModuleKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,41 +42,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-
-<pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.dao
-&nbsp;
-&nbsp;import androidx.room.Dao
-&nbsp;import androidx.room.Query
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;
-&nbsp;@Dao
-&nbsp;interface SyncMetaDao {
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM sync_meta
-&nbsp;        WHERE workspaceId = :workspaceId AND collection = :collection
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun get(workspaceId: String, collection: String): SyncMetaEntity?
-&nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: SyncMetaEntity)
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun observeByWorkspace(workspaceId: String): Flow&lt;List&lt;SyncMetaEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    suspend fun deleteByWorkspace(workspaceId: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM sync_meta&quot;)
-&nbsp;    suspend fun deleteAll()
-&nbsp;}
-</code>
-</pre>
+  <code class="sourceCode">Source code is not available<br /></code>
 </div>
 
 <script type="text/javascript">
@@ -98,7 +64,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-01 10:52</div>
+    <div style="float:right;">generated on 2026-08-02 17:31</div>
 </div>
 </body>
 </html>
