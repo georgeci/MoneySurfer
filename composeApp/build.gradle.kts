@@ -99,6 +99,9 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.compose.uiTest)
+            // BackNavigationDecoratorTest composes a `NavEntry` through the app's own
+            // `NavEntryDecorator`; `:navigation` keeps navigation3 to itself.
+            implementation(libs.jetbrains.navigation3.runtime)
             // The transaction screens' states carry `LocalDate` — day groups, week ranges and the
             // filter screen's custom range.
             implementation(libs.kotlinx.datetime)

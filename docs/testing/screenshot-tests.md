@@ -13,6 +13,8 @@
   - [SurferSplash — blocked, not forgotten](#surfersplash--blocked-not-forgotten)
 - [Adding a gallery](#adding-a-gallery)
 - [Adding a screen](#adding-a-screen)
+  - […at three window widths](#at-three-window-widths)
+  - [Screens that render a date](#screens-that-render-a-date)
 - [Enabling a new module](#enabling-a-new-module)
 <!-- DOCS:END -->
 
@@ -21,8 +23,9 @@
 - Modules render their UI under Robolectric and diff it against PNGs committed
   in `<module>/screenshots/`.
 - Three capture shapes: **component galleries** (`:uikit`), **full screens**
-  (`:feature:login` onboarding + sign-in) and **full screens at three window
-  widths** (the app shell in `:uikit`, the dashboard in `:feature:dashboard`).
+  (`:feature:login`, `:feature:transaction`, `:feature:account`,
+  `:feature:category`) and **full screens at three window widths** (the app shell
+  in `:uikit`, the dashboard in `:feature:dashboard`).
 - A visual change fails `./gradlew qaAndroidHost` — the same job that already
   gates every PR. There is no separate opt-in check.
 - If the change is intended, re-record and commit the new PNGs **in the same
@@ -56,6 +59,9 @@ offline onboarding, demo-only sign-in) rather than in every permutation.
 uikit/screenshots/<name>_light.png                  # component galleries
 uikit/screenshots/<name>_<width>_light.png          # the app shell, per width
 feature/login/screenshots/<name>_light.png          # onboarding + sign-in
+feature/transaction/screenshots/<name>_light.png    # the transaction form + details
+feature/account/screenshots/<name>_light.png        # the account list, form + details
+feature/category/screenshots/<name>_light.png       # the category tree, editor + details
 feature/dashboard/screenshots/<name>_<width>_light.png   # the dashboard, per width
 ```
 
@@ -239,13 +245,34 @@ the app shell and the dashboard today. Everything else stays on
 `captureFullScreen`.
 
 If the screen has no stateless body yet, extract one — `SignInContent` and
-`OnboardingContent` are the pattern. Pick the states that differ *structurally*
-(a build variant, an error shape, an empty list), not every field permutation:
-each one is two PNGs a reviewer has to look at.
+`OnboardingContent` are the pattern. A body that is already stateless but
+`private` only needs its visibility raised to `internal`: the capture lives in
+the same module's `androidHostTest`, so nothing has to become public
+(`AccountsManageContent` and the other account/category bodies went that way).
+Pick the states that differ *structurally* (a build variant, an error shape, an
+empty list), not every field permutation: each one is two PNGs a reviewer has to
+look at.
+
+### Screens that render a date
+
+A screen that formats an instant does it in the *host's* zone, so a reference
+recorded on CI (UTC) fails on a machine far enough east or west of it. Pin the
+zone in the test rather than picking a "safe" hour:
+
+```kotlin
+@Before
+fun pinTimeZone() {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+}
+```
+
+`TransactionCreationScreenshotTest` is the example. A screen handed an
+already-formatted date string — the transaction details screen — needs none of
+this.
 
 ## Enabling a new module
 
-Three edits, all of them mechanical:
+Four edits, all of them mechanical:
 
 1. `<module>/build.gradle.kts` — apply the script plugin and compile the harness:
    ```kotlin
@@ -258,7 +285,12 @@ Three edits, all of them mechanical:
    `screenshotHarnessProjects` so detekt lints the harness there. The directory
    sits outside every module's `src/`, so it is invisible to the per-module
    detekt config otherwise.
-3. `./gradlew :module:recordScreenshots -Proborazzi.record=true`, then commit
+3. `./gradlew :module:resolveAndLockAll --write-locks --no-configuration-cache` —
+   the script plugin adds Roborazzi, Robolectric and JUnit to the module's
+   host-test configurations, and dependency locking rejects anything absent from
+   the committed `<module>/gradle.lockfile`. Skipping this fails the *next* step
+   with "not part of the dependency lock state", not with a screenshot diff.
+4. `./gradlew :module:recordScreenshots -Proborazzi.record=true`, then commit
    `<module>/screenshots/`.
 
 The srcDir and detekt lines cannot move into the script plugin: a script applied
