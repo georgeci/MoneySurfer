@@ -11,6 +11,7 @@
 - [QA tasks](#qa-tasks)
   - [Configuration cache](#configuration-cache)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
+  - [Picking an Android device](#picking-an-android-device)
   - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
 - [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
 - [Integration tests (:integration-test)](#integration-tests-integration-test)
@@ -197,6 +198,34 @@ work has to be cacheable.
 iOS defaults to simulator name `iPhone 17`. Override with
 `-PiosSimulatorName="<name>"`; pass `-PiosSimulatorUdid=<udid>` when multiple
 simulators are visible to Maestro.
+
+### Picking an Android device
+
+With exactly one AVD or phone attached, nothing needs saying — `adb` and
+`maestro test` each pick the only target. With **both** attached, the install
+step dies on `adb: more than one device/emulator`, `maestroUninstallDebug` can
+strip the dev build off your phone, and Maestro may drive the wrong one. Pass
+the serial from `adb devices`:
+
+```bash
+./gradlew qaMaestroOfflineAndroid -PandroidDeviceId=emulator-5554
+```
+
+`ANDROID_SERIAL` is honoured as a fallback, but it is **not** sufficient on its
+own: it steers `adb`, and Maestro picks its device independently. The Gradle
+property (or env var) feeds both sides — `adb -s <serial>` and `maestro test
+--device <serial>` — across every Android Maestro task. It is the Android mirror
+of `-PiosSimulatorUdid`.
+
+Blank counts as unset on each source in turn, so a wrapper that expands an empty
+variable into `-PandroidDeviceId=` falls through to `ANDROID_SERIAL` instead of
+handing adb a `-s ""` it rejects.
+
+Pick an **AVD** serial for the online lanes. `defaultEmulatorHost()` is hardcoded
+to `10.0.2.2` — the AVD-only alias for the host machine — so an app pointed at a
+physical phone cannot reach the host Firebase Emulator, and every flow fails at
+sign-in with opaque network errors. A phone serial is fine for
+`qaMaestroOfflineAndroid`, which makes no network calls at all.
 
 ### iOS scope: launch smoke only (issue #297)
 
