@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionFiltersTestTags</title>
+  <title>MoneySurfer Coverage Report > TransactionFiltersViewModelKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.filters</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionFiltersTestTags (com.georgeci.moneysurfer.feature.transaction.filters)</h1>
+<h1>Coverage Summary for Class: TransactionFiltersViewModelKt (com.georgeci.moneysurfer.feature.transaction.filters)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionFiltersTestTags</td>
+  <td class="name">TransactionFiltersViewModelKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,214 +46,232 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.filters
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.HorizontalDivider
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Surface
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
 &nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_apply
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_cancel
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_reset
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_results
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_results_capped
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_title
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
-&nbsp;
-&nbsp;/** Apply carries a counted label, so it needs more room than the bare &quot;Cancel&quot; beside it. */
-&nbsp;private const val APPLY_WEIGHT = 1.4f
-&nbsp;
-&nbsp;object TransactionFiltersTestTags {
-&nbsp;    const val Root = &quot;transactionFilters:root&quot;
-&nbsp;    const val Apply = &quot;transactionFilters:apply&quot;
-&nbsp;    const val Cancel = &quot;transactionFilters:cancel&quot;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Transaction-type option, suffixed with the lowercased
-&nbsp;     * [com.georgeci.moneysurfer.domain.model.TransactionTypeFilter]. The Apply label carries a
-&nbsp;     * live result count, so it can never be a stable text selector.
-&nbsp;     */
-&nbsp;    const val TypePrefix = &quot;transactionFilters:type:&quot;
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun TransactionFiltersScreen(
-&nbsp;    accountId: AccountId?,
-&nbsp;    anchorEpochDay: Long?,
-&nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    // Key on the anchor as well: reopening the screen on a different paged period must build a
-&nbsp;    // fresh ViewModel so its result count reflects that period, not the one it first opened on.
-&nbsp;    viewModel: TransactionFiltersViewModel = koinViewModel(
-&nbsp;        key = &quot;${accountId?.value.orEmpty()}:$anchorEpochDay&quot;,
-&nbsp;    ) { parametersOf(accountId, anchorEpochDay) },
-&nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
-&nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            TransactionFiltersEffect.NavigateBack -&gt; onNavigateBack()
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    TransactionFiltersContent(state = state, onEvent = viewModel::onEvent)
-&nbsp;}
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.compile
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.list.collapseSplitLegs
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * The filter draft, drawn from a state it is handed.
+&nbsp; * How many rows the live result count looks at.
 &nbsp; *
-&nbsp; * Public for the desktop UI tests in `:composeApp` `jvmTest`, which mount it with a state of their
-&nbsp; * own — see docs/testing/testing-strategy.md.
+&nbsp; * The count is a real query, not an estimate — the same windowed query the list itself runs, with
+&nbsp; * the same matcher applied — because an estimate that disagreed with the list the user lands on
+&nbsp; * would be worse than no number at all. It is capped so that &quot;Apply&quot; on an unbounded date range
+&nbsp; * cannot pull an entire history into memory on every keystroke; beyond the cap the screen says
+&nbsp; * &quot;500+&quot; rather than a wrong exact number.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;fun TransactionFiltersContent(
-&nbsp;    state: TransactionFiltersState,
-&nbsp;    onEvent: (TransactionFiltersEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
-&nbsp;            .testTag(TransactionFiltersTestTags.Root)
-&nbsp;            .surferTestTagAsId(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.transaction_filters_title),
-&nbsp;                onBack = { onEvent(TransactionFiltersEvent.OnCancelClick) },
-&nbsp;                actions = {
-&nbsp;                    TextButton(
-&nbsp;                        onClick = { onEvent(TransactionFiltersEvent.OnResetClick) },
-&nbsp;                        enabled = state.canReset,
-&nbsp;                    ) {
-&nbsp;                        Text(stringResource(Res.string.transaction_filters_reset))
-&nbsp;                    }
-&nbsp;                },
-&nbsp;            )
-&nbsp;        },
-&nbsp;        bottomBar = { FiltersFooter(state = state, onEvent = onEvent) },
-&nbsp;    ) { padding -&gt;
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(padding)
-&nbsp;                .verticalScroll(rememberScrollState())
-&nbsp;                .padding(horizontal = 16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(20.dp),
-&nbsp;        ) {
-&nbsp;            Spacer(Modifier.height(4.dp))
-&nbsp;            DateRangeSection(dateRange = state.draft.dateRange, onEvent = onEvent)
-&nbsp;            TypeSection(type = state.draft.type, onEvent = onEvent)
-&nbsp;            if (state.showAccounts) {
-&nbsp;                AccountsSection(
-&nbsp;                    accounts = state.accounts,
-&nbsp;                    selected = state.draft.accountIds,
-&nbsp;                    onEvent = onEvent,
-&nbsp;                )
-&nbsp;            }
-&nbsp;            CategoriesSection(
-&nbsp;                categories = state.categories,
-&nbsp;                selected = state.draft.categoryIds,
-&nbsp;                onEvent = onEvent,
-&nbsp;            )
-&nbsp;            AmountSection(
-&nbsp;                minAmount = state.draft.minAmount,
-&nbsp;                maxAmount = state.draft.maxAmount,
-&nbsp;                onEvent = onEvent,
-&nbsp;            )
-&nbsp;            OtherSection(filters = state.draft, onEvent = onEvent)
-&nbsp;            SortSection(sort = state.draft.sort, onEvent = onEvent)
-&nbsp;            Spacer(Modifier.height(8.dp))
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
+&nbsp;private const val COUNT_LIMIT = 500
 &nbsp;
 &nbsp;/**
-&nbsp; * Sticky footer. `Apply` carries the live result count — a real count over the same windowed
-&nbsp; * query the list runs, so the number the user commits to is the number they land on.
+&nbsp; * The filter screen&#39;s draft.
+&nbsp; *
+&nbsp; * Nothing here touches [TransactionFilterStore] until `Apply`: the draft is local, so backing out
+&nbsp; * with `Cancel` — or with the system back gesture — leaves the list exactly as it was.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;private fun FiltersFooter(
-&nbsp;    state: TransactionFiltersState,
-&nbsp;    onEvent: (TransactionFiltersEvent) -&gt; Unit,
+&nbsp;@KoinViewModel
+&nbsp;class TransactionFiltersViewModel(
+&nbsp;    private val accountId: AccountId?,
+&nbsp;    /**
+&nbsp;     * The day the list is paged to, or null to fall back to today. Only used while the range still
+&nbsp;     * follows the period pager — a preset or custom range resolves its own window regardless.
+&nbsp;     */
+&nbsp;    private val anchorEpochDay: Long?,
+&nbsp;    private val filterStore: TransactionFilterStore,
+&nbsp;    private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
+&nbsp;    private val getAccounts: GetAccountsUseCase,
+&nbsp;    private val getCategories: GetCategoriesUseCase,
+&nbsp;    private val uiPreferences: UiPreferences,
+&nbsp;    private val clock: ClockUseCase,
+&nbsp;) : MviViewModel&lt;TransactionFiltersState, TransactionFiltersEvent, TransactionFiltersEffect&gt;(
+&nbsp;    initialState = TransactionFiltersState(
+&nbsp;        draft = TransactionFilters.Empty,
+&nbsp;        // The accounts section is meaningless on a list already scoped to one account: the query
+&nbsp;        // is restricted to it, so picking another one could only ever produce an empty list.
+&nbsp;        showAccounts = accountId == null,
+&nbsp;    ),
 &nbsp;) {
-&nbsp;    val results = if (state.resultCountCapped) {
-&nbsp;        stringResource(Res.string.transaction_filters_results_capped, state.resultCount)
-&nbsp;    } else {
-&nbsp;        stringResource(Res.string.transaction_filters_results, state.resultCount)
+&nbsp;
+&nbsp;    private val zone = TimeZone.currentSystemDefault()
+&nbsp;    private val today: LocalDate get() = clock.now().toLocalDateTime(zone).date
+&nbsp;
+&nbsp;    private val draft = MutableStateFlow(filterStore.filters.value)
+&nbsp;
+&nbsp;    init {
+&nbsp;        observeData()
 &nbsp;    }
-&nbsp;    Surface(color = AppTheme.materialColors.surface) {
-&nbsp;        // The surface itself bleeds to the window edges; its contents take the same cap as the
-&nbsp;        // form above, so the divider terminates that column instead of overrunning it.
-&nbsp;        Column(modifier = Modifier.surferContentContainer()) {
-&nbsp;            HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
-&nbsp;            Row(
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .padding(horizontal = 16.dp, vertical = 12.dp),
-&nbsp;                horizontalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;            ) {
-&nbsp;                SurferButton(
-&nbsp;                    text = stringResource(Res.string.transaction_filters_cancel),
-&nbsp;                    onClick = { onEvent(TransactionFiltersEvent.OnCancelClick) },
-&nbsp;                    style = SurferButtonStyle.Outlined,
-&nbsp;                    modifier = Modifier
-&nbsp;                        .weight(1f)
-&nbsp;                        .testTag(TransactionFiltersTestTags.Cancel),
-&nbsp;                )
-&nbsp;                SurferButton(
-&nbsp;                    text = stringResource(Res.string.transaction_filters_apply, results),
-&nbsp;                    onClick = { onEvent(TransactionFiltersEvent.OnApplyClick) },
-&nbsp;                    modifier = Modifier
-&nbsp;                        .weight(APPLY_WEIGHT)
-&nbsp;                        .testTag(TransactionFiltersTestTags.Apply),
-&nbsp;                )
+&nbsp;
+&nbsp;    @Suppress(&quot;CyclomaticComplexMethod&quot;)
+&nbsp;    override fun onEvent(event: TransactionFiltersEvent) {
+&nbsp;        when (event) {
+&nbsp;            TransactionFiltersEvent.OnCancelClick -&gt;
+&nbsp;                postSideEffect(TransactionFiltersEffect.NavigateBack)
+&nbsp;            TransactionFiltersEvent.OnResetClick -&gt; draft.value = draft.value.cleared()
+&nbsp;            TransactionFiltersEvent.OnApplyClick -&gt; {
+&nbsp;                filterStore.commit(draft.value)
+&nbsp;                postSideEffect(TransactionFiltersEffect.NavigateBack)
 &nbsp;            }
+&nbsp;            is TransactionFiltersEvent.OnDatePresetClick -&gt; edit { withPreset(event.preset) }
+&nbsp;            TransactionFiltersEvent.OnCustomDateClick -&gt; edit { withCustomRange() }
+&nbsp;            is TransactionFiltersEvent.OnCustomFromPicked -&gt; edit { withCustomFrom(event.date) }
+&nbsp;            is TransactionFiltersEvent.OnCustomToPicked -&gt; edit { withCustomTo(event.date) }
+&nbsp;            is TransactionFiltersEvent.OnTypeSelected -&gt; edit { copy(type = event.type) }
+&nbsp;            is TransactionFiltersEvent.OnAccountToggled -&gt; edit {
+&nbsp;                copy(accountIds = accountIds.toggle(event.accountId))
+&nbsp;            }
+&nbsp;            is TransactionFiltersEvent.OnCategoryToggled -&gt; edit {
+&nbsp;                copy(categoryIds = categoryIds.toggle(event.categoryId))
+&nbsp;            }
+&nbsp;            TransactionFiltersEvent.OnAllCategoriesClick -&gt; edit { copy(categoryIds = emptySet()) }
+&nbsp;            is TransactionFiltersEvent.OnMinAmountChanged -&gt; edit { copy(minAmount = event.text) }
+&nbsp;            is TransactionFiltersEvent.OnMaxAmountChanged -&gt; edit { copy(maxAmount = event.text) }
+&nbsp;            is TransactionFiltersEvent.OnRecurringOnlyChanged -&gt; edit { copy(recurringOnly = event.enabled) }
+&nbsp;            is TransactionFiltersEvent.OnPlannedOnlyChanged -&gt; edit { copy(plannedOnly = event.enabled) }
+&nbsp;            is TransactionFiltersEvent.OnSortSelected -&gt; edit { copy(sort = event.sort) }
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun TransactionFiltersPreview() {
-&nbsp;    AppTheme {
-&nbsp;        TransactionFiltersContent(
-&nbsp;            state = TransactionFiltersState(
-&nbsp;                draft = TransactionFilters.Empty,
-&nbsp;                showAccounts = true,
-&nbsp;                resultCount = 47,
-&nbsp;            ),
-&nbsp;            onEvent = {},
+&nbsp;    private fun edit(block: TransactionFilters.() -&gt; TransactionFilters) {
+&nbsp;        draft.value = draft.value.block()
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Tapping a selected preset clears it — otherwise a date range could only ever be swapped. */
+&nbsp;    private fun TransactionFilters.withPreset(preset: TransactionDatePreset): TransactionFilters {
+&nbsp;        val already = (dateRange as? TransactionDateRange.Preset)?.preset == preset
+&nbsp;        return copy(
+&nbsp;            dateRange = if (already) {
+&nbsp;                TransactionDateRange.FollowPeriod
+&nbsp;            } else {
+&nbsp;                TransactionDateRange.Preset(preset)
+&nbsp;            },
 &nbsp;        )
 &nbsp;    }
+&nbsp;
+&nbsp;    private fun TransactionFilters.withCustomRange(): TransactionFilters =
+&nbsp;        if (dateRange is TransactionDateRange.Custom) {
+&nbsp;            copy(dateRange = TransactionDateRange.FollowPeriod)
+&nbsp;        } else {
+&nbsp;            copy(dateRange = TransactionDateRange.Custom(from = null, to = null))
+&nbsp;        }
+&nbsp;
+&nbsp;    private fun TransactionFilters.withCustomFrom(date: LocalDate?): TransactionFilters =
+&nbsp;        copy(dateRange = customRange().copy(from = date))
+&nbsp;
+&nbsp;    private fun TransactionFilters.withCustomTo(date: LocalDate?): TransactionFilters =
+&nbsp;        copy(dateRange = customRange().copy(to = date))
+&nbsp;
+&nbsp;    /** Picking a From/To date is itself the switch to a custom range. */
+&nbsp;    private fun TransactionFilters.customRange(): TransactionDateRange.Custom =
+&nbsp;        dateRange as? TransactionDateRange.Custom ?: TransactionDateRange.Custom(null, null)
+&nbsp;
+&nbsp;    private fun &lt;T&gt; Set&lt;T&gt;.toggle(value: T): Set&lt;T&gt; =
+&nbsp;        if (value in this) this - value else this + value
+&nbsp;
+&nbsp;    @OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;    private fun observeData() {
+&nbsp;        launch {
+&nbsp;            val periodMode = uiPreferences.transactionsPeriodMode.flow.first()
+&nbsp;            // The window the list is actually showing when the range still follows the pager: the
+&nbsp;            // day it was paged to, not necessarily today.
+&nbsp;            val anchor = anchorEpochDay?.let(LocalDate::fromEpochDays) ?: today
+&nbsp;            val counted = draft
+&nbsp;                .map { filters -&gt; filters.forCount() }
+&nbsp;                .distinctUntilChanged()
+&nbsp;                .flatMapLatest { filters -&gt;
+&nbsp;                    val window = resolveWindow(filters.dateRange, periodMode, anchor, today)
+&nbsp;                    val matcher = filters.compile()
+&nbsp;                    getTransactionsByAccount.window(accountId, window, COUNT_LIMIT + 1)
+&nbsp;                        // Matched *then* collapsed, the same two steps in the same order the list
+&nbsp;                        // applies: the button promises how many rows the user is about to see, and
+&nbsp;                        // a receipt split across three categories is one of them, not three.
+&nbsp;                        .map { rows -&gt; collapseSplitLegs(rows.filter { matcher.matches(it) }).size }
+&nbsp;                }
+&nbsp;
+&nbsp;            combine(draft, counted, getAccounts(), getCategories()) { filters, count, accounts, categories -&gt;
+&nbsp;                TransactionFiltersState(
+&nbsp;                    draft = filters,
+&nbsp;                    showAccounts = accountId == null,
+&nbsp;                    accounts = accounts.filterNot { it.archived },
+&nbsp;                    categories = categories,
+&nbsp;                    resultCount = count.coerceAtMost(COUNT_LIMIT),
+&nbsp;                    resultCountCapped = count &gt; COUNT_LIMIT,
+&nbsp;                )
+&nbsp;            }.collect { state -&gt; updateState { state } }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The draft as the count query sees it: an account-scoped list ignores the account selection,
+&nbsp;     * exactly as the list does.
+&nbsp;     */
+&nbsp;    private fun TransactionFilters.forCount(): TransactionFilters =
+&nbsp;        if (accountId != null) copy(accountIds = emptySet()) else this
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * A plain data class rather than the sealed `Loading` / `Content` the repo uses elsewhere: the
+&nbsp; * screen has no async-load phase. The draft is available synchronously from
+&nbsp; * [TransactionFilterStore] at construction, so there is never a &quot;Loading&quot; state to model — the
+&nbsp; * accounts, categories and result count merely refine an already-usable screen as they arrive.
+&nbsp; */
+&nbsp;data class TransactionFiltersState(
+&nbsp;    val draft: TransactionFilters,
+&nbsp;    val showAccounts: Boolean,
+&nbsp;    val accounts: List&lt;Account&gt; = emptyList(),
+&nbsp;    val categories: List&lt;Category&gt; = emptyList(),
+&nbsp;    val resultCount: Int = 0,
+&nbsp;    /** The count hit [COUNT_LIMIT]; the screen shows &quot;500+&quot; rather than an exact number. */
+&nbsp;    val resultCountCapped: Boolean = false,
+&nbsp;) {
+&nbsp;    val canReset: Boolean get() = draft.activeCount &gt; 0
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface TransactionFiltersEvent {
+&nbsp;    data object OnCancelClick : TransactionFiltersEvent
+&nbsp;    data object OnResetClick : TransactionFiltersEvent
+&nbsp;    data object OnApplyClick : TransactionFiltersEvent
+&nbsp;    data class OnDatePresetClick(val preset: TransactionDatePreset) : TransactionFiltersEvent
+&nbsp;    data object OnCustomDateClick : TransactionFiltersEvent
+&nbsp;    data class OnCustomFromPicked(val date: LocalDate?) : TransactionFiltersEvent
+&nbsp;    data class OnCustomToPicked(val date: LocalDate?) : TransactionFiltersEvent
+&nbsp;    data class OnTypeSelected(val type: TransactionTypeFilter) : TransactionFiltersEvent
+&nbsp;    data class OnAccountToggled(val accountId: AccountId) : TransactionFiltersEvent
+&nbsp;    data class OnCategoryToggled(val categoryId: CategoryId) : TransactionFiltersEvent
+&nbsp;    data object OnAllCategoriesClick : TransactionFiltersEvent
+&nbsp;    data class OnMinAmountChanged(val text: String) : TransactionFiltersEvent
+&nbsp;    data class OnMaxAmountChanged(val text: String) : TransactionFiltersEvent
+&nbsp;    data class OnRecurringOnlyChanged(val enabled: Boolean) : TransactionFiltersEvent
+&nbsp;    data class OnPlannedOnlyChanged(val enabled: Boolean) : TransactionFiltersEvent
+&nbsp;    data class OnSortSelected(val sort: TransactionSort) : TransactionFiltersEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface TransactionFiltersEffect {
+&nbsp;    data object NavigateBack : TransactionFiltersEffect
 &nbsp;}
 </code>
 </pre>
@@ -278,7 +296,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-02 17:31</div>
+    <div style="float:right;">generated on 2026-08-03 10:40</div>
 </div>
 </body>
 </html>

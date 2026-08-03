@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncedSettingsSession</title>
+  <title>MoneySurfer Coverage Report > HostCapabilities</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncedSettingsSession (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: HostCapabilities (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncedSettingsSession</td>
+  <td class="name">HostCapabilities</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,30 +47,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
 &nbsp;/**
-&nbsp; * Session-boundary maintenance for the settings that replicate per user.
+&nbsp; * What this build of the app can do — the facts the host decides at compile time.
 &nbsp; *
-&nbsp; * A domain facade for the same reason `ConfigHydration` and `RemoteConfigRefresh` are: the callers
-&nbsp; * are session-lifecycle use cases in `domain`, which must not see `app-config` any more than a
-&nbsp; * feature may.
+&nbsp; * Replaces `OfflineBuildFlags`, `SignInFeatureConfig` and `TransactionCreationFeatureConfig`: one
+&nbsp; * facade over the configuration engine&#39;s Build layer instead of three data classes with a Koin
+&nbsp; * binding each in every host.
+&nbsp; *
+&nbsp; * Reads are synchronous because the Build layer is an in-memory map, but they still go through
+&nbsp; * `Config`, so a QA override can shadow one locally. That makes them valid only **after**
+&nbsp; * [ConfigHydration.hydrate] has completed — which `AppLaunchViewModel` awaits before it resolves
+&nbsp; * the start route, i.e. before any screen that injects this facade can exist.
 &nbsp; */
-&nbsp;fun interface SyncedSettingsSession {
+&nbsp;interface HostCapabilities {
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Run at the start of every session, before its first pull. Two jobs, both of which have to
-&nbsp;     * happen there and nowhere else:
-&nbsp;     *
-&nbsp;     * - **Drop the logout overlay.** The previous user&#39;s theme is held in memory so the UI does not
-&nbsp;     *   snap to defaults mid-session; left in place it would shadow whatever this user&#39;s pull writes
-&nbsp;     *   into local storage, which is the leak the account wipe exists to prevent.
-&nbsp;     * - **Re-enqueue writes the outbox refused.** `OutboxEnqueuerImpl` silently no-ops for demo and
-&nbsp;     *   signed-out sessions and nothing else replays those writes, so every setting whose stored
-&nbsp;     *   value never reached the server is queued now. This also closes the window between a local
-&nbsp;     *   write and its enqueue, which no shared transaction can protect — the two stores are
-&nbsp;     *   different databases.
-&nbsp;     *
-&nbsp;     * Idempotent, and safe without a Firebase session: the enqueue itself no-ops there.
-&nbsp;     */
-&nbsp;    suspend fun onSessionStart()
+&nbsp;    /** Firebase-free build: no profile, sync, members, invites, logout or account deletion. */
+&nbsp;    val isOffline: Boolean
+&nbsp;
+&nbsp;    val signInEmailPassword: Boolean
+&nbsp;    val signInAnonymous: Boolean
+&nbsp;    val signInDemo: Boolean
+&nbsp;
+&nbsp;    /** Multi-account transfers in transaction creation. */
+&nbsp;    val transferEnabled: Boolean
+&nbsp;
+&nbsp;    /** The per-widget card-style picker on the dashboard customize screen. */
+&nbsp;    val dashboardWidgetStyle: Boolean
 &nbsp;}
 </code>
 </pre>
@@ -95,7 +96,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-08-02 17:31</div>
+    <div style="float:right;">generated on 2026-08-03 10:40</div>
 </div>
 </body>
 </html>
