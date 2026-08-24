@@ -9,9 +9,9 @@
     "test:junit": "firebase --project=demo-moneysurfer emulators:exec --only firestore 'mocha --reporter mocha-junit-reporter --reporter-options mochaFile=../build/test-results/firestore/firestore-report.xml,testCaseSwitchClassnameAndName=true --timeout 20000 test/**/*.spec.js'"
   },
   "devDependencies": {
-    "@firebase/rules-unit-testing": "^5.0.1",
-    "firebase": "^12.17.0",
-    "mocha": "^11.7.6",
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "firebase": "^12.18.0",
+    "mocha": "^11.8.0",
     "mocha-junit-reporter": "^2.2.1"
   },
   "engines": {
