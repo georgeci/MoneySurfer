@@ -67,7 +67,7 @@ jobs:
       # any networked services baked in. No maestro-setup either — this lane
       # only compiles; the golden flow runs in nightly.
       - name: Set up JDK
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           distribution: temurin
           java-version: "17"
@@ -75,7 +75,7 @@ jobs:
       # Canonical macOS Gradle cache writer. setup-gradle writes only on the
       # default branch by default; other macOS jobs are explicitly read-only.
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
       # Cache the Kotlin/Native toolchain (~/.konan) that linkDebugFramework
       # below pulls — setup-gradle doesn't cover it. macOS runner minutes.
