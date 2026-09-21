@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Harden the runner (egress audit)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -118,14 +118,14 @@ jobs:
 
       - name: Set up JDK
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
-        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
       - name: Assemble signed offline release APK
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
